@@ -65,6 +65,7 @@ export 'src/components/molecules/ds_tooltip.dart';
 export 'src/components/organisms/ds_bar_chart.dart';
 export 'src/components/organisms/ds_business_verification.dart';
 export 'src/components/organisms/ds_context_view.dart';
+export 'src/components/organisms/ds_data_grid.dart';
 export 'src/components/organisms/ds_data_table.dart';
 export 'src/components/organisms/ds_focus_view.dart';
 export 'src/components/organisms/ds_line_chart.dart';

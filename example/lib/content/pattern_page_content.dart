@@ -16,6 +16,7 @@ enum DocGroup {
   content('Content'),
   forms('Forms'),
   charts('Charts'),
+  data('Data'),
   layout('Layout'),
   onboarding('Onboarding'),
   userActions('User actions'),

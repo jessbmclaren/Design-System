@@ -26,6 +26,7 @@ import 'pages/sparkline.dart';
 import 'pages/bar_chart.dart';
 import 'pages/line_chart.dart';
 import 'pages/meter_chart.dart';
+import 'pages/data_grid.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
@@ -79,6 +80,8 @@ final List<PatternPage> allPages = [
   barChartPage,
   lineChartPage,
   meterChartPage,
+  // data
+  dataGridPage,
   // layout
   fullPageLayoutsPage,
   listsPage,
