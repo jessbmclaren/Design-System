@@ -1,22 +1,49 @@
 // Pure Dart — NO Flutter imports.
 //
 // The registry of every documentation page, in navigation order. Both the
-// docs app and tool/generate_markdown.dart import this.
+// docs app and tool/generate_markdown.dart import this. Generated/reconciled
+// deterministically — keep it in sync with lib/content/pages/.
 
 import 'pattern_page_content.dart';
 import 'pages/design_tokens.dart';
+import 'pages/accordion.dart';
+import 'pages/avatar.dart';
+import 'pages/divider.dart';
+import 'pages/icon.dart';
+import 'pages/img.dart';
+import 'pages/inline.dart';
+import 'pages/link.dart';
+import 'pages/menu.dart';
+import 'pages/tooltip.dart';
+import 'pages/text_fields.dart';
+import 'pages/text_area.dart';
+import 'pages/selection_controls.dart';
+import 'pages/select_dropdown.dart';
+import 'pages/currency_field.dart';
+import 'pages/date_field.dart';
+import 'pages/form_field_group.dart';
+import 'pages/sparkline.dart';
+import 'pages/bar_chart.dart';
+import 'pages/line_chart.dart';
+import 'pages/meter_chart.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
-import 'pages/text_fields.dart';
-import 'pages/selection_controls.dart';
-import 'pages/select_dropdown.dart';
+import 'pages/focus_view.dart';
+import 'pages/box.dart';
+import 'pages/button_group.dart';
+import 'pages/context_view.dart';
+import 'pages/settings_view.dart';
 import 'pages/onboarding.dart';
 import 'pages/sign_in.dart';
+import 'pages/sign_up.dart';
 import 'pages/settings_sign_in.dart';
 import 'pages/additional_context.dart';
 import 'pages/redirects.dart';
 import 'pages/sign_out.dart';
+import 'pages/coachmark.dart';
+import 'pages/onboarding_wizard.dart';
+import 'pages/business_verification.dart';
 import 'pages/back_link.dart';
 import 'pages/action_buttons.dart';
 import 'pages/communicating_state.dart';
@@ -27,27 +54,55 @@ import 'pages/waiting_screens.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
-  // Foundations
+  // foundations
   designTokensPage,
-  // Layout
+  // content
+  accordionPage,
+  avatarPage,
+  dividerPage,
+  iconPage,
+  imgPage,
+  inlinePage,
+  linkPage,
+  menuPage,
+  tooltipPage,
+  // forms
+  textFieldsPage,
+  textAreaPage,
+  selectionControlsPage,
+  selectDropdownPage,
+  currencyFieldPage,
+  dateFieldPage,
+  formFieldGroupPage,
+  // charts
+  sparklinePage,
+  barChartPage,
+  lineChartPage,
+  meterChartPage,
+  // layout
   fullPageLayoutsPage,
   listsPage,
   filterControlsPage,
-  // Forms
-  textFieldsPage,
-  selectionControlsPage,
-  selectDropdownPage,
-  // Onboarding
+  focusViewPage,
+  boxPage,
+  buttonGroupPage,
+  contextViewPage,
+  settingsViewPage,
+  // onboarding
   onboardingPage,
   signInPage,
+  signUpPage,
   settingsSignInPage,
   additionalContextPage,
   redirectsPage,
   signOutPage,
-  // User actions
+  coachmarkPage,
+  onboardingWizardPage,
+  businessVerificationPage,
+  // userActions
   backLinkPage,
   actionButtonsPage,
-  // Status
+  // status
   communicatingStatePage,
   emptyStatePage,
   loadingPage,
