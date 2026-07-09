@@ -2,7 +2,7 @@
 
 The Design System is theme-driven. Every colour, type ramp, radius and spacing value is a token exposed through the `DsTokens` theme extension, and every component reads its appearance from the active theme. Because nothing is hard-coded, you re-brand the entire system by supplying your own token set to `DsTheme.light` or `DsTheme.dark` — the system is white-label by default.
 
-Read tokens for the active theme with `DsTokens.of(context)`. Switch between `DsTheme.light()` and `DsTheme.dark()` to flip every component at once. Sizes are expressed in logical pixels (`double`); text transforms default to `none` and accept `uppercase`, `lowercase` or `capitalize`. Each typography row below is a property of that level's `DsTypeToken` (`headingXl`, `bodyMd`, …), so you can re-scale a level with `copyWith(headingXl: DsTypeToken(fontSize: 30, ...))`.
+Read tokens for the active theme with `DsTokens.of(context)`. Switch between `DsTheme.light()` and `DsTheme.dark()` to flip every component at once. Sizes are expressed in logical pixels (`double`); text transforms default to `none` and accept `uppercase`, `lowercase` or `capitalize`. Each heading / body / label ramp row is a property of that level's `DsTypeToken` (`headingXl`, `bodyMd`, …); re-scale a level with `copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: DsTypography.bold))`. The button- and badge-label rows are instead flat tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden individually.
 
 ## Commonly used variables
 
@@ -132,6 +132,39 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `badgePaddingY` | double | `2` | The vertical padding for badges. |
 | `tableRowPaddingY` | double | `8` | The vertical padding for table rows. |
 
+## Elevation, icons and weights
+
+Beyond the appearance variables, the system ships a small set of shared primitives that components reach for directly: an elevation scale, an icon-size scale, and a font-weight ramp. The bundled Inter provides all four weights (400 / 500 / 600 / 700), so hierarchy is not limited to regular and bold.
+
+### Elevation (DsElevation)
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `DsElevation.low` | List<BoxShadow> | `resting` | Resting raised surfaces — chips, hovers, list cards. |
+| `DsElevation.medium` | List<BoxShadow> | `floating` | Floating surfaces — menus, popovers, toasts. |
+| `DsElevation.high` | List<BoxShadow> | `modal` | Modal surfaces — dialogs, drawers, takeovers. |
+| `DsElevation.tinted` | Color → shadows | `brand` | A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue. |
+
+### Icon size (DsIconSize)
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `DsIconSize.xxs` | double | `12` | Tiny marker glyphs. |
+| `DsIconSize.xs` | double | `14` | Inline with small text. |
+| `DsIconSize.sm` | double | `16` | The default control icon (buttons, inputs, chips). |
+| `DsIconSize.md` | double | `18` | List rows and toolbars. |
+| `DsIconSize.lg` | double | `20` | Prominent actions and status icons. |
+| `DsIconSize.xl` | double | `24` | Headers and empty-state glyphs. |
+
+### Font weight (DsTypography)
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `DsTypography.regular` | FontWeight | `400` | Regular body weight. |
+| `DsTypography.medium` | FontWeight | `500` | Quiet emphasis — labels, secondary controls. |
+| `DsTypography.semiBold` | FontWeight | `600` | Strong labels, control text, active tabs. |
+| `DsTypography.bold` | FontWeight | `700` | Headings. |
+
 ## Overlays
 
 The `overlays` token controls whether a focused overlay (such as `DsFocusView`) presents as a centred dialog or a drawer that slides in from the edge. Choose the value that best suits your product.
@@ -170,6 +203,9 @@ final brand = DsTokens.light().copyWith(
 );
 
 MaterialApp(theme: DsTheme.light(tokens: brand));
+
+// Opt into a ready-made skin — this changes nothing about the defaults.
+MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // Read a token inside a widget.
 final tokens = DsTokens.of(context);

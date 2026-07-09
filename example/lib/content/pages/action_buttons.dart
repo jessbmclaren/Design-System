@@ -12,9 +12,10 @@ final PatternPage actionButtonsPage = PatternPage(
       'reachable while the content below scrolls. Give each view a single '
       'primary `DsButton` for the one action you most want people to take, and '
       'render the supporting choices as `secondary` buttons beside it. This '
-      'consistent right-aligned placement means people always know where to '
-      'look to act, and the emphasis in the button styling tells them which '
-      'action is the expected next step.',
+      'consistent placement — aligned to the trailing edge beside the title on '
+      'wide layouts, and stacked beneath it on narrow ones — means people '
+      'always know where to look to act, and the emphasis in the button '
+      'styling tells them which action is the expected next step.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(

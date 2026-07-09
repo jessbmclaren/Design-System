@@ -13,9 +13,12 @@ import 'loading_demo.dart';
 import 'onboarding_demo.dart';
 import 'progress_stepping_demo.dart';
 import 'redirects_demo.dart';
+import 'select_dropdown_demo.dart';
+import 'selection_controls_demo.dart';
 import 'settings_sign_in_demo.dart';
 import 'sign_in_demo.dart';
 import 'sign_out_demo.dart';
+import 'text_fields_demo.dart';
 import 'waiting_screens_demo.dart';
 
 /// Maps a page id to its live demo widget. Used by the docs app to render the
@@ -25,12 +28,15 @@ final Map<String, Widget Function()> _demos = {
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),
+  'select': () => const SelectDropdownDemo(),
   'onboarding': () => const OnboardingDemo(),
   'sign-in': () => const SignInDemo(),
   'settings-sign-in': () => const SettingsSignInDemo(),
   'additional-context': () => const AdditionalContextDemo(),
   'redirects': () => const RedirectsDemo(),
   'sign-out': () => const SignOutDemo(),
+  'text-fields': () => const TextFieldsDemo(),
+  'selection-controls': () => const SelectionControlsDemo(),
   'back-link': () => const BackLinkDemo(),
   'action-buttons': () => const ActionButtonsDemo(),
   'communicating-state': () => const CommunicatingStateDemo(),

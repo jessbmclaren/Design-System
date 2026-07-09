@@ -14,8 +14,8 @@ final PatternPage loadingPage = PatternPage(
       'medium spinner while a section of the page fills in, and a small spinner '
       'inline beside the content it belongs to. For an action a person has just '
       'triggered — saving a record, running a report — keep the control in '
-      'place and set the button\'s `pending` state so the label stays readable '
-      'and the button becomes unavailable until the work finishes.',
+      'place and set the button\'s `pending` state, which replaces the label '
+      'with a spinner and disables the button until the work finishes.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(

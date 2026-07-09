@@ -212,8 +212,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       actionPrimaryTextDecorationColor: const Color(0xFF58A6F0),
       actionSecondaryColorText: const Color(0xFFC9CDD3),
       actionSecondaryTextDecorationColor: const Color(0xFF58A6F0),
-      buttonPrimaryColorBackground: const Color(0xFF2388DB),
-      buttonPrimaryColorBorder: const Color(0xFF2388DB),
+      // AA-safe with white label text (contrast ~5:1); the lighter #2388DB
+      // is kept for scheme accents/links only.
+      buttonPrimaryColorBackground: const Color(0xFF0B6BC7),
+      buttonPrimaryColorBorder: const Color(0xFF0B6BC7),
       buttonSecondaryColorBackground: const Color(0xFF2A2C33),
       buttonSecondaryColorBorder: const Color(0xFF2A2C33),
       buttonSecondaryColorText: const Color(0xFFE5E7EB),

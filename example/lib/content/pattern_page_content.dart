@@ -13,6 +13,7 @@
 /// The navigation groups, in display order.
 enum DocGroup {
   foundations('Foundations'),
+  forms('Forms'),
   layout('Layout'),
   onboarding('Onboarding'),
   userActions('User actions'),

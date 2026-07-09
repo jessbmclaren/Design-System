@@ -8,6 +8,9 @@ import 'pages/design_tokens.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
+import 'pages/text_fields.dart';
+import 'pages/selection_controls.dart';
+import 'pages/select_dropdown.dart';
 import 'pages/onboarding.dart';
 import 'pages/sign_in.dart';
 import 'pages/settings_sign_in.dart';
@@ -30,6 +33,10 @@ final List<PatternPage> allPages = [
   fullPageLayoutsPage,
   listsPage,
   filterControlsPage,
+  // Forms
+  textFieldsPage,
+  selectionControlsPage,
+  selectDropdownPage,
   // Onboarding
   onboardingPage,
   signInPage,

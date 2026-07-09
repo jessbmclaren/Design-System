@@ -24,9 +24,12 @@ final PatternPage designTokensPage = PatternPage(
       'between `DsTheme.light()` and `DsTheme.dark()` to flip every component '
       'at once. Sizes are expressed in logical pixels (`double`); text '
       'transforms default to `none` and accept `uppercase`, `lowercase` or '
-      '`capitalize`. Each typography row below is a property of that level\'s '
-      '`DsTypeToken` (`headingXl`, `bodyMd`, …), so you can re-scale a level '
-      'with `copyWith(headingXl: DsTypeToken(fontSize: 30, ...))`.',
+      '`capitalize`. Each heading / body / label ramp row is a property of that '
+      'level\'s `DsTypeToken` (`headingXl`, `bodyMd`, …); re-scale a level with '
+      '`copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: '
+      'DsTypography.bold))`. The button- and badge-label rows are instead flat '
+      'tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden '
+      'individually.',
     ),
     SubheadingBlock('Commonly used variables'),
     VariablesBlock(
@@ -154,6 +157,43 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'tableRowPaddingY', type: 'double', example: '8', description: 'The vertical padding for table rows.'),
       ],
     ),
+    SubheadingBlock('Elevation, icons and weights'),
+    ProseBlock(
+      'Beyond the appearance variables, the system ships a small set of shared '
+      'primitives that components reach for directly: an elevation scale, an '
+      'icon-size scale, and a font-weight ramp. The bundled Inter provides all '
+      'four weights (400 / 500 / 600 / 700), so hierarchy is not limited to '
+      'regular and bold.',
+    ),
+    VariablesBlock(
+      title: 'Elevation (DsElevation)',
+      rows: [
+        VariableRow(name: 'DsElevation.low', type: 'List<BoxShadow>', example: 'resting', description: 'Resting raised surfaces — chips, hovers, list cards.'),
+        VariableRow(name: 'DsElevation.medium', type: 'List<BoxShadow>', example: 'floating', description: 'Floating surfaces — menus, popovers, toasts.'),
+        VariableRow(name: 'DsElevation.high', type: 'List<BoxShadow>', example: 'modal', description: 'Modal surfaces — dialogs, drawers, takeovers.'),
+        VariableRow(name: 'DsElevation.tinted', type: 'Color → shadows', example: 'brand', description: 'A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue.'),
+      ],
+    ),
+    VariablesBlock(
+      title: 'Icon size (DsIconSize)',
+      rows: [
+        VariableRow(name: 'DsIconSize.xxs', type: 'double', example: '12', description: 'Tiny marker glyphs.'),
+        VariableRow(name: 'DsIconSize.xs', type: 'double', example: '14', description: 'Inline with small text.'),
+        VariableRow(name: 'DsIconSize.sm', type: 'double', example: '16', description: 'The default control icon (buttons, inputs, chips).'),
+        VariableRow(name: 'DsIconSize.md', type: 'double', example: '18', description: 'List rows and toolbars.'),
+        VariableRow(name: 'DsIconSize.lg', type: 'double', example: '20', description: 'Prominent actions and status icons.'),
+        VariableRow(name: 'DsIconSize.xl', type: 'double', example: '24', description: 'Headers and empty-state glyphs.'),
+      ],
+    ),
+    VariablesBlock(
+      title: 'Font weight (DsTypography)',
+      rows: [
+        VariableRow(name: 'DsTypography.regular', type: 'FontWeight', example: '400', description: 'Regular body weight.'),
+        VariableRow(name: 'DsTypography.medium', type: 'FontWeight', example: '500', description: 'Quiet emphasis — labels, secondary controls.'),
+        VariableRow(name: 'DsTypography.semiBold', type: 'FontWeight', example: '600', description: 'Strong labels, control text, active tabs.'),
+        VariableRow(name: 'DsTypography.bold', type: 'FontWeight', example: '700', description: 'Headings.'),
+      ],
+    ),
     SubheadingBlock('Overlays'),
     ProseBlock(
       'The `overlays` token controls whether a focused overlay (such as '
@@ -186,6 +226,9 @@ final brand = DsTokens.light().copyWith(
 );
 
 MaterialApp(theme: DsTheme.light(tokens: brand));
+
+// Opt into a ready-made skin — this changes nothing about the defaults.
+MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // Read a token inside a widget.
 final tokens = DsTokens.of(context);

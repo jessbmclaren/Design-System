@@ -8,13 +8,19 @@ library;
 // Tokens
 export 'src/tokens/ds_breakpoints.dart';
 export 'src/tokens/ds_colors.dart';
+export 'src/tokens/ds_elevation.dart';
+export 'src/tokens/ds_icon_size.dart';
 export 'src/tokens/ds_radii.dart';
 export 'src/tokens/ds_spacing.dart';
 export 'src/tokens/ds_typography.dart';
 
 // Theme
+export 'src/theme/ds_skins.dart';
 export 'src/theme/ds_theme.dart';
 export 'src/theme/ds_tokens_extension.dart';
+
+// Utilities
+export 'src/util/ds_motion.dart';
 
 // Components — organised by Atomic Design layer.
 //
@@ -22,15 +28,20 @@ export 'src/theme/ds_tokens_extension.dart';
 export 'src/components/atoms/ds_back_link.dart';
 export 'src/components/atoms/ds_badge.dart';
 export 'src/components/atoms/ds_button.dart';
+export 'src/components/atoms/ds_checkbox.dart';
 export 'src/components/atoms/ds_chip.dart';
+export 'src/components/atoms/ds_radio.dart';
 export 'src/components/atoms/ds_spinner.dart';
+export 'src/components/atoms/ds_switch.dart';
 // Molecules
 export 'src/components/molecules/ds_banner.dart';
 export 'src/components/molecules/ds_empty_state.dart';
 export 'src/components/molecules/ds_filter_chip.dart';
 export 'src/components/molecules/ds_list_item.dart';
 export 'src/components/molecules/ds_page_header.dart';
+export 'src/components/molecules/ds_select.dart';
 export 'src/components/molecules/ds_tabs.dart';
+export 'src/components/molecules/ds_text_field.dart';
 export 'src/components/molecules/ds_toast.dart';
 // Organisms
 export 'src/components/organisms/ds_data_table.dart';

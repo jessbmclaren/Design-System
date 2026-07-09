@@ -12,6 +12,7 @@ Future<void> pumpDs(
   Widget child, {
   Size? surfaceSize,
   ThemeData? theme,
+  double textScale = 1.0,
 }) async {
   if (surfaceSize != null) {
     tester.view.devicePixelRatio = 1.0;
@@ -22,7 +23,12 @@ Future<void> pumpDs(
   await tester.pumpWidget(
     MaterialApp(
       theme: theme ?? DsTheme.light(),
-      home: Scaffold(body: Center(child: child)),
+      home: Scaffold(
+        body: MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+          child: Center(child: child),
+        ),
+      ),
     ),
   );
 }

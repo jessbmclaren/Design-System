@@ -116,6 +116,21 @@ abstract final class DsTypography {
   /// (`packages/design_system/Inter`).
   static const String packagedFontFamily = 'packages/design_system/Inter';
 
+  // Weight ramp — the bundled Inter ships 400/500/600/700, so a component can
+  // reach for a nuanced weight (medium/semiBold) rather than only regular/bold.
+
+  /// Regular body weight.
+  static const FontWeight regular = FontWeight.w400;
+
+  /// Medium weight — quiet emphasis (labels, secondary controls).
+  static const FontWeight medium = FontWeight.w500;
+
+  /// Semi-bold weight — strong labels, control text, active tabs.
+  static const FontWeight semiBold = FontWeight.w600;
+
+  /// Bold weight — headings.
+  static const FontWeight bold = FontWeight.w700;
+
   // Headings — weight 700.
 
   /// Extra large heading. 28px / 700.
