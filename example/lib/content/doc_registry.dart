@@ -24,6 +24,12 @@ import 'pages/select_dropdown.dart';
 import 'pages/currency_field.dart';
 import 'pages/date_field.dart';
 import 'pages/form_field_group.dart';
+import 'pages/field_label.dart';
+import 'pages/password_field.dart';
+import 'pages/password_strength.dart';
+import 'pages/icon_button.dart';
+import 'pages/wordmark.dart';
+import 'pages/labeled_divider.dart';
 import 'pages/sparkline.dart';
 import 'pages/bar_chart.dart';
 import 'pages/line_chart.dart';
@@ -74,8 +80,12 @@ final List<PatternPage> allPages = [
   backLinkPage,
   buttonGroupPage,
   linkPage,
+  iconButtonPage,
   // Inputs
   textFieldsPage,
+  fieldLabelPage,
+  passwordFieldPage,
+  passwordStrengthPage,
   textAreaPage,
   selectDropdownPage,
   selectionControlsPage,
@@ -87,10 +97,12 @@ final List<PatternPage> allPages = [
   accordionPage,
   avatarPage,
   dividerPage,
+  labeledDividerPage,
   iconPage,
   imgPage,
   inlinePage,
   listsPage,
+  wordmarkPage,
   // Feedback
   communicatingStatePage,
   emptyStatePage,

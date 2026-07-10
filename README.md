@@ -59,14 +59,14 @@ MaterialApp(theme: DsTheme.light(tokens: brand));
 
 ## Components: Atomic Design
 
-Components are organised into Brad Frost's atomic layers under
+Components are organised into atomic design layers under
 `lib/src/components/` (all re-exported from the single barrel, so imports stay
 `package:design_system/design_system.dart`):
 
 | Layer | Components |
 | --- | --- |
-| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsBackLink`, `DsChip` |
-| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsEmptyState`, `DsTabs`, `DsPageHeader` |
+| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel` |
+| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordStrength`, `DsLabeledDivider` |
 | **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSignInView`, `DsFocusView` |
 | **Templates** | `DsPageScaffold` |
 | **Pages** | the documentation demos in [`example/`](example/) |
