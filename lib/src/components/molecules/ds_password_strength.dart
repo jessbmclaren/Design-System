@@ -183,11 +183,10 @@ DsPasswordTier dsPasswordTier(
 
 /// The strength word and colour for [value], resolved against [tokens].
 ///
-/// An empty value returns an empty label. The colours come from the existing
-/// danger and badge tokens, so the readout re-skins with the theme: too weak
-/// and weak use the danger colour, fair the warning text colour, good and
-/// strong the success text colour. [brandWords] is forwarded to
-/// [dsPasswordTier].
+/// An empty value returns an empty label. The colours come from the bright
+/// signal tier, so the readout re-skins with the theme: too weak and weak use
+/// the danger colour, fair uses [DsTokens.colorWarning], good and strong use
+/// [DsTokens.colorSuccess]. [brandWords] is forwarded to [dsPasswordTier].
 ({String label, Color color}) dsPasswordStrengthLabel(
   DsTokens tokens,
   String value, {
@@ -197,11 +196,11 @@ DsPasswordTier dsPasswordTier(
   return switch (dsPasswordTier(value, brandWords: brandWords)) {
     DsPasswordTier.tooWeak => (label: 'Too weak', color: tokens.colorDanger),
     DsPasswordTier.weak => (label: 'Weak', color: tokens.colorDanger),
-    DsPasswordTier.fair => (label: 'Fair', color: tokens.badgeWarningColorText),
-    DsPasswordTier.good => (label: 'Good', color: tokens.badgeSuccessColorText),
+    DsPasswordTier.fair => (label: 'Fair', color: tokens.colorWarning),
+    DsPasswordTier.good => (label: 'Good', color: tokens.colorSuccess),
     DsPasswordTier.strong => (
       label: 'Strong',
-      color: tokens.badgeSuccessColorText,
+      color: tokens.colorSuccess,
     ),
   };
 }

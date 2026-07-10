@@ -14,7 +14,8 @@ enum DsDividerAxis {
 /// A hairline rule used to visually separate content.
 ///
 /// The divider draws a single line coloured with the active theme's
-/// [DsTokens.colorBorder]. A [DsDividerAxis.horizontal] divider fills the
+/// [DsTokens.colorBorderSubtle], the hairline tier beneath the component
+/// border colour. A [DsDividerAxis.horizontal] divider fills the
 /// available width and reserves a fixed height equal to [thickness]; a
 /// [DsDividerAxis.vertical] divider fills the available height and reserves a
 /// fixed width equal to [thickness].
@@ -81,13 +82,13 @@ class DsDivider extends StatelessWidget {
   /// available space) and centres within any surplus space.
   final double? length;
 
-  /// Overrides the rule colour. Defaults to [DsTokens.colorBorder].
+  /// Overrides the rule colour. Defaults to [DsTokens.colorBorderSubtle].
   final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final DsTokens tokens = DsTokens.of(context);
-    final Color lineColor = color ?? tokens.colorBorder;
+    final Color lineColor = color ?? tokens.colorBorderSubtle;
     final bool isHorizontal = axis == DsDividerAxis.horizontal;
 
     // The painted rule, inset from the edges of its main axis.

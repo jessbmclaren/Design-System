@@ -27,6 +27,7 @@ export 'src/util/ds_motion.dart';
 // Components, organised by Atomic Design layer.
 //
 // Atoms
+export 'src/components/atoms/ds_animated_ellipsis.dart';
 export 'src/components/atoms/ds_avatar.dart';
 export 'src/components/atoms/ds_back_link.dart';
 export 'src/components/atoms/ds_badge.dart';
@@ -35,8 +36,10 @@ export 'src/components/atoms/ds_button.dart';
 export 'src/components/atoms/ds_checkbox.dart';
 export 'src/components/atoms/ds_chip.dart';
 export 'src/components/atoms/ds_divider.dart';
+export 'src/components/atoms/ds_fade_slide_in.dart';
 export 'src/components/atoms/ds_field_label.dart';
 export 'src/components/atoms/ds_icon.dart';
+export 'src/components/atoms/ds_icon_badge.dart';
 export 'src/components/atoms/ds_icon_button.dart';
 export 'src/components/atoms/ds_img.dart';
 export 'src/components/atoms/ds_inline.dart';
@@ -45,6 +48,7 @@ export 'src/components/atoms/ds_progress_bar.dart';
 export 'src/components/atoms/ds_radio.dart';
 export 'src/components/atoms/ds_spinner.dart';
 export 'src/components/atoms/ds_sparkline.dart';
+export 'src/components/atoms/ds_step_header.dart';
 export 'src/components/atoms/ds_switch.dart';
 export 'src/components/atoms/ds_wordmark.dart';
 // Molecules

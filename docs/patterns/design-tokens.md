@@ -18,6 +18,8 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `colorBackground` | `Color` | `#FFFFFF` | The background colour for components, including overlays and surfaces. |
 | `colorText` | `Color` | `#1A1B25` | The colour used for primary text. |
 | `colorDanger` | `Color` | `#E61947` | The colour used to indicate errors or destructive actions. |
+| `colorSuccess` | `Color` | `#05690D` | The bright signal colour for positive live status, such as a strength meter's good tier. Defaults to the success badge text colour. |
+| `colorWarning` | `Color` | `#A82C00` | The bright signal colour for cautionary live status, such as a strength meter's fair tier. Defaults to the warning badge text colour. |
 
 ### Actions and buttons
 
@@ -28,12 +30,17 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `buttonPrimaryColorBackground` | `Color` | `#0074D4` | The colour used as a background for primary buttons. |
 | `buttonPrimaryColorBorder` | `Color` | `#0074D4` | The border colour used for primary buttons. |
 | `buttonPrimaryColorText` | `Color` | `#FFFFFF` | The text colour used for primary buttons. |
+| `buttonPrimaryDisabledColorBackground` | `Color` | `#800074D4` | The background colour for disabled primary buttons (ARGB). Defaults to the primary background at 50% opacity; a skin can supply a solid tint instead. |
+| `buttonPrimaryDisabledColorText` | `Color` | `#E6FFFFFF` | The text colour for disabled primary buttons (ARGB). Defaults to the primary text colour at 90% opacity. |
 | `buttonSecondaryColorBackground` | `Color` | `#EBEEF1` | The colour used as a background for secondary buttons. |
 | `buttonSecondaryColorBorder` | `Color` | `#EBEEF1` | The colour used as a border for secondary buttons. |
 | `buttonSecondaryColorText` | `Color` | `#393B3E` | The text colour used for secondary buttons. |
 | `buttonDangerColorBackground` | `Color` | `#E61947` | The background colour for danger buttons that indicate destructive actions. |
 | `buttonDangerColorBorder` | `Color` | `#E61947` | The border colour for danger buttons that indicate destructive actions. |
 | `buttonDangerColorText` | `Color` | `#FFFFFF` | The text colour for danger buttons that indicate destructive actions. |
+| `buttonNeutralColorBackground` | `Color` | `#EBEEF1` | The colour used as a background for neutral buttons, which carry third-party or utility actions such as federated sign-in. Defaults to the secondary button background. |
+| `buttonNeutralColorBorder` | `Color` | `#EBEEF1` | The border colour used for neutral buttons. Defaults to the secondary button border. |
+| `buttonNeutralColorText` | `Color` | `#393B3E` | The text colour used for neutral buttons. Defaults to the secondary button text colour. |
 
 ### Text and surfaces
 
@@ -41,6 +48,7 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | --- | --- | --- | --- |
 | `colorSecondaryText` | `Color` | `#717171` | The colour used for secondary text. |
 | `colorBorder` | `Color` | `#D7D7D7` | The colour used for borders throughout components. |
+| `colorBorderSubtle` | `Color` | `#D7D7D7` | The hairline tier beneath colorBorder: the quietest rule the system draws, used by dividers and decorative hairlines. Defaults to the border colour. |
 | `formBackgroundColor` | `Color` | `#FFFFFF` | The background colour used for form items. |
 | `offsetBackgroundColor` | `Color` | `#FFFFFF` | The background colour used when highlighting information, like the selected row on a table. |
 | `formHighlightColorBorder` | `Color` | `#D7D7D7` | The colour used to highlight form items when focused. |
@@ -124,10 +132,11 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `buttonBorderRadius` | `double` | `4` | The border radius used for buttons. |
 | `formBorderRadius` | `double` | `6` | The border radius used for form elements. |
 | `badgeBorderRadius` | `double` | `4` | The border radius used for badges. |
-| `buttonPaddingX` | `double` | `4` | The horizontal padding for buttons. |
-| `buttonPaddingY` | `double` | `4` | The vertical padding for buttons. |
+| `buttonPaddingX` | `double` | `16` | The horizontal padding for buttons, the full inset the button paints. |
+| `buttonPaddingY` | `double` | `10` | The vertical padding for buttons, the full inset the button paints. |
 | `inputFieldPaddingX` | `double` | `8` | The horizontal padding for input fields in forms. |
 | `inputFieldPaddingY` | `double` | `4` | The vertical padding for input fields in forms. |
+| `textFieldPaddingY` | `double` | `16` | The full vertical padding a bordered text input paints, so a skin can retune the text field without moving every other form control. |
 | `badgePaddingX` | `double` | `6` | The horizontal padding for badges. |
 | `badgePaddingY` | `double` | `2` | The vertical padding for badges. |
 | `tableRowPaddingY` | `double` | `8` | The vertical padding for table rows. |

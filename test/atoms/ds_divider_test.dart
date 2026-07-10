@@ -22,6 +22,34 @@ void main() {
       expect(box.width, isNull);
     });
 
+    testWidgets('paints the hairline tier by default', (tester) async {
+      await pumpDs(tester, const DsDivider());
+
+      final tokens = DsTokens.of(tester.element(find.byType(DsDivider)));
+      final DecoratedBox decorated = tester.widget<DecoratedBox>(
+        find.byType(DecoratedBox),
+      );
+      final BoxDecoration decoration = decorated.decoration as BoxDecoration;
+      expect(decoration.color, tokens.colorBorderSubtle);
+      // The default hairline equals the border colour, so nothing shifts
+      // until a skin supplies a lighter tier.
+      expect(tokens.colorBorderSubtle, tokens.colorBorder);
+    });
+
+    testWidgets('a skin hairline tier re-colours the rule', (tester) async {
+      await pumpDs(
+        tester,
+        const DsDivider(),
+        theme: DsTheme.light(tokens: DsSkins.engenLight()),
+      );
+
+      final DecoratedBox decorated = tester.widget<DecoratedBox>(
+        find.byType(DecoratedBox),
+      );
+      final BoxDecoration decoration = decorated.decoration as BoxDecoration;
+      expect(decoration.color, const Color(0xFFE5E8F0));
+    });
+
     testWidgets('applies a custom color override', (tester) async {
       const Color custom = Color(0xFF123456);
       await pumpDs(tester, const DsDivider(color: custom));

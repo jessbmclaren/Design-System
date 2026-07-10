@@ -33,6 +33,21 @@ abstract final class DsColors {
   /// The text colour used for primary buttons.
   static const Color buttonPrimaryText = Color(0xFFFFFFFF);
 
+  /// The background colour for disabled primary buttons.
+  ///
+  /// Matches the fade the button used to derive at build time
+  /// ([buttonPrimaryBackground] at 50% opacity), so the default disabled
+  /// treatment is unchanged. A skin can supply a solid tint instead.
+  static final Color buttonPrimaryDisabledBackground =
+      buttonPrimaryBackground.withValues(alpha: 0.5);
+
+  /// The text colour for disabled primary buttons.
+  ///
+  /// Matches the fade the button used to derive at build time
+  /// ([buttonPrimaryText] at 90% opacity).
+  static final Color buttonPrimaryDisabledText =
+      buttonPrimaryText.withValues(alpha: 0.9);
+
   /// The colour used as a background for secondary buttons.
   static const Color buttonSecondaryBackground = Color(0xFFEBEEF1);
 
@@ -51,6 +66,19 @@ abstract final class DsColors {
 
   /// The text colour for danger buttons that indicate destructive actions.
   static const Color buttonDangerText = Color(0xFFFFFFFF);
+
+  /// The colour used as a background for neutral buttons.
+  ///
+  /// Neutral buttons carry third-party or utility actions (such as federated
+  /// sign-in) that must not compete with the brand pair. The defaults match
+  /// the secondary button so existing surfaces keep their appearance.
+  static const Color buttonNeutralBackground = Color(0xFFEBEEF1);
+
+  /// The border colour used for neutral buttons.
+  static const Color buttonNeutralBorder = Color(0xFFEBEEF1);
+
+  /// The text colour used for neutral buttons.
+  static const Color buttonNeutralText = Color(0xFF393B3E);
 
   // ---------------------------------------------------------------------------
   // Text
@@ -79,6 +107,11 @@ abstract final class DsColors {
   /// The colour used for borders throughout components.
   static const Color border = Color(0xFFD7D7D7);
 
+  /// The hairline tier beneath [border]: the quietest rule the system draws
+  /// (dividers, decorative hairlines). The default equals [border] so nothing
+  /// shifts until a skin supplies a lighter value.
+  static const Color borderSubtle = Color(0xFFD7D7D7);
+
   /// The colour used to highlight form items when focused.
   static const Color formHighlightBorder = Color(0xFFD7D7D7);
 
@@ -89,6 +122,20 @@ abstract final class DsColors {
   /// The backdrop colour shown behind an open overlay: a translucent scrim
   /// derived from [textPrimary] so the page recedes without changing hue.
   static const Color overlayBackdrop = Color(0x661A1B25);
+
+  // ---------------------------------------------------------------------------
+  // Signals
+  // ---------------------------------------------------------------------------
+
+  /// The bright signal colour for positive live status, such as a strength
+  /// meter's good tier. Defaults to [badgeSuccessText] so existing readouts
+  /// keep their colour; a skin can supply a brighter indicator instead.
+  static const Color success = Color(0xFF05690D);
+
+  /// The bright signal colour for cautionary live status, such as a strength
+  /// meter's fair tier. Defaults to [badgeWarningText] so existing readouts
+  /// keep their colour.
+  static const Color warning = Color(0xFFA82C00);
 
   // ---------------------------------------------------------------------------
   // Badges: neutral

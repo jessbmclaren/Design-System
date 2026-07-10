@@ -30,5 +30,47 @@ void main() {
       await tester.enterText(find.byType(TextField), 'hunter2');
       expect(latest, 'hunter2');
     });
+
+    testWidgets('forwards validator to the underlying field', (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        Form(
+          key: formKey,
+          child: DsPasswordField(
+            label: 'Password',
+            validator: (value) =>
+                dsPasswordMeetsAll(value ?? '') ? null : 'Password too weak',
+          ),
+        ),
+      );
+
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pump();
+      expect(find.text('Password too weak'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'Aa1!aaaa');
+      expect(formKey.currentState!.validate(), isTrue);
+    });
+
+    testWidgets('forwards autovalidateMode to the underlying field',
+        (tester) async {
+      await pumpDs(
+        tester,
+        Form(
+          child: DsPasswordField(
+            label: 'Password',
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) =>
+                (value ?? '').length >= 8 ? null : 'Too short',
+          ),
+        ),
+      );
+
+      expect(find.text('Too short'), findsNothing);
+      await tester.enterText(find.byType(TextField), 'abc');
+      await tester.pump();
+      expect(find.text('Too short'), findsOneWidget);
+    });
   });
 }

@@ -191,7 +191,7 @@ class _DsSignInViewState extends State<DsSignInView> {
             ),
             decoration: BoxDecoration(
               color: tokens.offsetBackgroundColor,
-              border: Border(top: BorderSide(color: tokens.colorBorder)),
+              border: Border(top: BorderSide(color: tokens.colorBorderSubtle)),
             ),
             child: widget.footerBand,
           ),
@@ -255,7 +255,7 @@ class _DsSignInViewState extends State<DsSignInView> {
         ],
         if (hasReveal) ...[
           const SizedBox(height: DsSpacing.md),
-          Divider(height: 1, color: tokens.colorBorder),
+          Divider(height: 1, color: tokens.colorBorderSubtle),
           _RevealControl(
             label: widget.additionalContextLabel!,
             expanded: _expanded,

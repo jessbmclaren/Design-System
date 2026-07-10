@@ -12,6 +12,24 @@ import 'golden_helpers.dart';
 /// stable across runs.
 void main() {
   group('golden · atoms', () {
+    // Captured under reduced motion so the golden is the settled full
+    // ellipsis, not whichever frame of the cycle the pump lands on.
+    dsGoldenMatrix(
+      'atom',
+      'animated_ellipsis',
+      () => const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: 'Preparing your workspace'),
+              WidgetSpan(child: DsAnimatedEllipsis()),
+            ],
+          ),
+        ),
+      ),
+    );
+
     dsGoldenMatrix('atom', 'avatar', () => const DsAvatar(name: 'Ada Lovelace'));
 
     dsGoldenMatrix(
@@ -61,8 +79,36 @@ void main() {
 
     dsGoldenMatrix('atom', 'divider', () => const DsDivider());
 
+    // Captured under reduced motion so the golden is the settled frame, not a
+    // mid-entrance blend that shifts whenever the motion scale is tuned.
+    dsGoldenMatrix(
+      'atom',
+      'fade_slide_in',
+      () => const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: DsFadeSlideIn(child: Text('Entrance content')),
+      ),
+    );
+
     dsGoldenMatrix(
         'atom', 'icon', () => const DsIcon(icon: Icons.check_circle_outline));
+
+    // A row of every tone, where a token-pair regression surfaces.
+    dsGoldenMatrix(
+      'atom',
+      'icon_badge',
+      () => const Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          DsIconBadge(icon: DsIcons.check),
+          DsIconBadge(icon: DsIcons.check, tone: DsIconBadgeTone.success),
+          DsIconBadge(icon: DsIcons.warning, tone: DsIconBadgeTone.warning),
+          DsIconBadge(icon: DsIcons.close, tone: DsIconBadgeTone.danger),
+          DsIconBadge(icon: DsIcons.lock, tone: DsIconBadgeTone.neutral),
+        ],
+      ),
+    );
 
     // No `src` → the deterministic fallback box (never touches the network).
     dsGoldenMatrix(
@@ -94,6 +140,15 @@ void main() {
         'atom', 'sparkline', () => const DsSparkline(values: [3, 5, 2, 8, 6, 9, 7]));
 
     dsGoldenMatrix('atom', 'spinner', () => const DsSpinner());
+
+    dsGoldenMatrix(
+      'atom',
+      'step_header',
+      () => const DsStepHeader(
+        title: 'Describe your business in a few words.',
+        lead: 'This helps us recommend the best setup.',
+      ),
+    );
 
     dsGoldenMatrix(
       'atom',

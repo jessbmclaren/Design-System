@@ -34,17 +34,28 @@ abstract final class DsElevation {
 
   /// A brand-tinted scale derived from [color]. The three steps use the same
   /// geometry as the defaults with the colour applied at increasing opacity.
-  static List<BoxShadow> tinted(Color color, {double intensity = 1}) {
-    List<BoxShadow> step(double alpha, Offset offset, double blur) => [
-          BoxShadow(
-            color: color.withValues(alpha: alpha * intensity),
-            offset: offset,
-            blurRadius: blur,
-          ),
-        ];
-    return [
-      ...step(0.10, const Offset(0, 6), 16),
-    ];
+  ///
+  /// Returns the whole scale as a `(low, medium, high)` record, ready to feed
+  /// a skin's `shadowLow` / `shadowMedium` / `shadowHigh` tokens. Raise or
+  /// lower [intensity] to deepen or soften every step at once.
+  static ({
+    List<BoxShadow> low,
+    List<BoxShadow> medium,
+    List<BoxShadow> high,
+  }) tinted(Color color, {double intensity = 1}) {
+    BoxShadow step(double alpha, Offset offset, double blur) => BoxShadow(
+          color: color.withValues(alpha: alpha * intensity),
+          offset: offset,
+          blurRadius: blur,
+        );
+    return (
+      low: [
+        step(0.08, const Offset(0, 1), 2),
+        step(0.06, const Offset(0, 2), 6),
+      ],
+      medium: [step(0.10, const Offset(0, 6), 16)],
+      high: [step(0.14, const Offset(0, 16), 40)],
+    );
   }
 
   /// The shadow list for a semantic [DsElevationLevel].

@@ -71,6 +71,10 @@ import 'pages/progress_bar.dart';
 import 'pages/progress_stepping.dart';
 import 'pages/setup_guide.dart';
 import 'pages/waiting_screens.dart';
+import 'pages/step_header.dart';
+import 'pages/icon_badge.dart';
+import 'pages/animated_ellipsis.dart';
+import 'pages/fade_slide_in.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
@@ -103,11 +107,14 @@ final List<PatternPage> allPages = [
   dividerPage,
   labeledDividerPage,
   iconPage,
+  iconBadgePage,
   imgPage,
   inlinePage,
   listsPage,
+  stepHeaderPage,
   wordmarkPage,
   // Feedback
+  animatedEllipsisPage,
   communicatingStatePage,
   emptyStatePage,
   loadingPage,
@@ -137,6 +144,7 @@ final List<PatternPage> allPages = [
   sparklinePage,
   // Layout
   boxPage,
+  fadeSlideInPage,
   fullPageLayoutsPage,
   settingsViewPage,
   // Patterns

@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers.dart';
@@ -107,6 +108,134 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('optional renders the subdued marker in the label row',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsTextField(label: 'Company', optional: true),
+      );
+
+      expect(find.text('Company'), findsOneWidget);
+      expect(find.text('Optional'), findsOneWidget);
+    });
+
+    testWidgets('validator reports its message when the form validates',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        Form(
+          key: formKey,
+          child: DsTextField(
+            label: 'Email',
+            validator: (value) =>
+                (value == null || value.isEmpty) ? 'Email required' : null,
+          ),
+        ),
+      );
+
+      expect(find.text('Email required'), findsNothing);
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pump();
+      expect(find.text('Email required'), findsOneWidget);
+    });
+
+    testWidgets('autovalidateMode onUserInteraction validates after edits',
+        (tester) async {
+      await pumpDs(
+        tester,
+        Form(
+          child: DsTextField(
+            label: 'Email',
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) =>
+                (value ?? '').contains('@') ? null : 'Enter a valid email',
+          ),
+        ),
+      );
+
+      // Untouched, the field shows no error.
+      expect(find.text('Enter a valid email'), findsNothing);
+
+      await tester.enterText(find.byType(TextField), 'nope');
+      await tester.pump();
+      expect(find.text('Enter a valid email'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'a@b.co');
+      await tester.pump();
+      expect(find.text('Enter a valid email'), findsNothing);
+    });
+
+    testWidgets('onSaved receives the value when the form saves',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      String? saved;
+      await pumpDs(
+        tester,
+        Form(
+          key: formKey,
+          child: DsTextField(label: 'Name', onSaved: (value) => saved = value),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), 'Ada');
+      formKey.currentState!.save();
+      expect(saved, 'Ada');
+    });
+
+    testWidgets('inputFormatters filter what the user types', (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+      await pumpDs(
+        tester,
+        DsTextField(
+          label: 'Amount',
+          controller: controller,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), '12ab3');
+      expect(controller.text, '123');
+    });
+
+    testWidgets('maxLength caps input and shows a counter', (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+      await pumpDs(
+        tester,
+        DsTextField(label: 'Code', controller: controller, maxLength: 4),
+      );
+
+      await tester.enterText(find.byType(TextField), '123456');
+      await tester.pump();
+      expect(controller.text, '1234');
+      expect(find.text('4/4'), findsOneWidget);
+    });
+
+    testWidgets('minLines reserves a taller text area', (tester) async {
+      await pumpDs(
+        tester,
+        const DsTextField(label: 'Notes', minLines: 3, maxLines: 6),
+      );
+
+      final EditableText editable = tester.widget(find.byType(EditableText));
+      expect(editable.minLines, 3);
+      expect(editable.maxLines, 6);
+    });
+
+    testWidgets('readOnly keeps the value but rejects edits', (tester) async {
+      final controller = TextEditingController(text: 'fixed');
+      addTearDown(controller.dispose);
+      await pumpDs(
+        tester,
+        DsTextField(label: 'Reference', controller: controller, readOnly: true),
+      );
+
+      final EditableText editable = tester.widget(find.byType(EditableText));
+      expect(editable.readOnly, isTrue);
     });
   });
 }

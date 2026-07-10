@@ -141,20 +141,28 @@ void main() {
       ));
       expect(dsPasswordStrengthLabel(tokens, 'Abcd1234!xyz'), (
         label: 'Fair',
-        color: tokens.badgeWarningColorText,
+        color: tokens.colorWarning,
       ));
       expect(dsPasswordStrengthLabel(tokens, 'Axcr1935!kdz'), (
         label: 'Good',
-        color: tokens.badgeSuccessColorText,
+        color: tokens.colorSuccess,
       ));
       expect(dsPasswordStrengthLabel(tokens, 'Xk9#mPq2\$vLz7!Qw'), (
         label: 'Strong',
-        color: tokens.badgeSuccessColorText,
+        color: tokens.colorSuccess,
       ));
       expect(
         dsPasswordStrengthLabel(tokens, 'xEngenz19!Ab', brandWords: {'engen'}),
         (label: 'Too weak', color: tokens.colorDanger),
       );
+    });
+
+    test('signal defaults equal the badge inks they replaced', () {
+      // The bright signal tier defaults to the badge text colours the meter
+      // used before, so nothing shifts until a skin overrides it.
+      final tokens = DsTokens.light();
+      expect(tokens.colorWarning, tokens.badgeWarningColorText);
+      expect(tokens.colorSuccess, tokens.badgeSuccessColorText);
     });
   });
 
@@ -184,15 +192,28 @@ void main() {
         tester,
         const DsPasswordStrength(value: 'Abcd1234!xyz', showChecklist: false),
       );
-      expect(_segmentsPainted(tester, tokens.badgeWarningColorText), 2);
+      expect(_segmentsPainted(tester, tokens.colorWarning), 2);
       expect(find.text('Fair'), findsOneWidget);
 
       await pumpDs(
         tester,
         const DsPasswordStrength(value: 'Axcr1935!kdz', showChecklist: false),
       );
-      expect(_segmentsPainted(tester, tokens.badgeSuccessColorText), 3);
+      expect(_segmentsPainted(tester, tokens.colorSuccess), 3);
       expect(find.text('Good'), findsOneWidget);
+    });
+
+    testWidgets('the meter follows a skin override of the signal tier',
+        (tester) async {
+      const brightGreen = Color(0xFF1F9D57);
+      await pumpDs(
+        tester,
+        const DsPasswordStrength(value: 'Axcr1935!kdz', showChecklist: false),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(colorSuccess: brightGreen),
+        ),
+      );
+      expect(_segmentsPainted(tester, brightGreen), 3);
     });
 
     testWidgets('shows no filled segment or word for an empty value', (

@@ -41,6 +41,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.colorPrimary,
     required this.colorBackground,
     required this.colorDanger,
+    required this.colorSuccess,
+    required this.colorWarning,
     // Typography ramp
     required this.headingXl,
     required this.headingLg,
@@ -55,6 +57,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.colorText,
     required this.colorSecondaryText,
     required this.colorBorder,
+    required this.colorBorderSubtle,
     // Actions
     required this.actionPrimaryColorText,
     required this.actionPrimaryTextDecorationLine,
@@ -72,12 +75,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.buttonPrimaryColorBackground,
     required this.buttonPrimaryColorBorder,
     required this.buttonPrimaryColorText,
+    required this.buttonPrimaryDisabledColorBackground,
+    required this.buttonPrimaryDisabledColorText,
     required this.buttonSecondaryColorBackground,
     required this.buttonSecondaryColorBorder,
     required this.buttonSecondaryColorText,
     required this.buttonDangerColorBackground,
     required this.buttonDangerColorBorder,
     required this.buttonDangerColorText,
+    required this.buttonNeutralColorBackground,
+    required this.buttonNeutralColorBorder,
+    required this.buttonNeutralColorText,
     required this.buttonPaddingX,
     required this.buttonPaddingY,
     required this.buttonBorderRadius,
@@ -112,6 +120,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.formBorderRadius,
     required this.inputFieldPaddingX,
     required this.inputFieldPaddingY,
+    required this.textFieldPaddingY,
     // Table
     required this.tableRowPaddingY,
     // Overlays
@@ -124,8 +133,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
   });
 
   /// The default Design System light appearance.
+  ///
+  /// Not const because the disabled button defaults derive from the primary
+  /// button colours at build time; [DsTokens] equality stays structural.
   factory DsTokens.light() {
-    return const DsTokens(
+    return DsTokens(
       fontFamily: DsTypography.fontFamily,
       fontSizeBase: 16,
       spacingUnit: DsSpacing.sm,
@@ -133,6 +145,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorPrimary: DsColors.actionPrimary,
       colorBackground: DsColors.formBackground,
       colorDanger: DsColors.buttonDangerBackground,
+      colorSuccess: DsColors.success,
+      colorWarning: DsColors.warning,
       headingXl: DsTypography.headingXl,
       headingLg: DsTypography.headingLg,
       headingMd: DsTypography.headingMd,
@@ -145,6 +159,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorText: DsColors.textPrimary,
       colorSecondaryText: DsColors.textSecondary,
       colorBorder: DsColors.border,
+      colorBorderSubtle: DsColors.borderSubtle,
       actionPrimaryColorText: DsColors.actionPrimary,
       actionPrimaryTextDecorationLine: TextDecoration.underline,
       actionPrimaryTextDecorationColor: DsColors.actionTextDecoration,
@@ -160,14 +175,23 @@ class DsTokens extends ThemeExtension<DsTokens> {
       buttonPrimaryColorBackground: DsColors.buttonPrimaryBackground,
       buttonPrimaryColorBorder: DsColors.buttonPrimaryBorder,
       buttonPrimaryColorText: DsColors.buttonPrimaryText,
+      buttonPrimaryDisabledColorBackground:
+          DsColors.buttonPrimaryDisabledBackground,
+      buttonPrimaryDisabledColorText: DsColors.buttonPrimaryDisabledText,
       buttonSecondaryColorBackground: DsColors.buttonSecondaryBackground,
       buttonSecondaryColorBorder: DsColors.buttonSecondaryBorder,
       buttonSecondaryColorText: DsColors.buttonSecondaryText,
       buttonDangerColorBackground: DsColors.buttonDangerBackground,
       buttonDangerColorBorder: DsColors.buttonDangerBorder,
       buttonDangerColorText: DsColors.buttonDangerText,
-      buttonPaddingX: DsSpacing.buttonPaddingX,
-      buttonPaddingY: DsSpacing.buttonPaddingY,
+      buttonNeutralColorBackground: DsColors.buttonNeutralBackground,
+      buttonNeutralColorBorder: DsColors.buttonNeutralBorder,
+      buttonNeutralColorText: DsColors.buttonNeutralText,
+      // The full padding the button paints: the raw DsSpacing values plus the
+      // 12 and 6 the button used to add at build time, so the rendered
+      // control is unchanged and a skin can set its metrics directly.
+      buttonPaddingX: DsSpacing.buttonPaddingX + 12,
+      buttonPaddingY: DsSpacing.buttonPaddingY + 6,
       buttonBorderRadius: DsRadii.button,
       buttonLabelFontSize: 16,
       buttonLabelFontWeight: FontWeight.w400,
@@ -198,6 +222,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formBorderRadius: DsRadii.form,
       inputFieldPaddingX: DsSpacing.inputFieldPaddingX,
       inputFieldPaddingY: DsSpacing.inputFieldPaddingY,
+      // The full vertical padding the text field paints: the raw DsSpacing
+      // value plus the 12 the field used to add at build time.
+      textFieldPaddingY: DsSpacing.inputFieldPaddingY + 12,
       tableRowPaddingY: DsSpacing.tableRowPaddingY,
       overlayBorderRadius: DsRadii.overlay,
       overlayBackdropColor: DsColors.overlayBackdrop,
@@ -216,6 +243,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorText: const Color(0xFFF3F4F6),
       colorSecondaryText: const Color(0xFF9CA3AF),
       colorBorder: const Color(0xFF3F4147),
+      colorBorderSubtle: const Color(0xFF3F4147),
+      colorSuccess: const Color(0xFF7FD860),
+      colorWarning: const Color(0xFFF0B429),
       actionPrimaryColorText: const Color(0xFF58A6F0),
       actionPrimaryTextDecorationColor: const Color(0xFF58A6F0),
       actionSecondaryColorText: const Color(0xFFC9CDD3),
@@ -224,9 +254,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // is kept for scheme accents/links only.
       buttonPrimaryColorBackground: const Color(0xFF0B6BC7),
       buttonPrimaryColorBorder: const Color(0xFF0B6BC7),
+      // Re-derived from the dark primary pair so the disabled fade matches
+      // the dark fill, exactly as the button used to compute it.
+      buttonPrimaryDisabledColorBackground:
+          const Color(0xFF0B6BC7).withValues(alpha: 0.5),
+      buttonPrimaryDisabledColorText:
+          const Color(0xFFFFFFFF).withValues(alpha: 0.9),
       buttonSecondaryColorBackground: const Color(0xFF2A2C33),
       buttonSecondaryColorBorder: const Color(0xFF2A2C33),
       buttonSecondaryColorText: const Color(0xFFE5E7EB),
+      buttonNeutralColorBackground: const Color(0xFF2A2C33),
+      buttonNeutralColorBorder: const Color(0xFF2A2C33),
+      buttonNeutralColorText: const Color(0xFFE5E7EB),
       badgeNeutralColorBackground: const Color(0xFF2C3234),
       badgeNeutralColorText: const Color(0xFFB4BCC8),
       badgeNeutralColorBorder: const Color(0xFF454E50),
@@ -286,6 +325,16 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The colour used to indicate errors or destructive actions.
   final Color colorDanger;
 
+  /// The bright signal colour for positive live status, such as a password
+  /// meter's good tier or a healthy status readout. Defaults to the success
+  /// badge text colour so existing readouts keep their colour.
+  final Color colorSuccess;
+
+  /// The bright signal colour for cautionary live status, such as a password
+  /// meter's fair tier. Defaults to the warning badge text colour so existing
+  /// readouts keep their colour.
+  final Color colorWarning;
+
   // Typography ramp ------------------------------------------------------
   //
   // Each level is a [DsTypeToken] bundling its font size, weight, line
@@ -330,6 +379,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
 
   /// The colour used for borders throughout components.
   final Color colorBorder;
+
+  /// The hairline tier beneath [colorBorder]: the quietest rule the system
+  /// draws, used by [DsDivider] and decorative hairlines. Defaults to
+  /// [colorBorder]'s value so nothing shifts until a skin supplies a lighter
+  /// hairline.
+  final Color colorBorderSubtle;
 
   // Actions -------------------------------------------------------------
 
@@ -380,6 +435,20 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The text colour used for primary buttons.
   final Color buttonPrimaryColorText;
 
+  /// The background colour for disabled primary buttons.
+  ///
+  /// Defaults to [buttonPrimaryColorBackground] at 50% opacity, the fade the
+  /// button used to derive at build time, so the default treatment is
+  /// unchanged. A skin can supply a solid tint that reads identically on any
+  /// backdrop.
+  final Color buttonPrimaryDisabledColorBackground;
+
+  /// The text colour for disabled primary buttons.
+  ///
+  /// Defaults to [buttonPrimaryColorText] at 90% opacity, the fade the button
+  /// used to derive at build time.
+  final Color buttonPrimaryDisabledColorText;
+
   /// The colour used as a background for secondary buttons.
   final Color buttonSecondaryColorBackground;
 
@@ -399,10 +468,25 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The text colour for danger buttons that indicate destructive actions.
   final Color buttonDangerColorText;
 
-  /// The horizontal padding for buttons.
+  /// The colour used as a background for neutral buttons.
+  ///
+  /// Neutral buttons carry third-party or utility actions (such as federated
+  /// sign-in) that must not compete with the brand pair. The defaults match
+  /// the secondary button so existing surfaces keep their appearance.
+  final Color buttonNeutralColorBackground;
+
+  /// The border colour used for neutral buttons.
+  final Color buttonNeutralColorBorder;
+
+  /// The text colour used for neutral buttons.
+  final Color buttonNeutralColorText;
+
+  /// The horizontal padding for buttons. This is the full inset the button
+  /// paints, so a skin can set its metrics directly.
   final double buttonPaddingX;
 
-  /// The vertical padding for buttons.
+  /// The vertical padding for buttons. This is the full inset the button
+  /// paints, so a skin can set its metrics directly.
   final double buttonPaddingY;
 
   /// The border radius used for buttons.
@@ -509,6 +593,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The vertical padding for input fields in forms.
   final double inputFieldPaddingY;
 
+  /// The full vertical padding a bordered text input paints, used by
+  /// [DsTextField]. Defaults to [inputFieldPaddingY] plus the 12 the field
+  /// used to add at build time, so the rendered field is unchanged; a skin
+  /// can lower it directly for denser inputs.
+  final double textFieldPaddingY;
+
   // Table ---------------------------------------------------------------
 
   /// The vertical padding for table rows.
@@ -546,6 +636,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? colorPrimary,
     Color? colorBackground,
     Color? colorDanger,
+    Color? colorSuccess,
+    Color? colorWarning,
     DsTypeToken? headingXl,
     DsTypeToken? headingLg,
     DsTypeToken? headingMd,
@@ -558,6 +650,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? colorText,
     Color? colorSecondaryText,
     Color? colorBorder,
+    Color? colorBorderSubtle,
     Color? actionPrimaryColorText,
     TextDecoration? actionPrimaryTextDecorationLine,
     Color? actionPrimaryTextDecorationColor,
@@ -573,12 +666,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? buttonPrimaryColorBackground,
     Color? buttonPrimaryColorBorder,
     Color? buttonPrimaryColorText,
+    Color? buttonPrimaryDisabledColorBackground,
+    Color? buttonPrimaryDisabledColorText,
     Color? buttonSecondaryColorBackground,
     Color? buttonSecondaryColorBorder,
     Color? buttonSecondaryColorText,
     Color? buttonDangerColorBackground,
     Color? buttonDangerColorBorder,
     Color? buttonDangerColorText,
+    Color? buttonNeutralColorBackground,
+    Color? buttonNeutralColorBorder,
+    Color? buttonNeutralColorText,
     double? buttonPaddingX,
     double? buttonPaddingY,
     double? buttonBorderRadius,
@@ -611,6 +709,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? formBorderRadius,
     double? inputFieldPaddingX,
     double? inputFieldPaddingY,
+    double? textFieldPaddingY,
     double? tableRowPaddingY,
     double? overlayBorderRadius,
     Color? overlayBackdropColor,
@@ -627,6 +726,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorPrimary: colorPrimary ?? this.colorPrimary,
       colorBackground: colorBackground ?? this.colorBackground,
       colorDanger: colorDanger ?? this.colorDanger,
+      colorSuccess: colorSuccess ?? this.colorSuccess,
+      colorWarning: colorWarning ?? this.colorWarning,
       headingXl: headingXl ?? this.headingXl,
       headingLg: headingLg ?? this.headingLg,
       headingMd: headingMd ?? this.headingMd,
@@ -639,6 +740,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorText: colorText ?? this.colorText,
       colorSecondaryText: colorSecondaryText ?? this.colorSecondaryText,
       colorBorder: colorBorder ?? this.colorBorder,
+      colorBorderSubtle: colorBorderSubtle ?? this.colorBorderSubtle,
       actionPrimaryColorText:
           actionPrimaryColorText ?? this.actionPrimaryColorText,
       actionPrimaryTextDecorationLine: actionPrimaryTextDecorationLine ??
@@ -671,6 +773,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonPrimaryColorBorder ?? this.buttonPrimaryColorBorder,
       buttonPrimaryColorText:
           buttonPrimaryColorText ?? this.buttonPrimaryColorText,
+      buttonPrimaryDisabledColorBackground:
+          buttonPrimaryDisabledColorBackground ??
+              this.buttonPrimaryDisabledColorBackground,
+      buttonPrimaryDisabledColorText: buttonPrimaryDisabledColorText ??
+          this.buttonPrimaryDisabledColorText,
       buttonSecondaryColorBackground: buttonSecondaryColorBackground ??
           this.buttonSecondaryColorBackground,
       buttonSecondaryColorBorder:
@@ -683,6 +790,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonDangerColorBorder ?? this.buttonDangerColorBorder,
       buttonDangerColorText:
           buttonDangerColorText ?? this.buttonDangerColorText,
+      buttonNeutralColorBackground:
+          buttonNeutralColorBackground ?? this.buttonNeutralColorBackground,
+      buttonNeutralColorBorder:
+          buttonNeutralColorBorder ?? this.buttonNeutralColorBorder,
+      buttonNeutralColorText:
+          buttonNeutralColorText ?? this.buttonNeutralColorText,
       buttonPaddingX: buttonPaddingX ?? this.buttonPaddingX,
       buttonPaddingY: buttonPaddingY ?? this.buttonPaddingY,
       buttonBorderRadius: buttonBorderRadius ?? this.buttonBorderRadius,
@@ -732,6 +845,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formBorderRadius: formBorderRadius ?? this.formBorderRadius,
       inputFieldPaddingX: inputFieldPaddingX ?? this.inputFieldPaddingX,
       inputFieldPaddingY: inputFieldPaddingY ?? this.inputFieldPaddingY,
+      textFieldPaddingY: textFieldPaddingY ?? this.textFieldPaddingY,
       tableRowPaddingY: tableRowPaddingY ?? this.tableRowPaddingY,
       overlayBorderRadius: overlayBorderRadius ?? this.overlayBorderRadius,
       overlayBackdropColor: overlayBackdropColor ?? this.overlayBackdropColor,
@@ -755,6 +869,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorPrimary: c(colorPrimary, other.colorPrimary),
       colorBackground: c(colorBackground, other.colorBackground),
       colorDanger: c(colorDanger, other.colorDanger),
+      colorSuccess: c(colorSuccess, other.colorSuccess),
+      colorWarning: c(colorWarning, other.colorWarning),
       headingXl: t < 0.5 ? headingXl : other.headingXl,
       headingLg: t < 0.5 ? headingLg : other.headingLg,
       headingMd: t < 0.5 ? headingMd : other.headingMd,
@@ -767,6 +883,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorText: c(colorText, other.colorText),
       colorSecondaryText: c(colorSecondaryText, other.colorSecondaryText),
       colorBorder: c(colorBorder, other.colorBorder),
+      colorBorderSubtle: c(colorBorderSubtle, other.colorBorderSubtle),
       actionPrimaryColorText:
           c(actionPrimaryColorText, other.actionPrimaryColorText),
       actionPrimaryTextDecorationLine: t < 0.5
@@ -805,6 +922,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
           c(buttonPrimaryColorBorder, other.buttonPrimaryColorBorder),
       buttonPrimaryColorText:
           c(buttonPrimaryColorText, other.buttonPrimaryColorText),
+      buttonPrimaryDisabledColorBackground: c(
+          buttonPrimaryDisabledColorBackground,
+          other.buttonPrimaryDisabledColorBackground),
+      buttonPrimaryDisabledColorText: c(buttonPrimaryDisabledColorText,
+          other.buttonPrimaryDisabledColorText),
       buttonSecondaryColorBackground: c(buttonSecondaryColorBackground,
           other.buttonSecondaryColorBackground),
       buttonSecondaryColorBorder:
@@ -817,6 +939,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           c(buttonDangerColorBorder, other.buttonDangerColorBorder),
       buttonDangerColorText:
           c(buttonDangerColorText, other.buttonDangerColorText),
+      buttonNeutralColorBackground:
+          c(buttonNeutralColorBackground, other.buttonNeutralColorBackground),
+      buttonNeutralColorBorder:
+          c(buttonNeutralColorBorder, other.buttonNeutralColorBorder),
+      buttonNeutralColorText:
+          c(buttonNeutralColorText, other.buttonNeutralColorText),
       buttonPaddingX: d(buttonPaddingX, other.buttonPaddingX),
       buttonPaddingY: d(buttonPaddingY, other.buttonPaddingY),
       buttonBorderRadius: d(buttonBorderRadius, other.buttonBorderRadius),
@@ -868,6 +996,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formBorderRadius: d(formBorderRadius, other.formBorderRadius),
       inputFieldPaddingX: d(inputFieldPaddingX, other.inputFieldPaddingX),
       inputFieldPaddingY: d(inputFieldPaddingY, other.inputFieldPaddingY),
+      textFieldPaddingY: d(textFieldPaddingY, other.textFieldPaddingY),
       tableRowPaddingY: d(tableRowPaddingY, other.tableRowPaddingY),
       overlayBorderRadius: d(overlayBorderRadius, other.overlayBorderRadius),
       overlayBackdropColor: c(overlayBackdropColor, other.overlayBackdropColor),
@@ -893,6 +1022,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
           colorPrimary == other.colorPrimary &&
           colorBackground == other.colorBackground &&
           colorDanger == other.colorDanger &&
+          colorSuccess == other.colorSuccess &&
+          colorWarning == other.colorWarning &&
           headingXl == other.headingXl &&
           headingLg == other.headingLg &&
           headingMd == other.headingMd &&
@@ -905,6 +1036,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           colorText == other.colorText &&
           colorSecondaryText == other.colorSecondaryText &&
           colorBorder == other.colorBorder &&
+          colorBorderSubtle == other.colorBorderSubtle &&
           actionPrimaryColorText == other.actionPrimaryColorText &&
           actionPrimaryTextDecorationLine == other.actionPrimaryTextDecorationLine &&
           actionPrimaryTextDecorationColor == other.actionPrimaryTextDecorationColor &&
@@ -920,12 +1052,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonPrimaryColorBackground == other.buttonPrimaryColorBackground &&
           buttonPrimaryColorBorder == other.buttonPrimaryColorBorder &&
           buttonPrimaryColorText == other.buttonPrimaryColorText &&
+          buttonPrimaryDisabledColorBackground ==
+              other.buttonPrimaryDisabledColorBackground &&
+          buttonPrimaryDisabledColorText ==
+              other.buttonPrimaryDisabledColorText &&
           buttonSecondaryColorBackground == other.buttonSecondaryColorBackground &&
           buttonSecondaryColorBorder == other.buttonSecondaryColorBorder &&
           buttonSecondaryColorText == other.buttonSecondaryColorText &&
           buttonDangerColorBackground == other.buttonDangerColorBackground &&
           buttonDangerColorBorder == other.buttonDangerColorBorder &&
           buttonDangerColorText == other.buttonDangerColorText &&
+          buttonNeutralColorBackground == other.buttonNeutralColorBackground &&
+          buttonNeutralColorBorder == other.buttonNeutralColorBorder &&
+          buttonNeutralColorText == other.buttonNeutralColorText &&
           buttonPaddingX == other.buttonPaddingX &&
           buttonPaddingY == other.buttonPaddingY &&
           buttonBorderRadius == other.buttonBorderRadius &&
@@ -958,6 +1097,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           formBorderRadius == other.formBorderRadius &&
           inputFieldPaddingX == other.inputFieldPaddingX &&
           inputFieldPaddingY == other.inputFieldPaddingY &&
+          textFieldPaddingY == other.textFieldPaddingY &&
           tableRowPaddingY == other.tableRowPaddingY &&
           overlayBorderRadius == other.overlayBorderRadius &&
           overlayBackdropColor == other.overlayBackdropColor &&
@@ -977,6 +1117,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
         colorPrimary,
         colorBackground,
         colorDanger,
+        colorSuccess,
+        colorWarning,
         headingXl,
         headingLg,
         headingMd,
@@ -989,6 +1131,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         colorText,
         colorSecondaryText,
         colorBorder,
+        colorBorderSubtle,
         actionPrimaryColorText,
         actionPrimaryTextDecorationLine,
         actionPrimaryTextDecorationColor,
@@ -1004,12 +1147,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
         buttonPrimaryColorBackground,
         buttonPrimaryColorBorder,
         buttonPrimaryColorText,
+        buttonPrimaryDisabledColorBackground,
+        buttonPrimaryDisabledColorText,
         buttonSecondaryColorBackground,
         buttonSecondaryColorBorder,
         buttonSecondaryColorText,
         buttonDangerColorBackground,
         buttonDangerColorBorder,
         buttonDangerColorText,
+        buttonNeutralColorBackground,
+        buttonNeutralColorBorder,
+        buttonNeutralColorText,
         buttonPaddingX,
         buttonPaddingY,
         buttonBorderRadius,
@@ -1042,6 +1190,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         formBorderRadius,
         inputFieldPaddingX,
         inputFieldPaddingY,
+        textFieldPaddingY,
         tableRowPaddingY,
         overlayBorderRadius,
         overlayBackdropColor,

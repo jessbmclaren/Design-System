@@ -60,29 +60,45 @@ abstract final class DsSkins {
       colorText: _navyInk,
       colorSecondaryText: _slate,
       colorBorder: _border,
+      colorBorderSubtle: _hairline,
       colorBackground: _page,
       offsetBackgroundColor: _fill,
       formPlaceholderTextColor: _placeholder,
       colorDanger: _danger,
+      // Bright signal tier for meters and live status (distinct from the
+      // AA-safe badge container inks).
+      colorSuccess: const Color(0xFF1F9D57),
+      colorWarning: const Color(0xFFD9870B),
       buttonDangerColorBackground: _danger,
       buttonDangerColorBorder: _danger,
+      // Disabled primary: a solid tint (brand flattened onto white) so the
+      // treatment reads identically on any backdrop.
+      buttonPrimaryDisabledColorBackground: const Color(0xFF9DA3D5),
+      buttonPrimaryDisabledColorText: const Color(0xFFF5F6FB),
       // Secondary action: a neutral outline (white fill, hairline border).
       buttonSecondaryColorBackground: const Color(0xFFFFFFFF),
       buttonSecondaryColorBorder: _border,
       buttonSecondaryColorText: _navyInk,
-      // Badges (Engen container tones).
+      // Neutral action (federated sign-in): the same quiet outline as the
+      // secondary action in this skin.
+      buttonNeutralColorBackground: const Color(0xFFFFFFFF),
+      buttonNeutralColorBorder: _border,
+      buttonNeutralColorText: _navyInk,
+      // Badges (Engen container tones). Status borders match their
+      // backgrounds so each badge reads as a flat container without an
+      // outline; only the neutral badge keeps its hairline.
       badgeNeutralColorBackground: _fill,
       badgeNeutralColorText: _slate,
       badgeNeutralColorBorder: _hairline,
       badgeSuccessColorBackground: const Color(0xFFE4F3EB),
       badgeSuccessColorText: const Color(0xFF116B3C),
-      badgeSuccessColorBorder: const Color(0xFFB6DEC6),
+      badgeSuccessColorBorder: const Color(0xFFE4F3EB),
       badgeWarningColorBackground: const Color(0xFFFCEEBA),
       badgeWarningColorText: const Color(0xFFA82C00),
-      badgeWarningColorBorder: const Color(0xFFF5DA80),
+      badgeWarningColorBorder: const Color(0xFFFCEEBA),
       badgeDangerColorBackground: const Color(0xFFFCE8EC),
       badgeDangerColorText: const Color(0xFFB01030),
-      badgeDangerColorBorder: const Color(0xFFF3C6D0),
+      badgeDangerColorBorder: const Color(0xFFFCE8EC),
       // Shape: roomier corners.
       buttonBorderRadius: 10,
       formBorderRadius: 10,
@@ -129,6 +145,10 @@ abstract final class DsSkins {
       formAccentColor: const Color(0xFF5A6BE0),
       buttonPrimaryColorBackground: const Color(0xFF3B49C4),
       buttonPrimaryColorBorder: const Color(0xFF3B49C4),
+      // Disabled primary: the dark indigo flattened onto the dark page, a
+      // solid tint mirroring the light skin's treatment.
+      buttonPrimaryDisabledColorBackground: const Color(0xFF232A60),
+      buttonPrimaryDisabledColorText: const Color(0xFFE9EAEF),
       buttonBorderRadius: 10,
       formBorderRadius: 10,
       badgeBorderRadius: 8,

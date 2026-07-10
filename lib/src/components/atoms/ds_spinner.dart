@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../util/ds_motion.dart';
 
 /// The visual size of a [DsSpinner].
 enum DsSpinnerSize {
@@ -30,13 +31,20 @@ enum DsSpinnerSize {
 /// view, [DsSpinnerSize.medium] for a section, [DsSpinnerSize.small] inline.
 /// Use [delay] to avoid flashing a spinner for fast operations; the spinner
 /// stays invisible until the delay elapses.
+///
+/// When the user has requested reduced motion the spinner renders a static
+/// three-quarter ring instead of animating, so it still reads as busy without
+/// the spin. Pass a [label] to announce what is loading through a polite live
+/// region; without one the spinner keeps its plain [semanticLabel].
 class DsSpinner extends StatefulWidget {
+  /// Creates a loading indicator.
   const DsSpinner({
     super.key,
     this.size = DsSpinnerSize.medium,
     this.delay = Duration.zero,
     this.color,
     this.semanticLabel = 'Loading',
+    this.label,
   });
 
   /// The visual size of the spinner.
@@ -53,6 +61,12 @@ class DsSpinner extends StatefulWidget {
 
   /// The semantic label announced by assistive technologies.
   final String semanticLabel;
+
+  /// A description of what is loading, announced through a live region as the
+  /// spinner appears (for example "Loading results"). When set it replaces
+  /// [semanticLabel] as the announced text; when null the spinner keeps its
+  /// plain [semanticLabel] with no live region.
+  final String? label;
 
   @override
   State<DsSpinner> createState() => _DsSpinnerState();
@@ -84,16 +98,35 @@ class _DsSpinnerState extends State<DsSpinner> {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     final color = widget.color ?? tokens.buttonPrimaryColorBackground;
-    return SizedBox(
+    final liveRegion = widget.label != null;
+
+    final ring = SizedBox(
       width: widget.size.dimension,
       height: widget.size.dimension,
       child: _visible
           ? CircularProgressIndicator(
               strokeWidth: widget.size.strokeWidth,
+              // Under reduced motion a static three-quarter ring still reads
+              // as busy without the spin.
+              value: DsMotion.reduced(context) ? 0.75 : null,
               valueColor: AlwaysStoppedAnimation<Color>(color),
-              semanticsLabel: widget.semanticLabel,
+              // The live region below carries the announcement when a [label]
+              // is set, so the indicator's own label is dropped to avoid a
+              // double reading.
+              semanticsLabel: liveRegion ? null : widget.semanticLabel,
             )
           : null,
+    );
+
+    if (!liveRegion || !_visible) return ring;
+
+    // The node is created when the spinner becomes visible, so a polite live
+    // region announces the label at that moment rather than on mount.
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: widget.label,
+      child: ring,
     );
   }
 }

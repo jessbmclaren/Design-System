@@ -17,6 +17,12 @@ import '../../tokens/ds_icon_size.dart';
 /// meaningful [semanticLabel]: an icon alone carries no text for a screen
 /// reader.
 ///
+/// Keyboard focus draws a ring around the circle in the theme's
+/// [DsTokens.formAccentColor], so focus reads differently from hover. The tap
+/// target is padded to at least 48dp on every platform while the visible
+/// circle keeps its [size], so the control stays accessible to touch without
+/// growing visually.
+///
 /// The diameter and glyph default to the medium control size. Pass [size] and
 /// [iconSize] to fit a denser or more prominent slot.
 class DsIconButton extends StatelessWidget {
@@ -46,6 +52,12 @@ class DsIconButton extends StatelessWidget {
   /// The glyph size, in logical pixels.
   final double iconSize;
 
+  /// The stroke width of the keyboard focus ring.
+  ///
+  /// There is no dedicated focus-ring token yet, so the width is fixed here
+  /// and the colour comes from [DsTokens.formAccentColor].
+  static const double _focusRingWidth = 2;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -65,6 +77,21 @@ class DsIconButton extends StatelessWidget {
       return null;
     });
 
+    // The soft fill alone reads the same as hover, so keyboard focus adds an
+    // accent ring on the circle's edge as a distinct indicator.
+    final WidgetStateProperty<OutlinedBorder> shape =
+        WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.focused)) {
+        return CircleBorder(
+          side: BorderSide(
+            color: tokens.formAccentColor,
+            width: _focusRingWidth,
+          ),
+        );
+      }
+      return const CircleBorder();
+    });
+
     return IconButton(
       onPressed: onPressed,
       icon: Icon(icon, size: iconSize),
@@ -74,8 +101,11 @@ class DsIconButton extends StatelessWidget {
       style: IconButton.styleFrom(
         foregroundColor: foreground,
         disabledForegroundColor: foreground.withValues(alpha: 0.38),
-        shape: const CircleBorder(),
-      ).copyWith(backgroundColor: fill),
+        // Pad the hit area out to the 48dp accessible minimum on every
+        // platform. The visible circle stays at [size]; the padding is
+        // transparent and still routes taps to the button.
+        tapTargetSize: MaterialTapTargetSize.padded,
+      ).copyWith(backgroundColor: fill, shape: shape),
     );
   }
 }

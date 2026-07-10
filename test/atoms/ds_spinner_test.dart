@@ -62,5 +62,68 @@ void main() {
       );
       expect(indicator.semanticsLabel, 'Fetching results');
     });
+
+    testWidgets('renders a static three-quarter ring under reduced motion',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: DsSpinner(),
+        ),
+      );
+      await tester.pump();
+
+      final indicator = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(indicator.value, 0.75);
+
+      // A determinate ring schedules no frames, so the surface is still.
+      await tester.pump(const Duration(seconds: 1));
+      expect(tester.binding.transientCallbackCount, 0);
+    });
+
+    testWidgets('spins normally when motion is not reduced', (tester) async {
+      await pumpDs(tester, const DsSpinner());
+      await tester.pump();
+
+      final indicator = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(indicator.value, isNull);
+    });
+
+    testWidgets('label wraps the spinner in a polite live region',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsSpinner(label: 'Loading results'));
+      await tester.pump();
+
+      expect(
+        tester.getSemantics(find.byType(DsSpinner)),
+        isSemantics(label: 'Loading results', isLiveRegion: true),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('the live region only appears once the delay elapses',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsSpinner(
+          delay: Duration(milliseconds: 300),
+          label: 'Loading results',
+        ),
+      );
+      await tester.pump();
+
+      expect(find.bySemanticsLabel('Loading results'), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.bySemanticsLabel('Loading results'), findsOneWidget);
+      handle.dispose();
+    });
   });
 }

@@ -29,6 +29,8 @@ class DsPasswordField extends StatefulWidget {
     this.enabled = true,
     this.autofocus = false,
     this.focusNode,
+    this.validator,
+    this.autovalidateMode,
   });
 
   /// The text shown above the input. When null, no label row is rendered.
@@ -66,6 +68,14 @@ class DsPasswordField extends StatefulWidget {
   /// An optional focus node controlling the field's focus.
   final FocusNode? focusNode;
 
+  /// Validates the password inside a [Form], forwarded to [DsTextField].
+  /// Pair it with the rules in `dsPasswordRules` so the form gate and the
+  /// visible checklist agree.
+  final FormFieldValidator<String>? validator;
+
+  /// When the [validator] runs, forwarded to [DsTextField].
+  final AutovalidateMode? autovalidateMode;
+
   @override
   State<DsPasswordField> createState() => _DsPasswordFieldState();
 }
@@ -89,6 +99,8 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
       enabled: widget.enabled,
       autofocus: widget.autofocus,
       focusNode: widget.focusNode,
+      validator: widget.validator,
+      autovalidateMode: widget.autovalidateMode,
       obscureText: _obscured,
       suffixIcon: IconButton(
         onPressed: widget.enabled ? _toggle : null,
