@@ -6,6 +6,8 @@ import '../../tokens/ds_icons.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_icon_button.dart';
+import 'ds_sign_up_view.dart' show DsHeadingAlignment;
 
 /// The primary call to action shown in a [DsSignInView].
 ///
@@ -27,7 +29,7 @@ class DsSignInAction {
 /// A centred sign-in / onboarding view.
 ///
 /// [DsSignInView] presents a focused welcome card: an optional brand icon, a
-/// [title], a supporting [description] and a single full-width primary
+/// [title], an optional supporting [description] and a single full-width primary
 /// [DsButton] built from [primaryAction]. It deliberately collects no
 /// passwords. The primary action navigates the user outward to a dedicated
 /// authentication flow.
@@ -39,6 +41,11 @@ class DsSignInAction {
 /// enterprise sign-in options) behind a lightweight expand/reveal so the card
 /// stays uncluttered by default.
 ///
+/// For a form-led card, left-align the heading with [headingAlignment], move
+/// the sign-up prompt into the edge-to-edge tinted [footerBand] and add a
+/// corner close button with [onClose]. Set [showBorder] to false for a
+/// shadow-only card.
+///
 /// The card is constrained to a comfortable reading width (~420dp) and shrinks
 /// to fit narrower viewports, so it never overflows on small phones.
 class DsSignInView extends StatefulWidget {
@@ -46,21 +53,25 @@ class DsSignInView extends StatefulWidget {
   const DsSignInView({
     super.key,
     required this.title,
-    required this.description,
     required this.primaryAction,
+    this.description,
     this.form,
     this.brandIcon,
     this.brandColor,
+    this.headingAlignment = DsHeadingAlignment.center,
     this.footer,
+    this.footerBand,
     this.additionalContextLabel,
     this.additionalContext,
+    this.onClose,
+    this.showBorder = true,
   });
 
   /// The prominent heading, typically a short welcome message.
   final String title;
 
-  /// Supporting copy shown beneath the [title].
-  final String description;
+  /// Optional supporting copy shown beneath the [title].
+  final String? description;
 
   /// The full-width primary action that navigates the user onward.
   final DsSignInAction primaryAction;
@@ -78,8 +89,17 @@ class DsSignInView extends StatefulWidget {
   /// button background token when omitted.
   final Color? brandColor;
 
+  /// How the heading block (the [brandIcon], the [title] and the
+  /// [description]) is aligned. Defaults to [DsHeadingAlignment.center].
+  final DsHeadingAlignment headingAlignment;
+
   /// Optional content shown below the primary action, such as a sign-up link.
   final Widget? footer;
+
+  /// Optional content rendered edge-to-edge below the card's padded body, in
+  /// a tinted band with a hairline top border. The band touches the card's
+  /// edges and the card's bottom corner radius clips it.
+  final Widget? footerBand;
 
   /// The label for the expand/reveal control. When null, no reveal is shown.
   final String? additionalContextLabel;
@@ -87,6 +107,14 @@ class DsSignInView extends StatefulWidget {
   /// The content revealed when the [additionalContextLabel] control is
   /// expanded. Ignored when [additionalContextLabel] is null.
   final Widget? additionalContext;
+
+  /// Called when the close button in the card's top corner is tapped. When
+  /// null no close affordance is shown.
+  final VoidCallback? onClose;
+
+  /// Whether the card draws a hairline border. Set false for a shadow-only
+  /// card.
+  final bool showBorder;
 
   @override
   State<DsSignInView> createState() => _DsSignInViewState();
@@ -98,7 +126,6 @@ class _DsSignInViewState extends State<DsSignInView> {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final hasReveal = widget.additionalContextLabel != null;
 
     return Center(
       child: SingleChildScrollView(
@@ -107,70 +134,30 @@ class _DsSignInViewState extends State<DsSignInView> {
           constraints: const BoxConstraints(maxWidth: 420),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(DsSpacing.xl),
             decoration: BoxDecoration(
               color: tokens.formBackgroundColor,
-              border: Border.all(color: tokens.colorBorder),
+              border: widget.showBorder
+                  ? Border.all(color: tokens.colorBorder)
+                  : null,
               borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
               boxShadow: tokens.shadowMedium,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            // The close affordance sits fully inside the Stack: hit-testing
+            // stops at the Stack's bounds, so a control hanging outside the
+            // padded body would paint whole but respond only in part.
+            child: Stack(
               children: [
-                if (widget.brandIcon != null) ...[
-                  _BrandMark(
-                    icon: widget.brandIcon!,
-                    color:
-                        widget.brandColor ?? tokens.buttonPrimaryColorBackground,
+                _buildCard(tokens),
+                if (widget.onClose != null)
+                  Positioned(
+                    top: DsSpacing.sm,
+                    right: DsSpacing.sm,
+                    child: DsIconButton(
+                      icon: DsIcons.close,
+                      semanticLabel: 'Close',
+                      onPressed: widget.onClose,
+                    ),
                   ),
-                  const SizedBox(height: DsSpacing.lg),
-                ],
-                Text(
-                  widget.title,
-                  textAlign: TextAlign.center,
-                  style: tokens.headingLg.toTextStyle(
-                    color: tokens.colorText,
-                  ),
-                ),
-                const SizedBox(height: DsSpacing.sm),
-                Text(
-                  widget.description,
-                  textAlign: TextAlign.center,
-                  style: tokens.bodySm.toTextStyle(
-                    color: tokens.colorSecondaryText,
-                  ),
-                ),
-                const SizedBox(height: DsSpacing.xl),
-                if (widget.form != null) ...[
-                  widget.form!,
-                  const SizedBox(height: DsSpacing.lg),
-                ],
-                DsButton(
-                  label: widget.primaryAction.label,
-                  onPressed: widget.primaryAction.onPressed,
-                  fullWidth: true,
-                ),
-                if (widget.footer != null) ...[
-                  const SizedBox(height: DsSpacing.lg),
-                  Align(
-                    alignment: Alignment.center,
-                    child: widget.footer,
-                  ),
-                ],
-                if (hasReveal) ...[
-                  const SizedBox(height: DsSpacing.md),
-                  Divider(height: 1, color: tokens.colorBorder),
-                  _RevealControl(
-                    label: widget.additionalContextLabel!,
-                    expanded: _expanded,
-                    onToggle: () => setState(() => _expanded = !_expanded),
-                  ),
-                  if (_expanded && widget.additionalContext != null) ...[
-                    const SizedBox(height: DsSpacing.sm),
-                    widget.additionalContext!,
-                  ],
-                ],
               ],
             ),
           ),
@@ -178,20 +165,129 @@ class _DsSignInViewState extends State<DsSignInView> {
       ),
     );
   }
+
+  /// The padded card body, plus the optional edge-to-edge
+  /// [DsSignInView.footerBand] clipped to the card's corner radius.
+  Widget _buildCard(DsTokens tokens) {
+    final body = Padding(
+      padding: const EdgeInsets.all(DsSpacing.xl),
+      child: _buildBody(tokens),
+    );
+    if (widget.footerBand == null) return body;
+
+    // The band sits outside the body's padding so its tint reaches the card's
+    // edges; the ClipRRect keeps it inside the bottom corner radius.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          body,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DsSpacing.xl,
+              vertical: DsSpacing.lg,
+            ),
+            decoration: BoxDecoration(
+              color: tokens.offsetBackgroundColor,
+              border: Border(top: BorderSide(color: tokens.colorBorder)),
+            ),
+            child: widget.footerBand,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The card body: heading block, optional form, primary action, footer and
+  /// the additional-context reveal.
+  Widget _buildBody(DsTokens tokens) {
+    final hasReveal = widget.additionalContextLabel != null;
+    final centred = widget.headingAlignment == DsHeadingAlignment.center;
+    final textAlign = centred ? TextAlign.center : TextAlign.start;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (widget.brandIcon != null) ...[
+          _BrandMark(
+            icon: widget.brandIcon!,
+            color: widget.brandColor ?? tokens.buttonPrimaryColorBackground,
+            alignment: centred ? Alignment.center : Alignment.centerLeft,
+          ),
+          const SizedBox(height: DsSpacing.lg),
+        ],
+        Text(
+          widget.title,
+          textAlign: textAlign,
+          style: tokens.headingLg.toTextStyle(
+            color: tokens.colorText,
+          ),
+        ),
+        if (widget.description != null) ...[
+          const SizedBox(height: DsSpacing.sm),
+          Text(
+            widget.description!,
+            textAlign: textAlign,
+            style: tokens.bodySm.toTextStyle(
+              color: tokens.colorSecondaryText,
+            ),
+          ),
+        ],
+        const SizedBox(height: DsSpacing.xl),
+        if (widget.form != null) ...[
+          widget.form!,
+          const SizedBox(height: DsSpacing.lg),
+        ],
+        DsButton(
+          label: widget.primaryAction.label,
+          onPressed: widget.primaryAction.onPressed,
+          fullWidth: true,
+        ),
+        if (widget.footer != null) ...[
+          const SizedBox(height: DsSpacing.lg),
+          Align(
+            alignment: Alignment.center,
+            child: widget.footer,
+          ),
+        ],
+        if (hasReveal) ...[
+          const SizedBox(height: DsSpacing.md),
+          Divider(height: 1, color: tokens.colorBorder),
+          _RevealControl(
+            label: widget.additionalContextLabel!,
+            expanded: _expanded,
+            onToggle: () => setState(() => _expanded = !_expanded),
+          ),
+          if (_expanded && widget.additionalContext != null) ...[
+            const SizedBox(height: DsSpacing.sm),
+            widget.additionalContext!,
+          ],
+        ],
+      ],
+    );
+  }
 }
 
 /// The tinted rounded square that frames a brand glyph.
 class _BrandMark extends StatelessWidget {
-  const _BrandMark({required this.icon, required this.color});
+  const _BrandMark({
+    required this.icon,
+    required this.color,
+    required this.alignment,
+  });
 
   final IconData icon;
   final Color color;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     return Align(
-      alignment: Alignment.center,
+      alignment: alignment,
       child: Container(
         padding: const EdgeInsets.all(DsSpacing.md),
         decoration: BoxDecoration(

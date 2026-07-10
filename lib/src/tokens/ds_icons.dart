@@ -121,6 +121,9 @@ abstract final class DsIcons {
   /// An error / failure.
   static const IconData error = LucideIcons.circle_alert;
 
+  /// A locked, gated affordance that is not yet available.
+  static const IconData lock = LucideIcons.lock;
+
   // --- Selection & true-state ----------------------------------------------
 
   /// A selected rating step: filled, because the fill is the state. Kept as the

@@ -131,5 +131,204 @@ void main() {
       expect(find.text('Marketing benefits panel'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('renders the header in place of the brand icon',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          brandIcon: Icons.workspaces_outline,
+          header: const DsWordmark(primary: 'acme', accent: 'id'),
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      expect(find.byType(DsWordmark), findsOneWidget);
+      expect(find.byIcon(Icons.workspaces_outline), findsNothing);
+    });
+
+    testWidgets('renders aboveForm between the description and the form',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          description: 'Takes seconds.',
+          aboveForm: const Text('Already have an account?'),
+          form: const TextField(key: Key('email')),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      final promptY =
+          tester.getTopLeft(find.text('Already have an account?')).dy;
+      expect(
+        promptY,
+        greaterThan(tester.getTopLeft(find.text('Takes seconds.')).dy),
+      );
+      expect(
+        promptY,
+        lessThan(tester.getTopLeft(find.byKey(const Key('email'))).dy),
+      );
+    });
+
+    testWidgets('start-aligns the heading by default and centres it on request',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      expect(
+        tester.widget<Text>(find.text('Sign up')).textAlign,
+        TextAlign.start,
+      );
+
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          headingAlignment: DsHeadingAlignment.center,
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      expect(
+        tester.widget<Text>(find.text('Sign up')).textAlign,
+        TextAlign.center,
+      );
+    });
+
+    testWidgets('shows a labelled close button that fires onClose',
+        (tester) async {
+      var closed = 0;
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+          onClose: () => closed++,
+        ),
+      );
+
+      expect(find.byTooltip('Close'), findsOneWidget);
+
+      await tester.tap(find.byType(DsIconButton));
+      await tester.pump();
+
+      expect(closed, 1);
+    });
+
+    testWidgets('shows no close button when onClose is null', (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      expect(find.byType(DsIconButton), findsNothing);
+    });
+
+    testWidgets('draws the card border by default and drops it on request',
+        (tester) async {
+      BoxDecoration cardDecoration() {
+        final tokens = DsTokens.of(tester.element(find.byType(DsSignUpView)));
+        return tester
+            .widgetList<Container>(find.byType(Container))
+            .map((c) => c.decoration)
+            .whereType<BoxDecoration>()
+            .singleWhere((d) => d.color == tokens.formBackgroundColor);
+      }
+
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+      expect(cardDecoration().border, isNotNull);
+
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          showBorder: false,
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+      expect(cardDecoration().border, isNull);
+    });
+
+    testWidgets('lays out the new slots without overflow on a small phone',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Seconds to sign up!',
+          headingAlignment: DsHeadingAlignment.center,
+          header: const DsWordmark(primary: 'acme', accent: 'id'),
+          aboveForm: const Text('Already have an account?'),
+          form: const SizedBox(height: 120),
+          primaryActionLabel: 'Sign up with Email',
+          onSubmit: () {},
+          footer: const Text('Terms apply'),
+          onClose: () {},
+          showBorder: false,
+        ),
+        surfaceSize: const Size(320, 900),
+      );
+      await tester.pump();
+
+      expect(find.text('Seconds to sign up!'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('lays out the new slots without overflow on a large desktop',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Seconds to sign up!',
+          headingAlignment: DsHeadingAlignment.center,
+          header: const DsWordmark(primary: 'acme', accent: 'id'),
+          aboveForm: const Text('Already have an account?'),
+          form: const SizedBox(height: 120),
+          primaryActionLabel: 'Sign up with Email',
+          onSubmit: () {},
+          footer: const Text('Terms apply'),
+          aside: const Text('Marketing benefits panel'),
+          onClose: () {},
+          showBorder: false,
+        ),
+        surfaceSize: const Size(1200, 900),
+      );
+      await tester.pump();
+
+      expect(find.text('Seconds to sign up!'), findsOneWidget);
+      expect(find.text('Marketing benefits panel'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

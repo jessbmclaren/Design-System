@@ -75,6 +75,10 @@ void main() {
 
     dsGoldenMatrix('atom', 'link', () => const DsLink(label: 'View details'));
 
+    // Static (animate stays false) so the fill lands on a deterministic frame.
+    dsGoldenMatrix(
+        'atom', 'progress_bar', () => const DsProgressBar(value: 0.6));
+
     dsGoldenMatrix(
       'atom',
       'radio',

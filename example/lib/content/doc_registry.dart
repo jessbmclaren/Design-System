@@ -66,7 +66,9 @@ import 'pages/action_buttons.dart';
 import 'pages/communicating_state.dart';
 import 'pages/empty_state.dart';
 import 'pages/loading.dart';
+import 'pages/progress_bar.dart';
 import 'pages/progress_stepping.dart';
+import 'pages/setup_guide.dart';
 import 'pages/waiting_screens.dart';
 
 /// Every documentation page, in sidebar order.
@@ -107,6 +109,7 @@ final List<PatternPage> allPages = [
   communicatingStatePage,
   emptyStatePage,
   loadingPage,
+  progressBarPage,
   progressSteppingPage,
   waitingScreensPage,
   // Overlays
@@ -142,6 +145,7 @@ final List<PatternPage> allPages = [
   signOutPage,
   settingsSignInPage,
   businessVerificationPage,
+  setupGuidePage,
   additionalContextPage,
   redirectsPage,
 ];

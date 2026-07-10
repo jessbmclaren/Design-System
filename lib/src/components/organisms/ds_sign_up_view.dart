@@ -3,10 +3,25 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_icon_size.dart';
+import '../../tokens/ds_icons.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_box.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_icon_button.dart';
+
+/// How an auth card's heading block is aligned.
+///
+/// Applies to the title, the description and any brand header above them.
+/// Start alignment reads as a conventional form; centred alignment suits a
+/// short, focused card such as a one-step sign-up.
+enum DsHeadingAlignment {
+  /// Align the heading block with the leading edge.
+  start,
+
+  /// Centre the heading block.
+  center,
+}
 
 /// A centred sign-up screen scaffold.
 ///
@@ -16,6 +31,11 @@ import '../atoms/ds_icon.dart';
 /// primary [DsButton] built from [primaryActionLabel] / [onSubmit] and an
 /// optional [footer] for secondary links (such as an "Already have an account?"
 /// prompt).
+///
+/// For a brand-led card, pass a [header] (typically a `DsWordmark`) in place
+/// of the glyph, centre the heading block with [headingAlignment], slot a
+/// sign-in prompt into [aboveForm] and add a corner close button with
+/// [onClose]. Set [showBorder] to false for a shadow-only card.
 ///
 /// The view composes existing Design System components rather than
 /// re-implementing fields or buttons. The caller owns the form's contents and
@@ -62,9 +82,14 @@ class DsSignUpView extends StatelessWidget {
     this.description,
     this.brandIcon,
     this.brandColor,
+    this.header,
+    this.headingAlignment = DsHeadingAlignment.start,
+    this.aboveForm,
     this.submitPending = false,
     this.footer,
     this.aside,
+    this.onClose,
+    this.showBorder = true,
   });
 
   /// The prominent heading, typically a short "Create your account" message.
@@ -79,6 +104,18 @@ class DsSignUpView extends StatelessWidget {
   /// The tint used for the brand glyph's container. Defaults to the primary
   /// button background token when omitted.
   final Color? brandColor;
+
+  /// An optional brand header (typically a `DsWordmark`) rendered above the
+  /// [title]. When set it replaces the [brandIcon] treatment.
+  final Widget? header;
+
+  /// How the heading block (the [header] or [brandIcon], the [title] and the
+  /// [description]) is aligned. Defaults to [DsHeadingAlignment.start].
+  final DsHeadingAlignment headingAlignment;
+
+  /// Optional content rendered between the [description] and the [form], such
+  /// as an "Already have an account?" prompt.
+  final Widget? aboveForm;
 
   /// The caller-supplied form body, typically a `DsFormFieldGroup` or a column
   /// of `DsTextField`s. The view lays this out between the header and the
@@ -105,6 +142,14 @@ class DsSignUpView extends StatelessWidget {
   /// screens and stacked beneath it on compact ones. When omitted the card is
   /// centred on its own.
   final Widget? aside;
+
+  /// Called when the close button in the card's top corner is tapped. When
+  /// null no close affordance is shown.
+  final VoidCallback? onClose;
+
+  /// Whether the card draws a hairline border. Set false for a shadow-only
+  /// card.
+  final bool showBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -148,11 +193,16 @@ class DsSignUpView extends StatelessWidget {
               description: description,
               brandIcon: brandIcon,
               brandColor: brandColor,
+              header: header,
+              headingAlignment: headingAlignment,
+              aboveForm: aboveForm,
               form: form,
               primaryActionLabel: primaryActionLabel,
               onSubmit: onSubmit,
               submitPending: submitPending,
               footer: footer,
+              onClose: onClose,
+              showBorder: showBorder,
             ),
           ),
           const SizedBox(width: DsSpacing.xl),
@@ -180,11 +230,16 @@ class DsSignUpView extends StatelessWidget {
             description: description,
             brandIcon: brandIcon,
             brandColor: brandColor,
+            header: header,
+            headingAlignment: headingAlignment,
+            aboveForm: aboveForm,
             form: form,
             primaryActionLabel: primaryActionLabel,
             onSubmit: onSubmit,
             submitPending: submitPending,
             footer: footer,
+            onClose: onClose,
+            showBorder: showBorder,
           ),
           if (aside != null) ...[
             const SizedBox(height: DsSpacing.lg),
@@ -203,76 +258,119 @@ class _FormCard extends StatelessWidget {
     required this.description,
     required this.brandIcon,
     required this.brandColor,
+    required this.header,
+    required this.headingAlignment,
+    required this.aboveForm,
     required this.form,
     required this.primaryActionLabel,
     required this.onSubmit,
     required this.submitPending,
     required this.footer,
+    required this.onClose,
+    required this.showBorder,
   });
 
   final String title;
   final String? description;
   final IconData? brandIcon;
   final Color? brandColor;
+  final Widget? header;
+  final DsHeadingAlignment headingAlignment;
+  final Widget? aboveForm;
   final Widget form;
   final String primaryActionLabel;
   final VoidCallback? onSubmit;
   final bool submitPending;
   final Widget? footer;
+  final VoidCallback? onClose;
+  final bool showBorder;
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
+    final centred = headingAlignment == DsHeadingAlignment.center;
+    final headerAlignment = centred ? Alignment.center : Alignment.centerLeft;
+    final textAlign = centred ? TextAlign.center : TextAlign.start;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(DsSpacing.xl),
       decoration: BoxDecoration(
         color: tokens.formBackgroundColor,
-        border: Border.all(color: tokens.colorBorder),
+        border: showBorder ? Border.all(color: tokens.colorBorder) : null,
         borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
         boxShadow: tokens.shadowMedium,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      // The close affordance sits fully inside the Stack: hit-testing stops at
+      // the Stack's bounds, so a control hanging outside the padded body would
+      // paint whole but respond only in part.
+      child: Stack(
         children: [
-          if (brandIcon != null) ...[
-            _BrandMark(
-              icon: brandIcon!,
-              color: brandColor ?? tokens.buttonPrimaryColorBackground,
-            ),
-            const SizedBox(height: DsSpacing.lg),
-          ],
-          Semantics(
-            header: true,
-            child: Text(
-              title,
-              style: tokens.headingLg.toTextStyle(color: tokens.colorText),
+          Padding(
+            padding: const EdgeInsets.all(DsSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (header != null) ...[
+                  Align(alignment: headerAlignment, child: header),
+                  const SizedBox(height: DsSpacing.lg),
+                ] else if (brandIcon != null) ...[
+                  _BrandMark(
+                    icon: brandIcon!,
+                    color: brandColor ?? tokens.buttonPrimaryColorBackground,
+                    alignment: headerAlignment,
+                  ),
+                  const SizedBox(height: DsSpacing.lg),
+                ],
+                Semantics(
+                  header: true,
+                  child: Text(
+                    title,
+                    textAlign: textAlign,
+                    style:
+                        tokens.headingLg.toTextStyle(color: tokens.colorText),
+                  ),
+                ),
+                if (description != null) ...[
+                  const SizedBox(height: DsSpacing.sm),
+                  Text(
+                    description!,
+                    textAlign: textAlign,
+                    style: tokens.bodySm.toTextStyle(
+                      color: tokens.colorSecondaryText,
+                    ),
+                  ),
+                ],
+                if (aboveForm != null) ...[
+                  const SizedBox(height: DsSpacing.sm),
+                  aboveForm!,
+                ],
+                const SizedBox(height: DsSpacing.xl),
+                form,
+                const SizedBox(height: DsSpacing.xl),
+                DsButton(
+                  label: primaryActionLabel,
+                  onPressed: onSubmit,
+                  pending: submitPending,
+                  fullWidth: true,
+                ),
+                if (footer != null) ...[
+                  const SizedBox(height: DsSpacing.lg),
+                  Align(alignment: Alignment.center, child: footer),
+                ],
+              ],
             ),
           ),
-          if (description != null) ...[
-            const SizedBox(height: DsSpacing.sm),
-            Text(
-              description!,
-              style: tokens.bodySm.toTextStyle(
-                color: tokens.colorSecondaryText,
+          if (onClose != null)
+            Positioned(
+              top: DsSpacing.sm,
+              right: DsSpacing.sm,
+              child: DsIconButton(
+                icon: DsIcons.close,
+                semanticLabel: 'Close',
+                onPressed: onClose,
               ),
             ),
-          ],
-          const SizedBox(height: DsSpacing.xl),
-          form,
-          const SizedBox(height: DsSpacing.xl),
-          DsButton(
-            label: primaryActionLabel,
-            onPressed: onSubmit,
-            pending: submitPending,
-            fullWidth: true,
-          ),
-          if (footer != null) ...[
-            const SizedBox(height: DsSpacing.lg),
-            Align(alignment: Alignment.center, child: footer),
-          ],
         ],
       ),
     );
@@ -303,16 +401,21 @@ class _AsidePanel extends StatelessWidget {
 
 /// The tinted rounded square that frames a brand glyph.
 class _BrandMark extends StatelessWidget {
-  const _BrandMark({required this.icon, required this.color});
+  const _BrandMark({
+    required this.icon,
+    required this.color,
+    required this.alignment,
+  });
 
   final IconData icon;
   final Color color;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: alignment,
       child: Container(
         padding: const EdgeInsets.all(DsSpacing.md),
         decoration: BoxDecoration(

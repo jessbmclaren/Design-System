@@ -4,6 +4,7 @@ import '../../tokens/ds_icons.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_spacing.dart';
+import '../atoms/ds_progress_bar.dart';
 
 /// A single step within a [DsProgressStepper].
 ///
@@ -179,17 +180,9 @@ class DsProgressStepper extends StatelessWidget {
           ],
         ),
         const SizedBox(height: DsSpacing.sm),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 4,
-            backgroundColor: tokens.colorBorder,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              tokens.buttonPrimaryColorBackground,
-            ),
-          ),
-        ),
+        // The shared atom draws the identical bar (same 4dp height, track and
+        // fill tokens, fully rounded ends) this stepper used to draw inline.
+        DsProgressBar(value: progress),
       ],
     );
   }

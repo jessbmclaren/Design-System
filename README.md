@@ -65,9 +65,9 @@ Components are organised into atomic design layers under
 
 | Layer | Components |
 | --- | --- |
-| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel` |
+| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel` |
 | **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordStrength`, `DsLabeledDivider` |
-| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSignInView`, `DsFocusView` |
+| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSignInView`, `DsFocusView` |
 | **Templates** | `DsPageScaffold` |
 | **Pages** | the documentation demos in [`example/`](example/) |
 
