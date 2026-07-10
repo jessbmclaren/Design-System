@@ -4,6 +4,8 @@ Anchor a record's main actions in its `DsPageHeader` so they stay reachable whil
 
 Emphasis comes from the `variant`, not the position. Reserve the `danger` variant for destructive, hard-to-undo actions such as deleting a record or voiding a document, and pair it with a confirmation step. Ordinary actions (even important ones like saving) should never borrow the danger style, or the colour stops signalling real risk.
 
+Feedback is felt, not flashy. On press a `DsButton` gives a subtle, physical response: it scales down a touch and springs back through the `DsMotion.spring` token, settling with a single small overshoot and no bounce, with the ink ripple removed so the motion itself is the acknowledgement. It is deliberately restrained — the same calm press on every button reads as considered, where an exaggerated bounce would read as a toy — and under reduced motion it holds perfectly still. Because it lives in the atom, every button in the product feels identical; you never add your own scale or bounce on top.
+
 ![Desktop (1280dp)](img/action-buttons_desktop.png)
 
 *Desktop (1280dp)*
@@ -28,6 +30,7 @@ Emphasis comes from the `variant`, not the position. Reserve the `danger` varian
 - Don't present two primary buttons competing for attention.
 - Don't use the danger style for ordinary actions.
 - Don't change action order or placement from one page to the next.
+- Don't add a custom scale or bounce to a button; the atom's subtle, token-driven press is the one, consistent feedback.
 
 ## Example
 

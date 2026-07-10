@@ -67,13 +67,13 @@ class DsButton extends StatefulWidget {
 
 class _DsButtonState extends State<DsButton>
     with SingleTickerProviderStateMixin {
-  /// How far the button scales down while held — a physical push.
-  static const double _pressedScale = 0.90;
+  /// How far the button scales down while held: a subtle physical push.
+  static const double _pressedScale = 0.96;
 
   final WidgetStatesController _states = WidgetStatesController();
 
-  /// Drives the scale. Unbounded so the spring can overshoot past 1.0 on
-  /// release — the bounce.
+  /// Drives the scale. Unbounded so the spring can overshoot slightly past 1.0
+  /// on release before settling.
   late final AnimationController _scale = AnimationController.unbounded(
     vsync: this,
     value: 1,
@@ -111,10 +111,10 @@ class _DsButtonState extends State<DsButton>
         curve: DsMotion.emphasized,
       );
     } else {
-      // Spring back to rest with the bounce token — under-damped, so it
-      // overshoots past 1.0 and settles with a couple of diminishing rebounds.
+      // Spring back to rest with the calm spring token — near-critically
+      // damped, so it settles with a single small overshoot and no rebounds.
       _scale.animateWith(
-        SpringSimulation(DsMotion.bounce, _scale.value, 1, _scale.velocity),
+        SpringSimulation(DsMotion.spring, _scale.value, 1, _scale.velocity),
       );
     }
   }

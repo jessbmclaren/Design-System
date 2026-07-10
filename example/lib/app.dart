@@ -4,18 +4,32 @@ import 'package:go_router/go_router.dart';
 
 import 'content/doc_registry.dart';
 import 'ui/docs_scaffold.dart';
+import 'ui/docs_skins.dart';
 
-/// Inherited controller for the light/dark toggle in the docs chrome.
+/// Inherited controller for the docs chrome's theming: the light/dark mode and
+/// the active brand [DocsSkin]. These are orthogonal axes — a brand can be
+/// viewed in either mode.
 class ThemeController extends InheritedWidget {
   const ThemeController({
     super.key,
     required this.mode,
     required this.toggle,
+    required this.skin,
+    required this.selectSkin,
     required super.child,
   });
 
+  /// The active light/dark mode.
   final ThemeMode mode;
+
+  /// Flips between light and dark.
   final VoidCallback toggle;
+
+  /// The active brand skin.
+  final DocsSkin skin;
+
+  /// Selects a brand skin.
+  final ValueChanged<DocsSkin> selectSkin;
 
   static ThemeController of(BuildContext context) {
     final controller =
@@ -25,7 +39,8 @@ class ThemeController extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(ThemeController oldWidget) => mode != oldWidget.mode;
+  bool updateShouldNotify(ThemeController oldWidget) =>
+      mode != oldWidget.mode || skin != oldWidget.skin;
 }
 
 /// The documentation application.
