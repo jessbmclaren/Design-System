@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -19,17 +20,37 @@ void main() {
     }
   });
 
-  test('the family policy holds: outlined defaults, filled only for true-state',
+  test('the family policy holds: Lucide line glyphs, filled only for true-state',
       () {
-    // Status/entity roles are the outlined line glyphs, not the rounded/filled
-    // Material variants.
-    expect(DsIcons.warning, Icons.warning_amber); // not warning_amber_rounded
-    expect(DsIcons.check, Icons.check); // not check_rounded
-    expect(DsIcons.user, Icons.person_outline); // not filled Icons.person
-    expect(DsIcons.checkboxChecked, Icons.check_box_outlined); // not filled
+    // The vocabulary is drawn from the Lucide font (thin, consistent, open line
+    // work) rather than Material — every role except the one true-state star
+    // resolves to a `flutter_lucide` glyph.
+    for (final icon in <IconData>[
+      DsIcons.close,
+      DsIcons.check,
+      DsIcons.chevronRight,
+      DsIcons.edit,
+      DsIcons.warning,
+      DsIcons.success,
+      DsIcons.error,
+      DsIcons.user,
+      DsIcons.checkboxChecked,
+      DsIcons.starOutline,
+    ]) {
+      expect(icon.fontFamily, 'lucide');
+      expect(icon.fontPackage, 'flutter_lucide');
+    }
 
-    // Filled is reserved for a genuine true-state (a selected rating step).
+    // A few semantic roles pinned to their Lucide glyph.
+    expect(DsIcons.warning, LucideIcons.triangle_alert);
+    expect(DsIcons.check, LucideIcons.check);
+    expect(DsIcons.user, LucideIcons.user);
+    expect(DsIcons.checkboxChecked, LucideIcons.square_check);
+
+    // Filled is reserved for a genuine true-state (a selected rating step): the
+    // one Material solid star, since Lucide is an outline-only set.
     expect(DsIcons.star, Icons.star);
-    expect(DsIcons.starOutline, Icons.star_border);
+    expect(DsIcons.star.fontFamily, 'MaterialIcons');
+    expect(DsIcons.starOutline, LucideIcons.star);
   });
 }

@@ -39,7 +39,7 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      expect(find.byIcon(DsIcons.chevronRight), findsOneWidget);
 
       await tester.tap(find.text('Settings'));
       await tester.pump();
@@ -51,7 +51,7 @@ void main() {
         (tester) async {
       await pumpDs(tester, const DsListItem(title: 'Read only'));
 
-      expect(find.byIcon(Icons.chevron_right), findsNothing);
+      expect(find.byIcon(DsIcons.chevronRight), findsNothing);
       expect(find.byType(InkWell), findsNothing);
     });
 
@@ -66,7 +66,7 @@ void main() {
       );
 
       expect(find.byIcon(Icons.star), findsOneWidget);
-      expect(find.byIcon(Icons.chevron_right), findsNothing);
+      expect(find.byIcon(DsIcons.chevronRight), findsNothing);
     });
 
     testWidgets('long title ellipsizes without overflow at 320dp',

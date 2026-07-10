@@ -172,7 +172,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(DsIcons.close));
       await tester.pump();
       expect(closed, isTrue);
 

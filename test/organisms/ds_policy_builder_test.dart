@@ -241,7 +241,7 @@ void main() {
       );
       await tester.pump();
       // Remove the FIRST rule.
-      await tester.tap(find.byIcon(Icons.close).first);
+      await tester.tap(find.byIcon(DsIcons.close).first);
       await tester.pump();
       expect(last!.rules, hasLength(1));
       expect(last!.rules.first.description, 'beta rule');

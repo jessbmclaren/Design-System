@@ -29,7 +29,7 @@ void main() {
         const DsBackLink(label: 'Back to customers'),
       );
 
-      expect(find.byIcon(Icons.arrow_back_ios_new), findsOneWidget);
+      expect(find.byIcon(DsIcons.arrowBack), findsOneWidget);
     });
 
     testWidgets('onPressed fires on tap', (tester) async {

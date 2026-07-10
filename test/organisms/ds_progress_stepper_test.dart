@@ -36,7 +36,7 @@ void main() {
       await tester.pump();
 
       // Completed steps (index < currentIndex) show a check mark.
-      expect(find.byIcon(Icons.check), findsOneWidget);
+      expect(find.byIcon(DsIcons.check), findsOneWidget);
       // Current step (index 1) shows its number "2".
       expect(find.text('2'), findsOneWidget);
       // Upcoming step (index 2) shows its number "3".
@@ -55,7 +55,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byIcon(Icons.check), findsNWidgets(3));
+      expect(find.byIcon(DsIcons.check), findsNWidgets(3));
     });
 
     testWidgets('collapses to a compact summary on narrow widths', (

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:design_system/design_system.dart';
@@ -43,7 +44,37 @@ Future<void> loadDsFonts() async {
     ..addFont(_fontBytes(File(_materialIconsFontPath()).readAsBytesSync()));
   await materialIcons.load();
 
+  // Lucide backs the DsIcons vocabulary; load its font under the family the
+  // package's IconData use (`packages/flutter_lucide/lucide`).
+  final lucide = FontLoader('packages/flutter_lucide/lucide')
+    ..addFont(_fontBytes(File(_lucideFontPath()).readAsBytesSync()));
+  await lucide.load();
+
   _fontsLoaded = true;
+}
+
+/// Resolves `lucide.ttf` inside the resolved `flutter_lucide` package by reading
+/// `.dart_tool/package_config.json`, so it works regardless of pub-cache
+/// location (fvm, CI, plain installs).
+String _lucideFontPath() {
+  final config = File('.dart_tool/package_config.json');
+  final packages =
+      (jsonDecode(config.readAsStringSync()) as Map<String, dynamic>)['packages']
+          as List<dynamic>;
+  final lucide = packages.cast<Map<String, dynamic>>().firstWhere(
+        (p) => p['name'] == 'flutter_lucide',
+        orElse: () => throw StateError('flutter_lucide not found in package_config.json'),
+      );
+  var rootUri = lucide['rootUri'] as String;
+  if (!rootUri.endsWith('/')) rootUri = '$rootUri/';
+  // rootUri is absolute (file://) for hosted packages, or relative to .dart_tool/.
+  final base = Uri.directory('${Directory.current.path}/.dart_tool');
+  final root = base.resolveUri(Uri.parse(rootUri));
+  final ttf = root.resolve('lib/fonts/lucide.ttf').toFilePath();
+  if (!File(ttf).existsSync()) {
+    throw StateError('Could not locate lucide.ttf (looked in $ttf)');
+  }
+  return ttf;
 }
 
 Future<ByteData> _fontBytes(List<int> bytes) =>

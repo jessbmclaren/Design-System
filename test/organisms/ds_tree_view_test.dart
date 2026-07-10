@@ -91,14 +91,14 @@ void main() {
       expect(find.text('Active'), findsNothing);
 
       // Expand 'Customers' via its chevron.
-      await tester.tap(find.byIcon(Icons.chevron_right).first);
+      await tester.tap(find.byIcon(DsIcons.chevronRight).first);
       await tester.pump();
       expect(find.text('Active'), findsOneWidget);
       // Its grandchildren stay hidden until 'Active' is expanded too.
       expect(find.text('Acme Corp'), findsNothing);
 
       // Collapse again hides the children.
-      await tester.tap(find.byIcon(Icons.expand_more).first);
+      await tester.tap(find.byIcon(DsIcons.expandMore).first);
       await tester.pump();
       expect(find.text('Active'), findsNothing);
     });

@@ -35,7 +35,7 @@ void main() {
 
       expect(find.text('Heads up'), findsOneWidget);
       expect(find.byType(TextButton), findsNothing);
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(DsIcons.close), findsNothing);
     });
 
     testWidgets('fires the action callback on tap', (tester) async {
@@ -73,8 +73,8 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byIcon(Icons.close), findsOneWidget);
-      await tester.tap(find.byIcon(Icons.close));
+      expect(find.byIcon(DsIcons.close), findsOneWidget);
+      await tester.tap(find.byIcon(DsIcons.close));
       await tester.pump();
 
       expect(dismissed, isTrue);

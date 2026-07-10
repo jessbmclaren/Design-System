@@ -46,7 +46,7 @@ void main() {
       // The browse button is replaced by the file chip.
       expect(find.text('Browse'), findsNothing);
 
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(DsIcons.close));
       await tester.pump();
       expect(cleared, 1);
     });

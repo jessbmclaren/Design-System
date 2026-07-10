@@ -23,7 +23,7 @@ void main() {
       expect(find.text('Duplicate'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
       // Everything fits inline, so there is no overflow affordance.
-      expect(find.byIcon(Icons.more_horiz), findsNothing);
+      expect(find.byIcon(DsIcons.moreHorizontal), findsNothing);
     });
 
     testWidgets('fires a visible action callback when tapped', (tester) async {
@@ -66,7 +66,7 @@ void main() {
 
       // Only the first action stays inline; the rest move to the More menu.
       expect(find.text('Save'), findsOneWidget);
-      expect(find.byIcon(Icons.more_horiz), findsOneWidget);
+      expect(find.byIcon(DsIcons.moreHorizontal), findsOneWidget);
       expect(find.text('Delete'), findsNothing);
     });
 
@@ -90,7 +90,7 @@ void main() {
         surfaceSize: const Size(1200, 900),
       );
 
-      await tester.tap(find.byIcon(Icons.more_horiz));
+      await tester.tap(find.byIcon(DsIcons.moreHorizontal));
       await tester.pump();
 
       expect(find.text('Delete'), findsOneWidget);

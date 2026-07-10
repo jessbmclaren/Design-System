@@ -37,7 +37,7 @@ void main() {
       DsLink(label: 'Docs', onPressed: () {}, external: true),
     );
 
-    expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+    expect(find.byIcon(DsIcons.externalLink), findsOneWidget);
   });
 
   testWidgets('renders a custom trailing icon', (tester) async {

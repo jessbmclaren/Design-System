@@ -56,7 +56,7 @@ void main() {
     await tester.pump();
     expect(secondary, isTrue);
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tap(find.byIcon(DsIcons.close));
     await tester.pump();
     expect(dismissed, isTrue);
   });

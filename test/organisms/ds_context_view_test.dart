@@ -37,7 +37,7 @@ void main() {
         ),
       );
 
-      final closeButton = find.byIcon(Icons.close);
+      final closeButton = find.byIcon(DsIcons.close);
       expect(closeButton, findsOneWidget);
 
       await tester.tap(closeButton);
@@ -58,7 +58,7 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(DsIcons.close), findsNothing);
     });
 
     testWidgets('renders header actions and footer', (tester) async {

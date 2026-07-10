@@ -20,6 +20,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  # The system uses Material icons for the one solid true-state glyph
+  # (the selected rating star); Lucide supplies the rest.
+  uses-material-design: true
   fonts:
     - family: Inter
       fonts:

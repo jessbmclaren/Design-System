@@ -41,7 +41,7 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(DsIcons.close), findsNothing);
     });
 
     testWidgets('shows a close button that fires onClose on tap',
@@ -56,9 +56,9 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.byIcon(DsIcons.close), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(DsIcons.close));
       await tester.pump();
 
       expect(closed, isTrue);

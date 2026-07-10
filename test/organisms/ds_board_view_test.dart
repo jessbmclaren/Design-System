@@ -145,7 +145,7 @@ void main() {
         matching: find.byType(LongPressDraggable<String>),
       );
       await tester.tap(
-        find.descendant(of: cardA, matching: find.byIcon(Icons.more_vert)),
+        find.descendant(of: cardA, matching: find.byIcon(DsIcons.moreVertical)),
       );
       await tester.pumpAndSettle();
 
@@ -181,7 +181,7 @@ void main() {
         matching: find.byType(LongPressDraggable<String>),
       );
       await tester.tap(
-        find.descendant(of: cardB, matching: find.byIcon(Icons.more_vert)),
+        find.descendant(of: cardB, matching: find.byIcon(DsIcons.moreVertical)),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Move to Ungrouped'));

@@ -21,7 +21,7 @@ void main() {
         DsCheckbox(value: true, onChanged: (_) {}, label: 'Subscribe'),
       );
 
-      expect(find.byIcon(Icons.check), findsOneWidget);
+      expect(find.byIcon(DsIcons.check), findsOneWidget);
     });
 
     testWidgets('does not show a check icon when unchecked', (tester) async {
@@ -30,7 +30,7 @@ void main() {
         DsCheckbox(value: false, onChanged: (_) {}, label: 'Subscribe'),
       );
 
-      expect(find.byIcon(Icons.check), findsNothing);
+      expect(find.byIcon(DsIcons.check), findsNothing);
     });
 
     testWidgets('tapping calls onChanged with the negated value',

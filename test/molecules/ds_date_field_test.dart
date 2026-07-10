@@ -19,7 +19,7 @@ void main() {
 
     expect(find.text('Start date'), findsOneWidget);
     expect(find.text('2026-07-09'), findsOneWidget);
-    expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+    expect(find.byIcon(DsIcons.calendar), findsOneWidget);
   });
 
   testWidgets('shows hintText while value is null', (WidgetTester tester) async {
@@ -66,7 +66,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.calendar_today));
+    await tester.tap(find.byIcon(DsIcons.calendar));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -93,7 +93,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.calendar_today));
+    await tester.tap(find.byIcon(DsIcons.calendar));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 

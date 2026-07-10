@@ -23,7 +23,7 @@ void main() {
       );
 
       expect(find.text('Status'), findsOneWidget);
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.byIcon(DsIcons.add), findsOneWidget);
     });
 
     testWidgets('tapping suggested chip opens the option menu', (tester) async {
@@ -76,8 +76,8 @@ void main() {
       );
 
       expect(find.text('Status: Open'), findsOneWidget);
-      expect(find.byIcon(Icons.close), findsOneWidget);
-      expect(find.byIcon(Icons.add), findsNothing);
+      expect(find.byIcon(DsIcons.close), findsOneWidget);
+      expect(find.byIcon(DsIcons.add), findsNothing);
     });
 
     testWidgets('tapping the clear icon reports null', (tester) async {
@@ -92,7 +92,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(DsIcons.close));
       await tester.pump();
 
       expect(selected, isNull);
