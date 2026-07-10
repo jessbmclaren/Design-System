@@ -2,8 +2,8 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Link page: primary and secondary hyperlinks, an external
-/// link with the "open in new" glyph, a link with a trailing chevron, and a
-/// disabled link — the full range of `DsLink` affordances in one compact view.
+/// link with the "open in new" glyph, a link with a trailing chevron and a
+/// disabled link. The full range of `DsLink` affordances in one compact view.
 class LinkDemo extends StatelessWidget {
   const LinkDemo({super.key});
 

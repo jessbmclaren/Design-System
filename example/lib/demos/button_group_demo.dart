@@ -2,9 +2,9 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Button group page: a record toolbar of `DsButton`s laid
-/// out with `DsButtonGroup`. The actions are given in priority order — a
+/// out with `DsButtonGroup`. The actions are given in priority order (a
 /// primary "Save" first, supporting "Duplicate" and "Archive" next, and a
-/// destructive "Delete" last — so the group keeps the leading ones inline and
+/// destructive "Delete" last), so the group keeps the leading ones inline and
 /// collapses the rest into the trailing "More" menu when the width is tight.
 ///
 /// Tapping an action records it in a short status line via `setState`, so the

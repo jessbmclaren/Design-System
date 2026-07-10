@@ -1,7 +1,7 @@
 # Design System
 
 A white-label, Material 3 based Flutter component library, with a full
-documentation experience: live examples, copyable code, and a "View as
+documentation experience: live examples, copyable code and a "View as
 Markdown" twin for every pattern.
 
 - **Token-driven & white-label.** Every colour, type ramp, radius and spacing
@@ -57,7 +57,7 @@ final brand = DsTokens.light().copyWith(
 MaterialApp(theme: DsTheme.light(tokens: brand));
 ```
 
-## Components — Atomic Design
+## Components: Atomic Design
 
 Components are organised into Brad Frost's atomic layers under
 `lib/src/components/` (all re-exported from the single barrel, so imports stay
@@ -73,15 +73,15 @@ Components are organised into Brad Frost's atomic layers under
 
 ## Documentation
 
-The [`example/`](example/) app is the documentation site — grouped navigation,
-a live example per pattern, copyable Dart, and a "View as Markdown" pane.
+The [`example/`](example/) app is the documentation site: grouped navigation,
+a live example per pattern, copyable Dart and a "View as Markdown" pane.
 
 ```sh
 cd example
 flutter run -d chrome
 ```
 
-The written pattern docs live in [`docs/patterns/`](docs/patterns/) — one
+The written pattern docs live in [`docs/patterns/`](docs/patterns/): one
 markdown page per pattern with embedded screenshots, generated from the same
 content model the app renders, so they never drift. See
 [`example/README.md`](example/README.md) for how to regenerate them.

@@ -2,7 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Record panel page: a single vehicle record opened for
-/// editing, its fields grouped into sections. Controlled — edits update the
+/// editing, its fields grouped into sections. Controlled: edits update the
 /// local values map. Screenshot safe.
 class RecordPanelDemo extends StatefulWidget {
   const RecordPanelDemo({super.key});

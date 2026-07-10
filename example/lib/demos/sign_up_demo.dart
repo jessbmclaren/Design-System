@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// [DsFormFieldGroup] and a benefits [aside]. The fields start pre-filled so the
 /// primary action is enabled on the first frame; editing a field re-runs
 /// validation via [setState] so the button disables the moment a required field
-/// is emptied. No timers, network or overlays — the captured frame is stable.
+/// is emptied. No timers, network or overlays. The captured frame is stable.
 class SignUpDemo extends StatefulWidget {
   const SignUpDemo({super.key});
 
@@ -37,8 +37,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
 
     return DsSignUpView(
       brandIcon: Icons.workspaces_outline,
-      brandColor: const Color(0xFF6D28D9),
-      title: 'Create your workspace',
+      title: 'Create your account',
       description: 'Start your 14-day trial. No card required.',
       form: DsFormFieldGroup(
         columns: 1,

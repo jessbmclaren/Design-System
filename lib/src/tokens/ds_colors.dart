@@ -90,7 +90,7 @@ abstract final class DsColors {
   static const Color overlayBackdrop = Color(0xFFF9E4F1);
 
   // ---------------------------------------------------------------------------
-  // Badges — neutral
+  // Badges: neutral
   // ---------------------------------------------------------------------------
 
   /// The background colour used to represent neutral state or lack of state
@@ -106,7 +106,7 @@ abstract final class DsColors {
   static const Color badgeNeutralBorder = Color(0xFFCBD5D6);
 
   // ---------------------------------------------------------------------------
-  // Badges — success
+  // Badges: success
   // ---------------------------------------------------------------------------
 
   /// The background colour used to reinforce a successful outcome in status
@@ -121,7 +121,7 @@ abstract final class DsColors {
   static const Color badgeSuccessBorder = Color(0xFFB4E1A2);
 
   // ---------------------------------------------------------------------------
-  // Badges — warning
+  // Badges: warning
   // ---------------------------------------------------------------------------
 
   /// The background colour used in status badges to highlight things that
@@ -137,7 +137,7 @@ abstract final class DsColors {
   static const Color badgeWarningBorder = Color(0xFFF5DA80);
 
   // ---------------------------------------------------------------------------
-  // Badges — danger
+  // Badges: danger
   // ---------------------------------------------------------------------------
 
   /// The background colour used in status badges for high-priority, critical

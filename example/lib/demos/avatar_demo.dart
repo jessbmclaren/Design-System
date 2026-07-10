@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 ///
 /// Shows the fallback chain [DsAvatar] resolves without any network: initials
 /// derived from a name, a person glyph when no name is given, an icon fallback
-/// for non-person entities, and a per-person accent via colour overrides. It
-/// also demonstrates the size scale. Nothing here needs the network — the
-/// `imageUrl` tile relies on the built-in graceful fallback to initials — so
-/// the demo is stable on the first frame and screenshot-safe.
+/// for non-person entities and a per-person accent via colour overrides. It
+/// also demonstrates the size scale. Nothing here needs the network (the
+/// `imageUrl` tile relies on the built-in fallback to initials), so the demo
+/// is stable on the first frame and screenshot-safe.
 class AvatarDemo extends StatelessWidget {
   const AvatarDemo({super.key});
 

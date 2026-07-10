@@ -1,8 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Live demo for the Sign in page: a branded [DsSignInView] with a single
-/// primary action and a sign-up prompt in the footer.
+/// Live demo for the Sign in page: a branded, form-based [DsSignInView] with
+/// username and password fields, a forgot-password link, a full-width primary
+/// action and a sign-up prompt in the footer.
 class SignInDemo extends StatelessWidget {
   const SignInDemo({super.key});
 
@@ -11,12 +12,29 @@ class SignInDemo extends StatelessWidget {
     final tokens = DsTokens.of(context);
 
     return DsSignInView(
-      brandIcon: Icons.hexagon_rounded,
-      brandColor: const Color(0xFF6D28D9),
-      title: 'Sign in to Acme',
-      description:
-          'Access your dashboards, records and reports. '
-          "We'll take you to a secure page to continue.",
+      brandIcon: Icons.workspaces_outline,
+      title: 'Welcome back',
+      description: 'Sign in to your Acme account to continue.',
+      form: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const DsTextField(
+            label: 'Username',
+            hintText: 'Enter your username',
+          ),
+          const SizedBox(height: DsSpacing.md),
+          const DsTextField(
+            label: 'Password',
+            hintText: 'Enter your password',
+            obscureText: true,
+          ),
+          const SizedBox(height: DsSpacing.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: DsLink(label: 'Forgot password?', onPressed: () {}),
+          ),
+        ],
+      ),
       primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
       footer: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -27,15 +45,7 @@ class SignInDemo extends StatelessWidget {
               color: tokens.colorSecondaryText,
             ),
           ),
-          InkWell(
-            onTap: () {},
-            child: Text(
-              'Sign up',
-              style: DsTypography.labelMd.toTextStyle(
-                color: tokens.actionPrimaryColorText,
-              ),
-            ),
-          ),
+          DsLink(label: 'Create an account', onPressed: () {}),
         ],
       ),
     );

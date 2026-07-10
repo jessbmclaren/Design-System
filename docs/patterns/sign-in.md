@@ -1,8 +1,8 @@
 # Sign in
 
-The sign-in view is the front door to your product: a single, focused card that welcomes people and sends them into authentication with one clear action. `DsSignInView` shows your brand mark, a short title and description, and a full-width primary button. It deliberately collects no passwords itself. Instead of embedding a credential form, the primary action hands off to your dedicated authentication flow, so the card stays lightweight, trustworthy and easy to brand.
+The sign-in view is the front door to your product — a single, centred card that welcomes people back and gets them in with as little friction as possible. `DsSignInView` leads with your brand mark and a warm greeting, then a compact `form` (a username and a password), a forgot-password link, and a full-width primary action. A footer offers the other path — creating an account — so returning and new people each land somewhere. The card owns none of the form's state or validation; you pass the fields in and handle submission, so the same view backs a password sign-in, a magic link, or an SSO hand-off just by changing what you put in `form` and `primaryAction`.
 
-Give people a way both to sign in and to sign up. Put the primary action first and keep it unmistakable, then offer the secondary path (a sign-up prompt) in the `footer`. Set `brandIcon` and `brandColor` so the card reads as yours the moment it appears. If you need to surface terms, help text or an enterprise sign-in option, tuck it behind `additionalContextLabel` so the default view stays uncluttered.
+Keep it to the two things people came to do: enter their details and get in. Lead with the brand so the card reads as yours the instant it appears, keep the greeting short and human, and let the primary button be the obvious next step. Put recovery (forgot password) next to the fields where people look for it, and the alternate path (sign up) in the footer. Surface a failed attempt with a `DsBanner` above the form rather than a bare sentence, and use the field labels and hints to guide, not to lecture.
 
 ![Desktop (1280dp)](img/sign-in_desktop.png)
 
@@ -16,50 +16,49 @@ Give people a way both to sign in and to sign up. Put the primary action first a
 
 **Do**
 
-- Keep the view lightweight and focused on a single primary action.
-- Offer both sign in and sign up so returning and new users each have a path.
-- Use consistent action labels that match the flow you send people into.
-- Brand the card with your own icon and colour so it feels trustworthy.
+- Lead with the brand and a warm, one-line greeting so the card feels like yours and like a welcome, not a gate.
+- Give people the two obvious paths: signing in (the primary action) and creating an account (the footer).
+- Put the forgot-password link right by the password field, where people reach for it.
+- Surface a failed sign-in clearly — a banner above the form — and keep the fields filled so they can correct one thing.
 
 **Don't**
 
-- Don't ask people to enter full credentials into a surface you don't control.
-- Don't add distracting links that pull people out of the flow before they start.
-- Don't bury the primary action beneath secondary text or options.
+- Don't crowd the card with links and options; the two paths and recovery are enough, everything else buries them.
+- Don't hide which action signs in; the full-width primary button should be unmistakable.
+- Don't scold in field copy — a hint guides, an error explains, neither blames.
+- Don't reinvent the inputs; use `DsTextField` so the form matches every other form in the product.
 
 ## Example
 
 ```dart
 DsSignInView(
-  brandIcon: Icons.hexagon_rounded,
-  brandColor: const Color(0xFF6D28D9),
-  title: 'Sign in to Acme',
-  description:
-      'Access your dashboards, records and reports. '
-      'We\'ll take you to a secure page to continue.',
-  primaryAction: DsSignInAction(
-    label: 'Sign in',
-    onPressed: () {},
-  ),
-  footer: Wrap(
-    crossAxisAlignment: WrapCrossAlignment.center,
+  brandIcon: Icons.workspaces_outline,
+  title: 'Welcome back',
+  description: 'Sign in to your Acme account to continue.',
+  form: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Text('New here? ', style: DsTypography.bodySm.toTextStyle(
-        color: DsTokens.of(context).colorSecondaryText,
-      )),
-      InkWell(
-        onTap: () {},
-        child: Text('Sign up', style: DsTypography.labelMd.toTextStyle(
-          color: DsTokens.of(context).actionPrimaryColorText,
-        )),
+      const DsTextField(label: 'Username', hintText: 'Enter your username'),
+      const SizedBox(height: DsSpacing.md),
+      const DsTextField(
+        label: 'Password',
+        hintText: 'Enter your password',
+        obscureText: true,
+      ),
+      const SizedBox(height: DsSpacing.sm),
+      Align(
+        alignment: Alignment.centerRight,
+        child: DsLink(label: 'Forgot password?', onPressed: _recover),
       ),
     ],
   ),
+  primaryAction: DsSignInAction(label: 'Sign in', onPressed: _submit),
+  footer: DsLink(label: 'Create an account', onPressed: _goToSignUp),
 )
 ```
 
 ## See also
 
-- [Design tokens](design-tokens.md)
-- [Action buttons](action-buttons.md)
+- [Sign up](sign-up.md)
+- [Text fields](text-fields.md)
 - [Communicating state](communicating-state.md)

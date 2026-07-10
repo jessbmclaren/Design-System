@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Live demo for the Data grid page: a realistic fleet register showing the
 /// frozen first column, typed cells (status, user, currency, date, progress,
 /// rating, checkbox, link), row selection and sortable headers. Screenshot
-/// safe — it starts no timers and holds its own selection state.
+/// safe: it starts no timers and holds its own selection state.
 class DataGridDemo extends StatefulWidget {
   const DataGridDemo({super.key});
 

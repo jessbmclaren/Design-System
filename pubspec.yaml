@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Lucide icon set (MIT). Tree-shakeable — consumers only bundle the glyphs
+  # they use. Backs the DsIcons vocabulary.
+  flutter_lucide: ^1.11.0
 
 dev_dependencies:
   flutter_test:

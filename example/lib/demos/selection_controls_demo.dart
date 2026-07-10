@@ -2,7 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Selection controls page: a consent checkbox, a
-/// mutually-exclusive radio group for the plan tier, and a switch for an
+/// mutually-exclusive radio group for the plan tier and a switch for an
 /// immediate setting. Every control is interactive and updates local state.
 class SelectionControlsDemo extends StatefulWidget {
   const SelectionControlsDemo({super.key});
@@ -32,7 +32,7 @@ class _SelectionControlsDemoState extends State<SelectionControlsDemo> {
         ),
         const SizedBox(height: 20),
 
-        // Mutually exclusive choice — one shared groupValue.
+        // Mutually exclusive choice: one shared groupValue.
         Text('Plan', style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         DsRadio<String>(
@@ -55,7 +55,7 @@ class _SelectionControlsDemoState extends State<SelectionControlsDemo> {
         ),
         const SizedBox(height: 20),
 
-        // Immediate setting — no Save step.
+        // Immediate setting: no Save step.
         DsSwitch(
           value: _emailUpdates,
           label: 'Email me updates',

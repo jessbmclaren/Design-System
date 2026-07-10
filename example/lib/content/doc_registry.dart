@@ -1,8 +1,8 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 //
 // The registry of every documentation page, in navigation order. Both the
 // docs app and tool/generate_markdown.dart import this. Generated/reconciled
-// deterministically — keep it in sync with lib/content/pages/.
+// deterministically. Keep it in sync with lib/content/pages/.
 
 import 'pattern_page_content.dart';
 import 'pages/design_tokens.dart';

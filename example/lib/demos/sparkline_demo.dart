@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// a stack of KPI rows (one filled headline metric, one status-coloured metric)
 /// and as compact plots inside dense table-style cells. Every sparkline is
 /// paired with the real value it trends, since the plot conveys shape, not
-/// magnitude. Static and screenshot-safe — no timers or animation.
+/// magnitude. Static and screenshot-safe: no timers or animation.
 class SparklineDemo extends StatelessWidget {
   const SparklineDemo({super.key});
 
@@ -99,7 +99,7 @@ class SparklineDemo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Headline metric — filled area, brand hue, trending up.
+        // Headline metric: filled area, brand hue, trending up.
         kpi(
           label: 'Monthly active users',
           value: '14.1k',
@@ -108,7 +108,7 @@ class SparklineDemo extends StatelessWidget {
           filled: true,
         ),
         const DsDivider(),
-        // Revenue — positive status hue.
+        // Revenue: positive status hue.
         kpi(
           label: 'Net revenue',
           value: '\$92,480',
@@ -118,7 +118,7 @@ class SparklineDemo extends StatelessWidget {
         const SizedBox(height: 18),
         Text('Support metrics', style: mutedStyle),
         const SizedBox(height: 6),
-        // Dense cells — status-coloured trends beside their real values.
+        // Dense cells: status-coloured trends beside their real values.
         cell(
           label: 'Avg. response time',
           value: '2.9 h',

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 ///
 /// Renders a single-series `DsBarChart` of weekly active users and lets the
 /// viewer toggle the numeric value labels above each bar. The chart draws a
-/// stable still frame — no timers or animation — so it is safe to screenshot,
-/// and it reflows without overflow down to a 320dp width.
+/// stable frame (no timers or animation), so it is safe to screenshot and
+/// reflows without overflow down to a 320dp width.
 class BarChartDemo extends StatefulWidget {
   const BarChartDemo({super.key});
 

@@ -1,8 +1,8 @@
-// Pure Dart — NO Flutter imports. Shared by the docs app and the CLI.
+// Pure Dart, no Flutter imports. Shared by the docs app and the CLI.
 
 import '../content/pattern_page_content.dart';
 
-/// Renders [page] as a GitHub-flavored markdown document.
+/// Renders [page] as a GitHub-flavoured markdown document.
 ///
 /// The same function powers the in-app "View as Markdown" pane and the
 /// committed `docs/patterns/*.md` twins, so the two are guaranteed to match.

@@ -1,7 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Live demo for the Redirects page: a compact, centered return panel shown
+/// Live demo for the Redirects page: a compact, centred return panel shown
 /// after a user comes back from an external identity provider. It sets
 /// expectations and offers a single, same-tab call to action to continue.
 class RedirectsDemo extends StatelessWidget {

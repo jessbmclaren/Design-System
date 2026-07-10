@@ -6,14 +6,14 @@ import '../content/pattern_page_content.dart';
 /// Renders a [VariablesBlock] as a NAME / TYPE / EXAMPLE VALUE table with a
 /// per-row description, matching the appearance-variables reference layout:
 /// a light monospace pill for the name (hugging its text), plain type text,
-/// a value pill, and the description on its own line beneath.
+/// a value pill and the description on its own line beneath.
 class VariableTable extends StatelessWidget {
   const VariableTable({super.key, required this.block});
 
   final VariablesBlock block;
 
   // Column proportions, tuned to the reference: a wide name column, a
-  // narrower type column, and a value column.
+  // narrower type column and a value column.
   static const int _nameFlex = 5;
   static const int _typeFlex = 3;
   static const int _valueFlex = 4;
@@ -106,7 +106,7 @@ class _VariableRowView extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // NAME — a pill that hugs its text on the left.
+              // NAME: a pill that hugs its text on the left.
               Expanded(
                 flex: VariableTable._nameFlex,
                 child: Align(
@@ -114,7 +114,7 @@ class _VariableRowView extends StatelessWidget {
                   child: _Pill(text: row.name),
                 ),
               ),
-              // TYPE — plain text.
+              // TYPE: plain text.
               Expanded(
                 flex: VariableTable._typeFlex,
                 child: Text(
@@ -123,7 +123,7 @@ class _VariableRowView extends StatelessWidget {
                       ?.copyWith(color: tokens.colorText),
                 ),
               ),
-              // EXAMPLE VALUE — a pill, with a colour swatch for hex values.
+              // EXAMPLE VALUE: a pill, with a colour swatch for hex values.
               Expanded(
                 flex: VariableTable._valueFlex,
                 child: Align(
@@ -151,7 +151,7 @@ class _VariableRowView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          // Description — its own line, full width, in secondary text.
+          // Description: its own line, full width, in secondary text.
           Text(
             row.description,
             style: theme.textTheme.bodySmall

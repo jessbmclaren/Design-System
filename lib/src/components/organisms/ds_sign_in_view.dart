@@ -46,6 +46,7 @@ class DsSignInView extends StatefulWidget {
     required this.title,
     required this.description,
     required this.primaryAction,
+    this.form,
     this.brandIcon,
     this.brandColor,
     this.footer,
@@ -61,6 +62,12 @@ class DsSignInView extends StatefulWidget {
 
   /// The full-width primary action that navigates the user onward.
   final DsSignInAction primaryAction;
+
+  /// An optional form body — typically a column of `DsTextField`s (username,
+  /// password) — rendered between the description and the primary action. When
+  /// omitted the view reads as a redirect / SSO card; when provided it reads as
+  /// a credential sign-in. The view lays it out but owns none of its state.
+  final Widget? form;
 
   /// An optional brand glyph shown in a tinted rounded square above the title.
   final IconData? brandIcon;
@@ -132,6 +139,10 @@ class _DsSignInViewState extends State<DsSignInView> {
                   ),
                 ),
                 const SizedBox(height: DsSpacing.xl),
+                if (widget.form != null) ...[
+                  widget.form!,
+                  const SizedBox(height: DsSpacing.lg),
+                ],
                 DsButton(
                   label: widget.primaryAction.label,
                   onPressed: widget.primaryAction.onPressed,

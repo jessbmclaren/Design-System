@@ -1,8 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Live demo for the Form field group page: two related groups — a name and
-/// contact pair, and a full-width address block — showing the responsive
+/// Live demo for the Form field group page: two related groups (a name and
+/// contact pair, and a full-width address block). Shows the responsive
 /// two-column and single-column layouts side by side.
 class FormFieldGroupDemo extends StatefulWidget {
   const FormFieldGroupDemo({super.key});

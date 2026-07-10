@@ -1,7 +1,7 @@
 // Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
-/// Onboarding → Sign up.
+/// Patterns → Sign up.
 final PatternPage signUpPage = PatternPage(
   id: 'sign-up',
   group: DocGroup.patterns,

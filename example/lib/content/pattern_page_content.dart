@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 //
 // This model is the single source of truth for every documentation page. It
 // is consumed by two things:
@@ -12,8 +12,8 @@
 
 /// The navigation groups, in display order.
 ///
-/// Organised by purpose (what a component is *for*) rather than by atomic layer
-/// — the code stays atomic (`lib/src/components/{atoms,molecules,organisms}`),
+/// Organised by purpose (what a component is *for*) rather than by atomic layer.
+/// The code stays atomic (`lib/src/components/{atoms,molecules,organisms}`),
 /// while the docs navigate by intent so a component is easy to find.
 enum DocGroup {
   foundations('Foundations'),
@@ -148,7 +148,7 @@ class PatternPage {
   /// The page heading.
   final String title;
 
-  /// The lead description paragraph — the most important copy on the page.
+  /// The lead description paragraph, the most important copy on the page.
   final String description;
 
   /// Extra content blocks (prose, subheadings, variable tables) rendered

@@ -2,8 +2,8 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Action buttons page: a record header (`DsPageHeader`) with
-/// its main actions anchored to the top right — one secondary "Edit" beside a
-/// single primary "Send" — and a separate row illustrating the reserved
+/// its main actions anchored to the top right (one secondary "Edit" beside a
+/// single primary "Send") and a separate row illustrating the reserved
 /// `danger` variant for a destructive action.
 class ActionButtonsDemo extends StatelessWidget {
   const ActionButtonsDemo({super.key});

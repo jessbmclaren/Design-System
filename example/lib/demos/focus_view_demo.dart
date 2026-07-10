@@ -1,8 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Live demo for the Focus view page: the panel rendered inline (screenshot
-/// safe — the modal `show` helper is described in the code sample).
+/// Live demo for the Focus view page: the panel rendered inline. Screenshot
+/// safe: the modal `show` helper is described in the code sample.
 class FocusViewDemo extends StatelessWidget {
   const FocusViewDemo({super.key});
 

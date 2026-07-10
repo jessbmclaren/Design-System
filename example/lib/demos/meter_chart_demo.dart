@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 ///
 /// Renders a `DsMeterChart` breaking one storage total into four labelled,
 /// palette-coloured segments and lets the viewer toggle the legend beneath the
-/// bar. The chart draws a stable still frame — no timers or animation — so it
-/// is safe to screenshot, and it reflows without overflow down to a 320dp
-/// width.
+/// bar. The chart draws a stable frame (no timers or animation), so it is safe
+/// to screenshot and reflows without overflow down to a 320dp width.
 class MeterChartDemo extends StatefulWidget {
   const MeterChartDemo({super.key});
 

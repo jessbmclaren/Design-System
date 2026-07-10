@@ -19,17 +19,17 @@ class DsEmptyStateAction {
   final VoidCallback onPressed;
 }
 
-/// A centered placeholder shown when a screen, list or panel has no data.
+/// A centred placeholder shown when a screen, list or panel has no data.
 ///
 /// Use [DsEmptyState] to explain why a region is empty and, where possible,
 /// offer the user a way to fill it. A first-run list, a search with no
 /// results and a cleared inbox are all good candidates.
 ///
-/// The layout is a vertically centered column: an optional large [icon]
+/// The layout is a vertically centred column: an optional large [icon]
 /// tinted with the secondary text colour, a required [title], an optional
 /// supporting [message] constrained to a comfortable reading width, and an
 /// optional primary [action] button. The content never overflows and stays
-/// centered within the space it is given, from 320dp phones upward.
+/// centred within the space it is given, from 320dp phones upward.
 class DsEmptyState extends StatelessWidget {
   const DsEmptyState({
     super.key,

@@ -2,8 +2,8 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Empty state page: a records view that has no data yet.
-/// It reassures the person the screen is working, explains why it is empty,
-/// and offers the single next step — creating the first invoice.
+/// It reassures the person the screen is working, explains why it is empty
+/// and offers the single next step: creating the first invoice.
 class EmptyStateDemo extends StatelessWidget {
   const EmptyStateDemo({super.key});
 

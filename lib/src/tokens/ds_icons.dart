@@ -115,7 +115,7 @@ abstract final class DsIcons {
 
   // --- Selection & true-state ----------------------------------------------
 
-  /// A selected rating step — filled, because the fill is the state.
+  /// A selected rating step: filled, because the fill is the state.
   static const IconData star = Icons.star;
 
   /// An unselected rating step.

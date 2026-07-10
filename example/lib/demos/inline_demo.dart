@@ -41,7 +41,7 @@ class _MixedParagraph extends StatelessWidget {
           DsInline.span(context: context, text: 'retry_limit', code: true),
           const TextSpan(text: ' to '),
           DsInline.span(context: context, text: '3', bold: true),
-          const TextSpan(text: ' — the old default of '),
+          const TextSpan(text: '. The old default of '),
           DsInline.span(context: context, text: '10', strikethrough: true),
           const TextSpan(text: ' is '),
           DsInline.span(context: context, text: 'deprecated', italic: true),

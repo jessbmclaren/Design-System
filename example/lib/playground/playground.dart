@@ -5,8 +5,8 @@ import '../ui/code_block.dart';
 
 /// A single interactive control in a component [PlaygroundSpec].
 ///
-/// Knobs are pure data — the [PlaygroundPanel] renders the matching control
-/// (a [DsSelect], [DsSwitch] or [DsTextField]) — so a spec reads as a plain
+/// Knobs are pure data. The [PlaygroundPanel] renders the matching control
+/// (a [DsSelect], [DsSwitch] or [DsTextField]), so a spec reads as a plain
 /// list of the props a person can turn.
 sealed class Knob {
   const Knob(this.id, this.label);
@@ -55,7 +55,7 @@ class TextKnob extends Knob {
 
 /// Describes an interactive playground for one component: the [knobs] a person
 /// can turn, a [builder] that renders the component from the current knob
-/// values, and an optional [code] generator that mirrors those values.
+/// values and an optional [code] generator that mirrors those values.
 class PlaygroundSpec {
   const PlaygroundSpec({required this.knobs, required this.builder, this.code});
 
@@ -66,9 +66,8 @@ class PlaygroundSpec {
 }
 
 /// Renders a [PlaygroundSpec]: a live stage that re-renders the component as
-/// the knobs change, the knobs themselves, and the generated code. Fully
-/// responsive — stage and knobs sit side by side on wide viewports and stack
-/// on a phone.
+/// the knobs change, the knobs themselves and the generated code. Stage and
+/// knobs sit side by side on wide viewports and stack on a phone.
 class PlaygroundPanel extends StatefulWidget {
   const PlaygroundPanel({super.key, required this.spec});
 

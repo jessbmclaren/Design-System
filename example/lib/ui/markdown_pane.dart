@@ -9,7 +9,7 @@ import '../markdown/emitter.dart';
 /// The full-page "View as Markdown" view.
 ///
 /// Shows the exact committed `docs/patterns/{id}.md` source as selectable
-/// plain text — the same string [emitMarkdown] writes to disk — so what you
+/// plain text (the same string [emitMarkdown] writes to disk), so what you
 /// read here is byte-identical to the file. A back affordance returns to the
 /// rendered page.
 class MarkdownView extends StatelessWidget {

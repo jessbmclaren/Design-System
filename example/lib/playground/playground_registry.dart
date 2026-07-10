@@ -5,7 +5,7 @@ import 'playground.dart';
 
 /// Interactive playgrounds keyed by page id. A page with a spec here shows a
 /// live knobs panel in place of its static demo, so people can turn each prop
-/// and watch the component — and its code — update.
+/// and watch the component (and its code) update.
 final Map<String, PlaygroundSpec> _playgrounds = {
   'action-buttons': PlaygroundSpec(
     knobs: const [

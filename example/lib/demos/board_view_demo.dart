@@ -2,7 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Board view page: fleet records laned by status, moved by
-/// drag or the accessible "Move to…" menu on each card. Controlled — the demo
+/// drag or the accessible "Move to…" menu on each card. Controlled: the demo
 /// applies each move to its own state. Screenshot safe.
 class BoardViewDemo extends StatefulWidget {
   const BoardViewDemo({super.key});

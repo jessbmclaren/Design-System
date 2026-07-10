@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 
-/// Holds the light and dark Dart highlighters, initialized once in `main`.
+/// Holds the light and dark Dart highlighters, initialised once in `main`.
 class CodeHighlighters {
   CodeHighlighters({required this.light, required this.dark});
 

@@ -15,7 +15,7 @@ import 'markdown_pane.dart';
 import 'variable_table.dart';
 
 /// Renders one [PatternPage]: title, lead description, extra blocks, the live
-/// example, guidance, the code sample, and a "View as Markdown" pane.
+/// example, guidance, the code sample and a "View as Markdown" pane.
 class PatternPageView extends StatefulWidget {
   const PatternPageView({super.key, required this.page});
 
@@ -171,8 +171,8 @@ class _Prose extends StatelessWidget {
   }
 }
 
-/// The thin action bar under the page description. We keep a single action —
-/// "View as Markdown" — which reveals the page's raw markdown source.
+/// The thin action bar under the page description. We keep a single action,
+/// "View as Markdown", which reveals the page's raw markdown source.
 class _ActionBar extends StatelessWidget {
   const _ActionBar({required this.onViewMarkdown});
   final VoidCallback onViewMarkdown;

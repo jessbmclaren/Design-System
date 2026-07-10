@@ -2,9 +2,9 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Live demo for the Box page: three `DsBox` surfaces built entirely from
-/// theme tokens — a padded card with a border and shadow, a tinted callout,
-/// and a plain padded box — showing how spacing, background, border, radius
-/// and elevation compose without a raw Container.
+/// theme tokens. A padded card with a border and shadow, a tinted callout
+/// and a plain padded box. Spacing, background, border, radius and elevation
+/// compose without a raw Container.
 class BoxDemo extends StatelessWidget {
   const BoxDemo({super.key});
 

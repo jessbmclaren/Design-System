@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Foundations → Iconography.
@@ -11,20 +11,19 @@ final PatternPage iconographyPage = PatternPage(
       'Icons are referenced by the role they play, not the glyph they happen '
       'to be. `DsIcons` is the system\'s icon vocabulary: a component asks for '
       '`DsIcons.close` or `DsIcons.success`, and the registry decides which '
-      'drawing that is. Centralising it is what turns a pile of glyphs into a '
-      'system — the family policy lives in one place, the set stays coherent, '
-      'and re-branding the iconography (or swapping in a real Lucide font '
-      'later) is a single file\'s edit rather than a hunt through every call '
-      'site.',
+      'drawing that is. Centralising it turns a pile of glyphs into a system. '
+      'The family policy lives in one place, the set stays coherent and '
+      're-branding the iconography (or swapping in a real Lucide font later) '
+      'is a single file\'s edit rather than a hunt through every call site.',
   blocks: const [
     ProseBlock(
-      'The set is drawn to read like Lucide — thin, even, open line work with a '
+      'The set is drawn to read like Lucide: thin, even, open line work with a '
       'consistent stroke. A short family policy keeps it honest: **outlined '
       'line glyphs** are the default for actions, affordances and status; '
       '**bare strokes** carry pure directional marks (chevrons, arrows, add, '
       'close) that have no shape to outline; **filled is reserved for '
       'true-state** glyphs where the fill itself is the meaning, like a selected '
-      'rating star; and the **rounded family is banned** — it reads as '
+      'rating star; and the **rounded family is banned**: it reads as '
       'consumer-playful, the wrong register for a dense professional product, '
       'so any rounded Material glyph is mapped to its sharp or outlined '
       'equivalent here.',
@@ -39,7 +38,7 @@ final PatternPage iconographyPage = PatternPage(
     ),
   ],
   dos: const [
-    'Reference icons by role through `DsIcons` — never reach for `Icons.*` '
+    'Reference icons by role through `DsIcons`; never use `Icons.*` '
         'directly in a component or a screen.',
     'Add a new glyph by adding a semantic entry to the registry, so the family '
         'policy and the single swap-site stay intact.',
@@ -51,7 +50,7 @@ final PatternPage iconographyPage = PatternPage(
   donts: const [
     "Don't scatter raw `Icons.*` through the codebase; that is the audit the "
         'registry exists to prevent.',
-    "Don't introduce a rounded glyph — it breaks the register; map it to the "
+    "Don't introduce a rounded glyph; it breaks the register. Map it to the "
         'sharp or outlined equivalent instead.',
     "Don't name an entry for how it looks (`filledBell`); name it for what it "
         'means (`notifications`) so a later redraw keeps the name true.',
