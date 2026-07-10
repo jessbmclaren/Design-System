@@ -101,4 +101,27 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('DsButton.social', () {
+    testWidgets('is a full-width secondary button with a provider glyph',
+        (tester) async {
+      var taps = 0;
+      await pumpDs(
+        tester,
+        DsButton.social(
+          icon: Icons.g_mobiledata,
+          label: 'Continue with Google',
+          onPressed: () => taps++,
+        ),
+      );
+
+      expect(find.text('Continue with Google'), findsOneWidget);
+      expect(find.byIcon(Icons.g_mobiledata), findsOneWidget);
+      // A social button is a DsButton, so type-based finders still match.
+      expect(find.byType(DsButton), findsOneWidget);
+
+      await tester.tap(find.byType(DsButton));
+      expect(taps, 1);
+    });
+  });
 }

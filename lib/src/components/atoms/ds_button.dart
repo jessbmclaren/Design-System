@@ -42,6 +42,31 @@ class DsButton extends StatefulWidget {
     this.fullWidth = false,
   });
 
+  /// A provider sign-in button, such as "Continue with Google".
+  ///
+  /// A preset of [DsButton]: a full-width [DsButtonVariant.secondary] button
+  /// with a leading provider [icon], so every social or SSO action across the
+  /// product reads identically. A social button is a variant of the button, not
+  /// a component of its own. The glyph inherits the button's text colour, so
+  /// pass a monochrome provider mark.
+  factory DsButton.social({
+    Key? key,
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+    bool pending = false,
+  }) {
+    return DsButton(
+      key: key,
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      pending: pending,
+      variant: DsButtonVariant.secondary,
+      fullWidth: true,
+    );
+  }
+
   /// The button label.
   final String label;
 

@@ -15,7 +15,7 @@ These LCV atoms map straight onto an existing `Ds*` component:
 | `LabeledCheckbox` | `DsCheckbox` (`label:`) | label is built in |
 | `LinkText` | `DsLink` | direct |
 | `AdaptiveFieldRow` | `DsFormFieldGroup` | stacks compact, 2-col wide |
-| `FieldLabel` | — | absorbed into `DsTextField`; no standalone atom needed |
+| `FieldLabel` | `DsFieldLabel` | now a real atom; `DsTextField` reuses it |
 
 ## 2. Build-list (the real gaps)
 
@@ -27,10 +27,10 @@ Four things LCV has and the DS does not. Each is specced from its LCV source.
 - **Build:** `DsIconButton({required IconData icon, required VoidCallback onPressed, required String semanticLabel, double? size, double? iconSize})`. Fill colour from a token (`offsetBackgroundColor` or a new `controlHoverColor`); shape `CircleBorder`; ≥48dp tap target.
 - **Effort:** S. Genuinely new, but small and self-contained.
 
-### 2b. `DsSocialButton` — provider sign-in button  ·  thin preset
+### 2b. `DsButton.social` — provider sign-in button  ·  button variant
 - **Source of truth:** `lib/screens/lcv/atoms/social_button.dart`
 - **Contract:** full-width neutral-outline button with a **leading provider icon**, label, `onPressed` (null = disabled), optional `iconColor`, `loading`.
-- **Build:** thin preset over `DsButton`. **Verified:** `DsButton` already exposes `icon`, `pending` and `fullWidth`, so this is ~15 lines with no change to `DsButton`.
+- **Build:** a **factory on `DsButton`** (`DsButton.social(icon:, label:, onPressed:, pending:)`) returning a full-width secondary button. It is a variant of the button atom, not a new atom (per the atomic-design review). The glyph inherits the button text colour, so pass a monochrome mark; a brand-coloured logo would need a `leading`-widget slot on `DsButton`.
 - **Effort:** XS. No enabling change needed.
 
 ### 2c. `DsWordmark` — two-tone product wordmark  ·  new atom + tokens
