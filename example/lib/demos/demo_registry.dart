@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'design_tokens_demo.dart';
+import 'motion_demo.dart';
 import 'accordion_demo.dart';
 import 'avatar_demo.dart';
 import 'divider_demo.dart';
@@ -60,6 +61,7 @@ import 'waiting_screens_demo.dart';
 /// screenshot harness. Reconciled deterministically with the content registry.
 final Map<String, Widget Function()> _demos = {
   'design-tokens': () => const DesignTokensDemo(),
+  'motion': () => const MotionDemo(),
   'accordion': () => const AccordionDemo(),
   'avatar': () => const AvatarDemo(),
   'divider': () => const DividerDemo(),

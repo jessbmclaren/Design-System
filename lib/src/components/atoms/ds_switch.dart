@@ -66,8 +66,8 @@ class DsSwitch extends StatelessWidget {
         value ? const Color(0xFFFFFFFF) : tokens.formBackgroundColor;
 
     final duration =
-        DsMotion.duration(context, const Duration(milliseconds: 150));
-    final curve = DsMotion.curve(context, Curves.easeInOut);
+        DsMotion.durationOf(context, const Duration(milliseconds: 150));
+    final curve = DsMotion.curveOf(context, Curves.easeInOut);
 
     final track = AnimatedContainer(
       duration: duration,

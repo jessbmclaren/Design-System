@@ -6,6 +6,7 @@
 
 import 'pattern_page_content.dart';
 import 'pages/design_tokens.dart';
+import 'pages/motion.dart';
 import 'pages/accordion.dart';
 import 'pages/avatar.dart';
 import 'pages/divider.dart';
@@ -65,6 +66,7 @@ import 'pages/waiting_screens.dart';
 final List<PatternPage> allPages = [
   // foundations
   designTokensPage,
+  motionPage,
   // content
   accordionPage,
   avatarPage,

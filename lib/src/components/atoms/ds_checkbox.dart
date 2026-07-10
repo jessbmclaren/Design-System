@@ -62,8 +62,8 @@ class DsCheckbox extends StatelessWidget {
     }
 
     final box = AnimatedContainer(
-      duration: DsMotion.duration(context, const Duration(milliseconds: 150)),
-      curve: DsMotion.curve(context, Curves.easeOut),
+      duration: DsMotion.durationOf(context, const Duration(milliseconds: 150)),
+      curve: DsMotion.curveOf(context, Curves.easeOut),
       width: _boxSize,
       height: _boxSize,
       decoration: BoxDecoration(

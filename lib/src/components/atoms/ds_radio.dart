@@ -84,8 +84,8 @@ class DsRadio<T> extends StatelessWidget {
     final double opacity = enabled ? 1 : 0.5;
 
     final Widget indicator = AnimatedContainer(
-      duration: DsMotion.duration(context, const Duration(milliseconds: 150)),
-      curve: DsMotion.curve(context, Curves.easeOut),
+      duration: DsMotion.durationOf(context, const Duration(milliseconds: 150)),
+      curve: DsMotion.curveOf(context, Curves.easeOut),
       width: _indicatorSize,
       height: _indicatorSize,
       decoration: BoxDecoration(
@@ -98,8 +98,8 @@ class DsRadio<T> extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: AnimatedScale(
-        duration: DsMotion.duration(context, const Duration(milliseconds: 150)),
-        curve: DsMotion.curve(context, Curves.easeOut),
+        duration: DsMotion.durationOf(context, const Duration(milliseconds: 150)),
+        curve: DsMotion.curveOf(context, Curves.easeOut),
         scale: selected ? 1 : 0,
         child: Container(
           width: _dotSize,

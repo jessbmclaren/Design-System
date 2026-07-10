@@ -192,8 +192,8 @@ class _DsAccordionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final motion = DsMotion.duration(context, const Duration(milliseconds: 200));
-    final curve = DsMotion.curve(context, Curves.easeInOut);
+    final motion = DsMotion.durationOf(context, const Duration(milliseconds: 200));
+    final curve = DsMotion.curveOf(context, Curves.easeInOut);
 
     final titleStyle = tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
           fontWeight: DsTypography.semiBold,
