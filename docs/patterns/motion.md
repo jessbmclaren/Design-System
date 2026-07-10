@@ -22,7 +22,8 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | `DsMotion.decelerate` | Curve | `cubic(0.05, 0.7, 0.1, 1)` | Pure decelerate for elements arriving from off-screen. |
 | `DsMotion.accelerate` | Curve | `cubic(0.3, 0, 0.8, 0.15)` | Accelerate for elements leaving the screen entirely. |
 | `DsMotion.settle` | Curve | `cubic(0.34, 1.35, 0.64, 1)` | A physical settle with a restrained overshoot: the premium, alive arrival. |
-| `DsMotion.spring` | SpringDescription | `stiffness 180` | A spring for physics-driven motion: a dragged card snapping back. |
+| `DsMotion.spring` | SpringDescription | `damping 22` | A near-critically-damped spring for physics-driven motion: a dragged card snapping back, only a hint of overshoot. |
+| `DsMotion.bounce` | SpringDescription | `damping 10` | An under-damped spring for a tactile, playful bounce: a button releasing. Visibly overshoots and settles. |
 
 One law above all: **respect reduced motion.** When a person has asked their platform for less motion, animation is not softened. It is removed. Resolve every duration and curve through `DsMotion.durationOf` and `DsMotion.curveOf`, which collapse to a still, instant change under the setting, and gate any bespoke animation behind `DsMotion.reduced`. The demo above obeys this: press Replay with reduce-motion on and it stays put.
 

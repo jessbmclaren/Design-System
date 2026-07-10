@@ -41,7 +41,8 @@ final PatternPage motionPage = PatternPage(
       VariableRow(name: 'DsMotion.decelerate', type: 'Curve', example: 'cubic(0.05, 0.7, 0.1, 1)', description: 'Pure decelerate for elements arriving from off-screen.'),
       VariableRow(name: 'DsMotion.accelerate', type: 'Curve', example: 'cubic(0.3, 0, 0.8, 0.15)', description: 'Accelerate for elements leaving the screen entirely.'),
       VariableRow(name: 'DsMotion.settle', type: 'Curve', example: 'cubic(0.34, 1.35, 0.64, 1)', description: 'A physical settle with a restrained overshoot: the premium, alive arrival.'),
-      VariableRow(name: 'DsMotion.spring', type: 'SpringDescription', example: 'stiffness 180', description: 'A spring for physics-driven motion: a dragged card snapping back.'),
+      VariableRow(name: 'DsMotion.spring', type: 'SpringDescription', example: 'damping 22', description: 'A near-critically-damped spring for physics-driven motion: a dragged card snapping back, only a hint of overshoot.'),
+      VariableRow(name: 'DsMotion.bounce', type: 'SpringDescription', example: 'damping 10', description: 'An under-damped spring for a tactile, playful bounce: a button releasing. Visibly overshoots and settles.'),
     ]),
     ProseBlock(
       'One law above all: **respect reduced motion.** When a person has '

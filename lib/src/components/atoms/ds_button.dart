@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../util/ds_motion.dart';
 import 'ds_spinner.dart';
 
 /// The visual emphasis of a [DsButton].
@@ -25,7 +27,11 @@ enum DsButtonVariant {
 /// spinner and the button is disabled so the action cannot be triggered
 /// twice. Set [fullWidth] on compact layouts where a button should span the
 /// available width.
-class DsButton extends StatelessWidget {
+///
+/// Pressing the button gives a physical, tactile response: it scales down and
+/// springs back through the [DsMotion] tokens (and stays still under reduced
+/// motion), with the ink ripple removed so the motion itself is the feedback.
+class DsButton extends StatefulWidget {
   const DsButton({
     super.key,
     required this.label,
@@ -56,9 +62,67 @@ class DsButton extends StatelessWidget {
   final bool fullWidth;
 
   @override
+  State<DsButton> createState() => _DsButtonState();
+}
+
+class _DsButtonState extends State<DsButton>
+    with SingleTickerProviderStateMixin {
+  /// How far the button scales down while held — a physical push.
+  static const double _pressedScale = 0.90;
+
+  final WidgetStatesController _states = WidgetStatesController();
+
+  /// Drives the scale. Unbounded so the spring can overshoot past 1.0 on
+  /// release — the bounce.
+  late final AnimationController _scale = AnimationController.unbounded(
+    vsync: this,
+    value: 1,
+  );
+
+  bool _wasPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _states.addListener(_onStatesChanged);
+  }
+
+  @override
+  void dispose() {
+    _states.removeListener(_onStatesChanged);
+    _states.dispose();
+    _scale.dispose();
+    super.dispose();
+  }
+
+  void _onStatesChanged() {
+    final pressed = _states.value.contains(WidgetState.pressed);
+    if (pressed == _wasPressed) return;
+    _wasPressed = pressed;
+    if (DsMotion.reduced(context)) {
+      _scale.value = 1;
+      return;
+    }
+    if (pressed) {
+      // Quick, decisive push down.
+      _scale.animateTo(
+        _pressedScale,
+        duration: DsMotion.fast,
+        curve: DsMotion.emphasized,
+      );
+    } else {
+      // Spring back to rest with the bounce token — under-damped, so it
+      // overshoots past 1.0 and settles with a couple of diminishing rebounds.
+      _scale.animateWith(
+        SpringSimulation(DsMotion.bounce, _scale.value, 1, _scale.velocity),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final (background, border, foreground) = switch (variant) {
+    final (background, border, foreground) = switch (widget.variant) {
       DsButtonVariant.primary => (
           tokens.buttonPrimaryColorBackground,
           tokens.buttonPrimaryColorBorder,
@@ -76,10 +140,10 @@ class DsButton extends StatelessWidget {
         ),
     };
 
-    final enabled = onPressed != null && !pending;
-    final label = tokens.buttonLabelTextTransform.apply(this.label);
+    final enabled = widget.onPressed != null && !widget.pending;
+    final label = tokens.buttonLabelTextTransform.apply(widget.label);
 
-    final child = pending
+    final child = widget.pending
         ? SizedBox(
             height: tokens.buttonLabelFontSize + 4,
             child: Center(
@@ -91,11 +155,11 @@ class DsButton extends StatelessWidget {
             ),
           )
         : Row(
-            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: tokens.buttonLabelFontSize + 2),
+              if (widget.icon != null) ...[
+                Icon(widget.icon, size: tokens.buttonLabelFontSize + 2),
                 const SizedBox(width: 8),
               ],
               Flexible(
@@ -114,29 +178,34 @@ class DsButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: pending ? 'Working' : null,
+      label: widget.pending ? 'Working' : null,
       child: SizedBox(
-        width: fullWidth ? double.infinity : null,
-        child: FilledButton(
-          onPressed: enabled ? onPressed : null,
-          style: FilledButton.styleFrom(
-            backgroundColor: background,
-            foregroundColor: foreground,
-            disabledBackgroundColor: background.withValues(alpha: 0.5),
-            disabledForegroundColor: foreground.withValues(alpha: 0.9),
-            elevation: 0,
-            minimumSize: const Size(0, 40),
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.buttonPaddingX + 12,
-              vertical: tokens.buttonPaddingY + 6,
+        width: widget.fullWidth ? double.infinity : null,
+        child: ScaleTransition(
+          scale: _scale,
+          child: FilledButton(
+            onPressed: enabled ? widget.onPressed : null,
+            statesController: _states,
+            style: FilledButton.styleFrom(
+              backgroundColor: background,
+              foregroundColor: foreground,
+              disabledBackgroundColor: background.withValues(alpha: 0.5),
+              disabledForegroundColor: foreground.withValues(alpha: 0.9),
+              elevation: 0,
+              // The scale is the press feedback; drop the ink splash.
+              splashFactory: NoSplash.splashFactory,
+              minimumSize: const Size(0, 40),
+              padding: EdgeInsets.symmetric(
+                horizontal: tokens.buttonPaddingX + 12,
+                vertical: tokens.buttonPaddingY + 6,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.buttonBorderRadius),
+                side: BorderSide(color: border),
+              ),
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(tokens.buttonBorderRadius),
-              side: BorderSide(color: border),
-            ),
+            child: child,
           ),
-          child: child,
         ),
       ),
     );

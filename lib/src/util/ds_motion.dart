@@ -74,6 +74,17 @@ abstract final class DsMotion {
     damping: 22,
   );
 
+  /// A springier, under-damped spring for a tactile, playful *bounce* — a
+  /// button releasing, a chip toggling. It visibly overshoots and settles with
+  /// a couple of diminishing rebounds (damping ratio ≈ 0.37), where [spring] is
+  /// nearly critically damped. Reach for this when the motion should feel
+  /// satisfying, not merely correct.
+  static const SpringDescription bounce = SpringDescription(
+    mass: 1,
+    stiffness: 180,
+    damping: 10,
+  );
+
   // --- Choreography ---------------------------------------------------------
 
   /// The delay before the item at [index] in a staggered sequence begins, so a
