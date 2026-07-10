@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_box.dart';
@@ -232,7 +231,7 @@ class _FormCard extends StatelessWidget {
         color: tokens.formBackgroundColor,
         border: Border.all(color: tokens.colorBorder),
         borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
-        boxShadow: DsElevation.medium,
+        boxShadow: tokens.shadowMedium,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -319,7 +318,7 @@ class _BrandMark extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          boxShadow: DsElevation.medium,
+          boxShadow: tokens.shadowMedium,
         ),
         child: DsIcon(
           icon: icon,

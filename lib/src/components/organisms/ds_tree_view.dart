@@ -5,7 +5,6 @@ import '../../tokens/ds_icons.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
@@ -446,7 +445,7 @@ class _DsTreeViewState extends State<DsTreeView> {
             color: tokens.formBackgroundColor,
             borderRadius: BorderRadius.circular(tokens.formBorderRadius),
             border: Border.all(color: tokens.colorBorder),
-            boxShadow: DsElevation.medium,
+            boxShadow: tokens.shadowMedium,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(

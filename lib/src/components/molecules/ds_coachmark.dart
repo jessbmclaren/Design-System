@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
@@ -158,7 +157,7 @@ class DsCoachmark extends StatelessWidget {
         color: tokens.formBackgroundColor,
         borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
         border: Border.all(color: tokens.colorBorder),
-        boxShadow: DsElevation.high,
+        boxShadow: tokens.shadowHigh,
       ),
       child: Padding(
         padding: const EdgeInsets.all(DsSpacing.lg),

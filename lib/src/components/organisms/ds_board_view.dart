@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
@@ -591,7 +590,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(_cardRadius),
-            boxShadow: DsElevation.medium,
+            boxShadow: tokens.shadowMedium,
           ),
           child: surface,
         ),

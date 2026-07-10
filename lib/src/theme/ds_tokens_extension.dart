@@ -1,8 +1,10 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../tokens/ds_colors.dart';
+import '../tokens/ds_elevation.dart';
 import '../tokens/ds_radii.dart';
 import '../tokens/ds_spacing.dart';
 import '../tokens/ds_typography.dart';
@@ -116,6 +118,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.overlayBorderRadius,
     required this.overlayBackdropColor,
     required this.overlays,
+    required this.shadowLow,
+    required this.shadowMedium,
+    required this.shadowHigh,
   });
 
   /// The default Design System light appearance.
@@ -197,6 +202,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       overlayBorderRadius: DsRadii.overlay,
       overlayBackdropColor: DsColors.overlayBackdrop,
       overlays: DsOverlayStyle.dialog,
+      shadowLow: DsElevation.low,
+      shadowMedium: DsElevation.medium,
+      shadowHigh: DsElevation.high,
     );
   }
 
@@ -517,6 +525,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// Whether overlays such as [DsFocusView] present as a dialog or a drawer.
   final DsOverlayStyle overlays;
 
+  /// The resting drop shadow for lightly raised surfaces (chips, hover cards).
+  /// Defaults to [DsElevation.low]; a skin can supply a brand-tinted shadow.
+  final List<BoxShadow> shadowLow;
+
+  /// The drop shadow for floating surfaces such as cards, menus and overlays.
+  /// Defaults to [DsElevation.medium]; a skin can supply a brand-tinted shadow.
+  final List<BoxShadow> shadowMedium;
+
+  /// The drop shadow for modal surfaces (dialogs, drawers, takeovers). Defaults
+  /// to [DsElevation.high]; a skin can supply a brand-tinted shadow.
+  final List<BoxShadow> shadowHigh;
+
   @override
   DsTokens copyWith({
     String? fontFamily,
@@ -595,6 +615,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? overlayBorderRadius,
     Color? overlayBackdropColor,
     DsOverlayStyle? overlays,
+    List<BoxShadow>? shadowLow,
+    List<BoxShadow>? shadowMedium,
+    List<BoxShadow>? shadowHigh,
   }) {
     return DsTokens(
       fontFamily: fontFamily ?? this.fontFamily,
@@ -713,6 +736,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       overlayBorderRadius: overlayBorderRadius ?? this.overlayBorderRadius,
       overlayBackdropColor: overlayBackdropColor ?? this.overlayBackdropColor,
       overlays: overlays ?? this.overlays,
+      shadowLow: shadowLow ?? this.shadowLow,
+      shadowMedium: shadowMedium ?? this.shadowMedium,
+      shadowHigh: shadowHigh ?? this.shadowHigh,
     );
   }
 
@@ -846,6 +872,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
       overlayBorderRadius: d(overlayBorderRadius, other.overlayBorderRadius),
       overlayBackdropColor: c(overlayBackdropColor, other.overlayBackdropColor),
       overlays: t < 0.5 ? overlays : other.overlays,
+      shadowLow: BoxShadow.lerpList(shadowLow, other.shadowLow, t) ?? shadowLow,
+      shadowMedium:
+          BoxShadow.lerpList(shadowMedium, other.shadowMedium, t) ??
+              shadowMedium,
+      shadowHigh:
+          BoxShadow.lerpList(shadowHigh, other.shadowHigh, t) ?? shadowHigh,
     );
   }
 
@@ -929,7 +961,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           tableRowPaddingY == other.tableRowPaddingY &&
           overlayBorderRadius == other.overlayBorderRadius &&
           overlayBackdropColor == other.overlayBackdropColor &&
-          overlays == other.overlays;
+          overlays == other.overlays &&
+          listEquals(shadowLow, other.shadowLow) &&
+          listEquals(shadowMedium, other.shadowMedium) &&
+          listEquals(shadowHigh, other.shadowHigh);
   }
 
   @override
@@ -1011,5 +1046,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
         overlayBorderRadius,
         overlayBackdropColor,
         overlays,
+        Object.hashAll(shadowLow),
+        Object.hashAll(shadowMedium),
+        Object.hashAll(shadowHigh),
       ]);
 }

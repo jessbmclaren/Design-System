@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_icon.dart';
@@ -53,7 +52,7 @@ class DsMenuItem {
 /// [DsMenuItem.onSelected] and closes the menu. The surface reads its fill
 /// ([DsTokens.formBackgroundColor]), corner radius
 /// ([DsTokens.overlayBorderRadius]), 1px border ([DsTokens.colorBorder]) and
-/// [DsElevation.medium] drop shadow from the active theme, so a white-label
+/// [DsTokens.shadowMedium] drop shadow from the active theme, so a white-label
 /// skin restyles it without touching this widget.
 ///
 /// ```dart
@@ -183,7 +182,7 @@ class _DsMenuSurface extends StatelessWidget {
           color: tokens.formBackgroundColor,
           borderRadius: radius,
           border: Border.all(color: tokens.colorBorder),
-          boxShadow: DsElevation.medium,
+          boxShadow: tokens.shadowMedium,
         ),
         child: ClipRRect(
           borderRadius: radius,

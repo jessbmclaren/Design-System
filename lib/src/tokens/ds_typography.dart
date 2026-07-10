@@ -38,6 +38,7 @@ class DsTypeToken {
     required this.fontSize,
     required this.fontWeight,
     this.height,
+    this.letterSpacing,
     this.textTransform = DsTextTransform.none,
   });
 
@@ -49,6 +50,10 @@ class DsTypeToken {
 
   /// The line height multiplier.
   final double? height;
+
+  /// The tracking (extra spacing between letters), in logical pixels. Negative
+  /// values tighten display and heading styles. Null leaves it to the font.
+  final double? letterSpacing;
 
   /// The text transform applied by Design System components when rendering strings
   /// with this token. Defaults to [DsTextTransform.none].
@@ -71,6 +76,7 @@ class DsTypeToken {
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height,
+      letterSpacing: letterSpacing,
       color: color,
     );
   }
@@ -80,12 +86,14 @@ class DsTypeToken {
     double? fontSize,
     FontWeight? fontWeight,
     double? height,
+    double? letterSpacing,
     DsTextTransform? textTransform,
   }) {
     return DsTypeToken(
       fontSize: fontSize ?? this.fontSize,
       fontWeight: fontWeight ?? this.fontWeight,
       height: height ?? this.height,
+      letterSpacing: letterSpacing ?? this.letterSpacing,
       textTransform: textTransform ?? this.textTransform,
     );
   }
@@ -98,10 +106,12 @@ class DsTypeToken {
           fontSize == other.fontSize &&
           fontWeight == other.fontWeight &&
           height == other.height &&
+          letterSpacing == other.letterSpacing &&
           textTransform == other.textTransform;
 
   @override
-  int get hashCode => Object.hash(fontSize, fontWeight, height, textTransform);
+  int get hashCode =>
+      Object.hash(fontSize, fontWeight, height, letterSpacing, textTransform);
 }
 
 /// Design System typography tokens.

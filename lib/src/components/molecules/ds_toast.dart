@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 
 /// An optional trailing action shown inside a [DsToast].
 ///
@@ -144,7 +143,7 @@ class DsToast extends StatelessWidget {
           decoration: BoxDecoration(
             color: background,
             borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
-            boxShadow: DsElevation.high,
+            boxShadow: tokens.shadowHigh,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_elevation.dart';
 
 /// A small text label that surfaces contextual help for its [child].
 ///
@@ -12,7 +11,7 @@ import '../../tokens/ds_elevation.dart';
 ///
 /// The bubble uses a dark, inverted surface ([DsTokens.colorText]) with text in
 /// [DsTokens.formBackgroundColor] for high contrast, `bodySm` typography, a
-/// [DsTokens.overlayBorderRadius] radius and a [DsElevation.medium] shadow so it
+/// [DsTokens.overlayBorderRadius] radius and a [DsTokens.shadowMedium] shadow so it
 /// floats above surrounding content.
 ///
 /// The bubble is constrained so long messages wrap rather than overflow, which
@@ -69,7 +68,7 @@ class DsTooltip extends StatelessWidget {
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
-        boxShadow: DsElevation.medium,
+        boxShadow: tokens.shadowMedium,
       ),
       child: child,
     );

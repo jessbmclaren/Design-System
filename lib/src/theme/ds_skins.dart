@@ -17,18 +17,35 @@ import 'ds_tokens_extension.dart';
 /// ```
 ///
 /// Because a skin is just data (a `DsTokens` built with `copyWith`), you can
-/// define your own the same way; [engenLight] / [engenDark] are provided as a
-/// worked example of a full re-brand (a deep-indigo fleet identity).
+/// define your own the same way. [engenLight] / [engenDark] are a full,
+/// pixel-accurate re-brand (the Engen fleet identity: deep indigo over
+/// navy-tinted slates), carried down to the type tracking and the card shadow.
 abstract final class DsSkins {
-  // Engen indigo palette.
-  static const Color _indigo = Color(0xFF15259B);
-  static const Color _navyInk = Color(0xFF0B1B45);
-  static const Color _slate = Color(0xFF5B6478);
-  static const Color _border = Color(0xFFD8DCE5);
-  static const Color _fill = Color(0xFFF5F6FB);
+  // Engen indigo palette (navy-tinted neutrals).
+  static const Color _indigo = Color(0xFF15259B); // brand
+  static const Color _navyInk = Color(0xFF0B1B45); // body ink
+  static const Color _slate = Color(0xFF5B6478); // secondary text
+  static const Color _border = Color(0xFFD8DCE5); // border
+  static const Color _hairline = Color(0xFFE5E8F0); // badge / divider hairline
+  static const Color _fill = Color(0xFFEEF0F5); // muted fill / offset surface
+  static const Color _page = Color(0xFFFAFBFD); // page background
+  static const Color _placeholder = Color(0xFF7A8295); // placeholder text
   static const Color _danger = Color(0xFFDF1B41);
 
-  /// The light Engen skin: deep indigo brand, navy ink, roomier corners.
+  /// The brand-tinted elevation scale: one soft indigo drop that deepens with
+  /// height (indigo at 8 to 12%), no grey ink or stacked layers.
+  static const List<BoxShadow> _shadowLow = <BoxShadow>[
+    BoxShadow(color: Color(0x1415259B), offset: Offset(0, 4), blurRadius: 12),
+  ];
+  static const List<BoxShadow> _shadowMedium = <BoxShadow>[
+    BoxShadow(color: Color(0x1F15259B), offset: Offset(0, 20), blurRadius: 48),
+  ];
+  static const List<BoxShadow> _shadowHigh = <BoxShadow>[
+    BoxShadow(color: Color(0x1F15259B), offset: Offset(0, 26), blurRadius: 56),
+  ];
+
+  /// The light Engen skin: deep indigo brand, navy ink, roomier corners, a
+  /// tightly-tracked heading ramp and a soft indigo card shadow.
   static DsTokens engenLight() {
     return DsTokens.light().copyWith(
       // Brand
@@ -38,32 +55,68 @@ abstract final class DsSkins {
       actionPrimaryColorText: _indigo,
       actionPrimaryTextDecorationColor: _indigo,
       formAccentColor: _indigo,
+      formHighlightColorBorder: _indigo,
       // Text & surfaces
       colorText: _navyInk,
       colorSecondaryText: _slate,
       colorBorder: _border,
+      colorBackground: _page,
       offsetBackgroundColor: _fill,
+      formPlaceholderTextColor: _placeholder,
       colorDanger: _danger,
       buttonDangerColorBackground: _danger,
       buttonDangerColorBorder: _danger,
-      // Badges (Engen container tones)
+      // Secondary action: a neutral outline (white fill, hairline border).
+      buttonSecondaryColorBackground: const Color(0xFFFFFFFF),
+      buttonSecondaryColorBorder: _border,
+      buttonSecondaryColorText: _navyInk,
+      // Badges (Engen container tones).
+      badgeNeutralColorBackground: _fill,
+      badgeNeutralColorText: _slate,
+      badgeNeutralColorBorder: _hairline,
       badgeSuccessColorBackground: const Color(0xFFE4F3EB),
       badgeSuccessColorText: const Color(0xFF116B3C),
       badgeSuccessColorBorder: const Color(0xFFB6DEC6),
+      badgeWarningColorBackground: const Color(0xFFFCEEBA),
+      badgeWarningColorText: const Color(0xFFA82C00),
+      badgeWarningColorBorder: const Color(0xFFF5DA80),
       badgeDangerColorBackground: const Color(0xFFFCE8EC),
       badgeDangerColorText: const Color(0xFFB01030),
       badgeDangerColorBorder: const Color(0xFFF3C6D0),
-      // Shape: Engen uses roomier corners
+      // Shape: roomier corners.
       buttonBorderRadius: 10,
       formBorderRadius: 10,
       badgeBorderRadius: 8,
       overlayBorderRadius: 16,
       borderRadius: 16,
-      // Type: larger display heading, semi-bold control labels
+      // Type: bold headings with the brand's tight tracking; semi-bold labels.
       headingXl: const DsTypeToken(
-          fontSize: 32, fontWeight: DsTypography.bold, height: 1.2),
+          fontSize: 32,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      headingLg: const DsTypeToken(
+          fontSize: 24,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      headingMd: const DsTypeToken(
+          fontSize: 20,
+          fontWeight: DsTypography.bold,
+          height: 1.25,
+          letterSpacing: -0.2),
+      headingSm: const DsTypeToken(
+          fontSize: 16, fontWeight: DsTypography.bold, height: 1.3),
+      labelMd: const DsTypeToken(
+          fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.4),
+      labelSm: const DsTypeToken(
+          fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
+      // Elevation: the brand-tinted scale (low / medium / high).
+      shadowLow: _shadowLow,
+      shadowMedium: _shadowMedium,
+      shadowHigh: _shadowHigh,
     );
   }
 
@@ -82,9 +135,34 @@ abstract final class DsSkins {
       overlayBorderRadius: 16,
       borderRadius: 16,
       headingXl: const DsTypeToken(
-          fontSize: 32, fontWeight: DsTypography.bold, height: 1.2),
+          fontSize: 32,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      headingLg: const DsTypeToken(
+          fontSize: 24,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      labelMd: const DsTypeToken(
+          fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.4),
+      labelSm: const DsTypeToken(
+          fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
+      // Deeper drops read on the dark surfaces.
+      shadowLow: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x40000000), offset: Offset(0, 4), blurRadius: 12),
+      ],
+      shadowMedium: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x66000000), offset: Offset(0, 20), blurRadius: 48),
+      ],
+      shadowHigh: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x73000000), offset: Offset(0, 26), blurRadius: 56),
+      ],
     );
   }
 }
