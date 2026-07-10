@@ -16,7 +16,7 @@ final PatternPage passwordFieldPage = PatternPage(
       '`autofocus` and `focusNode` straight to the underlying field. Use it '
       'anywhere someone enters a password: sign-in, sign-up and change-password '
       'forms.',
-  hasLiveDemo: false,
+  hasLiveDemo: true,
   dos: const [
     'Use DsPasswordField for every password input so the show and hide toggle behaves the same everywhere.',
     'Set errorText to report a failed rule or a mismatch; it moves the field into its error state.',
@@ -41,5 +41,9 @@ DsPasswordField(
   onSubmitted: (_) => _signIn(),
 );
 ''',
+  shots: const [
+    Shot(pageId: 'password-field', size: ShotSize.desktop),
+    Shot(pageId: 'password-field', size: ShotSize.phone),
+  ],
   related: const ['text-fields', 'password-strength'],
 );

@@ -15,7 +15,7 @@ final PatternPage setupGuidePage = PatternPage(
       'caller owns. Collapsed, the list gives way to a "Next" line linking to '
       'the first task the user can act on, so even the slim bar points '
       'somewhere useful.',
-  hasLiveDemo: false,
+  hasLiveDemo: true,
   blocks: const [
     ProseBlock(
       'Tasks come in four shapes. An open to-do is tappable at the full 48dp '
@@ -79,5 +79,9 @@ DsSetupGuide(
   ],
 );
 ''',
+  shots: const [
+    Shot(pageId: 'setup-guide', size: ShotSize.desktop),
+    Shot(pageId: 'setup-guide', size: ShotSize.phone),
+  ],
   related: const ['onboarding-wizard', 'business-verification', 'progress-bar'],
 );

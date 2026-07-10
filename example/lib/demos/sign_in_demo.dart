@@ -1,42 +1,113 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Live demo for the Sign in page: a branded, form-based [DsSignInView] with
-/// username and password fields, a forgot-password link, a full-width primary
-/// action and a sign-up prompt in the footer.
-class SignInDemo extends StatelessWidget {
+/// Live demo for the Sign in page.
+///
+/// Renders a real [DsSignInView] in its form-led composition: a left-aligned
+/// heading, an email field, a password block whose label row carries the
+/// forgot-password link, a remember-me [DsCheckbox], the full-width primary
+/// action, a labelled divider above the alternative providers and a
+/// create-account prompt in the tinted footer band. The fields start
+/// pre-filled so the first frame is complete; emptying a field surfaces its
+/// error via [setState]. No timers, network or randomness.
+class SignInDemo extends StatefulWidget {
   const SignInDemo({super.key});
+
+  @override
+  State<SignInDemo> createState() => _SignInDemoState();
+}
+
+class _SignInDemoState extends State<SignInDemo> {
+  final TextEditingController _email =
+      TextEditingController(text: 'jordan@northwind.io');
+  final TextEditingController _password =
+      TextEditingController(text: 'correct-horse-battery');
+  bool _remember = true;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
 
     return DsSignInView(
-      brandIcon: Icons.workspaces_outline,
-      title: 'Welcome back',
-      description: 'Sign in to your Acme account to continue.',
+      title: 'Sign in to your account',
+      headingAlignment: DsHeadingAlignment.start,
       form: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const DsTextField(
-            label: 'Username',
-            hintText: 'Enter your username',
+          DsTextField(
+            label: 'Email',
+            hintText: 'you@company.com',
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            controller: _email,
+            errorText: _email.text.trim().isEmpty ? 'Enter your email.' : null,
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: DsSpacing.lg),
+          Row(
+            children: [
+              const DsFieldLabel(label: 'Password'),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: DsLink(
+                    label: 'Forgot your password?',
+                    onPressed: () {},
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: DsSpacing.xs),
+          DsPasswordField(
+            controller: _password,
+            textInputAction: TextInputAction.done,
+            errorText: _password.text.isEmpty ? 'Enter your password.' : null,
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: DsSpacing.md),
-          const DsTextField(
-            label: 'Password',
-            hintText: 'Enter your password',
-            obscureText: true,
-          ),
-          const SizedBox(height: DsSpacing.sm),
-          Align(
-            alignment: Alignment.centerRight,
-            child: DsLink(label: 'Forgot password?', onPressed: () {}),
+          DsCheckbox(
+            value: _remember,
+            onChanged: (v) => setState(() => _remember = v),
+            label: 'Remember me on this device',
           ),
         ],
       ),
       primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
-      footer: Wrap(
+      footer: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const DsLabeledDivider(label: 'Or sign in with'),
+          const SizedBox(height: DsSpacing.lg),
+          DsButton.social(
+            icon: Icons.language,
+            label: 'Google',
+            onPressed: () {},
+          ),
+          const SizedBox(height: DsSpacing.md),
+          DsButton.social(
+            icon: Icons.key_outlined,
+            label: 'Passkey',
+            onPressed: () {},
+          ),
+          const SizedBox(height: DsSpacing.md),
+          DsButton.social(
+            icon: Icons.verified_user_outlined,
+            label: 'SSO',
+            onPressed: () {},
+          ),
+        ],
+      ),
+      footerBand: Wrap(
+        alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(

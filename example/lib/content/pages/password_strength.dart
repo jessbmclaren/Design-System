@@ -15,7 +15,7 @@ final PatternPage passwordStrengthPage = PatternPage(
       'someone types. Set `showChecklist: false` to keep the meter on its '
       'own where space is tight. The same grading is exposed as a pure '
       'model, so a form can validate with the exact logic the meter shows.',
-  hasLiveDemo: false,
+  hasLiveDemo: true,
   blocks: const [
     ProseBlock(
       'The widget shows guidance; the model decides. `dsPasswordRules(value)` '
@@ -61,5 +61,9 @@ Column(
   ],
 );
 ''',
+  shots: const [
+    Shot(pageId: 'password-strength', size: ShotSize.desktop),
+    Shot(pageId: 'password-strength', size: ShotSize.phone),
+  ],
   related: const ['password-field'],
 );

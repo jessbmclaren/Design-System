@@ -13,6 +13,8 @@ import 'link_demo.dart';
 import 'menu_demo.dart';
 import 'tooltip_demo.dart';
 import 'text_fields_demo.dart';
+import 'password_field_demo.dart';
+import 'password_strength_demo.dart';
 import 'text_area_demo.dart';
 import 'selection_controls_demo.dart';
 import 'select_dropdown_demo.dart';
@@ -50,11 +52,13 @@ import 'sign_out_demo.dart';
 import 'coachmark_demo.dart';
 import 'onboarding_wizard_demo.dart';
 import 'business_verification_demo.dart';
+import 'setup_guide_demo.dart';
 import 'back_link_demo.dart';
 import 'action_buttons_demo.dart';
 import 'communicating_state_demo.dart';
 import 'empty_state_demo.dart';
 import 'loading_demo.dart';
+import 'progress_bar_demo.dart';
 import 'progress_stepping_demo.dart';
 import 'waiting_screens_demo.dart';
 
@@ -74,6 +78,8 @@ final Map<String, Widget Function()> _demos = {
   'menu': () => const MenuDemo(),
   'tooltip': () => const TooltipDemo(),
   'text-fields': () => const TextFieldsDemo(),
+  'password-field': () => const PasswordFieldDemo(),
+  'password-strength': () => const PasswordStrengthDemo(),
   'text-area': () => const TextAreaDemo(),
   'selection-controls': () => const SelectionControlsDemo(),
   'select': () => const SelectDropdownDemo(),
@@ -111,11 +117,13 @@ final Map<String, Widget Function()> _demos = {
   'coachmark': () => const CoachmarkDemo(),
   'onboarding-wizard': () => const OnboardingWizardDemo(),
   'business-verification': () => const BusinessVerificationDemo(),
+  'setup-guide': () => const SetupGuideDemo(),
   'back-link': () => const BackLinkDemo(),
   'action-buttons': () => const ActionButtonsDemo(),
   'communicating-state': () => const CommunicatingStateDemo(),
   'empty-state': () => const EmptyStateDemo(),
   'loading': () => const LoadingDemo(),
+  'progress-bar': () => const ProgressBarDemo(),
   'progress-stepping': () => const ProgressSteppingDemo(),
   'waiting-screens': () => const WaitingScreensDemo(),
 };

@@ -9,74 +9,124 @@ final PatternPage signUpPage = PatternPage(
   title: 'Sign up',
   description:
       'The sign-up view turns a first visit into an account. `DsSignUpView` '
-      'frames registration as one focused card (a branded glyph, a short title '
-      'and description, your own form and a single full-width primary action) '
-      'so the moment of commitment stays calm and unmistakable. The scaffold '
-      'owns only the surrounding layout, spacing and responsive behaviour: you '
-      'supply the `form` (typically a `DsFormFieldGroup`) and own its validation, '
-      'while `onSubmit` does the work and, when `null`, disables the button until '
-      'the form is ready. Pass an optional `aside` and the card grows a benefits '
-      'panel beside it on wide screens and stacks it beneath on phones, so '
-      'nothing is ever lost.',
+      'frames registration as one focused, brand-led card: a `header` wordmark '
+      'centred with `headingAlignment`, a short title, an "Already have an '
+      'account?" prompt in the `aboveForm` slot, your own form and a single '
+      'full-width primary action. The scaffold owns only the surrounding '
+      'layout, spacing and responsive behaviour: you supply the `form` '
+      '(typically a `DsFormFieldGroup` and fields) and own its validation, '
+      'while `onSubmit` does the work and, when `null`, disables the button '
+      'until every field is valid. `onClose` adds a corner close for a card '
+      'opened over another surface, and `showBorder: false` lets the card '
+      'rest on its shadow alone.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Lead with the value of creating an account, then ask for the fewest '
-      'fields you truly need. Set `brandIcon` and `brandColor` so the card reads '
-      'as yours the instant it appears, and reserve the `footer` for the '
-      'returning-user path: an "Already have an account? Sign in" prompt. While '
-      'the request is in flight, set `submitPending` to show a spinner and block '
-      'repeat taps; the view never touches the network or a timer itself, so it '
-      'renders identically in a screenshot and in production.',
+      'Ask for the fewest fields you truly need, then validate them where '
+      'the user is looking. Name and surname share one `DsFormFieldGroup` '
+      'row and stack on narrow screens. The work email validates live once '
+      'touched: a format check surfaces "This email is invalid" and a '
+      'directory check "Email already taken", both through the field\'s '
+      '`errorText`. The password is captioned by `dsFirstUnmetPasswordRule`, '
+      'which names one rule at a time so the error always says the next '
+      'thing to fix, and a `DsPasswordStrength` meter beneath the field '
+      'grades the value as it is typed. While the request is in flight, set '
+      '`submitPending` to show a spinner and block repeat taps; the view '
+      'never touches the network or a timer itself, so it renders '
+      'identically in a screenshot and in production.',
+    ),
+    ProseBlock(
+      'Earlier revisions of this pattern paired the card with a benefits '
+      '`aside`. The slot still exists for trial-style layouts, but this '
+      'composition drops it: the single card keeps attention on the form, '
+      'and the terms line in the `footer` stays short so the primary action '
+      'is never buried.',
     ),
   ],
   dos: const [
     'Ask for the fewest fields that let someone get started, then progressively collect the rest.',
-    'Keep a single, unmistakable primary action and label it for the outcome, like "Create account".',
-    'Brand the card with your own `brandIcon` and `brandColor` so it feels trustworthy.',
+    'Put name and surname in one `DsFormFieldGroup` row; the group stacks them itself when the card narrows.',
+    'Validate the email live once touched: a format check first, then the taken-address check, both through `errorText`.',
+    'Caption the password with `dsFirstUnmetPasswordRule` so the error always names the next rule to fix.',
+    'Gate `onSubmit` on the same checks the fields show and pass `null` until every one passes.',
     'Use `submitPending` while the request is in flight to prevent duplicate submissions.',
-    'Offer the returning-user path in the `footer` so existing accounts have a way in.',
-    'Use `aside` to reinforce the value of signing up, not to add a second call to action.',
   ],
   donts: const [
-    'Don\'t disable `onSubmit` silently; surface field errors on the `form` so people know what to fix.',
+    'Don\'t flag an email error before the field is touched; an empty field is not yet wrong.',
+    'Don\'t list every unmet password rule at once; the ladder shows one message at a time.',
     'Don\'t crowd the card with links that pull people out before they finish.',
-    'Don\'t bury the primary action beneath long terms copy or secondary options.',
-    'Don\'t rely on the `aside` being visible on phones, where it stacks below the card.',
+    'Don\'t bury the primary action beneath long terms copy; one short line under the button is enough.',
+    'Don\'t add an `aside` to this composition; the card stands alone by design.',
   ],
   code: '''
 DsSignUpView(
-  brandIcon: Icons.workspaces_outline,
-  brandColor: const Color(0xFF6D28D9),
-  title: 'Create your workspace',
-  description: 'Start your 14-day trial. No card required.',
-  form: DsFormFieldGroup(
-    columns: 1,
+  header: const DsWordmark(primary: 'acme', accent: 'id', fontSize: 28),
+  headingAlignment: DsHeadingAlignment.center,
+  showBorder: false,
+  onClose: _abandonSignUp,
+  title: 'Seconds to sign up',
+  aboveForm: Wrap(
+    alignment: WrapAlignment.center,
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      DsTextField(
-        label: 'Work email',
-        hintText: 'you@company.com',
-        keyboardType: TextInputType.emailAddress,
+      Text('Already have an account?',
+          style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText)),
+      DsLink(label: 'Sign in', onPressed: _goToSignIn),
+    ],
+  ),
+  form: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      // Name and surname share a row; the group stacks them when narrow.
+      DsFormFieldGroup(
+        children: [
+          DsTextField(controller: _name, hintText: 'Name'),
+          DsTextField(controller: _surname, hintText: 'Surname'),
+        ],
       ),
-      DsTextField(label: 'Password', obscureText: true),
+      const SizedBox(height: DsSpacing.lg),
+      DsTextField(controller: _company, hintText: 'Company name'),
+      const SizedBox(height: DsSpacing.lg),
+      DsTextField(
+        controller: _email,
+        hintText: 'Work email',
+        keyboardType: TextInputType.emailAddress,
+        onChanged: (_) => setState(() => _emailTouched = true),
+        // 'This email is invalid' or 'Email already taken', live.
+        errorText: _emailTouched ? _emailError(_email.text) : null,
+      ),
+      const SizedBox(height: DsSpacing.lg),
+      DsPasswordField(
+        controller: _password,
+        hintText: 'Password',
+        onChanged: (_) => setState(() => _passwordTouched = true),
+        // One rule at a time: the first unmet rule is the next fix.
+        errorText: _passwordTouched
+            ? dsFirstUnmetPasswordRule(_password.text)
+            : null,
+      ),
+      const SizedBox(height: DsSpacing.sm),
+      DsPasswordStrength(value: _password.text, showChecklist: false),
+      DsPasswordStrengthHint(value: _password.text),
     ],
   ),
   primaryActionLabel: 'Create account',
-  onSubmit: _formValid ? _handleSubmit : null,
+  onSubmit: _allFieldsValid ? _handleSubmit : null,
   submitPending: _submitting,
-  footer: Wrap(
-    crossAxisAlignment: WrapCrossAlignment.center,
-    children: [
-      Text('Already have an account? ', style: DsTypography.bodySm.toTextStyle(
-        color: DsTokens.of(context).colorSecondaryText,
-      )),
-      InkWell(
-        onTap: _goToSignIn,
-        child: Text('Sign in', style: DsTypography.labelMd.toTextStyle(
-          color: DsTokens.of(context).actionPrimaryColorText,
-        )),
-      ),
-    ],
+  footer: Text.rich(
+    textAlign: TextAlign.center,
+    TextSpan(
+      style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+      children: [
+        const TextSpan(text: 'By continuing, you agree to our '),
+        TextSpan(text: 'Terms of Service',
+            style: TextStyle(color: tokens.actionPrimaryColorText)),
+        const TextSpan(text: ' and '),
+        TextSpan(text: 'Privacy Policy',
+            style: TextStyle(color: tokens.actionPrimaryColorText)),
+        const TextSpan(text: '.'),
+      ],
+    ),
   ),
 )
 ''',
@@ -84,5 +134,5 @@ DsSignUpView(
     Shot(pageId: 'sign-up', size: ShotSize.desktop),
     Shot(pageId: 'sign-up', size: ShotSize.phone),
   ],
-  related: const ['sign-in', 'onboarding'],
+  related: const ['sign-in', 'onboarding', 'password-strength'],
 );

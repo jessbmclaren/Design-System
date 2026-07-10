@@ -4,6 +4,14 @@
 
 The widget shows guidance; the model decides. `dsPasswordRules(value)` returns the same rules the checklist renders, `dsPasswordMeetsAll(value)` is true once every rule passes, and `dsPasswordTier(value)` grades the value from too weak up to strong, holding common words, brand words passed as `brandWords` and the usual word plus number plus symbol shape down even when every rule passes. `dsFirstUnmetPasswordRule(value)` returns the first unmet rule's message (null once all pass), ready for a field's error caption. Gate the submit button on the model and leave the widget to explain why.
 
+![Desktop (1280dp)](img/password-strength_desktop.png)
+
+*Desktop (1280dp)*
+
+![Small phone (320dp)](img/password-strength_phone.png)
+
+*Small phone (320dp)*
+
 ## Guidelines
 
 **Do**

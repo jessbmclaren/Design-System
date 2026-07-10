@@ -15,7 +15,7 @@ final PatternPage progressBarPage = PatternPage(
       'and it settles on a still frame when the user has asked for reduced '
       'motion. For an open-ended wait with no measurable fraction, show '
       '`DsSpinner` instead.',
-  hasLiveDemo: false,
+  hasLiveDemo: true,
   blocks: const [
     ProseBlock(
       'Assistive technology announces the bar as a percentage. Give it a '
@@ -51,5 +51,9 @@ Column(
   ],
 );
 ''',
+  shots: const [
+    Shot(pageId: 'progress-bar', size: ShotSize.desktop),
+    Shot(pageId: 'progress-bar', size: ShotSize.phone),
+  ],
   related: const ['setup-guide', 'progress-stepping', 'loading'],
 );

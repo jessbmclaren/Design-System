@@ -6,6 +6,14 @@ Tasks come in four shapes. An open to-do is tappable at the full 48dp target and
 
 The card floats at 320dp by default. Set `fullWidth: true` for a bottom-docked bar on mobile, with `initiallyCollapsed: true` so expanding it over the page stays the user's choice. Give it a `maxHeight` on short viewports and the task list scrolls inside the card instead of clipping.
 
+![Desktop (1280dp)](img/setup-guide_desktop.png)
+
+*Desktop (1280dp)*
+
+![Small phone (320dp)](img/setup-guide_phone.png)
+
+*Small phone (320dp)*
+
 ## Guidelines
 
 **Do**
