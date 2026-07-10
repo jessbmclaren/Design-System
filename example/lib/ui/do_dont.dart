@@ -37,14 +37,18 @@ class DoDont extends StatelessWidget {
         ],
       );
     }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var i = 0; i < cards.length; i++) ...[
-          if (i > 0) const SizedBox(width: 16),
-          Expanded(child: cards[i]),
+    // IntrinsicHeight + stretch keeps both cards the same height as the taller
+    // of the two, so the pair always lines up.
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            if (i > 0) const SizedBox(width: 16),
+            Expanded(child: cards[i]),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
