@@ -50,7 +50,7 @@ Wrap(
     ),
     DsLink(
       label: 'All activity',
-      trailingIcon: Icons.chevron_right,
+      trailingIcon: DsIcons.chevronRight,
       onPressed: () {},
     ),
   ],

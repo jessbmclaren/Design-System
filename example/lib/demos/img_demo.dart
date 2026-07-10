@@ -48,7 +48,7 @@ class ImgDemo extends StatelessWidget {
               ),
               child: const Center(
                 child: Icon(
-                  Icons.insert_chart_outlined,
+                  DsIcons.report,
                   color: Colors.white,
                   size: 32,
                 ),

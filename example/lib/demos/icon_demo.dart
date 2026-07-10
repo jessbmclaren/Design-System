@@ -36,25 +36,25 @@ class IconDemo extends StatelessWidget {
           runSpacing: 12,
           children: [
             DsIcon(
-              icon: Icons.check_circle_outline,
+              icon: DsIcons.success,
               size: DsIconSize.lg,
               color: tokens.badgeSuccessColorText,
               semanticLabel: 'Succeeded',
             ),
             DsIcon(
-              icon: Icons.error_outline,
+              icon: DsIcons.error,
               size: DsIconSize.lg,
               color: tokens.colorDanger,
               semanticLabel: 'Failed',
             ),
             DsIcon(
-              icon: Icons.bolt_outlined,
+              icon: DsIcons.activity,
               size: DsIconSize.lg,
               color: tokens.colorPrimary,
               semanticLabel: 'Active',
             ),
             const DsIcon(
-              icon: Icons.schedule,
+              icon: DsIcons.time,
               size: DsIconSize.lg,
               semanticLabel: 'Pending',
             ),
@@ -76,7 +76,7 @@ class _ScaleStep extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DsIcon(icon: Icons.dashboard_outlined, size: size),
+        DsIcon(icon: DsIcons.dashboard, size: size),
         const SizedBox(height: 6),
         Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],

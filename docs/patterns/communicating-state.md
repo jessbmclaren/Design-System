@@ -49,7 +49,7 @@ Column(
     // Transient: a brief confirmation that fades on its own.
     const DsToast(
       message: 'Changes saved',
-      icon: Icons.check_circle_outline,
+      icon: DsIcons.success,
     ),
   ],
 );

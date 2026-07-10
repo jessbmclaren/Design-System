@@ -76,12 +76,12 @@ class _FullPageLayoutsDemoState extends State<FullPageLayoutsDemo> {
             DsListItem(
               title: 'Notifications',
               subtitle: 'Email digests and alerts',
-              trailing: Icon(Icons.chevron_right),
+              trailing: Icon(DsIcons.chevronRight),
             ),
             DsListItem(
               title: 'Billing',
               subtitle: 'Payment method and invoices',
-              trailing: Icon(Icons.chevron_right),
+              trailing: Icon(DsIcons.chevronRight),
             ),
           ],
         );

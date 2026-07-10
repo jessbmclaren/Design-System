@@ -33,7 +33,7 @@ Match the copy to the reason the view is empty. When a record type has never bee
 
 ```dart
 DsEmptyState(
-  icon: Icons.inbox_outlined,
+  icon: DsIcons.inbox,
   title: 'No invoices yet',
   message: 'Invoices you create will appear here.',
   action: DsEmptyStateAction(

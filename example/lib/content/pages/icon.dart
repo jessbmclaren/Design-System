@@ -31,11 +31,11 @@ final PatternPage iconPage = PatternPage(
   ],
   code: '''
 // Decorative glyph: inherits the theme text colour, no label needed.
-const DsIcon(icon: Icons.check_circle_outline);
+const DsIcon(icon: DsIcons.success);
 
 // Meaning-bearing glyph: token colour and a semantic label.
 DsIcon(
-  icon: Icons.error_outline,
+  icon: DsIcons.error,
   size: DsIconSize.lg,
   color: DsTokens.of(context).colorDanger,
   semanticLabel: 'Payment failed',

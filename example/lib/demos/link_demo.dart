@@ -34,7 +34,7 @@ class LinkDemo extends StatelessWidget {
         SizedBox(height: 4),
         DsLink(
           label: 'All activity',
-          trailingIcon: Icons.chevron_right,
+          trailingIcon: DsIcons.chevronRight,
           onPressed: _noop,
         ),
         SizedBox(height: 4),

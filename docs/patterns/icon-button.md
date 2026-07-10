@@ -24,18 +24,18 @@
 Row(
   children: [
     DsIconButton(
-      icon: Icons.close,
+      icon: DsIcons.close,
       semanticLabel: 'Close',
       onPressed: () => Navigator.of(context).pop(),
     ),
     DsIconButton(
-      icon: Icons.edit_outlined,
+      icon: DsIcons.edit,
       semanticLabel: 'Edit',
       onPressed: controller.startEditing,
     ),
     // A null onPressed disables the button and removes it from the focus order.
     const DsIconButton(
-      icon: Icons.refresh,
+      icon: DsIcons.refresh,
       semanticLabel: 'Refresh',
       onPressed: null,
     ),

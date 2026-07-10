@@ -21,7 +21,7 @@ class _SettingsSignInDemoState extends State<SettingsSignInDemo> {
   Widget build(BuildContext context) {
     if (!_signedIn) {
       return DsSignInView(
-        brandIcon: Icons.hub_outlined,
+        brandIcon: DsIcons.platform,
         title: 'Connect your account',
         description: 'Sign in to manage this integration\'s settings.',
         primaryAction: DsSignInAction(
@@ -41,12 +41,12 @@ class _SettingsSignInDemoState extends State<SettingsSignInDemo> {
           bordered: true,
           children: [
             DsListItem(
-              leading: Icon(Icons.sync),
+              leading: Icon(DsIcons.refresh),
               title: 'Sync frequency',
               subtitle: 'Every 15 minutes',
             ),
             DsListItem(
-              leading: Icon(Icons.notifications_none),
+              leading: Icon(DsIcons.notifications),
               title: 'Notifications',
               subtitle: 'Enabled',
             ),

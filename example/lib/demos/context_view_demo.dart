@@ -26,7 +26,7 @@ class _ContextViewDemoState extends State<ContextViewDemo> {
           label: _watching ? 'Watching' : 'Watch',
           variant:
               _watching ? DsButtonVariant.primary : DsButtonVariant.secondary,
-          icon: _watching ? Icons.visibility : Icons.visibility_outlined,
+          icon: _watching ? DsIcons.visibility : DsIcons.visibilityOff,
           onPressed: () => setState(() => _watching = !_watching),
         ),
       ],

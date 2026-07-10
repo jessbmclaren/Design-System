@@ -38,7 +38,7 @@ DsAccordion(
   items: const [
     DsAccordionItem(
       title: 'Billing & invoices',
-      leading: Icon(Icons.receipt_long_outlined),
+      leading: Icon(DsIcons.receipt),
       initiallyExpanded: true,
       child: Text(
         'Invoices are issued on the first of each month and charged to your '
@@ -47,7 +47,7 @@ DsAccordion(
     ),
     DsAccordionItem(
       title: 'Team & permissions',
-      leading: Icon(Icons.group_outlined),
+      leading: Icon(DsIcons.team),
       child: Text(
         'Owners and admins can invite teammates and assign roles. Members keep '
         'access until an admin removes them from the workspace.',
@@ -55,7 +55,7 @@ DsAccordion(
     ),
     DsAccordionItem(
       title: 'Data & privacy',
-      leading: Icon(Icons.lock_outline),
+      leading: Icon(DsIcons.lock),
       child: Text(
         'Your data is encrypted in transit and at rest. Export or delete your '
         'workspace at any time from Settings.',

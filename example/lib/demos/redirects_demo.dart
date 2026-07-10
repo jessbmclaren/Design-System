@@ -15,7 +15,7 @@ class RedirectsDemo extends StatelessWidget {
       title: 'Almost done',
       footer: DsButton(
         label: 'Return to Acme',
-        icon: Icons.arrow_forward,
+        icon: DsIcons.arrowForward,
         onPressed: () {},
       ),
       child: Text(

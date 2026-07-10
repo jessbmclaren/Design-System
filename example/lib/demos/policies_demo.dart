@@ -29,10 +29,10 @@ class _PoliciesDemoState extends State<PoliciesDemo> {
     DsTreeNode(
       id: 'fleet',
       label: 'Meridian Fleet',
-      icon: Icons.account_tree_outlined,
+      icon: DsIcons.hierarchy,
       children: [
-        DsTreeNode(id: 'north', label: 'North depot', icon: Icons.warehouse_outlined, badgeCount: 12),
-        DsTreeNode(id: 'south', label: 'South depot', icon: Icons.warehouse_outlined, badgeCount: 9),
+        DsTreeNode(id: 'north', label: 'North depot', icon: DsIcons.warehouse, badgeCount: 12),
+        DsTreeNode(id: 'south', label: 'South depot', icon: DsIcons.warehouse, badgeCount: 9),
       ],
     ),
   ];

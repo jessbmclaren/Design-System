@@ -72,9 +72,9 @@ DsSignInView(
     children: [
       const DsLabeledDivider(label: 'Or sign in with'),
       const SizedBox(height: DsSpacing.lg),
-      DsButton.social(icon: Icons.language, label: 'Google', onPressed: _google),
+      DsButton.social(icon: DsIcons.web, label: 'Google', onPressed: _google),
       const SizedBox(height: DsSpacing.md),
-      DsButton.social(icon: Icons.key_outlined, label: 'Passkey', onPressed: _passkey),
+      DsButton.social(icon: DsIcons.key, label: 'Passkey', onPressed: _passkey),
     ],
   ),
   footerBand: Wrap(

@@ -97,7 +97,7 @@ class _FilterControlsDemoState extends State<FilterControlsDemo> {
         const SizedBox(height: 12),
         if (visible.isEmpty)
           DsEmptyState(
-            icon: Icons.filter_alt_off_outlined,
+            icon: DsIcons.filterOff,
             title: 'No matching records',
             message: 'No members match the current filters. Try clearing them '
                 'to see everyone.',

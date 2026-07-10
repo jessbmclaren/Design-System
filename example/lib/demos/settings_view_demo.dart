@@ -36,12 +36,12 @@ class _SettingsViewDemoState extends State<SettingsViewDemo> {
             description: 'Manage how your team signs in and gets reached.',
             children: [
               DsListItem(
-                leading: Icon(Icons.mail_outline),
+                leading: Icon(DsIcons.mail),
                 title: 'Email',
                 subtitle: 'avery@northwind.io',
               ),
               DsListItem(
-                leading: Icon(Icons.apartment_outlined),
+                leading: Icon(DsIcons.workspace),
                 title: 'Workspace',
                 subtitle: 'Northwind Labs',
               ),
@@ -52,7 +52,7 @@ class _SettingsViewDemoState extends State<SettingsViewDemo> {
             description: 'Choose which updates land in your inbox.',
             children: [
               DsListItem(
-                leading: const Icon(Icons.campaign_outlined),
+                leading: const Icon(DsIcons.announcement),
                 title: 'Product updates',
                 subtitle: 'New features and improvements',
                 trailing: DsSwitch(
@@ -61,7 +61,7 @@ class _SettingsViewDemoState extends State<SettingsViewDemo> {
                 ),
               ),
               DsListItem(
-                leading: const Icon(Icons.summarize_outlined),
+                leading: const Icon(DsIcons.report),
                 title: 'Weekly digest',
                 subtitle: 'A Monday summary of activity',
                 trailing: DsSwitch(
@@ -70,7 +70,7 @@ class _SettingsViewDemoState extends State<SettingsViewDemo> {
                 ),
               ),
               DsListItem(
-                leading: const Icon(Icons.shield_outlined),
+                leading: const Icon(DsIcons.security),
                 title: 'Security alerts',
                 subtitle: 'Sign-ins from new devices',
                 trailing: DsSwitch(
@@ -84,13 +84,13 @@ class _SettingsViewDemoState extends State<SettingsViewDemo> {
             title: 'Security',
             children: [
               DsListItem(
-                leading: const Icon(Icons.password_outlined),
+                leading: const Icon(DsIcons.password),
                 title: 'Password',
                 subtitle: 'Last changed 3 months ago',
                 onTap: () {},
               ),
               DsListItem(
-                leading: const Icon(Icons.verified_user_outlined),
+                leading: const Icon(DsIcons.verified),
                 title: 'Two-factor authentication',
                 subtitle: 'Authenticator app',
                 onTap: () {},

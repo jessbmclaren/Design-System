@@ -35,7 +35,7 @@ bool signedIn = false;
 // Gate the settings surface on the connection state.
 if (!signedIn) {
   return DsSignInView(
-    brandIcon: Icons.hub_outlined,
+    brandIcon: DsIcons.platform,
     title: 'Connect your account',
     description:
         'Sign in to manage this integration\'s settings.',

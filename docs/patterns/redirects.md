@@ -39,7 +39,7 @@ DsFocusView(
   ),
   footer: DsButton(
     label: 'Return to Acme',
-    icon: Icons.arrow_forward,
+    icon: DsIcons.arrowForward,
     onPressed: _continue,
   ),
 )

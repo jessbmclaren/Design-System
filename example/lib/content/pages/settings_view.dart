@@ -46,7 +46,7 @@ DsSettingsView(
       description: 'Manage how your team signs in.',
       children: [
         DsListItem(
-          leading: Icon(Icons.mail_outline),
+          leading: Icon(DsIcons.mail),
           title: 'Email',
           subtitle: 'avery@northwind.io',
         ),
@@ -56,7 +56,7 @@ DsSettingsView(
       title: 'Notifications',
       children: [
         DsListItem(
-          leading: const Icon(Icons.campaign_outlined),
+          leading: const Icon(DsIcons.announcement),
           title: 'Product updates',
           trailing: DsSwitch(
             value: productUpdates,

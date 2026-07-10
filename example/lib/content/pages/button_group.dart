@@ -43,19 +43,19 @@ DsButtonGroup(
     DsButton(
       label: 'Duplicate',
       variant: DsButtonVariant.secondary,
-      icon: Icons.copy_outlined,
+      icon: DsIcons.copy,
       onPressed: _duplicate,
     ),
     DsButton(
       label: 'Archive',
       variant: DsButtonVariant.secondary,
-      icon: Icons.archive_outlined,
+      icon: DsIcons.archive,
       onPressed: _archive,
     ),
     DsButton(
       label: 'Delete',
       variant: DsButtonVariant.danger,
-      icon: Icons.delete_outline,
+      icon: DsIcons.delete,
       onPressed: _delete,
     ),
   ],

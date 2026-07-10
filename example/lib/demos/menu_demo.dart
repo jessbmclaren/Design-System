@@ -28,41 +28,41 @@ class _MenuDemoState extends State<MenuDemo> {
       ),
       child: DsListItem(
         leading: DsIcon(
-          icon: Icons.description_outlined,
+          icon: DsIcons.file,
           color: tokens.colorSecondaryText,
         ),
         title: 'Q3 financial report',
         subtitle: _status,
         trailing: DsMenu(
           trigger: DsIcon(
-            icon: Icons.more_horiz,
+            icon: DsIcons.moreHorizontal,
             semanticLabel: 'Report actions',
             color: tokens.colorSecondaryText,
           ),
           items: [
             DsMenuItem(
               label: 'Rename',
-              icon: Icons.edit_outlined,
+              icon: DsIcons.edit,
               onSelected: () => _record('Renamed just now'),
             ),
             DsMenuItem(
               label: 'Duplicate',
-              icon: Icons.copy_all_outlined,
+              icon: DsIcons.copy,
               onSelected: () => _record('Duplicated just now'),
             ),
             DsMenuItem(
               label: 'Share',
-              icon: Icons.person_add_alt_outlined,
+              icon: DsIcons.invite,
               onSelected: () => _record('Shared with your team'),
             ),
             const DsMenuItem(
               label: 'Download',
-              icon: Icons.download_outlined,
+              icon: DsIcons.download,
               enabled: false,
             ),
             DsMenuItem(
               label: 'Delete',
-              icon: Icons.delete_outline,
+              icon: DsIcons.delete,
               destructive: true,
               onSelected: () => _record('Moved to trash'),
             ),

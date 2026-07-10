@@ -38,28 +38,28 @@ import 'package:flutter/material.dart';
 
 DsMenu(
   trigger: const DsIcon(
-    icon: Icons.more_horiz,
+    icon: DsIcons.moreHorizontal,
     semanticLabel: 'Report actions',
   ),
   items: [
     DsMenuItem(
       label: 'Rename',
-      icon: Icons.edit_outlined,
+      icon: DsIcons.edit,
       onSelected: () {},
     ),
     DsMenuItem(
       label: 'Duplicate',
-      icon: Icons.copy_all_outlined,
+      icon: DsIcons.copy,
       onSelected: () {},
     ),
     DsMenuItem(
       label: 'Download',
-      icon: Icons.download_outlined,
+      icon: DsIcons.download,
       enabled: false,
     ),
     DsMenuItem(
       label: 'Delete',
-      icon: Icons.delete_outline,
+      icon: DsIcons.delete,
       destructive: true,
       onSelected: () {},
     ),

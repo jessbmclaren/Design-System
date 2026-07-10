@@ -12,7 +12,7 @@ class OnboardingDemo extends StatelessWidget {
     final tokens = DsTokens.of(context);
 
     return DsSignInView(
-      brandIcon: Icons.dashboard_rounded,
+      brandIcon: DsIcons.dashboard,
       brandColor: tokens.buttonPrimaryColorBackground,
       title: 'Set up your workspace',
       description:

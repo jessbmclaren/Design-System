@@ -22,7 +22,7 @@ final PatternPage motionPage = PatternPage(
       'place by explaining a change (where a thing came from, where it went) or '
       'directing attention, never as ornament. **Physical.** Easing mimics '
       'real objects: quick to start, softly landing, with weight; the `settle` '
-      'curve and the `spring` give an arrival that hint of overshoot that reads '
+      'curve and the `spring` give an arrival the hint of overshoot that reads '
       'as alive. **Choreographed.** When several elements change together, '
       'stagger them a beat apart with `DsMotion.stagger` so the sequence has '
       'cause and effect rather than a simultaneous jump.',
@@ -83,13 +83,16 @@ AnimatedContainer(
   // …
 );
 
-// Choreograph a group: each item begins a beat after the last.
-for (var i = 0; i < items.length; i++)
-  AnimatedReveal(
-    delay: DsMotion.stagger(context, i),
-    curve: DsMotion.settle,
-    child: items[i],
-  );
+// Choreograph a group from one controller: each item animates a
+// staggered slice of the timeline and settles into place. The offset
+// comes from DsMotion.stagger, which collapses to zero under
+// reduce-motion so the group arrives together, instantly.
+final start = DsMotion.stagger(context, index).inMilliseconds /
+    controller.duration!.inMilliseconds;
+final reveal = CurvedAnimation(
+  parent: controller,
+  curve: Interval(start, 1, curve: DsMotion.settle),
+);
 ''',
   shots: const [
     Shot(pageId: 'motion', size: ShotSize.desktop),

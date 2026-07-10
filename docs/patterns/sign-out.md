@@ -32,7 +32,7 @@ Keep the control consistently located across the product so people build muscle 
 ```dart
 Row(
   children: [
-    const CircleAvatar(child: Icon(Icons.person_outline)),
+    const CircleAvatar(child: Icon(DsIcons.user)),
     const SizedBox(width: 12),
     const Expanded(
       child: Column(
@@ -46,7 +46,7 @@ Row(
     DsButton(
       label: 'Sign out',
       variant: DsButtonVariant.secondary,
-      icon: Icons.logout,
+      icon: DsIcons.signOut,
       onPressed: () {},
     ),
   ],

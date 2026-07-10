@@ -19,7 +19,7 @@ class _DataGridDemoState extends State<DataGridDemo> {
       title: 'Vehicle',
       frozen: true,
       width: 180,
-      icon: Icons.directions_car_outlined,
+      icon: DsIcons.vehicle,
     ),
     const DsGridColumn(key: 'status', title: 'Status', type: DsCellType.status, width: 128),
     const DsGridColumn(key: 'driver', title: 'Driver', type: DsCellType.user, width: 180),

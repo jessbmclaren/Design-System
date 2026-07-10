@@ -10,7 +10,7 @@ class EmptyStateDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DsEmptyState(
-      icon: Icons.inbox_outlined,
+      icon: DsIcons.inbox,
       title: 'No invoices yet',
       message: 'Invoices you create will appear here.',
       action: DsEmptyStateAction(

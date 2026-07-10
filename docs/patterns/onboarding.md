@@ -33,7 +33,7 @@ Treat the first screen as an invitation, not a form. Every field or step you add
 
 ```dart
 DsSignInView(
-  brandIcon: Icons.dashboard_rounded,
+  brandIcon: DsIcons.dashboard,
   brandColor: DsTokens.of(context).buttonPrimaryColorBackground,
   title: 'Set up your workspace',
   description:

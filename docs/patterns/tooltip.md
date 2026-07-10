@@ -33,7 +33,7 @@ A tooltip surfaces a short, on-demand hint for the element it wraps: shown on ho
 DsTooltip(
   message: 'Copy to clipboard',
   child: IconButton(
-    icon: const DsIcon(icon: Icons.copy),
+    icon: const DsIcon(icon: DsIcons.copy),
     onPressed: () {},
   ),
 );

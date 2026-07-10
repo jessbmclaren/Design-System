@@ -36,7 +36,7 @@ final PatternPage tooltipPage = PatternPage(
 DsTooltip(
   message: 'Copy to clipboard',
   child: IconButton(
-    icon: const DsIcon(icon: Icons.copy),
+    icon: const DsIcon(icon: DsIcons.copy),
     onPressed: () {},
   ),
 );

@@ -18,13 +18,13 @@ class _GroupHierarchyDemoState extends State<GroupHierarchyDemo> {
     DsTreeNode(
       id: 'fleet',
       label: 'Meridian Fleet',
-      icon: Icons.account_tree_outlined,
+      icon: DsIcons.hierarchy,
       badgeCount: 21,
       children: [
         DsTreeNode(
           id: 'north',
           label: 'North depot',
-          icon: Icons.warehouse_outlined,
+          icon: DsIcons.warehouse,
           badgeCount: 12,
           children: [
             DsTreeNode(id: 'north-longhaul', label: 'Long-haul team', subtitle: '5 vehicles', badgeCount: 5),
@@ -34,7 +34,7 @@ class _GroupHierarchyDemoState extends State<GroupHierarchyDemo> {
         DsTreeNode(
           id: 'south',
           label: 'South depot',
-          icon: Icons.warehouse_outlined,
+          icon: DsIcons.warehouse,
           badgeCount: 9,
           children: [
             DsTreeNode(id: 'south-refrigerated', label: 'Refrigerated team', subtitle: '4 vehicles', badgeCount: 4),

@@ -31,7 +31,7 @@ class CommunicatingStateDemo extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: DsToast(
             message: 'Changes saved',
-            icon: Icons.check_circle_outline,
+            icon: DsIcons.success,
           ),
         ),
       ],

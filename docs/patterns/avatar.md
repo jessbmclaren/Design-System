@@ -48,7 +48,7 @@ DsAvatar(
 
 // A non-person entity, using an icon fallback (no name, so the icon shows).
 DsAvatar(
-  icon: Icons.hub_outlined,
+  icon: DsIcons.platform,
   size: 40,
 );
 ```

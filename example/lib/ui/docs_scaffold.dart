@@ -84,6 +84,7 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final docs = DocsColors.of(context);
     return Container(
+      width: double.infinity,
       height: DocsMetrics.topBarHeight,
       // A full-width chrome bar: breadcrumb at the left gutter, global controls
       // at a right margin matching the sidebar wordmark's inset.
@@ -95,22 +96,33 @@ class _TopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(page.group.label, style: DocsType.footnote(docs.textSecondary)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Icon(LucideIcons.chevron_right,
-                size: 14, color: docs.textTertiary),
-          ),
-          Flexible(
-            child: Text(
-              page.navTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: DocsType.footnote(docs.textPrimary)
-                  .copyWith(fontWeight: FontWeight.w600),
+          // The breadcrumb takes all the spare width, so the controls stay
+          // pinned to the right edge no matter how long it is. A single Spacer
+          // would split the space with the title's own Flexible and let the
+          // controls drift as the breadcrumb changes length between pages.
+          Expanded(
+            child: Row(
+              children: [
+                Text(page.group.label,
+                    style: DocsType.footnote(docs.textSecondary)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Icon(LucideIcons.chevron_right,
+                      size: 14, color: docs.textTertiary),
+                ),
+                Flexible(
+                  child: Text(
+                    page.navTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: DocsType.footnote(docs.textPrimary)
+                        .copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 12),
           const _SkinSwitcher(),
           const SizedBox(width: 10),
           const _ThemeToggle(),

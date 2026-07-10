@@ -29,7 +29,7 @@ class ActionButtonsDemo extends StatelessWidget {
         DsButton(
           label: 'Delete invoice',
           variant: DsButtonVariant.danger,
-          icon: Icons.delete_outline,
+          icon: DsIcons.delete,
           onPressed: () {},
         ),
       ],

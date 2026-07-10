@@ -19,19 +19,19 @@ class TooltipDemo extends StatelessWidget {
           children: const [
             _ToolbarAction(
               message: 'Copy to clipboard',
-              icon: Icons.copy_outlined,
+              icon: DsIcons.copy,
             ),
             _ToolbarAction(
               message: 'Duplicate row',
-              icon: Icons.content_copy_outlined,
+              icon: DsIcons.add,
             ),
             _ToolbarAction(
               message: 'Archive',
-              icon: Icons.archive_outlined,
+              icon: DsIcons.archive,
             ),
             _ToolbarAction(
               message: 'Delete permanently',
-              icon: Icons.delete_outline,
+              icon: DsIcons.delete,
             ),
           ],
         ),
@@ -51,7 +51,7 @@ class TooltipDemo extends StatelessWidget {
               message:
                   'Normalised value of all active subscriptions for the month.',
               child: DsIcon(
-                icon: Icons.help_outline,
+                icon: DsIcons.help,
                 size: DsIconSize.sm,
                 semanticLabel: 'What is monthly recurring revenue?',
               ),

@@ -107,6 +107,30 @@ abstract final class DsIcons {
   /// A date / calendar affordance.
   static const IconData calendar = LucideIcons.calendar;
 
+  /// Download a file.
+  static const IconData download = LucideIcons.download;
+
+  /// Archive a record.
+  static const IconData archive = LucideIcons.archive;
+
+  /// Refresh, reload or re-sync.
+  static const IconData refresh = LucideIcons.refresh_cw;
+
+  /// Replay / run again.
+  static const IconData replay = LucideIcons.rotate_ccw;
+
+  /// Invite / add a person.
+  static const IconData invite = LucideIcons.user_plus;
+
+  /// Sign out of the product.
+  static const IconData signOut = LucideIcons.log_out;
+
+  /// Clear the active filters.
+  static const IconData filterOff = LucideIcons.funnel_x;
+
+  /// Contextual help.
+  static const IconData help = LucideIcons.circle_question_mark;
+
   // --- Status ---------------------------------------------------------------
 
   /// Success / positive confirmation.
@@ -123,6 +147,15 @@ abstract final class DsIcons {
 
   /// A locked, gated affordance that is not yet available.
   static const IconData lock = LucideIcons.lock;
+
+  /// A verified, protected state.
+  static const IconData verified = LucideIcons.shield_check;
+
+  /// Live activity / an active state.
+  static const IconData activity = LucideIcons.zap;
+
+  /// A time, schedule or pending state.
+  static const IconData time = LucideIcons.clock;
 
   // --- Selection & true-state ----------------------------------------------
 
@@ -158,4 +191,52 @@ abstract final class DsIcons {
 
   /// A placeholder for an image that failed to load.
   static const IconData brokenImage = LucideIcons.image_off;
+
+  /// An email address or message.
+  static const IconData mail = LucideIcons.mail;
+
+  /// Notifications.
+  static const IconData notifications = LucideIcons.bell;
+
+  /// An announcement / product update.
+  static const IconData announcement = LucideIcons.megaphone;
+
+  /// A report / summary of figures.
+  static const IconData report = LucideIcons.chart_column;
+
+  /// Security and privacy.
+  static const IconData security = LucideIcons.shield;
+
+  /// A password / secret credential.
+  static const IconData password = LucideIcons.rectangle_ellipsis;
+
+  /// A key or passkey credential.
+  static const IconData key = LucideIcons.key_round;
+
+  /// The public web / an external identity provider.
+  static const IconData web = LucideIcons.globe;
+
+  /// A dashboard overview.
+  static const IconData dashboard = LucideIcons.layout_dashboard;
+
+  /// An inbox of incoming items.
+  static const IconData inbox = LucideIcons.inbox;
+
+  /// A vehicle.
+  static const IconData vehicle = LucideIcons.car;
+
+  /// A connected platform / integration.
+  static const IconData platform = LucideIcons.network;
+
+  /// A hierarchy of groups.
+  static const IconData hierarchy = LucideIcons.waypoints;
+
+  /// A warehouse / depot site.
+  static const IconData warehouse = LucideIcons.warehouse;
+
+  /// A team / group of people.
+  static const IconData team = LucideIcons.users;
+
+  /// A receipt / billing record.
+  static const IconData receipt = LucideIcons.receipt;
 }

@@ -1,5 +1,4 @@
 import 'package:design_system/design_system.dart';
-import 'package:flutter/material.dart';
 
 import 'playground.dart';
 
@@ -22,7 +21,7 @@ final Map<String, PlaygroundSpec> _playgrounds = {
     builder: (context, v) => DsButton(
       label: (v['label'] as String).isEmpty ? 'Button' : v['label'] as String,
       variant: v['variant'] as DsButtonVariant,
-      icon: (v['icon'] as bool) ? Icons.check : null,
+      icon: (v['icon'] as bool) ? DsIcons.check : null,
       pending: v['pending'] as bool,
       onPressed: (v['disabled'] as bool) ? null : () {},
     ),
@@ -30,7 +29,7 @@ final Map<String, PlaygroundSpec> _playgrounds = {
       final b = StringBuffer('DsButton(\n');
       b.writeln("  label: '${v['label']}',");
       b.writeln('  variant: DsButtonVariant.${(v['variant'] as DsButtonVariant).name},');
-      if (v['icon'] as bool) b.writeln('  icon: Icons.check,');
+      if (v['icon'] as bool) b.writeln('  icon: DsIcons.check,');
       if (v['pending'] as bool) b.writeln('  pending: true,');
       b.writeln('  onPressed: ${(v['disabled'] as bool) ? 'null' : '() {}'},');
       b.write(');');

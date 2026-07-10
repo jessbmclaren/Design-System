@@ -31,11 +31,11 @@ void main() {
 
     // The live button renders; no leading icon until the knob is turned on.
     expect(find.widgetWithText(DsButton, 'Save changes'), findsOneWidget);
-    expect(find.byIcon(Icons.check), findsNothing);
+    expect(find.byIcon(DsIcons.check), findsNothing);
 
     // Flip the "Leading icon" toggle (its label is inside the switch's tap area).
     await tester.tap(find.text('Leading icon'));
     await tester.pump();
-    expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(find.byIcon(DsIcons.check), findsOneWidget);
   });
 }

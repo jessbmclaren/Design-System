@@ -88,19 +88,19 @@ class _SignInDemoState extends State<SignInDemo> {
           const DsLabeledDivider(label: 'Or sign in with'),
           const SizedBox(height: DsSpacing.lg),
           DsButton.social(
-            icon: Icons.language,
+            icon: DsIcons.web,
             label: 'Google',
             onPressed: () {},
           ),
           const SizedBox(height: DsSpacing.md),
           DsButton.social(
-            icon: Icons.key_outlined,
+            icon: DsIcons.key,
             label: 'Passkey',
             onPressed: () {},
           ),
           const SizedBox(height: DsSpacing.md),
           DsButton.social(
-            icon: Icons.verified_user_outlined,
+            icon: DsIcons.verified,
             label: 'SSO',
             onPressed: () {},
           ),

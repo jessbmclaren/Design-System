@@ -41,7 +41,7 @@ final PatternPage onboardingPage = PatternPage(
   ],
   code: '''
 DsSignInView(
-  brandIcon: Icons.dashboard_rounded,
+  brandIcon: DsIcons.dashboard,
   brandColor: DsTokens.of(context).buttonPrimaryColorBackground,
   title: 'Set up your workspace',
   description:

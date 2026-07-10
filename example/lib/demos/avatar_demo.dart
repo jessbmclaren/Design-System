@@ -33,7 +33,7 @@ class AvatarDemo extends StatelessWidget {
         ),
         _Tile(
           label: 'Icon',
-          child: DsAvatar(icon: Icons.hub_outlined, name: 'Platform', size: 48),
+          child: DsAvatar(icon: DsIcons.platform, name: 'Platform', size: 48),
         ),
         _Tile(
           label: 'Glyph',

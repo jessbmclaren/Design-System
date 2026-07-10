@@ -51,7 +51,7 @@ class _MotionDemoState extends State<MotionDemo>
             DsButton(
               label: 'Replay',
               variant: DsButtonVariant.secondary,
-              icon: Icons.play_arrow_rounded,
+              icon: DsIcons.replay,
               onPressed: _replay,
             ),
           ],

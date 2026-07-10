@@ -91,7 +91,7 @@ void _writeBlock(StringBuffer b, ContentBlock block) {
       b.writeln('| --- | --- | --- | --- |');
       for (final r in rows) {
         final desc = r.description.replaceAll('|', r'\|');
-        b.writeln('| `${r.name}` | ${r.type} | `${r.example}` | $desc |');
+        b.writeln('| `${r.name}` | `${r.type}` | `${r.example}` | $desc |');
       }
       b.writeln();
   }
