@@ -57,17 +57,14 @@ class _PatternPageViewState extends State<PatternPageView> {
         Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 860),
-            child: Column(
+            // Replays a gentle fade-and-rise each time the page changes.
+            child: _EntranceTransition(
+              key: ValueKey(page.id),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(page.group.label.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.7,
-                      color: tokens.actionPrimaryColorText,
-                    )),
-                const SizedBox(height: 8),
+                _Eyebrow(label: page.group.label),
+                const SizedBox(height: 12),
                 Text(page.title, style: theme.textTheme.displaySmall),
                 const SizedBox(height: 16),
                 _Prose(page.description, large: true),
@@ -122,6 +119,7 @@ class _PatternPageViewState extends State<PatternPageView> {
                 ],
                 const SizedBox(height: 60),
               ],
+              ),
             ),
           ),
         ),
@@ -213,47 +211,135 @@ class _ActionBar extends StatelessWidget {
   }
 }
 
-class _RelatedCard extends StatelessWidget {
-  const _RelatedCard({required this.page});
-  final PatternPage page;
+/// The small uppercase tag above a page title.
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow({required this.label});
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
+    final accent = tokens.actionPrimaryColorText;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: accent.withValues(alpha: 0.20)),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.7,
+          color: accent,
+        ),
+      ),
+    );
+  }
+}
+
+/// Fades and lifts its child into place once, on first build. Give it a
+/// [ValueKey] tied to the page id so navigation replays the entrance.
+class _EntranceTransition extends StatelessWidget {
+  const _EntranceTransition({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: DsMotion.durationOf(context, DsMotion.slow),
+      curve: DsMotion.emphasized,
+      builder: (context, t, child) => Opacity(
+        opacity: t.clamp(0.0, 1.0),
+        child: Transform.translate(
+          offset: Offset(0, (1 - t) * 12),
+          child: child,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// A "See also" link. Fixed height so a row of these always lines up, with a
+/// small lift on hover.
+class _RelatedCard extends StatefulWidget {
+  const _RelatedCard({required this.page});
+  final PatternPage page;
+
+  @override
+  State<_RelatedCard> createState() => _RelatedCardState();
+}
+
+class _RelatedCardState extends State<_RelatedCard> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
+    final page = widget.page;
+    final radius = BorderRadius.circular(10);
     return SizedBox(
-      width: 240,
-      child: Material(
-        color: tokens.formBackgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => context.go('/patterns/${page.id}'),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: tokens.colorBorder),
+      width: 262,
+      height: 86,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
+        child: AnimatedContainer(
+          duration: DsMotion.durationOf(context, DsMotion.fast),
+          curve: DsMotion.standard,
+          transform: _hover
+              ? Matrix4.translationValues(0, -3, 0)
+              : Matrix4.identity(),
+          decoration: BoxDecoration(
+            color: tokens.formBackgroundColor,
+            borderRadius: radius,
+            border: Border.all(
+              color: _hover
+                  ? tokens.actionPrimaryColorText.withValues(alpha: 0.45)
+                  : tokens.colorBorder,
             ),
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(page.group.label,
-                    style: TextStyle(
-                        fontSize: 11,
-                        color: tokens.colorSecondaryText,
-                        fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                Row(
+            boxShadow: _hover ? DsElevation.medium : DsElevation.none,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: () => context.go('/patterns/${page.id}'),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Text(page.navTitle,
-                          style: Theme.of(context).textTheme.titleSmall),
+                    Text(page.group.label.toUpperCase(),
+                        style: TextStyle(
+                            fontSize: 10.5,
+                            letterSpacing: 0.6,
+                            color: tokens.colorSecondaryText,
+                            fontWeight: FontWeight.w700)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(page.navTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleSmall),
+                        ),
+                        AnimatedSlide(
+                          duration: DsMotion.durationOf(context, DsMotion.fast),
+                          offset: _hover ? const Offset(0.2, 0) : Offset.zero,
+                          child: Icon(Icons.arrow_forward,
+                              size: 16, color: tokens.actionPrimaryColorText),
+                        ),
+                      ],
                     ),
-                    Icon(Icons.arrow_forward,
-                        size: 15, color: tokens.actionPrimaryColorText),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

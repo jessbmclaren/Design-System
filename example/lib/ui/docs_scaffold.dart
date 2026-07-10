@@ -21,6 +21,7 @@ class DocsScaffold extends StatelessWidget {
     final wide = MediaQuery.sizeOf(context).width >= 1024;
 
     return Scaffold(
+      backgroundColor: tokens.colorBackground,
       drawer: wide
           ? null
           : Drawer(
@@ -40,9 +41,9 @@ class DocsScaffold extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium),
               actions: const [
                 _SkinSwitcher(),
-                SizedBox(width: 4),
+                SizedBox(width: 8),
                 _ThemeToggle(),
-                SizedBox(width: 4),
+                SizedBox(width: 12),
               ],
             ),
       body: SafeArea(
@@ -53,7 +54,24 @@ class DocsScaffold extends StatelessWidget {
               child: Column(
                 children: [
                   if (wide) _TopBar(page: page),
-                  Expanded(child: PatternPageView(page: page)),
+                  Expanded(
+                    child: DecoratedBox(
+                      // A faint brand-tinted glow at the top gives the reading
+                      // column a sense of depth without a heavy background.
+                      decoration: BoxDecoration(
+                        color: tokens.colorBackground,
+                        gradient: RadialGradient(
+                          center: const Alignment(0, -1.2),
+                          radius: 1.1,
+                          colors: [
+                            tokens.colorPrimary.withValues(alpha: 0.06),
+                            tokens.colorBackground.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                      child: PatternPageView(page: page),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -72,24 +90,39 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     return Container(
-      height: 56,
+      height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
+        color: tokens.colorBackground,
         border: Border(bottom: BorderSide(color: tokens.colorBorder)),
+        boxShadow: DsElevation.low,
       ),
       child: Row(
         children: [
           Text(
-            '${page.group.label}  /  ${page.navTitle}',
+            page.group.label,
             style: TextStyle(
               fontSize: 13,
               color: tokens.colorSecondaryText,
               fontWeight: FontWeight.w500,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Icon(Icons.chevron_right,
+                size: 16, color: tokens.colorSecondaryText),
+          ),
+          Text(
+            page.navTitle,
+            style: TextStyle(
+              fontSize: 13,
+              color: tokens.colorText,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const Spacer(),
           const _SkinSwitcher(),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           const _ThemeToggle(),
         ],
       ),
@@ -119,10 +152,12 @@ class _SkinSwitcher extends StatelessWidget {
           ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
+          color: tokens.formBackgroundColor,
           border: Border.all(color: tokens.colorBorder),
-          borderRadius: BorderRadius.circular(tokens.buttonBorderRadius),
+          borderRadius: BorderRadius.circular(tokens.buttonBorderRadius + 4),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -147,17 +182,52 @@ class _SkinSwitcher extends StatelessWidget {
   }
 }
 
+/// The light/dark switch. The glyph swaps with a small rotate-and-fade so the
+/// change reads as a physical flip rather than a hard cut.
 class _ThemeToggle extends StatelessWidget {
   const _ThemeToggle();
 
   @override
   Widget build(BuildContext context) {
     final controller = ThemeController.of(context);
+    final tokens = DsTokens.of(context);
     final isDark = controller.mode == ThemeMode.dark;
-    return IconButton(
-      tooltip: isDark ? 'Switch to light' : 'Switch to dark',
-      onPressed: controller.toggle,
-      icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+    final radius = BorderRadius.circular(tokens.buttonBorderRadius + 4);
+    return Tooltip(
+      message: isDark ? 'Switch to light' : 'Switch to dark',
+      child: Material(
+        color: tokens.formBackgroundColor,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: tokens.colorBorder),
+          borderRadius: radius,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: controller.toggle,
+          child: SizedBox(
+            width: 36,
+            height: 36,
+            child: AnimatedSwitcher(
+              duration: DsMotion.durationOf(context, DsMotion.base),
+              switchInCurve: DsMotion.standard,
+              switchOutCurve: DsMotion.standard,
+              transitionBuilder: (child, anim) => RotationTransition(
+                turns: Tween<double>(begin: 0.6, end: 1).animate(anim),
+                child: FadeTransition(
+                  opacity: anim,
+                  child: ScaleTransition(scale: anim, child: child),
+                ),
+              ),
+              child: Icon(
+                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                key: ValueKey<bool>(isDark),
+                size: 18,
+                color: tokens.colorText,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
