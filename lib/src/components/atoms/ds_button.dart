@@ -17,7 +17,7 @@ enum DsButtonVariant {
 
 /// A Design System button.
 ///
-/// Every screen should have at most one [DsButtonVariant.primary] button — the
+/// Every screen should have at most one [DsButtonVariant.primary] button, the
 /// action you most want the user to take. Use [DsButtonVariant.secondary] for
 /// supporting actions and [DsButtonVariant.danger] only for destructive ones.
 ///

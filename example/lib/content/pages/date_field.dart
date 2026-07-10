@@ -1,16 +1,16 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Forms → Date field.
 final PatternPage dateFieldPage = PatternPage(
   id: 'date-field',
-  group: DocGroup.forms,
-  navTitle: 'DateField',
+  group: DocGroup.inputs,
+  navTitle: 'Date field',
   title: 'Date field',
   description:
       'The date field collects a single calendar date without the ambiguity of '
       'free-form typing. `DsDateField` presents a read-only, text-field-shaped '
-      'control — persistent label, filled surface, trailing calendar glyph — '
+      'control (persistent label, filled surface, trailing calendar glyph) '
       'that shows the selected date as `yyyy-MM-dd` or a placeholder hint while '
       'empty. Tapping opens the platform date picker, themed to inherit the '
       'design system, bounded by `firstDate` and `lastDate`; the confirmed date '
@@ -25,7 +25,7 @@ final PatternPage dateFieldPage = PatternPage(
       'future. Keep the `label` visible and let `hintText` show the expected '
       'shape rather than repeat the label. Use `helperText` to explain a '
       'constraint before the user acts, and swap to `errorText` only after a '
-      'selection has been made and found invalid — the two never appear '
+      'selection has been made and found invalid. The two never appear '
       'together. Passing a `null` `onChanged`, or `enabled: false`, dims the '
       'control and blocks the picker.',
     ),
@@ -39,7 +39,7 @@ final PatternPage dateFieldPage = PatternPage(
   ],
   donts: const [
     "Don't ask people to type dates free-form when a bounded calendar removes the guesswork.",
-    "Don't rely on the hint as the label — it vanishes the moment a date is selected.",
+    "Don't rely on the hint as the label. It vanishes the moment a date is selected.",
     "Don't show an error before the user has picked anything.",
     "Don't leave firstDate and lastDate unset for domain dates that have a natural range.",
   ],

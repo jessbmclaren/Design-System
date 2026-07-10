@@ -11,16 +11,21 @@
 // markdown emitter must stay Flutter-free.
 
 /// The navigation groups, in display order.
+///
+/// Organised by purpose (what a component is *for*) rather than by atomic layer
+/// — the code stays atomic (`lib/src/components/{atoms,molecules,organisms}`),
+/// while the docs navigate by intent so a component is easy to find.
 enum DocGroup {
   foundations('Foundations'),
-  content('Content'),
-  forms('Forms'),
-  charts('Charts'),
+  actions('Actions'),
+  inputs('Inputs'),
+  display('Display'),
+  feedback('Feedback'),
+  overlays('Overlays'),
   data('Data'),
+  charts('Charts'),
   layout('Layout'),
-  onboarding('Onboarding'),
-  userActions('User actions'),
-  status('Status');
+  patterns('Patterns');
 
   const DocGroup(this.label);
 

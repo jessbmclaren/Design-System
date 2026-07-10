@@ -14,7 +14,7 @@ enum DsTextTransform {
   /// Render the string in lower case.
   lowercase,
 
-  /// Capitalize the first letter of the string.
+  /// Capitalise the first letter of the string.
   capitalize;
 
   /// Applies this transform to [input].
@@ -54,7 +54,7 @@ class DsTypeToken {
   /// with this token. Defaults to [DsTextTransform.none].
   final DsTextTransform textTransform;
 
-  /// Materializes this token as a [TextStyle].
+  /// Materialises this token as a [TextStyle].
   ///
   /// The font family is intentionally omitted: it is applied once at the theme
   /// level from `DsTokens.fontFamily` (see [DsTheme]), so overriding that one
@@ -116,22 +116,22 @@ abstract final class DsTypography {
   /// (`packages/design_system/Inter`).
   static const String packagedFontFamily = 'packages/design_system/Inter';
 
-  // Weight ramp — the bundled Inter ships 400/500/600/700, so a component can
-  // reach for a nuanced weight (medium/semiBold) rather than only regular/bold.
+  // Weight ramp: the bundled Inter ships 400/500/600/700, so a component can
+  // use a nuanced weight (medium/semiBold) rather than only regular/bold.
 
   /// Regular body weight.
   static const FontWeight regular = FontWeight.w400;
 
-  /// Medium weight — quiet emphasis (labels, secondary controls).
+  /// Medium weight: quiet emphasis (labels, secondary controls).
   static const FontWeight medium = FontWeight.w500;
 
-  /// Semi-bold weight — strong labels, control text, active tabs.
+  /// Semi-bold weight: strong labels, control text, active tabs.
   static const FontWeight semiBold = FontWeight.w600;
 
-  /// Bold weight — headings.
+  /// Bold weight: headings.
   static const FontWeight bold = FontWeight.w700;
 
-  // Headings — weight 700.
+  // Headings, weight 700.
 
   /// Extra large heading. 28px / 700.
   static const DsTypeToken headingXl =
@@ -153,7 +153,7 @@ abstract final class DsTypography {
   static const DsTypeToken headingXs =
       DsTypeToken(fontSize: 12, fontWeight: FontWeight.w700, height: 1.35);
 
-  // Body — weight 400.
+  // Body, weight 400.
 
   /// Medium body text. 16px / 400.
   static const DsTypeToken bodyMd =
@@ -163,7 +163,7 @@ abstract final class DsTypography {
   static const DsTypeToken bodySm =
       DsTypeToken(fontSize: 14, fontWeight: FontWeight.w400, height: 1.45);
 
-  // Labels — weight 400.
+  // Labels, weight 400.
 
   /// Medium label. 14px / 400.
   static const DsTypeToken labelMd =

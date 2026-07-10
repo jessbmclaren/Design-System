@@ -4,16 +4,16 @@ import '../../theme/ds_tokens_extension.dart';
 
 /// A vertical list of rows separated by dividers.
 ///
-/// Pass any widgets as [children] — typically [DsListItem]s. A hairline
+/// Pass any widgets as [children], typically [DsListItem]s. A hairline
 /// [Divider] is drawn between adjacent children when [showDividers] is true.
 ///
 /// [DsList] lays its children out in a [Column], so it sizes to its content
-/// and can be embedded inside scroll views, cards, or sheets. It does not
+/// and can be embedded inside scroll views, cards or sheets. It does not
 /// scroll on its own; wrap it in a scrollable if the content may exceed the
 /// viewport.
 ///
 /// Set [bordered] to wrap the list in a rounded, hairline-bordered container
-/// with clipped corners — useful for presenting the list as a grouped card.
+/// with clipped corners, useful for presenting the list as a grouped card.
 class DsList extends StatelessWidget {
   const DsList({
     super.key,

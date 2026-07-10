@@ -1,8 +1,8 @@
 # Waiting screens
 
-A waiting screen holds attention while a long-running operation finishes in the background — generating a report, syncing a large data set, provisioning a new environment. Unlike an inline spinner, it takes over the region a person is looking at, so it must earn that space: name the work in progress, set a realistic expectation for how long it will take, and offer a way forward. Centre a large `DsSpinner` above a short title and a supporting line, and pair it with an action that either advances the task, gives context, or lets the person step away and be notified when it is done.
+A waiting screen holds attention while a long-running operation finishes in the background: generating a report, syncing a large data set, provisioning a new environment. Unlike an inline spinner, it takes over the region a person is looking at, so it must earn that space: name the work in progress, set a realistic expectation for how long it will take and offer a way forward. Centre a large `DsSpinner` above a short title and a supporting line, and pair it with an action that either advances the task, gives context or lets the person step away and be notified when it is done.
 
-Wherever the outcome is delivered asynchronously, let people leave. If the work continues on the server and you can notify them on completion, say so plainly and keep the rest of the product usable — a waiting screen should rarely be a dead end. Reserve a blocking, full-region wait for the cases where continuing without the result genuinely is not possible.
+Wherever the outcome is delivered asynchronously, let people leave. If the work continues on the server and you can notify them on completion, say so plainly and keep the rest of the product usable. A waiting screen should rarely be a dead end. Reserve a blocking, full-region wait for the cases where continuing without the result genuinely is not possible.
 
 ![Desktop (1280dp)](img/waiting-screens_desktop.png)
 
@@ -20,7 +20,7 @@ Wherever the outcome is delivered asynchronously, let people leave. If the work 
 - Only offer actions that move the task forward or give useful context.
 - Let people leave and come back when the result can be delivered later.
 - Tell people when they will be notified so they know they can stop watching.
-- Match the spinner size to the scope — use a large spinner for a full region.
+- Match the spinner size to the scope: use a large spinner for a full region.
 
 **Don't**
 

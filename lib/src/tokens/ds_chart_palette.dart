@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-/// The Design System data-visualization palette.
+/// The Design System data-visualisation palette.
 ///
-/// The categorical order is **fixed** — assign hues by series identity in this
+/// The categorical order is **fixed**: assign hues by series identity in this
 /// order and never cycle them; a 9th series folds into "Other". Both the light
 /// and dark ramps were validated for CVD separation, chroma, lightness band and
 /// contrast against their surface (do not hand-edit without re-validating).
@@ -35,7 +35,7 @@ abstract final class DsChartPalette {
   static const Color otherLight = Color(0xFF8A94A6);
   static const Color otherDark = Color(0xFF6B7480);
 
-  /// Sequential ramp (magnitude) — a single blue hue, light → dark.
+  /// Sequential ramp (magnitude): a single blue hue, light → dark.
   static const List<Color> sequential = [
     Color(0xFFDCEBFB),
     Color(0xFFAFD1F5),

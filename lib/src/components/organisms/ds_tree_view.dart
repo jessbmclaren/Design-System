@@ -52,7 +52,7 @@ class DsTreeNode {
   /// Optional secondary text shown beneath the [label].
   final String? subtitle;
 
-  /// An optional count rendered as a trailing [DsBadge] — for example the
+  /// An optional count rendered as a trailing [DsBadge], for example the
   /// number of records or children the node holds.
   final int? badgeCount;
 
@@ -69,7 +69,7 @@ class DsTreeNode {
 /// or `null` when it was dropped to the root of the tree.
 typedef DsTreeReparent = ({String nodeId, String? newParentId});
 
-/// Builds an optional trailing widget for a node — for example a "…" [DsMenu].
+/// Builds an optional trailing widget for a node, for example a "…" [DsMenu].
 ///
 /// Returning `null` leaves the node with just its [DsTreeNode.badgeCount] (or an
 /// empty trailing area). See [DsTreeView.trailingBuilder].
@@ -79,7 +79,7 @@ typedef DsTreeTrailingBuilder = Widget? Function(
 );
 
 /// A hierarchical group tree for organising records into groups, subgroups and
-/// children — the Design System's Airtable / Notion-sidebar-class navigator.
+/// children: the Design System's sidebar-style group navigator.
 ///
 /// [DsTreeView] renders [nodes] as a vertical, indentation-guided outline. Each
 /// row carries a disclosure chevron (only when the node [DsTreeNode.hasChildren]),
@@ -168,7 +168,7 @@ class DsTreeView extends StatefulWidget {
   /// it reports the move but never mutates [nodes].
   final ValueChanged<DsTreeReparent>? onMoveNode;
 
-  /// Builds an optional trailing widget per node, shown after the badge — for
+  /// Builds an optional trailing widget per node, shown after the badge, for
   /// example a "…" [DsMenu].
   final DsTreeTrailingBuilder? trailingBuilder;
 
@@ -257,7 +257,7 @@ class _DsTreeViewState extends State<DsTreeView> {
   // --- Reparenting ----------------------------------------------------------
 
   /// Whether [candidateId] is [ancestorId] itself or sits anywhere within its
-  /// subtree — the two cases that would make a reparent create a cycle.
+  /// subtree: the two cases that would make a reparent create a cycle.
   bool _isSelfOrDescendant(String ancestorId, String candidateId) {
     if (ancestorId == candidateId) return true;
     final ancestor = _byId[ancestorId];
@@ -498,7 +498,7 @@ class _SetExpandedIntent extends Intent {
 }
 
 /// A single interactive tree row: indentation guides, disclosure chevron,
-/// optional icon, label + subtitle, and a trailing area.
+/// optional icon, label + subtitle and a trailing area.
 class _DsTreeRow extends StatefulWidget {
   const _DsTreeRow({
     super.key,

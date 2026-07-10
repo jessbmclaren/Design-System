@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Data → Group hierarchy.
@@ -9,23 +9,23 @@ final PatternPage groupHierarchyPage = PatternPage(
   title: 'Group hierarchy',
   description:
       '`DsTreeView` is the standing structure your records live in: a hierarchy '
-      'of groups, subgroups and children — a fleet split into depots, a depot '
-      'into teams, a team holding vehicles. Where grid grouping is a view you '
+      'of groups, subgroups and children (a fleet split into depots, a depot '
+      'into teams, a team holding vehicles). Where grid grouping is a view you '
       'apply and remove, the hierarchy is durable: it is how the organisation '
-      'is shaped, who owns what, and where a new record belongs. Each node '
+      'is shaped, who owns what and where a new record belongs. Each node '
       'carries a label, an optional icon and subtitle, and a count badge; '
       'parents expand and collapse; a row selects to drive the rest of the '
       'screen; and, when you allow it, a node drags to a new parent.',
   blocks: const [
     ProseBlock(
-      'The tree is built from plain `DsTreeNode`s — an id, a label and a list of '
-      'children — so it maps straight onto whatever hierarchy your data already '
+      'The tree is built from plain `DsTreeNode`s (an id, a label and a list of '
+      'children) so it maps straight onto whatever hierarchy your data already '
       'has. It is controlled or uncontrolled for both expansion (`expandedIds` '
       '/ `onExpandedChanged`, or `initiallyExpandsAll`) and selection '
       '(`selectedId` / `onSelect`), so it backs both a simple always-open '
       'outline and a fully driven navigator. Reparenting is opt-in: provide '
       '`onMoveNode` and rows become draggable, reporting '
-      '`(nodeId, newParentId)` — a null parent means the root — while a drop '
+      '`(nodeId, newParentId)` (a null parent means the root) while a drop '
       'onto a node\'s own descendant is refused so the tree can never form a '
       'cycle. Like every data component here it never mutates its `nodes`; you '
       'apply the move and pass the new tree back.',
@@ -39,7 +39,7 @@ final PatternPage groupHierarchyPage = PatternPage(
     ),
   ],
   dos: const [
-    'Model the hierarchy people already use — depots, teams, regions — so the '
+    'Model the hierarchy people already use (depots, teams, regions) so the '
         'tree matches how the business is actually run.',
     'Show a count on each node so a parent communicates its size without being '
         'expanded.',
@@ -51,11 +51,11 @@ final PatternPage groupHierarchyPage = PatternPage(
   donts: const [
     "Don't nest deeper than the organisation genuinely is; a tree that is mostly "
         'indentation is harder to navigate than a shallow one.',
-    "Don't allow a reparent that would put a group inside its own descendant — "
+    "Don't allow a reparent that would put a group inside its own descendant; "
         'the component refuses it, and your model should too.',
     "Don't overload a node with actions; a single trailing menu keeps the row "
-        'scannable.',
-    "Don't rebuild the whole tree to toggle one branch — drive expansion through "
+        'uncluttered.',
+    "Don't rebuild the whole tree to toggle one branch; drive expansion through "
         'state so scroll position and selection survive.',
   ],
   code: '''

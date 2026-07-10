@@ -1,8 +1,8 @@
 # Date field
 
-The date field collects a single calendar date without the ambiguity of free-form typing. `DsDateField` presents a read-only, text-field-shaped control — persistent label, filled surface, trailing calendar glyph — that shows the selected date as `yyyy-MM-dd` or a placeholder hint while empty. Tapping opens the platform date picker, themed to inherit the design system, bounded by `firstDate` and `lastDate`; the confirmed date is returned through `onChanged`. Because entry is picker-only the value is always a valid `DateTime`, so `helperText` and `errorText` carry guidance and validation exactly as they do on the text field.
+The date field collects a single calendar date without the ambiguity of free-form typing. `DsDateField` presents a read-only, text-field-shaped control (persistent label, filled surface, trailing calendar glyph) that shows the selected date as `yyyy-MM-dd` or a placeholder hint while empty. Tapping opens the platform date picker, themed to inherit the design system, bounded by `firstDate` and `lastDate`; the confirmed date is returned through `onChanged`. Because entry is picker-only the value is always a valid `DateTime`, so `helperText` and `errorText` carry guidance and validation exactly as they do on the text field.
 
-Constrain the calendar to the dates that make sense: set `firstDate` and `lastDate` so a due date cannot land in the past or a birthday in the future. Keep the `label` visible and let `hintText` show the expected shape rather than repeat the label. Use `helperText` to explain a constraint before the user acts, and swap to `errorText` only after a selection has been made and found invalid — the two never appear together. Passing a `null` `onChanged`, or `enabled: false`, dims the control and blocks the picker.
+Constrain the calendar to the dates that make sense: set `firstDate` and `lastDate` so a due date cannot land in the past or a birthday in the future. Keep the `label` visible and let `hintText` show the expected shape rather than repeat the label. Use `helperText` to explain a constraint before the user acts, and swap to `errorText` only after a selection has been made and found invalid. The two never appear together. Passing a `null` `onChanged`, or `enabled: false`, dims the control and blocks the picker.
 
 ![Desktop (1280dp)](img/date-field_desktop.png)
 
@@ -25,7 +25,7 @@ Constrain the calendar to the dates that make sense: set `firstDate` and `lastDa
 **Don't**
 
 - Don't ask people to type dates free-form when a bounded calendar removes the guesswork.
-- Don't rely on the hint as the label — it vanishes the moment a date is selected.
+- Don't rely on the hint as the label. It vanishes the moment a date is selected.
 - Don't show an error before the user has picked anything.
 - Don't leave firstDate and lastDate unset for domain dates that have a natural range.
 

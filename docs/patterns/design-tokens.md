@@ -1,6 +1,6 @@
 # Design tokens & theming
 
-The Design System is theme-driven. Every colour, type ramp, radius and spacing value is a token exposed through the `DsTokens` theme extension, and every component reads its appearance from the active theme. Because nothing is hard-coded, you re-brand the entire system by supplying your own token set to `DsTheme.light` or `DsTheme.dark` — the system is white-label by default.
+The Design System is theme-driven. Every colour, type ramp, radius and spacing value is a token exposed through the `DsTokens` theme extension, and every component reads its appearance from the active theme. Because nothing is hard-coded, you re-brand the entire system by supplying your own token set to `DsTheme.light` or `DsTheme.dark`. The system is white-label by default.
 
 Read tokens for the active theme with `DsTokens.of(context)`. Switch between `DsTheme.light()` and `DsTheme.dark()` to flip every component at once. Sizes are expressed in logical pixels (`double`); text transforms default to `none` and accept `uppercase`, `lowercase` or `capitalize`. Each heading / body / label ramp row is a property of that level's `DsTypeToken` (`headingXl`, `bodyMd`, …); re-scale a level with `copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: DsTypography.bold))`. The button- and badge-label rows are instead flat tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden individually.
 
@@ -134,15 +134,15 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 
 ## Elevation, icons and weights
 
-Beyond the appearance variables, the system ships a small set of shared primitives that components reach for directly: an elevation scale, an icon-size scale, and a font-weight ramp. The bundled Inter provides all four weights (400 / 500 / 600 / 700), so hierarchy is not limited to regular and bold.
+Beyond the appearance variables, the system ships a small set of shared primitives that components use directly: an elevation scale, an icon-size scale and a font-weight ramp. The bundled Inter provides all four weights (400 / 500 / 600 / 700), so hierarchy is not limited to regular and bold.
 
 ### Elevation (DsElevation)
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
-| `DsElevation.low` | List<BoxShadow> | `resting` | Resting raised surfaces — chips, hovers, list cards. |
-| `DsElevation.medium` | List<BoxShadow> | `floating` | Floating surfaces — menus, popovers, toasts. |
-| `DsElevation.high` | List<BoxShadow> | `modal` | Modal surfaces — dialogs, drawers, takeovers. |
+| `DsElevation.low` | List<BoxShadow> | `resting` | Resting raised surfaces: chips, hovers and list cards. |
+| `DsElevation.medium` | List<BoxShadow> | `floating` | Floating surfaces: menus, popovers and toasts. |
+| `DsElevation.high` | List<BoxShadow> | `modal` | Modal surfaces: dialogs, drawers and takeovers. |
 | `DsElevation.tinted` | Color → shadows | `brand` | A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue. |
 
 ### Icon size (DsIconSize)
@@ -161,7 +161,7 @@ Beyond the appearance variables, the system ships a small set of shared primitiv
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
 | `DsTypography.regular` | FontWeight | `400` | Regular body weight. |
-| `DsTypography.medium` | FontWeight | `500` | Quiet emphasis — labels, secondary controls. |
+| `DsTypography.medium` | FontWeight | `500` | Quiet emphasis: labels and secondary controls. |
 | `DsTypography.semiBold` | FontWeight | `600` | Strong labels, control text, active tabs. |
 | `DsTypography.bold` | FontWeight | `700` | Headings. |
 
@@ -204,7 +204,7 @@ final brand = DsTokens.light().copyWith(
 
 MaterialApp(theme: DsTheme.light(tokens: brand));
 
-// Opt into a ready-made skin — this changes nothing about the defaults.
+// Opt into a ready-made skin. This changes nothing about the defaults.
 MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // Read a token inside a widget.

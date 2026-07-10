@@ -7,7 +7,7 @@ import '../molecules/ds_page_header.dart';
 /// A page-level layout template: a [DsPageHeader] above a scrolling body,
 /// centred and width-constrained for comfortable reading.
 ///
-/// Templates sit above organisms in the atomic hierarchy — they define the
+/// Templates sit above organisms in the atomic hierarchy: they define the
 /// arrangement of a screen without committing to specific content. Fill
 /// [body] with organisms (lists, tables, forms) to realise a concrete page.
 ///

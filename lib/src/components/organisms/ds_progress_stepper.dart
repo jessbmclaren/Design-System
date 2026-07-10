@@ -25,10 +25,10 @@ class DsStep {
 /// Renders a numbered circle for each of [steps], connected by thin lines.
 /// Each step is drawn in one of three states, derived from [currentIndex]:
 ///
-/// * **completed** (`index < currentIndex`) — a filled circle with a check mark.
-/// * **current** (`index == currentIndex`) — a filled circle with the step
-///   number, and its label emphasized.
-/// * **upcoming** (`index > currentIndex`) — an outlined circle with the step
+/// * **completed** (`index < currentIndex`): a filled circle with a check mark.
+/// * **current** (`index == currentIndex`): a filled circle with the step
+///   number, and its label emphasised.
+/// * **upcoming** (`index > currentIndex`): an outlined circle with the step
 ///   number in muted text.
 ///
 /// Use this when a task has a small, fixed number of ordered stages (checkout,
@@ -36,8 +36,8 @@ class DsStep {
 /// remaining work.
 ///
 /// The stepper is responsive. On widths below [DsBreakpoints.medium] it collapses
-/// to a compact form — a "Step X of N" summary, the current step's label and a
-/// thin progress bar — so it never overflows on narrow (down to 320dp) screens.
+/// to a compact form (a "Step X of N" summary, the current step's label and a
+/// thin progress bar), so it never overflows on narrow (down to 320dp) screens.
 /// The full circle-and-connector layout is used on wider screens.
 ///
 /// The widget is purely declarative and renders no animation, so it is safe to
@@ -117,7 +117,7 @@ class DsProgressStepper extends StatelessWidget {
         children.add(
           Expanded(
             child: Padding(
-              // Align the connector with the vertical center of the circles.
+              // Align the connector with the vertical centre of the circles.
               padding: const EdgeInsets.only(
                 top: _circleSize / 2,
                 left: DsSpacing.xs,

@@ -1,10 +1,10 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Forms → Select.
 final PatternPage selectDropdownPage = PatternPage(
   id: 'select',
-  group: DocGroup.forms,
+  group: DocGroup.inputs,
   navTitle: 'Select',
   title: 'Select',
   description:
@@ -12,15 +12,15 @@ final PatternPage selectDropdownPage = PatternPage(
       'spending the vertical space a full set of radios would demand. It is '
       'generic over its value type, so each `DsSelectOption` carries an enum or '
       'domain value rather than a loose string, and the chosen value flows '
-      'straight back through `onChanged`. Reach for a select once a field has '
-      'roughly five or more options, always give it a visible label, and lead '
-      'the empty state with a hint that names the decision being made.',
+      'straight back through `onChanged`. Use a select once a field has '
+      'roughly five or more options. Give it a visible label and lead '
+      'the empty state with a hint that names the decision.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Order the options in a way people can predict — alphabetical, by '
-      'frequency, or in a natural sequence — so the list is scannable rather '
-      'than something to read end to end. When a submitted value fails '
+      'Order the options in a way people can predict (alphabetical, by '
+      'frequency or in a natural sequence) so the list is quick to skim '
+      'rather than something to read end to end. When a submitted value fails '
       'validation, surface the reason through `errorText` directly beneath the '
       'field; the control shifts to its error styling and the message stays '
       'visible until the choice is corrected.',
@@ -33,15 +33,15 @@ final PatternPage selectDropdownPage = PatternPage(
         '"Business type".',
     'Provide a hint for the empty state so the untouched field reads as a '
         'prompt, not a blank.',
-    'Order options predictably — alphabetically, by frequency, or in a natural '
-        'sequence — so people can find a value quickly.',
+    'Order options predictably (alphabetically, by frequency or in a '
+        'natural sequence) so people can find a value quickly.',
     'Show validation inline with `errorText` and keep it visible until the '
         'value is corrected.',
   ],
   donts: const [
     'Do not use a select for two or three options; expose them with radios or '
         'a segmented control so every choice is visible at once.',
-    'Do not leave a select without a label — a bare field forces people to '
+    'Do not leave a select without a label; a bare field forces people to '
         'guess what they are choosing.',
     'Do not hide validation errors or defer them to a distant banner; anchor '
         'the message to the field.',

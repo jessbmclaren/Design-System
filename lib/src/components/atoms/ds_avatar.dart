@@ -8,12 +8,12 @@ import '../../theme/ds_tokens_extension.dart';
 /// [DsAvatar] resolves what to paint by priority so it always renders
 /// something, even offline:
 ///
-/// 1. [imageUrl] — a network image. If it fails to load (or while it loads),
-///    the avatar falls back to the initials/icon content below, so a demo or
+/// 1. [imageUrl]: a network image. If it fails to load (or while it loads),
+///    the avatar falls back to the initials or icon content below, so a demo or
 ///    screenshot never shows a broken image.
-/// 2. [name] — up to two initials derived from the first letters of the first
+/// 2. [name]: up to two initials derived from the first letters of the first
 ///    two words, upper-cased.
-/// 3. [icon] — a caller-supplied glyph.
+/// 3. [icon]: a caller-supplied glyph.
 /// 4. A default person glyph.
 ///
 /// The avatar is a circle of diameter [size]. Colours default to the theme:
@@ -37,8 +37,8 @@ class DsAvatar extends StatelessWidget {
 
   /// An optional network image URL, shown at highest priority.
   ///
-  /// If the image fails to load, the avatar gracefully falls back to the
-  /// initials derived from [name], then [icon], then a default person glyph.
+  /// If the image fails to load, the avatar falls back to the initials derived
+  /// from [name], then [icon], then a default person glyph.
   final String? imageUrl;
 
   /// The name used to derive initials and to label the avatar for assistive
@@ -107,7 +107,7 @@ class DsAvatar extends StatelessWidget {
           height: size,
           fit: BoxFit.cover,
           // Keep the fallback visible until the image is ready, and restore it
-          // if the image ever errors — no broken-image glyph, ever.
+          // if the image ever errors, so there is never a broken-image glyph.
           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
             if (wasSynchronouslyLoaded || frame != null) {
               return child;
@@ -131,7 +131,7 @@ class DsAvatar extends StatelessWidget {
             color: background,
             shape: BoxShape.circle,
           ),
-          // Exclude the visual initials/glyph so only the name is announced.
+          // Exclude the visual initials or glyph so only the name is announced.
           child: Center(child: ExcludeSemantics(child: content)),
         ),
       ),

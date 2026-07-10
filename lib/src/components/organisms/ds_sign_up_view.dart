@@ -11,12 +11,12 @@ import '../atoms/ds_button.dart';
 /// [DsSignUpView] frames account creation as a focused card: an optional brand
 /// glyph, a [title], a supporting [description], a caller-supplied [form]
 /// (typically a `DsFormFieldGroup` or a column of `DsTextField`s), a full-width
-/// primary [DsButton] built from [primaryActionLabel] / [onSubmit], and an
+/// primary [DsButton] built from [primaryActionLabel] / [onSubmit] and an
 /// optional [footer] for secondary links (such as an "Already have an account?"
 /// prompt).
 ///
 /// The view composes existing Design System components rather than
-/// re-implementing fields or buttons — the caller owns the form's contents and
+/// re-implementing fields or buttons. The caller owns the form's contents and
 /// validation, while this scaffold owns the surrounding layout, spacing and
 /// responsive behaviour. It collects no credentials of its own: [onSubmit] is
 /// expected to validate the caller's [form] and navigate the user onward.
@@ -24,15 +24,15 @@ import '../atoms/ds_button.dart';
 /// ## Responsiveness
 ///
 /// When no [aside] is supplied the card is constrained to a comfortable reading
-/// width (~440dp) and centred, shrinking to fit narrower viewports so it never
+/// width (~440dp) and centred; it shrinks to fit narrower viewports so it never
 /// overflows on a 320dp phone.
 ///
 /// When an [aside] (an optional marketing / benefits panel) is supplied, wide
 /// viewports (at or above the [DsBreakpoints.expanded] breakpoint) lay the form
 /// card and the aside out side by side in a two-column row capped at ~960dp,
 /// with the aside taking roughly 40% of the width inside a tinted [DsBox].
-/// Below that breakpoint the columns stack: the card is shown first, followed by
-/// the aside beneath it, so nothing is lost on small screens.
+/// Below that breakpoint the columns stack: the card is shown first, with the
+/// aside beneath it, so nothing is lost on small screens.
 ///
 /// {@tool snippet}
 ///

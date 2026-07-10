@@ -6,25 +6,25 @@ import '../../theme/ds_tokens_extension.dart';
 /// Each variant maps to a semantically meaningful set of background, text and
 /// border tokens defined in the theme:
 ///
-/// * [neutral] — informational or default state with no strong connotation.
-/// * [success] — positive, completed or healthy state.
-/// * [warning] — cautionary state that may need attention.
-/// * [danger] — error, failure or destructive state.
+/// * [neutral]: informational or default state with no strong connotation.
+/// * [success]: positive, completed or healthy state.
+/// * [warning]: cautionary state that may need attention.
+/// * [danger]: error, failure or destructive state.
 enum DsBadgeVariant { neutral, success, warning, danger }
 
 /// A compact status badge rendered as a rounded pill.
 ///
-/// [DsBadge] is used to label the state of an entity — such as a payment,
-/// account or task — with a short word or phrase and an optional leading icon.
+/// [DsBadge] is used to label the state of an entity (such as a payment,
+/// account or task) with a short word or phrase and an optional leading icon.
 /// It sizes itself to its content (it never expands to fill available width)
 /// so it can sit inline with text, inside table cells, list rows or headers.
 ///
-/// All colors, radius, padding and typography are read from [DsTokens] so the
+/// All colours, radius, padding and typography are read from [DsTokens] so the
 /// badge automatically adopts the active white-label theme. The [label] is
 /// transformed according to the theme's `badgeLabelTextTransform` (for example
 /// forced to uppercase) before being rendered.
 ///
-/// This widget is purely static — it runs no animations or timers — so it is
+/// This widget is purely static: it runs no animations or timers, so it is
 /// safe to render directly in screenshots and golden tests.
 ///
 /// Example:
@@ -39,9 +39,9 @@ class DsBadge extends StatelessWidget {
   /// Creates a status badge.
   ///
   /// The [label] is required and should be short; long values are truncated
-  /// with an ellipsis. The [variant] selects the color scheme and defaults to
+  /// with an ellipsis. The [variant] selects the colour scheme and defaults to
   /// [DsBadgeVariant.neutral]. Provide an optional [icon] to show a small
-  /// leading glyph tinted with the badge's text color.
+  /// leading glyph tinted with the badge's text colour.
   const DsBadge({
     super.key,
     required this.label,
@@ -55,10 +55,10 @@ class DsBadge extends StatelessWidget {
   /// is rendered.
   final String label;
 
-  /// The semantic intent of the badge, which selects its colors.
+  /// The semantic intent of the badge, which selects its colours.
   final DsBadgeVariant variant;
 
-  /// An optional leading icon tinted with the badge's text color.
+  /// An optional leading icon tinted with the badge's text colour.
   final IconData? icon;
 
   @override

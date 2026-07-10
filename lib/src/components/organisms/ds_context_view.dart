@@ -7,12 +7,12 @@ import '../../theme/ds_tokens_extension.dart';
 ///
 /// [DsContextView] is an embedded, non-modal drawer: a full-height surface
 /// pinned to the edge of a layout that supplements the main content without
-/// taking it over. Use it for supporting detail — an inspector, a filter
-/// column, a preview, or a help panel — that should stay visible while the
+/// taking it over. Use it for supporting detail (an inspector, a filter
+/// column, a preview or a help panel) that should stay visible while the
 /// user works alongside it.
 ///
 /// The panel has a titled header (with optional [actions] and a close button
-/// when [onClose] is provided), a scrollable body, and an optional [footer]
+/// when [onClose] is provided), a scrollable body and an optional [footer]
 /// above a divider. It reads every colour and text style from
 /// [DsTokens.of], so it re-themes with the surrounding application.
 ///
@@ -21,8 +21,8 @@ import '../../theme/ds_tokens_extension.dart';
 /// available width, becoming a full-bleed column rather than a cramped sliver.
 /// It never overflows down to a 320dp-wide viewport.
 ///
-/// The widget starts no timers or animations, so it renders a stable still
-/// frame that is safe to capture in screenshots.
+/// The widget starts no timers or animations, so it renders a stable frame
+/// that is safe to capture in screenshots.
 ///
 /// ```dart
 /// Row(
@@ -109,7 +109,7 @@ class DsContextView extends StatelessWidget {
                   tokens: tokens,
                 ),
                 Divider(height: 1, thickness: 1, color: borderColor),
-                // Scrollable body — takes the remaining height.
+                // Scrollable body: takes the remaining height.
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
@@ -135,7 +135,7 @@ class DsContextView extends StatelessWidget {
   }
 }
 
-/// The panel header: title, wrapped [actions], and an optional close button.
+/// The panel header: title, wrapped [actions] and an optional close button.
 class _Header extends StatelessWidget {
   const _Header({
     required this.title,

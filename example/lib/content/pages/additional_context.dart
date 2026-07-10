@@ -1,19 +1,19 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Additional context.
 final PatternPage additionalContextPage = PatternPage(
   id: 'additional-context',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Additional context',
   title: 'Additional context',
   description:
-      'Some sign-in screens carry more than a single action — a note about what '
-      'happens next, which account to use, or why access is required. Rather '
+      'Some sign-in screens carry more than a single action: a note about what '
+      'happens next, which account to use or why access is required. Rather '
       'than crowding the entry point with that detail, `DsSignInView` can tuck it '
       'behind a reveal. Pass `additionalContextLabel` and `additionalContext` to '
-      'expose a small, on-demand explanation that keeps the primary task front '
-      'and centre while supporting people who want to read further before they '
+      'expose a small, on-demand explanation. The primary task stays front '
+      'and centre, and people who want to read further can open it before they '
       'continue.',
   hasLiveDemo: true,
   blocks: const [
@@ -21,15 +21,15 @@ final PatternPage additionalContextPage = PatternPage(
       'The reveal stays collapsed by default, so the first thing anyone sees is '
       'the title, a short description and the primary action. Expanding it '
       'surfaces supporting lines without navigating away or resetting the form. '
-      'Keep the hidden content to a few scannable sentences or bullet rows; if '
+      'Keep the hidden content to a few short sentences or bullet rows; if '
       'the explanation grows into paragraphs or requires acknowledgement, move '
-      'it to a dedicated focused screen instead.',
+      'it to a separate screen instead.',
     ),
   ],
   dos: const [
     'Keep the sign-in screen focused on the single action people came to take.',
-    'Put supplementary detail behind a reveal or a separate focused screen.',
-    'Keep the revealed context brief — a few scannable lines or bullet rows.',
+    'Put supplementary detail behind a reveal or a separate screen.',
+    'Keep the revealed context brief: a few short lines or bullet rows.',
     'Use plain language that answers the question the reveal label implies.',
   ],
   donts: const [

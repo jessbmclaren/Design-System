@@ -5,7 +5,7 @@ import '../../tokens/ds_chart_palette.dart';
 
 /// A tiny inline line chart with no axes, labels or gridlines.
 ///
-/// [DsSparkline] renders a compact trend line — a "sparkline" — sized to sit
+/// [DsSparkline] renders a compact trend line (a "sparkline") sized to sit
 /// inline with text or inside a dense table cell. The [values] are normalised
 /// to fit the given [width] and [height] box, drawn as a 2px polyline, with an
 /// optional soft fill beneath the line and an end dot marking the last point.
@@ -13,13 +13,13 @@ import '../../tokens/ds_chart_palette.dart';
 /// The line colour defaults to the first entry of the validated
 /// [DsChartPalette] categorical order for the active [Brightness]; supply
 /// [color] to override it (for example to echo a value's status elsewhere in
-/// the UI). No number labels or axes are drawn — a sparkline communicates shape,
+/// the UI). No number labels or axes are drawn; a sparkline communicates shape,
 /// not precise values.
 ///
 /// The widget is screenshot-safe: it renders a single stable frame from the
-/// data passed in, with no timers or animation. Zero- and one-point inputs are
-/// handled gracefully (nothing, or a single centred dot). The chart fills the
-/// provided [width]/[height] and never overflows.
+/// data passed in, with no timers or animation. Zero- and one-point inputs draw
+/// nothing or a single centred dot. The chart fills the provided [width] and
+/// [height] and never overflows.
 ///
 /// ```dart
 /// DsSparkline(values: [3, 5, 2, 8, 6, 9, 7])
@@ -36,7 +36,7 @@ class DsSparkline extends StatelessWidget {
     this.showEndDot = true,
   });
 
-  /// The ordered data points, plotted left → right and normalised to the box.
+  /// The ordered data points, plotted left to right and normalised to the box.
   ///
   /// A flat series (all equal) draws along the vertical centre. An empty list
   /// draws nothing; a single value draws a centred end dot only.

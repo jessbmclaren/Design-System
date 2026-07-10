@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// The design system's icon vocabulary.
 ///
-/// Components — and the products that consume the system — reference glyphs by
+/// Components (and the products that consume the system) reference glyphs by
 /// their **semantic role** (`DsIcons.close`, `DsIcons.success`) rather than
 /// reaching for `Icons.*` directly. Centralising the vocabulary here is what
 /// makes the iconography a *system*: the family policy lives in one place, and
@@ -11,15 +11,15 @@ import 'package:flutter/material.dart';
 ///
 /// ## Family policy (Lucide-styled)
 ///
-/// The set is chosen to read like Lucide — thin, consistent, open line work:
+/// The set is chosen to read like Lucide, with thin, consistent, open line work:
 ///
 /// * **Outlined line glyphs** are the default for actions, affordances and
 ///   status (close, edit, upload, info, warning, success, error).
 /// * **Bare strokes** for pure directional marks (chevrons, arrows, add,
 ///   close, filter) that have no shape to outline.
 /// * **Filled is reserved for true-state** glyphs where the fill carries the
-///   meaning — a selected rating [star]. Everything else stays outlined.
-/// * **The rounded family is banned** — it reads as consumer-playful, the wrong
+///   meaning: a selected rating [star]. Everything else stays outlined.
+/// * **The rounded family is banned**: it reads as consumer-playful, the wrong
 ///   register for a dense, professional product. Any rounded Material glyph is
 ///   mapped to its sharp / outlined equivalent here.
 ///

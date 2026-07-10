@@ -1,16 +1,16 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Onboarding.
 final PatternPage onboardingPage = PatternPage(
   id: 'onboarding',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Onboarding',
   title: 'Onboarding',
   description:
       'Onboarding moves a new person from signed-out to productive with the '
       'smallest set of steps that matter. Lead with a single, centred welcome '
-      'card that names what they are setting up, states the value in one line, '
+      'card that names what they are setting up, states the value in one line '
       'and offers one obvious primary action. Build it with `DsSignInView`: it '
       'presents the brand mark, title, description and a full-width Continue '
       'button, and deliberately collects no credentials of its own so you can '
@@ -28,7 +28,7 @@ final PatternPage onboardingPage = PatternPage(
   ],
   dos: const [
     'Keep onboarding to the essential steps needed to reach a first useful moment.',
-    'Make the primary action unmistakable — one full-width button labelled "Continue".',
+    'Make the primary action unmistakable: one full-width button labelled "Continue".',
     'Collect sensitive credentials on your own secure sign-in, then return the user to where they left off.',
     'Scale complexity to the person: show more setup only when their account actually needs it.',
     'State the value in the description so the user knows why the step is worth taking.',
@@ -36,7 +36,7 @@ final PatternPage onboardingPage = PatternPage(
   donts: const [
     'Don\'t use onboarding for promotions, cross-sells or unrelated announcements.',
     'Don\'t collect passwords or payment details on a screen you don\'t fully control.',
-    'Don\'t add steps that aren\'t required to get started — defer the rest.',
+    'Don\'t add steps that aren\'t required to get started; defer the rest.',
     'Don\'t bury the primary action beneath competing links or dense copy.',
   ],
   code: '''

@@ -9,10 +9,10 @@ import '../tokens/ds_typography.dart';
 
 /// How the system presents an overlay such as a [DsFocusView].
 enum DsOverlayStyle {
-  /// A centered dialog (modal).
+  /// A centred dialog (modal).
   dialog,
 
-  /// A drawer that slides in from the edge — often better on small screens.
+  /// A drawer that slides in from the edge, often better on small screens.
   drawer,
 }
 
@@ -31,7 +31,7 @@ enum DsOverlayStyle {
 @immutable
 class DsTokens extends ThemeExtension<DsTokens> {
   const DsTokens({
-    // Global — the high-level knobs the rest of the system derives from.
+    // Global: the high-level knobs the rest of the system derives from.
     required this.fontFamily,
     required this.fontSizeBase,
     required this.spacingUnit,

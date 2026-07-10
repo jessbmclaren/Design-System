@@ -17,7 +17,7 @@ enum DsLinkVariant {
 /// A textual hyperlink.
 ///
 /// [DsLink] renders inline, tappable text styled from the theme's `action*`
-/// tokens — colour and text decoration come from
+/// tokens. Colour and text decoration come from
 /// [DsTokens.actionPrimaryColorText] and friends for
 /// [DsLinkVariant.primary], or the matching `actionSecondary*` tokens for
 /// [DsLinkVariant.secondary]. A null [onPressed] renders the link disabled and

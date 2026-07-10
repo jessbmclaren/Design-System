@@ -7,12 +7,12 @@ import '../../tokens/ds_typography.dart';
 ///
 /// [DsTextField] is the Design System's primary way to collect free-form text
 /// (names, emails, passwords, multi-line notes). It composes an optional
-/// [label], the input itself, and an optional [helperText] or [errorText] into
+/// [label], the input itself and an optional [helperText] or [errorText] into
 /// a single accessible column so that the caption is always associated with the
 /// field it describes.
 ///
-/// Reach for it whenever a form needs a text entry. Pass an [errorText] to move
-/// the field into its error state — the border, and the caption beneath it,
+/// Use it whenever a form needs a text entry. Pass an [errorText] to move
+/// the field into its error state: the border and the caption beneath it
 /// switch to the danger colour and the label is read out with the error by
 /// assistive technology.
 ///

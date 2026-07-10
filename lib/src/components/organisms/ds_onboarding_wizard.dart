@@ -26,10 +26,10 @@ class DsWizardStep {
 ///
 /// [DsOnboardingWizard] frames a multi-step flow: a progress header built from
 /// [steps] and [currentIndex], an optional [title] and [subtitle], a scrollable
-/// body holding the current step's [child], and a footer with **Back** and
+/// body holding the current step's [child] and a footer with **Back** and
 /// **Next** actions above a hairline [DsDivider].
 ///
-/// The wizard is deliberately *content-agnostic* — it owns the chrome (progress,
+/// The wizard is deliberately *content-agnostic*: it owns the chrome (progress,
 /// headings, navigation) while the caller supplies each step's body as [child]
 /// and drives navigation via [onBack] / [onNext] and [currentIndex]. This lets a
 /// single component back both an "onboarding wizard" and a "setup wizard".
@@ -101,7 +101,7 @@ class DsOnboardingWizard extends StatelessWidget {
 
   /// Called when the **Back** action is tapped.
   ///
-  /// When null the Back button is hidden entirely — typically on the first
+  /// When null the Back button is hidden entirely, typically on the first
   /// step, where there is nowhere to go back to.
   final VoidCallback? onBack;
 

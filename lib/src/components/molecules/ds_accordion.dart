@@ -11,7 +11,7 @@ import '../../util/ds_motion.dart';
 ///
 /// Each item pairs a [title] (rendered in the label/medium type ramp) with a
 /// [child] body that is revealed when the section is expanded. Provide an
-/// optional [leading] widget — such as an icon — to appear before the title.
+/// optional [leading] widget, such as an icon, to appear before the title.
 ///
 /// Set [initiallyExpanded] to open the section on first build. When the parent
 /// [DsAccordion] is single-open (`allowMultiple: false`) and more than one item
@@ -42,8 +42,8 @@ class DsAccordionItem {
 
 /// A vertical stack of collapsible [DsAccordionItem] sections.
 ///
-/// Each section shows a tappable header — an optional leading widget, the
-/// title, and a trailing chevron that rotates 180° when open — with a body that
+/// Each section shows a tappable header (an optional leading widget, the
+/// title and a trailing chevron that rotates 180° when open) with a body that
 /// animates open and closed. A 1px border separates sections and rounds the
 /// whole container to the theme's form radius.
 ///
@@ -105,7 +105,7 @@ class _DsAccordionState extends State<DsAccordion> {
   @override
   void didUpdateWidget(DsAccordion oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the item count shrank, drop any now-out-of-range indices, and enforce
+    // If the item count shrank, drop any now-out-of-range indices and enforce
     // single-open if the mode flipped.
     if (widget.items.length != oldWidget.items.length ||
         widget.allowMultiple != oldWidget.allowMultiple) {

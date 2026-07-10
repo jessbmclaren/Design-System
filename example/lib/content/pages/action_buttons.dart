@@ -1,10 +1,10 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// User actions → Action buttons.
 final PatternPage actionButtonsPage = PatternPage(
   id: 'action-buttons',
-  group: DocGroup.userActions,
+  group: DocGroup.actions,
   navTitle: 'Action buttons',
   title: 'Action buttons',
   description:
@@ -12,8 +12,8 @@ final PatternPage actionButtonsPage = PatternPage(
       'reachable while the content below scrolls. Give each view a single '
       'primary `DsButton` for the one action you most want people to take, and '
       'render the supporting choices as `secondary` buttons beside it. This '
-      'consistent placement — aligned to the trailing edge beside the title on '
-      'wide layouts, and stacked beneath it on narrow ones — means people '
+      'consistent placement (aligned to the trailing edge beside the title on '
+      'wide layouts, stacked beneath it on narrow ones) means people '
       'always know where to look to act, and the emphasis in the button '
       'styling tells them which action is the expected next step.',
   hasLiveDemo: true,
@@ -22,7 +22,7 @@ final PatternPage actionButtonsPage = PatternPage(
       'Emphasis comes from the `variant`, not the position. Reserve the '
       '`danger` variant for destructive, hard-to-undo actions such as deleting '
       'a record or voiding a document, and pair it with a confirmation step. '
-      'Ordinary actions — even important ones like saving — should never borrow '
+      'Ordinary actions (even important ones like saving) should never borrow '
       'the danger style, or the colour stops signalling real risk.',
     ),
   ],

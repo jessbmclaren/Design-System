@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Data → Grouping & aggregation.
@@ -10,11 +10,11 @@ final PatternPage groupingPage = PatternPage(
   description:
       'Grouping turns a flat grid into an outline. Pass `DsDataGrid` a `groupBy` '
       'list of column keys and it partitions the rows under collapsible group '
-      'headers — one key gives flat groups, several give nested subgroups '
+      'headers: one key gives flat groups, several give nested subgroups '
       '(depot → status → …), each indented under its parent. Every header shows '
       'the group value and its record count, and an `aggregations` map rolls up '
-      'a chosen column per group — a summed monthly cost, an averaged '
-      'utilisation, a count — rendered aligned under its column so the summary '
+      'a chosen column per group (a summed monthly cost, an averaged '
+      'utilisation, a count) rendered aligned under its column so the summary '
       'reads like part of the table. Collapse a group to fold its rows (and '
       'subgroups) away and scan the shape of the data.',
   blocks: const [
@@ -30,31 +30,31 @@ final PatternPage groupingPage = PatternPage(
       'the starting posture.',
     ),
     ProseBlock(
-      'Reach for grouping when the question is "how do these records cluster, '
-      'and what do the clusters total?" — vehicles by depot and status, drivers '
-      'by team, costs by category. For moving records between clusters by hand, '
-      'reach for the board view; for slicing which records are in scope at all, '
-      'reach for filtering.',
+      'Use grouping when the question is "how do these records cluster, '
+      'and what do the clusters total?": vehicles by depot and status, drivers '
+      'by team, costs by category. To move records between clusters by hand, '
+      'use the board view; to slice which records are in scope, use '
+      'filtering.',
     ),
   ],
   dos: const [
-    'Group by the attribute people compare across — a status, a depot, an '
-        'owner — and add a second key only when the nesting genuinely helps.',
+    'Group by the attribute people compare across (a status, a depot, an '
+        'owner) and add a second key only when the nesting genuinely helps.',
     'Aggregate the columns whose totals matter (sum a cost, average a rate) and '
-        'leave the rest; a header crowded with roll-ups stops being scannable.',
+        'leave the rest; a header crowded with roll-ups is hard to read.',
     'Give select and status group columns their `options` so headers show clean '
         'labels and colours instead of raw stored values.',
     'Start groups expanded for small sets and collapsed for large ones via '
         '`initiallyExpanded`, so the first screen is legible.',
   ],
   donts: const [
-    "Don't nest more than two or three levels deep — past that the indentation "
+    "Don't nest more than two or three levels deep; past that the indentation "
         'costs more than the structure gives back.',
     "Don't group by a near-unique column (an id, a free-text note); you get one "
         'record per group and lose the outline entirely.',
-    "Don't sum a column whose values aren't additive (a rate, a ratio) — average "
+    "Don't sum a column whose values aren't additive (a rate, a ratio); average "
         'or count it instead, or leave it un-aggregated.',
-    "Don't rely on grouping to hide records that shouldn't be there — filter "
+    "Don't rely on grouping to hide records that shouldn't be there; filter "
         'them out first, then group what remains.',
   ],
   code: '''

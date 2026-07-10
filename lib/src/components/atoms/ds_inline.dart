@@ -5,11 +5,10 @@ import '../../theme/ds_tokens_extension.dart';
 /// Inline styled text for a single run of copy.
 ///
 /// [DsInline] renders a [Text] whose style combines a small set of typographic
-/// treatments — bold, italic, monospace `code`, and strikethrough — while
+/// treatments (bold, italic, monospace `code` and strikethrough) while
 /// inheriting size and colour from the surrounding [DefaultTextStyle] unless an
-/// explicit [color] is provided. It is designed to be dropped inline anywhere
-/// text appears, and it never sets its own font size so it composes cleanly with
-/// any type ramp.
+/// explicit [color] is provided. Drop it inline anywhere text appears; it never
+/// sets its own font size, so it composes with any type ramp.
 ///
 /// For embedding the same treatment inside a [RichText] / [Text.rich], use the
 /// static [DsInline.span] helper, which returns an [InlineSpan] with identical
@@ -28,9 +27,9 @@ import '../../theme/ds_tokens_extension.dart';
 /// ```
 ///
 /// The widget starts no timers or animations and renders no network content, so
-/// it is safe for screenshots and demos. It is inherently responsive: it lays
-/// out within whatever constraints its parent provides and wraps/ellipsizes
-/// according to [softWrap] and [overflow].
+/// it is safe for screenshots and demos. It lays out within whatever constraints
+/// its parent provides and wraps or ellipsizes according to [softWrap] and
+/// [overflow].
 class DsInline extends StatelessWidget {
   /// Creates an inline styled text run.
   const DsInline({

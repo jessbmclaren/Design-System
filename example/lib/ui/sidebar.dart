@@ -59,10 +59,10 @@ class Sidebar extends StatelessWidget {
               child: Text(
                 group.label.toUpperCase(),
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.7,
-                  color: tokens.colorSecondaryText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                  color: tokens.colorText,
                 ),
               ),
             ),

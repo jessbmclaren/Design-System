@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Foundations → Design tokens & theming.
@@ -15,7 +15,7 @@ final PatternPage designTokensPage = PatternPage(
       'spacing value is a token exposed through the `DsTokens` theme extension, '
       'and every component reads its appearance from the active theme. Because '
       'nothing is hard-coded, you re-brand the entire system by supplying your '
-      'own token set to `DsTheme.light` or `DsTheme.dark` — the system is '
+      'own token set to `DsTheme.light` or `DsTheme.dark`. The system is '
       'white-label by default.',
   hasLiveDemo: true,
   blocks: const [
@@ -160,17 +160,17 @@ final PatternPage designTokensPage = PatternPage(
     SubheadingBlock('Elevation, icons and weights'),
     ProseBlock(
       'Beyond the appearance variables, the system ships a small set of shared '
-      'primitives that components reach for directly: an elevation scale, an '
-      'icon-size scale, and a font-weight ramp. The bundled Inter provides all '
+      'primitives that components use directly: an elevation scale, an '
+      'icon-size scale and a font-weight ramp. The bundled Inter provides all '
       'four weights (400 / 500 / 600 / 700), so hierarchy is not limited to '
       'regular and bold.',
     ),
     VariablesBlock(
       title: 'Elevation (DsElevation)',
       rows: [
-        VariableRow(name: 'DsElevation.low', type: 'List<BoxShadow>', example: 'resting', description: 'Resting raised surfaces — chips, hovers, list cards.'),
-        VariableRow(name: 'DsElevation.medium', type: 'List<BoxShadow>', example: 'floating', description: 'Floating surfaces — menus, popovers, toasts.'),
-        VariableRow(name: 'DsElevation.high', type: 'List<BoxShadow>', example: 'modal', description: 'Modal surfaces — dialogs, drawers, takeovers.'),
+        VariableRow(name: 'DsElevation.low', type: 'List<BoxShadow>', example: 'resting', description: 'Resting raised surfaces: chips, hovers and list cards.'),
+        VariableRow(name: 'DsElevation.medium', type: 'List<BoxShadow>', example: 'floating', description: 'Floating surfaces: menus, popovers and toasts.'),
+        VariableRow(name: 'DsElevation.high', type: 'List<BoxShadow>', example: 'modal', description: 'Modal surfaces: dialogs, drawers and takeovers.'),
         VariableRow(name: 'DsElevation.tinted', type: 'Color → shadows', example: 'brand', description: 'A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue.'),
       ],
     ),
@@ -189,7 +189,7 @@ final PatternPage designTokensPage = PatternPage(
       title: 'Font weight (DsTypography)',
       rows: [
         VariableRow(name: 'DsTypography.regular', type: 'FontWeight', example: '400', description: 'Regular body weight.'),
-        VariableRow(name: 'DsTypography.medium', type: 'FontWeight', example: '500', description: 'Quiet emphasis — labels, secondary controls.'),
+        VariableRow(name: 'DsTypography.medium', type: 'FontWeight', example: '500', description: 'Quiet emphasis: labels and secondary controls.'),
         VariableRow(name: 'DsTypography.semiBold', type: 'FontWeight', example: '600', description: 'Strong labels, control text, active tabs.'),
         VariableRow(name: 'DsTypography.bold', type: 'FontWeight', example: '700', description: 'Headings.'),
       ],
@@ -227,7 +227,7 @@ final brand = DsTokens.light().copyWith(
 
 MaterialApp(theme: DsTheme.light(tokens: brand));
 
-// Opt into a ready-made skin — this changes nothing about the defaults.
+// Opt into a ready-made skin. This changes nothing about the defaults.
 MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // Read a token inside a widget.

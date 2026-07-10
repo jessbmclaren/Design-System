@@ -9,7 +9,7 @@ import '../../tokens/ds_icon_size.dart';
 /// [DsIcon] is a thin, token-aware wrapper around Flutter's [Icon]. Prefer it
 /// over a raw [Icon] so that glyphs stay on the shared [DsIconSize] scale and
 /// pick up the correct foreground colour ([DsTokens.colorText]) for the active
-/// theme — including in white-label builds where that colour is themed.
+/// theme, including in white-label builds where that colour is themed.
 ///
 /// ```dart
 /// const DsIcon(icon: DsIcons.success)
@@ -35,7 +35,7 @@ import '../../tokens/ds_icon_size.dart';
 /// [semanticLabel] null so assistive technology skips it. A meaning-bearing or
 /// icon-only glyph should pass a concise [semanticLabel] describing its intent.
 /// Interactive affordances (tap targets, tooltips, the >=48dp touch area) are
-/// the responsibility of the enclosing control — [DsIcon] renders the glyph
+/// the responsibility of the enclosing control; [DsIcon] renders the glyph
 /// only.
 class DsIcon extends StatelessWidget {
   /// Creates a themed icon.

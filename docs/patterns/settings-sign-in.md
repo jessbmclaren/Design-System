@@ -2,7 +2,7 @@
 
 Some settings surfaces manage a connection to an external service, and those controls only make sense once the connection is authenticated. Gate the panel on the connection state: while the account is not connected, render a compact `DsSignInView` in place of the settings; once it is connected, swap in the settings themselves. The settings surface is the entry point, so the user authenticates exactly where the controls they came to change will appear.
 
-Keep the signed-out state minimal — a short title, one line of context and a single primary action are enough to start the connection. Reserve the settings controls (toggles, credentials, disconnect) for the authenticated state so nothing appears actionable before it can be acted on. When the sign-in genuinely needs more explanation, move it into the view's additional-context reveal rather than crowding the card.
+Keep the signed-out state minimal: a short title, one line of context and a single primary action are enough to start the connection. Reserve the settings controls (toggles, credentials, disconnect) for the authenticated state so nothing appears actionable before it can be acted on. When the sign-in genuinely needs more explanation, move it into the view's additional-context reveal rather than crowding the card.
 
 ![Desktop (1280dp)](img/settings-sign-in_desktop.png)
 
@@ -19,7 +19,7 @@ Keep the signed-out state minimal — a short title, one line of context and a s
 - Use the settings surface itself as the entry point, so users connect exactly where the controls live.
 - Keep the signed-out view minimal: a clear title, one line of context and a single primary action.
 - Move any extra explanation into a focused reveal or panel instead of the sign-in card.
-- Confirm the connected state plainly — a status badge and a way to disconnect — before showing detailed controls.
+- Confirm the connected state plainly (a status badge and a way to disconnect) before showing detailed controls.
 
 **Don't**
 

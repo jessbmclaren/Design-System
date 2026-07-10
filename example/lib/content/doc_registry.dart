@@ -65,34 +65,45 @@ import 'pages/waiting_screens.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
-  // foundations
+  // Foundations
   designTokensPage,
   motionPage,
   iconographyPage,
-  // content
+  // Actions
+  actionButtonsPage,
+  backLinkPage,
+  buttonGroupPage,
+  linkPage,
+  // Inputs
+  textFieldsPage,
+  textAreaPage,
+  selectDropdownPage,
+  selectionControlsPage,
+  currencyFieldPage,
+  dateFieldPage,
+  formFieldGroupPage,
+  filterControlsPage,
+  // Display
   accordionPage,
   avatarPage,
   dividerPage,
   iconPage,
   imgPage,
   inlinePage,
-  linkPage,
+  listsPage,
+  // Feedback
+  communicatingStatePage,
+  emptyStatePage,
+  loadingPage,
+  progressSteppingPage,
+  waitingScreensPage,
+  // Overlays
   menuPage,
   tooltipPage,
-  // forms
-  textFieldsPage,
-  textAreaPage,
-  selectionControlsPage,
-  selectDropdownPage,
-  currencyFieldPage,
-  dateFieldPage,
-  formFieldGroupPage,
-  // charts
-  sparklinePage,
-  barChartPage,
-  lineChartPage,
-  meterChartPage,
-  // data
+  coachmarkPage,
+  focusViewPage,
+  contextViewPage,
+  // Data
   dataGridPage,
   cellTypesPage,
   groupingPage,
@@ -102,35 +113,25 @@ final List<PatternPage> allPages = [
   policiesPage,
   dataImportPage,
   recordPanelPage,
-  // layout
-  fullPageLayoutsPage,
-  listsPage,
-  filterControlsPage,
-  focusViewPage,
+  // Charts
+  barChartPage,
+  lineChartPage,
+  meterChartPage,
+  sparklinePage,
+  // Layout
   boxPage,
-  buttonGroupPage,
-  contextViewPage,
+  fullPageLayoutsPage,
   settingsViewPage,
-  // onboarding
+  // Patterns
   onboardingPage,
+  onboardingWizardPage,
   signInPage,
   signUpPage,
+  signOutPage,
   settingsSignInPage,
+  businessVerificationPage,
   additionalContextPage,
   redirectsPage,
-  signOutPage,
-  coachmarkPage,
-  onboardingWizardPage,
-  businessVerificationPage,
-  // userActions
-  backLinkPage,
-  actionButtonsPage,
-  // status
-  communicatingStatePage,
-  emptyStatePage,
-  loadingPage,
-  progressSteppingPage,
-  waitingScreensPage,
 ];
 
 /// Lookup by page id.

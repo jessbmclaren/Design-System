@@ -8,13 +8,13 @@ import '../../tokens/ds_typography.dart';
 /// Groups related form fields together under an optional legend and
 /// description, as an accessible fieldset.
 ///
-/// [DsFormFieldGroup] is the layout primitive for a coherent block of inputs —
+/// [DsFormFieldGroup] is the layout primitive for a coherent block of inputs,
 /// for example an address block (street, city, postal code) or a pair of
 /// "first name" / "last name" fields. It renders, top to bottom:
 ///
 /// 1. an optional [legend] (medium label, semi-bold, in the primary text
-///    color) that names the group;
-/// 2. an optional [description] (small body text, in the secondary text color)
+///    colour) that names the group;
+/// 2. an optional [description] (small body text, in the secondary text colour)
 ///    that explains it; and
 /// 3. the [children] fields, separated by [spacing].
 ///
@@ -34,8 +34,8 @@ import '../../tokens/ds_typography.dart';
 ///   width less the gutter. Set [columns] to `1` to keep a single stacked
 ///   column at every size.
 ///
-/// The widget is purely declarative — it starts no timers or animations — so
-/// it renders identically in screenshots and in live use.
+/// The widget is purely declarative (it starts no timers or animations), so
+/// it renders identically in screenshots and live use.
 ///
 /// ```dart
 /// DsFormFieldGroup(
@@ -63,11 +63,11 @@ class DsFormFieldGroup extends StatelessWidget {
   }) : assert(columns == 1 || columns == 2, 'columns must be 1 or 2');
 
   /// Optional heading that names the group. Rendered with the medium label
-  /// token in a semi-bold weight and the primary text color.
+  /// token in a semi-bold weight and the primary text colour.
   final String? legend;
 
   /// Optional supporting text shown beneath the [legend], in the small body
-  /// token and the secondary text color.
+  /// token and the secondary text colour.
   final String? description;
 
   /// The form fields to lay out within the group.

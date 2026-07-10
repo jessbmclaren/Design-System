@@ -11,8 +11,8 @@ import '../atoms/ds_icon.dart';
 /// An item pairs a required [label] with an optional leading [icon] and an
 /// [onSelected] callback that fires when the row is chosen. Mark irreversible
 /// or dangerous choices (delete, revoke, …) with [destructive] so they render
-/// in the theme's danger colour, and set [enabled] to `false` to show — but
-/// dim and disable — a choice that is temporarily unavailable.
+/// in the theme's danger colour, and set [enabled] to `false` to show (but
+/// dim and disable) a choice that is temporarily unavailable.
 @immutable
 class DsMenuItem {
   /// Creates a menu item.

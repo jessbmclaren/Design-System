@@ -17,7 +17,7 @@ import '../atoms/ds_icon.dart';
 /// [DsButton]. Tapping anywhere on the surface (or the browse button) invokes
 /// [onBrowse].
 ///
-/// ## Scope — it does not do file IO
+/// ## Scope: it does not do file IO
 ///
 /// Real operating-system drag-and-drop needs platform plumbing that lives in the
 /// host application, so this widget is deliberately a *visual* drop target plus a
@@ -48,7 +48,7 @@ class DsDropzone extends StatelessWidget {
     this.enabled = true,
   });
 
-  /// Called when the surface — or the browse button — is activated to pick a
+  /// Called when the surface (or the browse button) is activated to pick a
   /// file. A null callback (or [enabled] false) makes the surface
   /// non-interactive.
   final VoidCallback? onBrowse;

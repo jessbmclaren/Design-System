@@ -31,7 +31,7 @@ class DsSelectOption<T> {
 /// [value] is `null`.
 ///
 /// Use it whenever a user must pick exactly one value from a known, bounded
-/// list — a country, a status, a currency — where a set of radio buttons would
+/// list (a country, a status, a currency) where a set of radio buttons would
 /// take too much room. For free-form entry use a text field instead; for
 /// multi-select, use a different control.
 ///
@@ -55,8 +55,8 @@ class DsSelect<T> extends StatelessWidget {
   ///
   /// [value] is the currently selected value (or `null` for none) and must
   /// match the `value` of one of the [options], or be `null`. [onChanged] is
-  /// called with the newly picked value; passing `null` — or setting [enabled]
-  /// to `false` — renders the control disabled.
+  /// called with the newly picked value; passing `null` (or setting [enabled]
+  /// to `false`) renders the control disabled.
   const DsSelect({
     super.key,
     this.label,
@@ -114,7 +114,7 @@ class DsSelect<T> extends StatelessWidget {
     }
 
     // DropdownButtonFormField applies `style` as the DefaultTextStyle for its
-    // own value/hint/menu text, replacing the ambient one — so a family-less
+    // own value/hint/menu text, replacing the ambient one, so a family-less
     // token style would strip the effective font family and render tofu. Bake
     // the ambient family (the theme's effective font) into these styles so the
     // dropdown text keeps it.

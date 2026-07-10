@@ -1,16 +1,16 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// User actions → Back link.
 final PatternPage backLinkPage = PatternPage(
   id: 'back-link',
-  group: DocGroup.userActions,
+  group: DocGroup.actions,
   navTitle: 'Back link',
   title: 'Back link',
   description:
       'A back link gives people a clear, labelled way to return to the screen '
-      'they came from. Use `DsBackLink` at the top-left of a detail view — a '
-      'single record, a report, or a settings panel opened from a list. Pair a '
+      'they came from. Use `DsBackLink` at the top-left of a detail view: a '
+      'single record, a report or a settings panel opened from a list. Pair a '
       'leading arrow with a label that names the destination, such as "Back to '
       'customers", so the return path is obvious before anyone clicks. Unlike '
       'the browser back button, an in-app back link is a deliberate, discoverable '
@@ -21,7 +21,7 @@ final PatternPage backLinkPage = PatternPage(
     ProseBlock(
       'Place the back link above the page title, aligned to the left edge of '
       'the content. Name the specific destination rather than using a generic '
-      '"Back" — the label doubles as a breadcrumb, reminding people where they '
+      '"Back". The label doubles as a breadcrumb that reminds people where they '
       'are in the hierarchy and where a click will take them.',
     ),
   ],

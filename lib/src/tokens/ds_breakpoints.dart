@@ -2,13 +2,13 @@ import 'package:flutter/widgets.dart';
 
 /// Design System window size classes, following the Material 3 breakpoint system.
 enum DsWindowSize {
-  /// Width < 600dp — phones in portrait.
+  /// Width < 600dp: phones in portrait.
   compact,
 
-  /// 600dp ≤ width < 840dp — tablets in portrait, large phones in landscape.
+  /// 600dp ≤ width < 840dp: tablets in portrait, large phones in landscape.
   medium,
 
-  /// Width ≥ 840dp — tablets in landscape, desktops.
+  /// Width ≥ 840dp: tablets in landscape, desktops.
   expanded;
 
   /// Whether this size is at least [other].

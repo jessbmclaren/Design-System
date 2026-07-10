@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Data → Cell types & editing.
@@ -10,7 +10,7 @@ final PatternPage cellTypesPage = PatternPage(
   description:
       'Every column in a `DsDataGrid` declares a `DsCellType`, and that one '
       'choice decides three things at once: how the value is rendered, how it '
-      'sorts and aligns, and — when editing is on — how it is edited. Text, '
+      'sorts and aligns and, when editing is on, how it is edited. Text, '
       'number and currency render as aligned type; `status`, `singleSelect` and '
       '`multiSelect` render as coloured badges drawn from the column\'s '
       '`options`; `user` shows an avatar and name; `date` a formatted day; '
@@ -21,20 +21,20 @@ final PatternPage cellTypesPage = PatternPage(
     ProseBlock(
       'Editing is opt-in and controlled. Set `DsDataGrid.editable` and mark the '
       'editable columns with `editable: true`; the grid then opens the right '
-      'editor for each type when a cell is tapped — an inline text field for '
+      'editor for each type when a cell is tapped: an inline text field for '
       'text, number, currency, link and user; the platform date picker for '
       'dates; an option menu for single-select and status; a checkable panel '
       'for multi-select; an immediate toggle for checkboxes; and a tap-to-set '
       'row for ratings. Progress is always read-only. The text-style editors '
       'commit on Enter or focus loss and cancel on Escape, while the pickers, '
-      'menus and toggles commit on selection — and the grid never mutates your '
+      'menus and toggles commit on selection. The grid never mutates your '
       'rows: it reports the new value through `onCellChanged(rowId, columnKey, '
       'value)` so your state stays the single source of truth.',
     ),
     ProseBlock(
       'Because the value type drives everything, keep each cell\'s runtime type '
-      'honest — a `num` for number and currency, a `DateTime` for date, a '
-      '`bool` for checkbox, an `int` 0–5 for rating, a `double` 0–1 for '
+      'honest: a `num` for number and currency, a `DateTime` for date, a '
+      '`bool` for checkbox, an `int` 0 to 5 for rating, a `double` 0 to 1 for '
       'progress, a `String` option value for select and status, and a '
       '`List<String>` for multi-select. A value that does not match its column '
       'renders as an em dash rather than throwing, so partial or mid-import '
@@ -45,7 +45,7 @@ final PatternPage cellTypesPage = PatternPage(
     'Give every select, status and multi-select column an `options` list so its '
         'labels and colours are consistent and its editor can offer the choices.',
     'Store the stable option `value` in the cell and let the option supply the '
-        'human-readable `label` — renaming a label then never touches your data.',
+        'human-readable `label`; renaming a label then never touches your data.',
     'Match each cell\'s runtime type to its `DsCellType`; mistyped values fall '
         'back to an em dash instead of the intended cell.',
     'Treat the grid as controlled: apply `onCellChanged` to your own state and '
@@ -54,11 +54,11 @@ final PatternPage cellTypesPage = PatternPage(
         "don't try to hand-edit a value the system owns.",
   ],
   donts: const [
-    "Don't build a parallel set of ad-hoc cell widgets — reach for the built-in "
+    "Don't build a parallel set of ad-hoc cell widgets; use the built-in "
         'types so sorting, alignment and editing stay coherent across the grid.',
     "Don't put free text where a select belongs; options keep values clean and "
         'make the data filterable and groupable later.',
-    "Don't mutate rows inside the grid and also in `onCellChanged` — pick one "
+    "Don't mutate rows inside the grid and also in `onCellChanged`; pick one "
         'source of truth (your state) to avoid flicker and lost edits.',
     "Don't make a column editable when the value is derived or read-only "
         'upstream; it invites edits that cannot be saved.',

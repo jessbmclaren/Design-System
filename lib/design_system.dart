@@ -1,4 +1,4 @@
-/// Design System — a Material 3 based Flutter component library.
+/// Design System: a Material 3 based Flutter component library.
 ///
 /// White-label by default: build your theme with [DsTheme.light] /
 /// [DsTheme.dark], optionally passing your own [DsTokens] to re-brand every
@@ -24,7 +24,7 @@ export 'src/theme/ds_tokens_extension.dart';
 // Utilities
 export 'src/util/ds_motion.dart';
 
-// Components — organised by Atomic Design layer.
+// Components, organised by Atomic Design layer.
 //
 // Atoms
 export 'src/components/atoms/ds_avatar.dart';

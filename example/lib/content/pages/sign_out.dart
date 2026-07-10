@@ -1,16 +1,16 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Sign out.
 final PatternPage signOutPage = PatternPage(
   id: 'sign-out',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Sign out',
   title: 'Sign out',
   description:
       'Every authenticated experience needs an easy, discoverable way to leave '
-      'it. Sign out lives where people instinctively look for it — in the '
-      'account menu or at the foot of settings — and reads as a plain, labelled '
+      'it. Sign out lives where people instinctively look for it (in the '
+      'account menu or at the foot of settings) and reads as a plain, labelled '
       'action rather than a stray icon. A small account footer that pairs the '
       'signed-in identity with a secondary "Sign out" button makes the current '
       'session obvious and gives people a calm, one-tap way to end it.',
@@ -25,7 +25,7 @@ final PatternPage signOutPage = PatternPage(
     ),
   ],
   dos: const [
-    'Place sign out where people expect it — the account menu or the foot of settings.',
+    'Place sign out where people expect it: the account menu or the foot of settings.',
     'Keep it visible and consistently located across every authenticated screen.',
     'Show the signed-in identity next to the control so the session is unambiguous.',
     'Confirm only when there is unsaved work that signing out would lose.',

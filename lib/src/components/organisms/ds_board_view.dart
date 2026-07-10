@@ -12,12 +12,12 @@ import '../atoms/ds_icon.dart';
 import '../molecules/ds_menu.dart';
 import 'ds_data_grid.dart';
 
-/// A flagship board (kanban) view for the Design System.
+/// A board (kanban) view for the Design System.
 ///
 /// [DsBoardView] arranges typed [rows] into vertical **lanes** grouped by a
 /// single status / select column identified by [groupByKey]. It reuses the data
-/// grid's shared vocabulary — [DsGridColumn], [DsGridRow], [DsCellType] and
-/// [DsGridOption] — so a table and a board can be driven from exactly the same
+/// grid's shared vocabulary ([DsGridColumn], [DsGridRow], [DsCellType] and
+/// [DsGridOption]), so a table and a board can be driven from exactly the same
 /// data. Every colour, radius, padding and type style is read from [DsTokens],
 /// so the board re-brands automatically with the active white-label theme.
 ///
@@ -25,15 +25,15 @@ import 'ds_data_grid.dart';
 ///
 /// One lane is rendered for each [DsGridOption] declared by the group column, in
 /// option order, followed by a trailing "[ungroupedLabel]" lane that collects
-/// rows whose group value is null, empty, or not one of the declared options.
-/// Each lane shows a header — the option's label as a [DsBadge] (honouring its
-/// [DsGridOption.variant] or [DsGridOption.color]) plus a live card count — above
+/// rows whose group value is null, empty or not one of the declared options.
+/// Each lane shows a header, the option's label as a [DsBadge] (honouring its
+/// [DsGridOption.variant] or [DsGridOption.color]) plus a live card count, above
 /// a list of record cards.
 ///
 /// ## Cards
 ///
 /// Each card shows the record's primary text (the first [DsCellType.text]
-/// column, or the first column) prominently, then a few secondary fields drawn
+/// column or the first column) prominently, then a few secondary fields drawn
 /// with the same atoms the grid uses: a [DsBadge] for a status / select value, a
 /// [DsAvatar] and name for a user, and formatted currency, number, date, rating
 /// and progress values. Supply [cardBuilder] to replace the card body entirely;
@@ -44,17 +44,17 @@ import 'ds_data_grid.dart';
 ///
 /// The board is a **controlled** component: it never mutates [rows]. A move is
 /// reported through [onRowMoved] as a `(rowId, toGroup)` record, where `toGroup`
-/// is the destination option's [DsGridOption.value] — or `null` for the
-/// ungrouped lane — and the parent is expected to apply the change and pass
+/// is the destination option's [DsGridOption.value] (or `null` for the
+/// ungrouped lane), and the parent is expected to apply the change and pass
 /// updated [rows] back.
 ///
 /// Two ways to move a card are always offered so the board is operable without a
 /// pointer:
 ///
-/// * **Drag and drop** — press and hold a card, then drag it onto another lane.
+/// * **Drag and drop**: press and hold a card, then drag it onto another lane.
 ///   Built on [LongPressDraggable] / [DragTarget] so it never steals the lane's
 ///   scroll gesture and runs no timer or animation at rest.
-/// * **A "Move to…" menu** — every card carries a [DsMenu] affordance listing
+/// * **A "Move to…" menu**: every card carries a [DsMenu] affordance listing
 ///   the other lanes, reachable and operable by keyboard and screen reader.
 ///
 /// ## Responsiveness
@@ -76,7 +76,7 @@ import 'ds_data_grid.dart';
 ///
 /// Lanes and cards carry container semantics with descriptive labels, the move
 /// affordance is a labelled button reachable by keyboard, and the widget runs no
-/// timers or indefinite animations — so it renders a stable frame that is safe
+/// timers or indefinite animations, so it renders a stable frame that is safe
 /// to capture in golden tests and screenshots.
 class DsBoardView extends StatefulWidget {
   /// Creates a board (kanban) view.
@@ -110,8 +110,8 @@ class DsBoardView extends StatefulWidget {
   final String groupByKey;
 
   /// Called when a card is moved to another lane, with the moved row's id and
-  /// the destination group (an option's [DsGridOption.value], or `null` for the
-  /// ungrouped lane). Using `null` — rather than a sentinel string — keeps the
+  /// the destination group (an option's [DsGridOption.value] or `null` for the
+  /// ungrouped lane). Using `null` (rather than a sentinel string) keeps the
   /// ungrouped lane distinct from an option that legitimately has an empty
   /// value. The board is controlled: it does not mutate [rows] itself.
   final ValueChanged<({String rowId, String? toGroup})>? onRowMoved;
@@ -135,7 +135,7 @@ class DsBoardView extends StatefulWidget {
   /// sitting side by side.
   final double compactBreakpoint;
 
-  /// The maximum number of secondary fields shown on a default card, keeping it
+  /// The maximum number of secondary fields shown on a default card, to keep it
   /// compact.
   final int maxCardFields;
 
@@ -681,7 +681,7 @@ class _DsBoardViewState extends State<DsBoardView> {
   // --- Field renderers ------------------------------------------------------
 
   /// Builds the compact widget shown for a secondary card field, or null when
-  /// the value is missing so the field is simply omitted.
+  /// the value is missing so the field is omitted.
   Widget? _fieldWidget(DsTokens tokens, DsGridColumn column, Object? value) {
     Widget label(String text, {Color? color}) => Text(
           text,
@@ -895,7 +895,7 @@ class _BoardLane {
   final String key;
 
   /// The destination reported when a card is moved into this lane: an option's
-  /// value, or `null` for the ungrouped lane.
+  /// value or `null` for the ungrouped lane.
   final String? groupValue;
   final String label;
   final DsBadgeVariant? variant;

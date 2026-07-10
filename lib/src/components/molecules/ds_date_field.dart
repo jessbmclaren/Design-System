@@ -14,7 +14,7 @@ import '../atoms/ds_icon.dart';
 /// placeholder while [value] is `null`. A trailing calendar glyph signals that
 /// the field is tappable. Tapping opens the platform [showDatePicker] (themed
 /// to inherit the app's [Theme]) bounded by [firstDate] and [lastDate]; the
-/// chosen date — or `null` if the user cancels while no date is set — is
+/// chosen date (or `null` if the user cancels while no date is set) is
 /// reported through [onChanged].
 ///
 /// Use it whenever a form needs a single calendar date (a birthday, a due date,
@@ -40,7 +40,7 @@ import '../atoms/ds_icon.dart';
 class DsDateField extends StatelessWidget {
   /// Creates a labelled, read-only date field.
   ///
-  /// Passing a `null` [onChanged] — or setting [enabled] to `false` — renders
+  /// Passing a `null` [onChanged] (or setting [enabled] to `false`) renders
   /// the control disabled (dimmed and non-interactive).
   const DsDateField({
     super.key,

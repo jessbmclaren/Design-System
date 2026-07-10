@@ -49,9 +49,9 @@ class DsDataRow {
 /// are unbounded):
 ///
 /// * **Compact** (width below [compactBreakpoint], e.g. a 320dp phone): each
-///   row is rendered as a bordered "key: value" card, stacking every cell as
-///   its column label above-adjacent to its value. This never overflows on
-///   narrow screens.
+///   row is rendered as a bordered "key: value" card, one cell per line with
+///   the column label beside its value. This never overflows on narrow
+///   screens.
 /// * **Wide** (width at or above [compactBreakpoint]): a true tabular layout
 ///   with a header row, per-row dividers and right-aligned numeric columns.
 ///   The table fills the available width but scrolls horizontally when the
@@ -59,8 +59,8 @@ class DsDataRow {
 ///
 /// Use it wherever tabular data must remain readable from small phones through
 /// to large desktop windows. Each [DsDataRow] may define its own `onTap` and
-/// `selected` state. This widget renders statically — it runs no timers or
-/// animations — so it is safe to capture in screenshots.
+/// `selected` state. This widget renders statically. It runs no timers or
+/// animations, so it is safe to capture in screenshots.
 ///
 /// Every [DsDataRow.cells] list is assumed to have the same length as
 /// [columns].
@@ -115,7 +115,7 @@ class DsDataTable extends StatelessWidget {
   // Wide layout: a table whose flex columns fill the available width.
   //
   // Columns are laid out with [Expanded], so they always fit the width the
-  // parent gives us — no horizontal scrolling is needed, and wrapping the
+  // parent gives us. No horizontal scrolling is needed, and wrapping the
   // stretch column in an unbounded viewport would force an infinite width.
   Widget _buildWide(BuildContext context, double maxWidth) {
     final tokens = DsTokens.of(context);

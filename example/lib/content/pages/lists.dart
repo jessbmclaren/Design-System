@@ -1,25 +1,25 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Layout → Lists.
 final PatternPage listsPage = PatternPage(
   id: 'lists',
-  group: DocGroup.layout,
+  group: DocGroup.display,
   navTitle: 'Lists',
   title: 'Lists',
   description:
-      'A list presents a collection of records as scannable, stacked rows. '
+      'A list presents a collection of records as stacked rows. '
       'Use `DsList` with `DsListItem` children when people need to skim a set '
-      'of items — teammates, invoices, projects — and open one to see more. '
+      'of items (teammates, invoices, projects) and open one to see more. '
       'Each row pairs a leading icon or avatar, a primary title, an optional '
-      'supporting detail, and a trailing element such as a status `DsBadge` or '
-      'a navigation chevron. Reach for a list when the goal is to recognise and '
-      'select a single record; reach for a table when people need aligned '
+      'supporting detail and a trailing element such as a status `DsBadge` or '
+      'a navigation chevron. Use a list when the goal is to recognise and '
+      'select a single record; use a table when people need aligned '
       'columns to compare values across rows.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Give `DsListItem` an `onTap` to make the whole row a target — when no '
+      'Give `DsListItem` an `onTap` to make the whole row a target. When no '
       'trailing widget is supplied, a chevron appears automatically to signal '
       'that the row navigates. Set `bordered: true` on `DsList` to group the '
       'rows into a rounded card, and keep `showDividers` on so adjacent rows '
@@ -34,7 +34,7 @@ final PatternPage listsPage = PatternPage(
   ],
   donts: const [
     'Don\'t cram more than two lines of detail into a single row.',
-    'Don\'t use a list when people need aligned columns to compare values — use a table.',
+    'Don\'t use a list when people need aligned columns to compare values. Use a table.',
     'Don\'t leave rows looking tappable if tapping them does nothing.',
   ],
   code: '''

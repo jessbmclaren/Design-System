@@ -4,7 +4,7 @@ import '../pattern_page_content.dart';
 /// Content → Accordion.
 final PatternPage accordionPage = PatternPage(
   id: 'accordion',
-  group: DocGroup.content,
+  group: DocGroup.display,
   navTitle: 'Accordion',
   title: 'Accordion',
   description:

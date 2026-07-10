@@ -39,8 +39,8 @@ class DsRecordFieldGroup {
 
 /// The detail / create / edit surface for a single record.
 ///
-/// [DsRecordPanel] is the record modal you know from database-style products —
-/// a titled panel wrapping a typed, editable form of one record's fields. A
+/// [DsRecordPanel] is the record modal used in database-style products: a
+/// titled panel wrapping a typed, editable form of one record's fields. A
 /// record's fields *are* [DsGridColumn]s (the same definitions a
 /// [DsDataGrid] renders in columns) and its values a `Map<String, Object?>`
 /// keyed by [DsGridColumn.key], so a row in a grid opens directly into a panel
@@ -49,7 +49,7 @@ class DsRecordFieldGroup {
 /// It mirrors the titled-panel structure of [DsContextView] and [DsFocusView]
 /// so it reads as part of the same family: a header (an optional leading avatar
 /// derived from the [title], the title and [subtitle], and a labelled close
-/// button when [onClose] is set), a scrollable body of labelled fields, and an
+/// button when [onClose] is set), a scrollable body of labelled fields and an
 /// optional footer carrying a primary **Save** and a secondary **Cancel**
 /// button when their callbacks are provided. Every colour, radius, padding and
 /// type style is read from [DsTokens.of], so the panel re-brands with the active
@@ -59,18 +59,18 @@ class DsRecordFieldGroup {
 ///
 /// Each column renders the editor that suits its [DsGridColumn.type]:
 ///
-/// * [DsCellType.text] / [DsCellType.link] / [DsCellType.user] — a
+/// * [DsCellType.text] / [DsCellType.link] / [DsCellType.user]: a
 ///   [DsTextField] (a `user` field edits the person's name).
-/// * [DsCellType.number] — a numeric [DsTextField].
-/// * [DsCellType.currency] — a [DsCurrencyField] using the column's
+/// * [DsCellType.number]: a numeric [DsTextField].
+/// * [DsCellType.currency]: a [DsCurrencyField] using the column's
 ///   [DsGridColumn.currencySymbol].
-/// * [DsCellType.date] — a [DsDateField].
-/// * [DsCellType.singleSelect] / [DsCellType.status] — a [DsSelect] of the
+/// * [DsCellType.date]: a [DsDateField].
+/// * [DsCellType.singleSelect] / [DsCellType.status]: a [DsSelect] of the
 ///   column's [DsGridColumn.options].
-/// * [DsCellType.multiSelect] — a checkable list of [DsCheckbox]es.
-/// * [DsCellType.checkbox] — a [DsSwitch].
-/// * [DsCellType.rating] — a row of tappable stars.
-/// * [DsCellType.progress] — always read-only (a percentage).
+/// * [DsCellType.multiSelect]: a checkable list of [DsCheckbox]es.
+/// * [DsCellType.checkbox]: a [DsSwitch].
+/// * [DsCellType.rating]: a row of tappable stars.
+/// * [DsCellType.progress]: always read-only (a percentage).
 ///
 /// A key listed in [readOnlyKeys] (and every `progress` field) renders its
 /// value as display text / a badge / an avatar rather than an input.
@@ -81,22 +81,21 @@ class DsRecordFieldGroup {
 /// [values] map through [onChanged] with only the edited key changed, and the
 /// parent feeds the updated map straight back. Field editors are keyed by their
 /// stable column key and reseed their controllers when an incoming value
-/// changes, so editing one field, switching the displayed record, or a
+/// changes, so editing one field, switching the displayed record or a
 /// parent-driven value change never strands stale text in the wrong field.
 ///
 /// ## Create vs edit
 ///
 /// There is no mode flag: pass a populated [values] map (and, say, the record's
 /// name as [title]) to edit an existing record, or an empty map (and a title
-/// like `'New vehicle'`) to create a new one — the same fields simply render
-/// empty.
+/// like `'New vehicle'`) to create a new one. The same fields render empty.
 ///
 /// ## Responsiveness & accessibility
 ///
 /// On medium and wider panels the fields flow two-per-row; on a 320dp phone
 /// they stack one per row without overflowing. The header title ellipsizes. The
-/// panel fills the height of its (bounded) parent — place it in a drawer, a
-/// dialog or an [Expanded] — and scrolls its body when the form is taller than
+/// panel fills the height of its (bounded) parent: place it in a drawer, a
+/// dialog or an [Expanded]. It scrolls its body when the form is taller than
 /// the space available. It starts no timers or animations, so it renders a
 /// stable frame that is safe to capture in screenshots.
 class DsRecordPanel extends StatelessWidget {
@@ -122,7 +121,7 @@ class DsRecordPanel extends StatelessWidget {
   /// record (every field renders empty).
   final Map<String, Object?> values;
 
-  /// Called with the full updated map on every edit — only the edited key
+  /// Called with the full updated map on every edit; only the edited key
   /// differs from the incoming [values].
   final ValueChanged<Map<String, Object?>> onChanged;
 
@@ -682,8 +681,8 @@ class _LabeledField extends StatelessWidget {
 }
 
 /// A controlled text editor whose [TextEditingController] is reseeded when the
-/// incoming [text] changes to something the field is not already showing — so a
-/// switched record or a parent-driven value change never leaves stale text —
+/// incoming [text] changes to something the field is not already showing, so a
+/// switched record or a parent-driven value change never leaves stale text,
 /// while never fighting the user's own keystrokes.
 class _TextRecordField extends StatefulWidget {
   const _TextRecordField({
@@ -743,8 +742,8 @@ class _TextRecordFieldState extends State<_TextRecordField> {
 
 /// A controlled [DsCurrencyField]. Because the field owns its own controller via
 /// `initialValue`, an external value change is applied by re-keying it (so it
-/// re-seeds from the new value), while the user's live typing — which echoes the
-/// value we just emitted — leaves the field untouched.
+/// re-seeds from the new value), while the user's live typing (which echoes the
+/// value we just emitted) leaves the field untouched.
 class _CurrencyRecordField extends StatefulWidget {
   const _CurrencyRecordField({
     super.key,
@@ -766,7 +765,7 @@ class _CurrencyRecordField extends StatefulWidget {
 class _CurrencyRecordFieldState extends State<_CurrencyRecordField> {
   int _seed = 0;
 
-  /// The value currently reflected by the inner field — our last echo.
+  /// The value currently reflected by the inner field: our last echo.
   num? _shown;
 
   @override
@@ -833,7 +832,7 @@ num? _parseNumber(String raw) {
   return num.tryParse(cleaned);
 }
 
-/// Formats [value] with thousands separators for read-only display, and with a
+/// Formats [value] with thousands separators for read-only display and with a
 /// fixed number of fractional digits when [decimals] is given.
 String _displayNumber(num value, {int? decimals}) {
   final negative = value < 0;

@@ -6,8 +6,8 @@ import 'ds_tokens_extension.dart';
 /// Optional, ready-made brand skins.
 ///
 /// These presets **do not change the default appearance** and have no effect
-/// on white-labelling — the core `DsTokens.light()` / `DsTokens.dark()` remain
-/// the neutral defaults. A skin is simply a `DsTokens` value you opt into:
+/// on white-labelling: the core `DsTokens.light()` / `DsTokens.dark()` remain
+/// the neutral defaults. A skin is a `DsTokens` value you opt into:
 ///
 /// ```dart
 /// MaterialApp(
@@ -28,7 +28,7 @@ abstract final class DsSkins {
   static const Color _fill = Color(0xFFF5F6FB);
   static const Color _danger = Color(0xFFDF1B41);
 
-  /// The light Engen skin — deep indigo brand, navy ink, roomier corners.
+  /// The light Engen skin: deep indigo brand, navy ink, roomier corners.
   static DsTokens engenLight() {
     return DsTokens.light().copyWith(
       // Brand
@@ -53,13 +53,13 @@ abstract final class DsSkins {
       badgeDangerColorBackground: const Color(0xFFFCE8EC),
       badgeDangerColorText: const Color(0xFFB01030),
       badgeDangerColorBorder: const Color(0xFFF3C6D0),
-      // Shape — Engen uses roomier corners
+      // Shape: Engen uses roomier corners
       buttonBorderRadius: 10,
       formBorderRadius: 10,
       badgeBorderRadius: 8,
       overlayBorderRadius: 16,
       borderRadius: 16,
-      // Type — larger display heading, semi-bold control labels
+      // Type: larger display heading, semi-bold control labels
       headingXl: const DsTypeToken(
           fontSize: 32, fontWeight: DsTypography.bold, height: 1.2),
       buttonLabelFontSize: 15,

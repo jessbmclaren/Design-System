@@ -15,22 +15,22 @@ import '../organisms/ds_onboarding_wizard.dart';
 /// A guided, multi-step flow for verifying a business's identity and details.
 ///
 /// [DsBusinessVerification] is a self-contained onboarding **organism** that
-/// composes the Design System's existing building blocks — it does not
+/// composes the Design System's existing building blocks. It does not
 /// re-implement any fields, buttons or steppers. The step chrome (progress
-/// stepper, title, and the Back / Continue actions) is provided by
+/// stepper, title and the Back / Continue actions) is provided by
 /// [DsOnboardingWizard]; each step's body is assembled from
 /// [DsFormFieldGroup], [DsSelect], [DsTextField] and [DsCheckbox].
 ///
 /// The flow walks the user through four steps:
 ///
-/// 1. **Business type** — a single [DsSelect] to classify the entity (sole
+/// 1. **Business type**: a single [DsSelect] to classify the entity (sole
 ///    trader, company, partnership or non-profit).
-/// 2. **Business details** — the legal name, registration number and a
+/// 2. **Business details**: the legal name, registration number and a
 ///    multi-line registered address.
-/// 3. **Verify identity** — the representative's full name, an identifier /
-///    reference number, and a consent checkbox confirming the representative is
+/// 3. **Verify identity**: the representative's full name, an identifier /
+///    reference number and a consent checkbox confirming the representative is
 ///    authorised to act for the business.
-/// 4. **Review & submit** — a read-back of every entered value plus a note that
+/// 4. **Review & submit**: a read-back of every entered value plus a note that
 ///    submitting sends the details for verification.
 ///
 /// The widget owns its step index and all entered values in local state, so the
@@ -119,7 +119,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
   int get _lastStep => _steps.length - 1;
 
   /// Whether the current step permits advancing. Only the identity step is
-  /// gated — on it the consent checkbox must be ticked.
+  /// gated: on it the consent checkbox must be ticked.
   bool get _canAdvance => _step == _identityStep ? _consent : true;
 
   @override
@@ -182,7 +182,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     }
   }
 
-  // Step 0 — Business type ------------------------------------------------
+  // Step 0: Business type ------------------------------------------------
 
   Widget _buildBusinessTypeStep() {
     return DsFormFieldGroup(
@@ -202,7 +202,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     );
   }
 
-  // Step 1 — Business details --------------------------------------------
+  // Step 1: Business details --------------------------------------------
 
   Widget _buildBusinessDetailsStep() {
     return DsFormFieldGroup(
@@ -232,7 +232,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     );
   }
 
-  // Step 2 — Verify identity ---------------------------------------------
+  // Step 2: Verify identity ---------------------------------------------
 
   Widget _buildIdentityStep() {
     return DsFormFieldGroup(
@@ -260,7 +260,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     );
   }
 
-  // Step 3 — Review & submit ---------------------------------------------
+  // Step 3: Review & submit ---------------------------------------------
 
   Widget _buildReviewStep(DsTokens tokens) {
     final rows = <_SummaryEntry>[
@@ -406,7 +406,7 @@ class _SuccessState extends StatelessWidget {
               ),
               const SizedBox(height: DsSpacing.sm),
               Text(
-                "Thanks — we've received your business details and will review "
+                "Thanks. We've received your business details and will review "
                 'them shortly. You can safely close this window.',
                 textAlign: TextAlign.center,
                 style: tokens.bodyMd

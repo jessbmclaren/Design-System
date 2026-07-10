@@ -7,18 +7,18 @@ import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 
-/// Lays out a set of related actions in a single row, collapsing the ones that
-/// do not fit into an overflow menu.
+/// Lays out a set of related actions in a single row and collapses the ones
+/// that do not fit into an overflow menu.
 ///
 /// A [DsButtonGroup] is the toolbar primitive of the Design System: pass a list
-/// of actions — typically [DsButton]s — as [children] and the group keeps them
-/// on one line, never overflowing. When the available width (or [maxVisible])
+/// of actions (typically [DsButton]s) as [children] and the group keeps them
+/// on one line so they never overflow. When the available width (or [maxVisible])
 /// cannot accommodate every action, the leading ones stay inline and the rest
 /// move into a "More" menu opened from a trailing icon button.
 ///
 /// The number of inline actions is resolved responsively from the constraints
 /// handed down by the parent, so the same group shows one or two actions plus a
-/// menu on a 320dp phone and every action inline on a wide desktop — without any
+/// menu on a 320dp phone and every action inline on a wide desktop, without any
 /// configuration.
 ///
 /// ```dart
@@ -101,7 +101,7 @@ class DsButtonGroup extends StatelessWidget {
 
         int visible;
         if (cap >= total && fitsAll >= total) {
-          // Everything is allowed and everything fits — show it all inline.
+          // Everything is allowed and everything fits, so show it all inline.
           visible = total;
         } else {
           // At least one action must collapse; reserve room for the More button.

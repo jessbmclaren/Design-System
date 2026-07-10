@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Layout → Full-page layouts.
@@ -8,20 +8,20 @@ final PatternPage fullPageLayoutsPage = PatternPage(
   navTitle: 'Full-page layouts',
   title: 'Full-page layouts',
   description:
-      'A full page opens with a `DsPageHeader` — a clear title, a short '
-      'subtitle for context, and the page\'s primary and secondary actions '
+      'A full page opens with a `DsPageHeader`: a clear title, a short '
+      'subtitle for context and the page\'s primary and secondary actions '
       'anchored to the top right. Below it, `DsTabs` splits the content into '
       'labelled sections so people meet a high-level overview first and drill '
       'into detail only when they choose to. This structure keeps every screen '
-      'in the product predictable: the same header, the same action placement, '
-      'and the same progressive disclosure from summary to specifics.',
+      'in the product predictable: the same header, action placement and '
+      'progressive disclosure from summary to specifics.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
       'Lead with the information most people need on arrival and move '
       'supporting detail into later tabs. Give each section a stable, '
       'deep-linkable route so a tab can be bookmarked, shared and reopened in '
-      'place — switching tabs should never reset the reader\'s scroll position '
+      'place. Switching tabs should never reset the reader\'s scroll position '
       'or their earlier selections.',
     ),
   ],

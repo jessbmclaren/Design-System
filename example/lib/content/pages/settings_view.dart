@@ -1,27 +1,27 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Layout → Settings view.
 final PatternPage settingsViewPage = PatternPage(
   id: 'settings-view',
   group: DocGroup.layout,
-  navTitle: 'SettingsView',
+  navTitle: 'Settings view',
   title: 'Settings view',
   description:
       '`DsSettingsView` organises a preferences screen into titled '
-      '`DsSettingsSection`s — each a heading and optional description above a '
+      '`DsSettingsSection`s, each a heading and optional description above a '
       'bordered card that stacks its rows behind hairline dividers. It centres '
-      'the content column, caps it at `maxContentWidth` on wide screens, and '
+      'the content column, caps it at `maxContentWidth` on wide screens and '
       'tightens the horizontal padding on compact phones, so the same page '
-      'reads cleanly from 320dp to desktop. Rows are ordinary widgets — most '
-      'often a `DsListItem` carrying a value, a `DsSwitch`, or a navigation '
-      'chevron — and the whole page scrolls as one `ListView`, letting a screen '
+      'reads cleanly from 320dp to desktop. Rows are ordinary widgets (most '
+      'often a `DsListItem` carrying a value, a `DsSwitch` or a navigation '
+      'chevron) and the whole page scrolls as one `ListView`, so a screen can '
       'grow to any number of sections without special handling. An optional '
       '`header` anchors the page title and a `footer` holds a closing action '
       'such as sign-out.',
   hasLiveDemo: true,
   dos: const [
-    'Group related settings into sections with short, scannable titles.',
+    'Group related settings into sections with short, clear titles.',
     'Add a section description when the controls need context or a caveat.',
     'Use a DsSwitch for preferences that take effect immediately.',
     'Give each row a clear label and, where useful, its current value as a subtitle.',
@@ -30,7 +30,7 @@ final PatternPage settingsViewPage = PatternPage(
   ],
   donts: const [
     'Don\'t pile unrelated controls into one long, untitled list.',
-    'Don\'t use a switch for a choice the user must confirm before it applies — use a form field.',
+    'Don\'t use a switch for a choice the user must confirm before it applies; use a form field.',
     'Don\'t nest a scrolling area inside a section; let the whole view scroll as one.',
     'Don\'t let the content column stretch edge to edge on wide screens.',
   ],

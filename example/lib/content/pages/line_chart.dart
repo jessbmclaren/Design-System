@@ -1,23 +1,23 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Charts → Line chart.
 final PatternPage lineChartPage = PatternPage(
   id: 'line-chart',
   group: DocGroup.charts,
-  navTitle: 'LineChart',
+  navTitle: 'Line chart',
   title: 'Line chart',
   description:
       'A line chart traces one or more metrics as they change over an ordered '
-      'axis — days, weeks or releases — so trend, momentum and the gap between '
-      'series are readable at a glance. Every `DsLineSeries` you pass shares a '
+      'axis (days, weeks or releases) so trend, momentum and the gap between '
+      'series are easy to read. Every `DsLineSeries` you pass shares a '
       'single y-axis, which keeps the lines directly comparable and rules out '
       'the misleading dual-axis pairing. Series take their colour from the '
       'validated `DsChartPalette` categorical order by position, so identity '
       'stays stable across a product and never collides with a status hue; a '
       'legend appears automatically once there are two or more lines. The chart '
       'fills its parent\'s width, renders as a single static frame, thins '
-      'x-labels rather than overflowing, and ships a spoken summary so the '
+      'x-labels rather than overflowing and ships a spoken summary so the '
       'trend is available to assistive technology as well as the eye.',
   hasLiveDemo: true,
   dos: const [
@@ -27,7 +27,7 @@ final PatternPage lineChartPage = PatternPage(
         'position, so a metric keeps the same hue everywhere it appears.',
     'Give every series a clear `name`; it drives the legend and the spoken '
         'summary for assistive technology.',
-    'Provide `xLabels` in x order for time axes — the chart thins them to fit '
+    'Provide `xLabels` in x order for time axes; the chart thins them to fit '
         'on narrow widths instead of overflowing.',
     'Set a `title` that names the metric, especially for a single-series chart '
         'where no legend is drawn.',
@@ -35,13 +35,13 @@ final PatternPage lineChartPage = PatternPage(
         'tappable point markers on each line.',
   ],
   donts: const [
-    'Do not force two different units onto the chart expecting a second axis — '
-        'it is single-axis by design; split them into two charts instead.',
+    'Do not force two different units onto the chart expecting a second axis. '
+        'It is single-axis by design; split them into two charts instead.',
     'Do not hand-pick a series `color` to signal state; status belongs to the '
         'badge tokens, never a categorical line hue.',
     'Do not crowd the chart with many long-running series; past a handful of '
         'lines, trends blur and the legend dominates.',
-    'Do not rely on colour alone to tell series apart — keep the legend and '
+    'Do not rely on colour alone to tell series apart. Keep the legend and '
         'series names meaningful.',
   ],
   code: '''

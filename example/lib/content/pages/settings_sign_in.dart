@@ -1,10 +1,10 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Settings sign in.
 final PatternPage settingsSignInPage = PatternPage(
   id: 'settings-sign-in',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Settings sign in',
   title: 'Settings sign in',
   description:
@@ -17,7 +17,7 @@ final PatternPage settingsSignInPage = PatternPage(
       'controls they came to change will appear.',
   blocks: const [
     ProseBlock(
-      'Keep the signed-out state minimal — a short title, one line of context '
+      'Keep the signed-out state minimal: a short title, one line of context '
       'and a single primary action are enough to start the connection. Reserve '
       'the settings controls (toggles, credentials, disconnect) for the '
       'authenticated state so nothing appears actionable before it can be '
@@ -33,8 +33,8 @@ final PatternPage settingsSignInPage = PatternPage(
         'a single primary action.',
     'Move any extra explanation into a focused reveal or panel instead of the '
         'sign-in card.',
-    'Confirm the connected state plainly — a status badge and a way to '
-        'disconnect — before showing detailed controls.',
+    'Confirm the connected state plainly (a status badge and a way to '
+        'disconnect) before showing detailed controls.',
   ],
   donts: const [
     'Don\'t clutter the sign-in with non-essential context, marketing copy or '

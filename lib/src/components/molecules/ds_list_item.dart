@@ -6,11 +6,11 @@ import '../../theme/ds_tokens_extension.dart';
 /// A single row within a `DsList`.
 ///
 /// Renders an optional [leading] widget, a [title] with an optional
-/// [subtitle], and an optional [trailing] widget. Use it for navigation
-/// rows, settings entries, or any vertically stacked list content.
+/// [subtitle] and an optional [trailing] widget. Use it for navigation
+/// rows, settings entries or any vertically stacked list content.
 ///
-/// When [onTap] is provided the row becomes tappable and — unless you supply
-/// your own [trailing] — a chevron is shown to signal navigation. The [title]
+/// When [onTap] is provided the row becomes tappable and, unless you supply
+/// your own [trailing], a chevron is shown to signal navigation. The [title]
 /// and [subtitle] ellipsize so a row never overflows on narrow screens.
 class DsListItem extends StatelessWidget {
   const DsListItem({

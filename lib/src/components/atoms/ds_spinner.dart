@@ -6,13 +6,13 @@ import '../../theme/ds_tokens_extension.dart';
 
 /// The visual size of a [DsSpinner].
 enum DsSpinnerSize {
-  /// 16dp — inline, next to text or inside compact controls.
+  /// 16dp: inline, next to text or inside compact controls.
   small(16, 2),
 
-  /// 24dp — section-level loading.
+  /// 24dp: section-level loading.
   medium(24, 2.5),
 
-  /// 40dp — full-page or full-view loading.
+  /// 40dp: full-page or full-view loading.
   large(40, 3.5);
 
   const DsSpinnerSize(this.dimension, this.strokeWidth);
@@ -28,7 +28,7 @@ enum DsSpinnerSize {
 ///
 /// Match the [size] to what is loading: [DsSpinnerSize.large] for a whole
 /// view, [DsSpinnerSize.medium] for a section, [DsSpinnerSize.small] inline.
-/// Use [delay] to avoid flashing a spinner for fast operations — the spinner
+/// Use [delay] to avoid flashing a spinner for fast operations; the spinner
 /// stays invisible until the delay elapses.
 class DsSpinner extends StatefulWidget {
   const DsSpinner({
@@ -44,7 +44,7 @@ class DsSpinner extends StatefulWidget {
 
   /// How long to wait before the spinner becomes visible.
   ///
-  /// A value of 200–300ms prevents a spinner flashing for operations that
+  /// A value of 200 to 300ms prevents a spinner flashing for operations that
   /// complete almost immediately.
   final Duration delay;
 

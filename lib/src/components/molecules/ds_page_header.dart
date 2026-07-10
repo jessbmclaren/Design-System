@@ -18,7 +18,7 @@ import '../../tokens/ds_breakpoints.dart';
 /// hairline divider ([showDivider]) closes the header off from the content
 /// below.
 ///
-/// This widget is purely declarative — it schedules no timers or animations —
+/// This widget is purely declarative (it schedules no timers or animations),
 /// so it renders identically in screenshots and live use.
 class DsPageHeader extends StatelessWidget {
   /// Creates a page header.
@@ -38,7 +38,7 @@ class DsPageHeader extends StatelessWidget {
   final String title;
 
   /// Optional supporting text shown beneath [title] in the secondary text
-  /// color. May wrap to a second line before truncating.
+  /// colour. May wrap to a second line before truncating.
   final String? subtitle;
 
   /// Contextual actions (for example `DsButton`s) shown to the trailing side of
@@ -49,7 +49,7 @@ class DsPageHeader extends StatelessWidget {
   /// back button.
   final Widget? leading;
 
-  /// Whether to draw a one-pixel divider in the border color beneath the
+  /// Whether to draw a one-pixel divider in the border colour beneath the
   /// header. Defaults to true.
   final bool showDivider;
 

@@ -11,15 +11,15 @@ import '../../tokens/ds_icon_size.dart';
 ///
 /// * While an image loads, it shows the [placeholder] you provide, or a
 ///   tokened skeleton box tinted with `offsetBackgroundColor`.
-/// * If an image fails to load — including when there is no network at all —
-///   it shows a tokened box containing a broken-image glyph in
+/// * If an image fails to load (including when there is no network at all) it
+///   shows a tokened box containing a broken-image glyph in
 ///   `colorSecondaryText`, and never throws.
 /// * If neither [image] nor [src] is supplied, it renders the same
-///   placeholder/skeleton box so demos and golden tests need no network.
+///   placeholder or skeleton box so demos and golden tests need no network.
 ///
-/// All colors and the fallback radius are read from [DsTokens], so the widget
+/// All colours and the fallback radius are read from [DsTokens], so the widget
 /// automatically adopts the active white-label theme. It starts no timers or
-/// indefinite animations, making it safe to render directly in screenshots.
+/// indefinite animations, so it is safe to render directly in screenshots.
 ///
 /// The image is exposed to assistive technologies via [semanticLabel]; when
 /// none is given the image is treated as decorative and hidden from the
@@ -101,7 +101,7 @@ class DsImg extends StatelessWidget {
 
     final Widget content;
     if (resolvedImage == null) {
-      // No source at all — render the placeholder or skeleton directly.
+      // No source at all: render the placeholder or skeleton directly.
       content = _fallback(tokens);
     } else {
       content = Image(
@@ -136,7 +136,7 @@ class DsImg extends StatelessWidget {
     );
   }
 
-  /// The skeleton/placeholder shown while loading or when no source exists.
+  /// The skeleton or placeholder shown while loading or when no source exists.
   Widget _fallback(DsTokens tokens) {
     if (placeholder != null) {
       return SizedBox(

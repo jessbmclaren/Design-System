@@ -7,7 +7,7 @@ import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 
-/// An onboarding coachmark — a small spotlight callout that points a first-time
+/// An onboarding coachmark: a small spotlight callout that points a first-time
 /// user at one thing and moves them through a short guided sequence.
 ///
 /// A coachmark is a compact elevated card (capped at roughly 320dp wide) that

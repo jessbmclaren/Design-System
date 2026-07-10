@@ -1,4 +1,4 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Data → Data grid.
@@ -9,10 +9,10 @@ final PatternPage dataGridPage = PatternPage(
   title: 'Data grid',
   description:
       '`DsDataGrid` is the spreadsheet-grade table at the centre of the data '
-      'experience — a dense, scrollable grid of typed cells for working through '
-      'hundreds of records at a glance. Each column declares a `DsCellType`, so '
+      'experience. A dense, scrollable grid of typed cells for working through '
+      'hundreds of records. Each column declares a `DsCellType`, so '
       'the grid renders a status as a coloured badge, a person as an avatar and '
-      'name, an amount as aligned currency, a ratio as an inline progress bar, '
+      'name, an amount as aligned currency, a ratio as an inline progress bar '
       'and so on, without you hand-building any cell. The leading column can be '
       'frozen so a record stays identifiable while the rest scrolls sideways; '
       'headers sort on tap; rows select with a tri-state select-all; and columns '
@@ -25,14 +25,14 @@ final PatternPage dataGridPage = PatternPage(
       'or how it is mutated: give it a list of `DsGridColumn`s and a list of '
       '`DsGridRow`s and it renders. Sort and selection can be left to the grid '
       '(uncontrolled) or driven from your own state by supplying `sort` / '
-      '`onSort` and `selectedRowIds` / `onSelectionChanged` — the same widget '
+      '`onSort` and `selectedRowIds` / `onSelectionChanged`. The same widget '
       'backs a quick read-only table and a fully controlled, server-sorted '
       'dataset. Values whose runtime type does not match the column render as an '
       'em dash rather than throwing, so a sparse or in-progress import still '
       'displays.',
     ),
     ProseBlock(
-      'Reach for the data grid when the job is scanning and comparing many '
+      'Use the data grid when the job is scanning and comparing many '
       'records across many attributes. When a person needs to see one record in '
       'full, pair it with a record panel; when they need to slice the set, layer '
       'a filter bar and grouping above it. The grid is the surface those '
@@ -43,20 +43,20 @@ final PatternPage dataGridPage = PatternPage(
     'Freeze the column that identifies the record (a name, a plate, an id) so it '
         'stays visible while the rest scrolls sideways.',
     'Match each column\'s `type` to its data so cells sort correctly and align by '
-        'convention — numbers, currency and progress to the trailing edge.',
+        'convention: numbers, currency and progress to the trailing edge.',
     'Let the grid own sort and selection for simple tables; lift them to `onSort` '
         'and `onSelectionChanged` only when your data source needs to react.',
-    'Give the grid a `caption` — it renders as a heading above the table and is '
-        'exposed to assistive technology as one, introducing the grid in reading order.',
+    'Give the grid a `caption`. It renders as a heading above the table and is '
+        'exposed to assistive technology as one.',
     'Keep column widths honest: set a realistic `width` and a `minWidth` that '
         'still shows the value, and let dense columns resize.',
   ],
   donts: const [
-    "Don't pour a single record's detail into an ever-wider row — send people to a "
+    "Don't pour a single record's detail into an ever-wider row. Send people to a "
         'record panel instead of forcing horizontal scrolling through everything.',
     "Don't freeze several columns; one identifying column keeps the seam legible, "
         'more just eats the scrollable width.',
-    "Don't disable the compact card layout to keep a wide grid on a phone — the "
+    "Don't disable the compact card layout to keep a wide grid on a phone. The "
         'stacked cards are how the data stays readable there.',
     "Don't put actions that mutate data behind a row tap alone; make them explicit "
         'so they are reachable by keyboard and screen reader.',

@@ -2,15 +2,14 @@ import 'package:flutter/widgets.dart';
 
 /// The design system's motion foundation.
 ///
-/// Motion here is **physical and purposeful**: things enter by decelerating
-/// into place, leave by accelerating away, and settle with a subtle
-/// spring-like overshoot rather than snapping — the difference between a UI
-/// that feels mechanical and one that feels alive. Choreography (staggering a
-/// group of elements a beat apart) gives a sequence a sense of cause and
-/// effect. And every animation obeys one law: it collapses to a still frame
-/// when the user has asked for reduced motion.
+/// Motion here is **physical**: things enter by decelerating into place, leave
+/// by accelerating away and settle with a subtle spring-like overshoot rather
+/// than snapping. Choreography (staggering a group of elements a beat apart)
+/// gives a sequence a sense of cause and effect. Every animation obeys one
+/// law: it collapses to a still frame when the user has asked for reduced
+/// motion.
 ///
-/// Reach for the **duration scale** ([fast]/[base]/[slow]/[expressive]) and the
+/// Use the **duration scale** ([fast]/[base]/[slow]/[expressive]) and the
 /// **curves** ([standard]/[emphasized]/[decelerate]/[accelerate]/[settle])
 /// rather than hand-picking millisecond values, and resolve them through
 /// [durationOf] / [curveOf] so a single call site both animates normally and
@@ -26,7 +25,7 @@ import 'package:flutter/widgets.dart';
 abstract final class DsMotion {
   // --- Duration scale -------------------------------------------------------
 
-  /// No motion — an immediate change.
+  /// No motion: an immediate change.
   static const Duration instant = Duration.zero;
 
   /// Micro-interactions: hover, press, a toggle flipping. Quick enough to feel
@@ -37,8 +36,8 @@ abstract final class DsMotion {
   /// and position shifts).
   static const Duration base = Duration(milliseconds: 220);
 
-  /// Deliberate transitions for larger surfaces — sheets, dialogs, an
-  /// accordion expanding — where the extra time reads as weight.
+  /// Deliberate transitions for larger surfaces (sheets, dialogs, an
+  /// accordion expanding) where the extra time reads as weight.
   static const Duration slow = Duration(milliseconds: 360);
 
   /// Choreographed, hero moments: an onboarding reveal, a celebratory
@@ -47,22 +46,22 @@ abstract final class DsMotion {
 
   // --- Curves ---------------------------------------------------------------
 
-  /// The everyday curve — a gentle decelerate into place.
+  /// The everyday curve: a gentle decelerate into place.
   static const Curve standard = Curves.easeOutCubic;
 
   /// A strong decelerate for entrances: fast off the mark, softly landing.
   static const Curve emphasized = Cubic(0.2, 0.0, 0.0, 1.0);
 
-  /// Pure decelerate — for elements arriving from off-screen.
+  /// Pure decelerate, for elements arriving from off-screen.
   static const Curve decelerate = Cubic(0.05, 0.7, 0.1, 1.0);
 
-  /// Accelerate — for elements leaving the screen entirely (they should not
+  /// Accelerate, for elements leaving the screen entirely (they should not
   /// linger on the way out).
   static const Curve accelerate = Cubic(0.3, 0.0, 0.8, 0.15);
 
-  /// A physical settle with a subtle overshoot — the premium, alive feel for a
-  /// value snapping into place (a switch, a card lifting, a sheet catching).
-  /// Restrained on purpose: it settles, it does not bounce.
+  /// A physical settle with a subtle overshoot, for a value snapping into place
+  /// (a switch, a card lifting, a sheet catching). Restrained on purpose: it
+  /// settles, it does not bounce.
   static const Curve settle = Cubic(0.34, 1.35, 0.64, 1.0);
 
   // --- Physics --------------------------------------------------------------

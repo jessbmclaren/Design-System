@@ -32,9 +32,9 @@ class DsMeterSegment {
 ///
 /// [DsMeterChart] renders one rounded-end horizontal bar split into
 /// [segments], each sized by its share of the total. It is the right form for
-/// a part-to-whole breakdown that fits on a single line — a budget split,
-/// storage usage by type, traffic by channel — where a full stacked bar chart
-/// would be overkill.
+/// a part-to-whole breakdown that fits on a single line (a budget split,
+/// storage usage by type or traffic by channel), where a full stacked bar
+/// chart would be overkill.
 ///
 /// Colour, type and spacing come entirely from the design system. Each segment
 /// is drawn in [DsMeterSegment.color] or, when that is null, the validated

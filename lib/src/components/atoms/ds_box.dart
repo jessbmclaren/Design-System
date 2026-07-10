@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// A lightweight, tokened layout wrapper around [Container].
 ///
 /// [DsBox] is the design system's primitive for applying spacing, a
-/// background, a border, a corner radius, and elevation shadows to a subtree
+/// background, a border, a corner radius and elevation shadows to a subtree
 /// without reaching for a raw [Container] and hand-writing a [BoxDecoration]
 /// each time.
 ///
@@ -22,16 +22,16 @@ import 'package:flutter/material.dart';
 /// );
 /// ```
 ///
-/// The widget is purely declarative — it starts no timers or animations and is
-/// therefore safe to render in screenshots and golden tests. It is fully
-/// responsive: with no explicit [width]/[height] it takes the size of its
-/// child and collapses gracefully down to a 320dp phone, and any content that
-/// might overflow is the responsibility of the (caller-provided) child.
+/// The widget is purely declarative: it starts no timers or animations and is
+/// therefore safe to render in screenshots and golden tests. With no explicit
+/// [width] or [height] it takes the size of its child and collapses down to a
+/// 320dp phone, and any content that might overflow is the responsibility of
+/// the (caller-provided) child.
 class DsBox extends StatelessWidget {
   /// Creates a tokened layout box.
   ///
   /// All colours default to `null` (transparent background, no border); pass
-  /// theme token values via [background], [borderColor], and [shadow].
+  /// theme token values via [background], [borderColor] and [shadow].
   const DsBox({
     super.key,
     this.child,
@@ -84,8 +84,8 @@ class DsBox extends StatelessWidget {
 
   /// How to align the [child] within the box.
   ///
-  /// When non-null and no [width]/[height] is given, the box will expand to
-  /// fill the available space in order to honour the alignment (this mirrors
+  /// When non-null and no [width] or [height] is given, the box will expand to
+  /// fill the available space to honour the alignment (this mirrors
   /// [Container]'s behaviour).
   final AlignmentGeometry? alignment;
 

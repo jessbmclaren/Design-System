@@ -1,19 +1,19 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Layout → Context view.
 final PatternPage contextViewPage = PatternPage(
   id: 'context-view',
-  group: DocGroup.layout,
-  navTitle: 'ContextView',
+  group: DocGroup.overlays,
+  navTitle: 'Context view',
   title: 'Context view',
   description:
       'A context view is an embedded, non-modal panel pinned to the edge of a '
       'layout that supplements the primary content without taking it over. '
-      'Reach for `DsContextView` when a person needs supporting detail — an '
-      'inspector, a filter column, a live preview, or a help panel — kept in '
+      'Use `DsContextView` when a person needs supporting detail (an '
+      'inspector, a filter column, a live preview or a help panel) kept in '
       'view while they keep working alongside it. It gives you a titled header '
-      'with optional actions and a close button, a scrollable body, and an '
+      'with optional actions and a close button, a scrollable body and an '
       'optional footer set off by a divider, all drawn from the same design tokens '
       'as the surrounding app. On wide layouts the panel sits at a fixed '
       '`width` beside the main column; on narrow layouts it expands to fill the '
@@ -21,7 +21,7 @@ final PatternPage contextViewPage = PatternPage(
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Unlike a modal drawer, a context view is always part of the layout — it '
+      'Unlike a modal drawer, a context view is always part of the layout: it '
       'does not dim the page or block interaction with what sits beside it. '
       'Because it starts no timers or animations, it renders a stable frame and '
       'keeps state (scroll position, selection, form entries) intact while the '
@@ -33,7 +33,7 @@ final PatternPage contextViewPage = PatternPage(
   dos: const [
     'Use it for supporting detail that should stay visible while someone works '
         'in the primary column.',
-    'Keep the header title short — it truncates with an ellipsis when space is '
+    'Keep the header title short; it truncates with an ellipsis when space is '
         'tight.',
     'Put the panel\'s primary action in the footer so it stays reachable below '
         'a scrolling body.',
@@ -45,11 +45,11 @@ final PatternPage contextViewPage = PatternPage(
         'width.',
   ],
   donts: const [
-    'Don\'t use it for content that must interrupt the task — reach for a modal '
+    'Don\'t use it for content that must interrupt the task; use a modal '
         'or a focus view instead.',
     'Don\'t crowd the header with more than a couple of actions; move the rest '
         'into the body or footer.',
-    'Don\'t rely on a fixed pixel width at phone sizes — the panel is designed '
+    'Don\'t rely on a fixed pixel width at phone sizes; the panel is designed '
         'to expand to fill.',
     'Don\'t hide the primary action inside a long scrolling body when it '
         'belongs in the footer.',

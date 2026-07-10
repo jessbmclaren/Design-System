@@ -1,33 +1,33 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Content → Divider.
 final PatternPage dividerPage = PatternPage(
   id: 'divider',
-  group: DocGroup.content,
+  group: DocGroup.display,
   navTitle: 'Divider',
   title: 'Divider',
   description:
       'A divider is a hairline rule that separates content without adding the '
       'visual weight of a card or a border box. Use `DsDivider` to break a long '
-      'run of stacked rows into scannable groups, or set `axis` to '
+      'run of stacked rows into readable groups, or set `axis` to '
       '`DsDividerAxis.vertical` to split side-by-side content such as a row of '
       'summary statistics. The rule paints a single line in the theme\'s '
-      '`colorBorder` token, reserving exactly `thickness` logical pixels on its '
-      'cross axis and filling the parent along its main axis. Use `indent` and '
-      '`endIndent` to inset the line from its leading and trailing edges — '
-      'handy for aligning a divider with text rather than an item\'s icon — and '
+      '`colorBorder` token. It reserves exactly `thickness` logical pixels on its '
+      'cross axis and fills the parent along its main axis. Use `indent` and '
+      '`endIndent` to inset the line from its leading and trailing edges '
+      '(handy for aligning a divider with text rather than an item\'s icon), and '
       '`length` to cap it at a fixed extent, centred within the available space. '
       'Because it carries no meaning of its own, the divider is hidden from '
       'assistive technologies.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Reach for a divider only when whitespace alone is not enough to signal a '
+      'Use a divider only when whitespace alone is not enough to signal a '
       'grouping. A horizontal divider fills its parent\'s width, so place it in '
       'a column that is already constrained; a vertical divider fills its '
-      'parent\'s height, so give it a bounded height — for example an '
-      'IntrinsicHeight row or a fixed-height container — otherwise it has no '
+      'parent\'s height, so give it a bounded height (for example an '
+      'IntrinsicHeight row or a fixed-height container), otherwise it has no '
       'extent to fill.',
     ),
   ],
@@ -43,7 +43,7 @@ final PatternPage dividerPage = PatternPage(
         'reads as ambiguous.',
   ],
   donts: const [
-    'Don\'t stack dividers around every row — the borders become louder than '
+    'Don\'t stack dividers around every row; the borders become louder than '
         'the content.',
     'Don\'t place a vertical divider in an unbounded-height parent; it has no '
         'extent to fill.',

@@ -43,7 +43,7 @@ class DsBannerAction {
 /// A persistent, inline banner that surfaces an issue or a required action.
 ///
 /// Place a [DsBanner] directly under a page header (or at the top of a section)
-/// to communicate state that should stay visible until it is resolved — a
+/// to communicate state that should stay visible until it is resolved: a
 /// failed payment, a pending verification, a saved-successfully confirmation.
 /// Unlike a transient snackbar it does not disappear on its own; provide
 /// [onDismiss] if the user should be able to close it.
@@ -51,7 +51,7 @@ class DsBannerAction {
 /// The [variant] drives the leading status icon and the tinted colour set
 /// (background, border and text) pulled from the badge tokens. Supply a
 /// [title] for the headline, an optional [message] for supporting detail, an
-/// optional [action] for the single most relevant next step, and [onDismiss]
+/// optional [action] for the single most relevant next step and [onDismiss]
 /// to show a close button.
 ///
 /// The layout is fully responsive: the text column flexes and the trailing

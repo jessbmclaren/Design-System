@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-/// Design System color tokens.
+/// Design System colour tokens.
 ///
 /// These are the raw brand values that power [DsTheme]. Prefer reading
-/// colors from `Theme.of(context)` (via the `DsTokens` theme extension)
-/// inside widgets so that light/dark mode resolves correctly; reach for
-/// these constants only when building a theme.
+/// colours from `Theme.of(context)` (via the `DsTokens` theme extension)
+/// inside widgets so that light/dark mode resolves correctly; use these
+/// constants only when building a theme.
 abstract final class DsColors {
   // ---------------------------------------------------------------------------
   // Brand & actions

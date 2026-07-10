@@ -10,7 +10,7 @@ import '../../tokens/ds_chart_palette.dart';
 /// A datum pairs a human-readable [label] with its [value]. Supply an explicit
 /// [color] only to override the chart's single series hue for one bar (for
 /// example to highlight a total); leave it null to let the chart colour every
-/// bar with the design system's data-visualization palette.
+/// bar with the design system's data-visualisation palette.
 @immutable
 class DsBarDatum {
   /// Creates a bar chart datum.
@@ -39,7 +39,7 @@ class DsBarDatum {
 ///
 /// [DsBarChart] plots one series of categorical magnitudes as thin, baseline
 /// anchored bars with lightly rounded tops. Because it shows a single series it
-/// carries no legend — the [title] names what is being measured — and every bar
+/// carries no legend (the [title] names what is being measured) and every bar
 /// shares one hue drawn from [DsChartPalette]. Individual bars may override that
 /// hue via [DsBarDatum.color].
 ///
@@ -180,7 +180,7 @@ class DsBarChart extends StatelessWidget {
 }
 
 /// Formats a magnitude compactly: integers plainly, thousands as `k`, millions
-/// as `M`, and otherwise to one decimal place.
+/// as `M` and otherwise to one decimal place.
 String _formatValue(double v) {
   final abs = v.abs();
   if (abs >= 1000000) {
@@ -308,7 +308,7 @@ class _DsBarChartPainter extends CustomPainter {
         );
       }
 
-      // Value label above the bar — only when enabled and it fits the slot.
+      // Value label above the bar, only when enabled and it fits the slot.
       if (showValueLabels) {
         final text = _layoutText(_formatValue(datum.value), valueStyle);
         final fitsWidth = text.width <= slot - 2;
@@ -321,7 +321,7 @@ class _DsBarChartPainter extends CustomPainter {
         }
       }
 
-      // X-axis label beneath the bar — thinned by [stride] and ellipsized.
+      // X-axis label beneath the bar, thinned by [stride] and ellipsized.
       if (i % stride == 0) {
         final maxWidth = math.min(slot * stride - 4, plotWidth);
         final text = _layoutText(
@@ -348,7 +348,7 @@ class _DsBarChartPainter extends CustomPainter {
       final y = bottom - (bottom - top) * (i / _divisions);
       canvas.drawLine(Offset(0, y), Offset(width, y), gridPaint);
     }
-    // Baseline — the axis, drawn a touch stronger.
+    // Baseline: the axis, drawn a touch stronger.
     canvas.drawLine(
       Offset(0, bottom),
       Offset(width, bottom),

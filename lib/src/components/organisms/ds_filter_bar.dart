@@ -16,8 +16,8 @@ import 'ds_data_grid.dart';
 
 /// How the individual conditions of a [DsFilter] are combined.
 ///
-/// * [and] — a row must satisfy *every* condition (intersection).
-/// * [or] — a row must satisfy *at least one* condition (union).
+/// * [and]: a row must satisfy *every* condition (intersection).
+/// * [or]: a row must satisfy *at least one* condition (union).
 enum DsFilterConjunction {
   /// All conditions must match.
   and,
@@ -170,11 +170,11 @@ List<DsFilterOperator> dsOperatorsForType(DsCellType type) {
 /// with [operator].
 ///
 /// [value] is interpreted per the column's [DsCellType] and the chosen
-/// [operator] — a `String` for text and single-select, a `num` for numeric
+/// [operator]: a `String` for text and single-select, a `num` for numeric
 /// comparisons, a `DateTime` for dates, a `bool` for checkboxes and a
 /// `List<String>` for [DsFilterOperator.isAnyOf] / [DsFilterOperator.isNoneOf].
 /// A `null` value (or an empty one) marks the condition incomplete, and
-/// [DsFilter.matches] simply ignores it.
+/// [DsFilter.matches] ignores it.
 @immutable
 class DsFilterCondition {
   /// Creates a filter condition.
@@ -545,12 +545,12 @@ Object? _defaultValueForKind(_ValueKind kind) =>
 /// An Airtable-class filter builder for a [DsDataGrid]'s [columns].
 ///
 /// The bar shows a single "Filter" button carrying the active condition count.
-/// Opening it reveals an editor of stacked conditions — each a
-/// `[field] [operator] [value] [remove]` row — joined by a shared AND/OR
+/// Opening it reveals an editor of stacked conditions (each a
+/// `[field] [operator] [value] [remove]` row) joined by a shared AND/OR
 /// conjunction, plus "Add condition" and "Clear all" actions. The value control
 /// adapts to the chosen column and operator: a [DsTextField] for text and
 /// numbers, a [DsDateField] for dates, a [DsSelect] for single-selects, a set of
-/// toggle chips for multi-value selection, a [DsSwitch] for checkboxes, and no
+/// toggle chips for multi-value selection, a [DsSwitch] for checkboxes and no
 /// input for the empty / not-empty operators.
 ///
 /// The widget is fully controlled: every edit reports a brand-new immutable
@@ -848,7 +848,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
   }
 
   /// The leading conjunction affordance: the word "Where" for the first row, an
-  /// editable And/Or toggle for the second, and the fixed conjunction word for
+  /// editable And/Or toggle for the second and the fixed conjunction word for
   /// every row after that (matching a database-style filter builder).
   Widget _prefix(DsTokens tokens, int index) {
     if (index == 0) {

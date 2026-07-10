@@ -30,7 +30,7 @@ class DsLineSeries {
   final String name;
 
   /// The magnitude of each point, in x order. May differ in length from other
-  /// series; missing trailing points are simply not drawn.
+  /// series; missing trailing points are not drawn.
   final List<double> values;
 
   /// An optional explicit line colour. When null the chart draws a stable
@@ -41,22 +41,22 @@ class DsLineSeries {
 /// A multi-series line chart rendered with [CustomPaint].
 ///
 /// The chart shares **one** y-axis across every series (never dual-axis), so
-/// lines are directly comparable. Lines are a crisp 2px; when there are only a
+/// lines are directly comparable. Lines are 2px; when there are only a
 /// handful of points per series, filled point markers (>= 8px) are drawn to
 /// make individual readings tappable-looking and legible.
 ///
 /// Colour, type and spacing all come from the Design System tokens:
 ///
 /// * Titles, axis labels and legend text wear the theme **text** tokens
-///   ([DsTokens.colorText] / [DsTokens.colorSecondaryText]) — never a series
+///   ([DsTokens.colorText] / [DsTokens.colorSecondaryText]), never a series
 ///   colour.
 /// * Grid lines and axes are recessive: [DsTokens.colorBorder] at low alpha.
 /// * Line colours come from the validated [DsChartPalette] categorical order,
 ///   so identity is stable and status hues are never reused.
 ///
 /// The widget is responsive: it fills its parent's width, adopts a sensible
-/// default [height], and uses a [LayoutBuilder] to thin x-axis labels on narrow
-/// widths rather than overflow — it lays out cleanly from a 320dp phone to a
+/// default [height] and uses a [LayoutBuilder] to thin x-axis labels on narrow
+/// widths rather than overflow. It lays out cleanly from a 320dp phone to a
 /// wide desktop. Rendering is a single static frame (no timers, no animation),
 /// so it is safe for screenshots and honours reduced-motion preferences.
 ///
@@ -541,7 +541,7 @@ double _niceNum(double range, {required bool round}) {
 }
 
 /// Formats [value] compactly for axis ticks and summaries: thousands as `k`,
-/// millions as `M`, and integers without a trailing `.0`.
+/// millions as `M` and integers without a trailing `.0`.
 String _formatNumber(double value) {
   if (!value.isFinite) return '';
   final abs = value.abs();

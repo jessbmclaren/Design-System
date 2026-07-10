@@ -1,17 +1,17 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Redirects.
 final PatternPage redirectsPage = PatternPage(
   id: 'redirects',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Redirects',
   title: 'Redirects',
   description:
-      'Some flows hand the user off to an external provider — an SSO or '
-      'identity provider, for example — and then bring them back. The moment '
+      'Some flows hand the user off to an external provider (an SSO or '
+      'identity provider, for example) and then bring them back. The moment '
       'they return is fragile: people need to know they are in the right place '
-      'and how to continue. Show a short, centered panel that names what just '
+      'and how to continue. Show a short, centred panel that names what just '
       'happened and offers a single call to action to return, all in the same '
       'tab so no context is lost.',
   hasLiveDemo: true,
@@ -19,8 +19,8 @@ final PatternPage redirectsPage = PatternPage(
     ProseBlock(
       'Keep the handoff and the return symmetrical. Send the user to the '
       'provider in the same tab, and bring them back to a panel that confirms '
-      'where they are and what to do next. A single primary action — worded '
-      'as a clear destination, such as "Return to Acme" — removes any doubt '
+      'where they are and what to do next. A single primary action (worded '
+      'as a clear destination, such as "Return to Acme") removes any doubt '
       'about how to get back into the product.',
     ),
     ProseBlock(
@@ -32,11 +32,11 @@ final PatternPage redirectsPage = PatternPage(
     ),
   ],
   dos: const [
-    'Offer a single, clearly worded call to action to return, naming the '
+    'Offer a single, clearly worded call to action to return that names the '
         'destination the user is going back to.',
     'Set context so people know what just happened and what comes next.',
     'Keep both the handoff and the return in the same tab.',
-    'Match the panel to the rest of the product so the return feels seamless.',
+    'Match the panel to the rest of the product so the return does not feel like a separate app.',
   ],
   donts: const [
     'Open the return in a new tab or window, which strands the original one.',

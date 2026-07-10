@@ -22,10 +22,10 @@ class DsTab {
 /// [selectedIndex] as active and reports taps through [onChanged]. Keep your
 /// own state in sync by updating [selectedIndex] in response to [onChanged].
 ///
-/// The selected tab is tinted with the primary action color and marked by a
-/// 2px underline; unselected tabs use the secondary text color. A 1px baseline
+/// The selected tab is tinted with the primary action colour and marked by a
+/// 2px underline; unselected tabs use the secondary text colour. A 1px baseline
 /// runs beneath the whole bar. When the tabs are wider than the available
-/// space the bar scrolls horizontally, so it never overflows — even at 320dp.
+/// space the bar scrolls horizontally, so it never overflows, even at 320dp.
 class DsTabs extends StatelessWidget {
   const DsTabs({
     super.key,

@@ -1,19 +1,19 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Onboarding wizard.
 final PatternPage onboardingWizardPage = PatternPage(
   id: 'onboarding-wizard',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Onboarding wizard',
   title: 'Onboarding wizard',
   description:
       'The onboarding wizard frames a multi-step setup flow in a single, '
       'predictable container: a progress header that shows where the user is, '
       'an optional title and subtitle, a scrollable body for the current '
-      'step, and a footer that pairs a secondary Back action with a primary '
+      'step and a footer that pairs a secondary Back action with a primary '
       'Next action above a hairline divider. It is deliberately '
-      'content-agnostic — `DsOnboardingWizard` owns the chrome while you '
+      'content-agnostic: `DsOnboardingWizard` owns the chrome while you '
       'supply each step\'s body as `child` and drive navigation yourself with '
       '`currentIndex`, `onBack` and `onNext`. Because it composes '
       '`DsProgressStepper` and `DsButton`, it inherits their theming, 48dp '
@@ -24,14 +24,14 @@ final PatternPage onboardingWizardPage = PatternPage(
     ProseBlock(
       'The wizard is a controlled component: it holds no step state of its '
       'own. Keep `currentIndex` and the collected values in your own model, '
-      'advance on `onNext`, retreat on `onBack`, and swap the `child` for the '
+      'advance on `onNext`, retreat on `onBack` and swap the `child` for the '
       'active step. Gate progress with `nextEnabled` while a step is '
       'incomplete, and set `nextPending` to show a spinner and block '
       'double-submits while a step is saving. Hide Back on the first step by '
       'leaving `onBack` null, and rename the final action with `nextLabel` '
       '(for example "Finish"). The body lives inside an `Expanded` scroll '
-      'view, so give the wizard a bounded height — a page body or an '
-      '`Expanded` — and it fills the space and scrolls long steps.',
+      'view, so give the wizard a bounded height (a page body or an '
+      '`Expanded`) and it fills the space and scrolls long steps.',
     ),
   ],
   dos: const [
@@ -43,9 +43,9 @@ final PatternPage onboardingWizardPage = PatternPage(
     'Give the wizard a bounded height so its scrollable body can expand and scroll long steps.',
   ],
   donts: const [
-    'Don\'t force a linear wizard on tasks the user could complete in any order — a single form or settings view may fit better.',
+    'Don\'t force a linear wizard on tasks the user could complete in any order; a single form or settings view may fit better.',
     'Don\'t reorder or renumber steps mid-flow; the progress header should stay stable as the user moves through it.',
-    'Don\'t advance past an invalid step — keep Next disabled rather than letting the user continue and fail later.',
+    'Don\'t advance past an invalid step; keep Next disabled rather than letting the user continue and fail later.',
     'Don\'t place the wizard in an unbounded-height context, where its Expanded body cannot lay out.',
   ],
   code: '''

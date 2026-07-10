@@ -24,8 +24,8 @@ The chip is generic over its value type, so it can carry an enum, an id or any d
 
 **Don't**
 
-- Do not reopen the options menu when someone clears an active chip — clearing should only remove the filter.
-- Do not use chips for complex multi-field filtering; reach for a focused filter panel instead.
+- Do not reopen the options menu when someone clears an active chip; clearing should only remove the filter.
+- Do not use chips for complex multi-field filtering; use a focused filter panel instead.
 - Do not leave a filtered-empty table blank with no explanation or reset.
 - Do not hide the active filters below the fold where their effect on the data is invisible.
 

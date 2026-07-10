@@ -1,8 +1,8 @@
 # Action buttons
 
-Anchor a record's main actions in its `DsPageHeader` so they stay reachable while the content below scrolls. Give each view a single primary `DsButton` for the one action you most want people to take, and render the supporting choices as `secondary` buttons beside it. This consistent placement — aligned to the trailing edge beside the title on wide layouts, and stacked beneath it on narrow ones — means people always know where to look to act, and the emphasis in the button styling tells them which action is the expected next step.
+Anchor a record's main actions in its `DsPageHeader` so they stay reachable while the content below scrolls. Give each view a single primary `DsButton` for the one action you most want people to take, and render the supporting choices as `secondary` buttons beside it. This consistent placement (aligned to the trailing edge beside the title on wide layouts, stacked beneath it on narrow ones) means people always know where to look to act, and the emphasis in the button styling tells them which action is the expected next step.
 
-Emphasis comes from the `variant`, not the position. Reserve the `danger` variant for destructive, hard-to-undo actions such as deleting a record or voiding a document, and pair it with a confirmation step. Ordinary actions — even important ones like saving — should never borrow the danger style, or the colour stops signalling real risk.
+Emphasis comes from the `variant`, not the position. Reserve the `danger` variant for destructive, hard-to-undo actions such as deleting a record or voiding a document, and pair it with a confirmation step. Ordinary actions (even important ones like saving) should never borrow the danger style, or the colour stops signalling real risk.
 
 ![Desktop (1280dp)](img/action-buttons_desktop.png)
 

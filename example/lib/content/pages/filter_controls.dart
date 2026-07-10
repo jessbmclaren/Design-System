@@ -1,10 +1,10 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Layout → Filter controls.
 final PatternPage filterControlsPage = PatternPage(
   id: 'filter-controls',
-  group: DocGroup.layout,
+  group: DocGroup.inputs,
   navTitle: 'Filter controls',
   title: 'Filter controls',
   description:
@@ -36,9 +36,9 @@ final PatternPage filterControlsPage = PatternPage(
     'Render an empty state when the active filters match no records.',
   ],
   donts: const [
-    'Do not reopen the options menu when someone clears an active chip — '
+    'Do not reopen the options menu when someone clears an active chip; '
         'clearing should only remove the filter.',
-    'Do not use chips for complex multi-field filtering; reach for a focused '
+    'Do not use chips for complex multi-field filtering; use a focused '
         'filter panel instead.',
     'Do not leave a filtered-empty table blank with no explanation or reset.',
     'Do not hide the active filters below the fold where their effect on the '

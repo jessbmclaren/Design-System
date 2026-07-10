@@ -6,17 +6,17 @@ import '../../theme/ds_tokens_extension.dart';
 /// A focused overlay surface for additional context or multi-step flows.
 ///
 /// [DsFocusView] renders a self-contained panel: a titled header, a scrollable
-/// body, and an optional footer for actions such as a primary [DsButton] or a
-/// step indicator. Use it to draw attention to a single task — confirming a
-/// change, collecting a short form, or guiding the user through a sequence of
-/// steps — without navigating away from the current screen.
+/// body and an optional footer for actions such as a primary [DsButton] or a
+/// step indicator. Use it to draw attention to a single task, such as confirming
+/// a change or collecting a short form, without navigating away from the current
+/// screen.
 ///
 /// The widget itself starts no timers or animations, so it renders a stable
-/// still frame that is safe to capture in screenshots. To present it as a modal
+/// frame that is safe to capture in screenshots. To present it as a modal
 /// dialog over the current route, call the static [show] helper, which wraps the
 /// same panel in a [Dialog] with the design system's overlay backdrop.
 ///
-/// The panel is constrained to a comfortable reading width (~560dp) and centered
+/// The panel is constrained to a comfortable reading width (~560dp) and centred
 /// horizontally. It remains usable down to 320dp-wide viewports.
 class DsFocusView extends StatelessWidget {
   const DsFocusView({
@@ -43,7 +43,7 @@ class DsFocusView extends StatelessWidget {
   final VoidCallback? onClose;
 
   /// Whether the panel fills the height of its parent, attached to the leading
-  /// edge — the drawer presentation. When false (the default) it hugs its
+  /// edge: the drawer presentation. When false (the default) it hugs its
   /// content and is centred as a dialog.
   final bool fill;
 
@@ -88,7 +88,7 @@ class DsFocusView extends StatelessWidget {
           ),
         ),
         Divider(height: 1, thickness: 1, color: borderColor),
-        // Body — fills in drawer mode, hugs content in dialog mode.
+        // Body: fills in drawer mode, hugs content in dialog mode.
         if (fill)
           Expanded(
             child: SingleChildScrollView(
@@ -147,9 +147,9 @@ class DsFocusView extends StatelessWidget {
 
   /// Presents a [DsFocusView] as an overlay over the current route.
   ///
-  /// The overlay style follows the `overlays` token by default — a centred
-  /// [DsOverlayStyle.dialog] or a [DsOverlayStyle.drawer]: an edge-anchored
-  /// panel that slides in from the trailing (right) edge, full height, and
+  /// The overlay style follows the `overlays` token by default: a centred
+  /// [DsOverlayStyle.dialog] or a [DsOverlayStyle.drawer], an edge-anchored
+  /// panel that slides in from the trailing (right) edge, full height and
   /// spans the full width on compact viewports. Pass [style] to override it for
   /// a single call. Either way the background is dimmed with the design
   /// system's overlay backdrop colour.

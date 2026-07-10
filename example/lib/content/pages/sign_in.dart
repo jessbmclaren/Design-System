@@ -1,17 +1,17 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Onboarding → Sign in.
 final PatternPage signInPage = PatternPage(
   id: 'sign-in',
-  group: DocGroup.onboarding,
+  group: DocGroup.patterns,
   navTitle: 'Sign in',
   title: 'Sign in',
   description:
       'The sign-in view is the front door to your product: a single, focused '
       'card that welcomes people and sends them into authentication with one '
       'clear action. `DsSignInView` shows your brand mark, a short title and '
-      'description, and a full-width primary button — and deliberately collects '
+      'description, and a full-width primary button. It deliberately collects '
       'no passwords itself. Instead of embedding a credential form, the primary '
       'action hands off to your dedicated authentication flow, so the card stays '
       'lightweight, trustworthy and easy to brand.',
@@ -19,8 +19,8 @@ final PatternPage signInPage = PatternPage(
   blocks: const [
     ProseBlock(
       'Give people a way both to sign in and to sign up. Put the primary action '
-      'first and keep it unmistakable, then offer the secondary path — a '
-      'sign-up prompt — in the `footer`. Set `brandIcon` and `brandColor` so '
+      'first and keep it unmistakable, then offer the secondary path (a '
+      'sign-up prompt) in the `footer`. Set `brandIcon` and `brandColor` so '
       'the card reads as yours the moment it appears. If you need to surface '
       'terms, help text or an enterprise sign-in option, tuck it behind '
       '`additionalContextLabel` so the default view stays uncluttered.',

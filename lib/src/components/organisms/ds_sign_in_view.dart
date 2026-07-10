@@ -25,9 +25,9 @@ class DsSignInAction {
 /// A centred sign-in / onboarding view.
 ///
 /// [DsSignInView] presents a focused welcome card: an optional brand icon, a
-/// [title], a supporting [description], and a single full-width primary
+/// [title], a supporting [description] and a single full-width primary
 /// [DsButton] built from [primaryAction]. It deliberately collects no
-/// passwords — the primary action navigates the user outward to a dedicated
+/// passwords. The primary action navigates the user outward to a dedicated
 /// authentication flow.
 ///
 /// Use it as the landing screen for an app or feature, or as the empty state

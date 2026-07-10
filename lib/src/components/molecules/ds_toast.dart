@@ -8,8 +8,8 @@ import '../../tokens/ds_elevation.dart';
 /// An optional trailing action shown inside a [DsToast].
 ///
 /// Use a toast action for a single, low-friction follow-up such as "Undo" or
-/// "Retry". Keep the [label] short — a toast is transient and the action must
-/// be readable at a glance.
+/// "Retry". Keep the [label] short: a toast is transient and its action must
+/// be easy to read.
 class DsToastAction {
   const DsToastAction({required this.label, required this.onPressed});
 
@@ -23,8 +23,8 @@ class DsToastAction {
 /// A transient feedback toast that confirms an action or reports a status.
 ///
 /// A toast is a compact, high-contrast pill that floats above the UI and
-/// disappears on its own. Reach for it to acknowledge a completed action
-/// ("Changes saved") or a quick status, optionally offering one follow-up
+/// disappears on its own. Use it to acknowledge a completed action
+/// ("Changes saved") or a quick status, with an optional follow-up
 /// action via [action]. For anything the user must acknowledge or that blocks
 /// progress, use a dialog instead.
 ///
@@ -50,7 +50,7 @@ class DsToast extends StatelessWidget {
     this.icon,
   });
 
-  /// The message to display. Keep it concise — a single short sentence.
+  /// The message to display. Keep it concise: a single short sentence.
   final String message;
 
   /// An optional trailing action, such as "Undo".
@@ -65,8 +65,8 @@ class DsToast extends StatelessWidget {
   /// Presents a [DsToast] in an overlay near the bottom centre of the screen
   /// and removes it automatically after [duration].
   ///
-  /// This is the only entry point that schedules a timer, keeping the widget
-  /// itself safe for static rendering. Calling it multiple times stacks toasts
+  /// This is the only entry point that schedules a timer, so the widget
+  /// itself stays safe for static rendering. Calling it multiple times stacks toasts
   /// independently; each manages and removes its own overlay entry.
   static void show(
     BuildContext context, {

@@ -21,10 +21,10 @@ import 'ds_filter_bar.dart';
 /// reads consistently with status badges elsewhere in the system (see
 /// [DsPolicyBuilder]):
 ///
-/// * [require] — the record must satisfy something. Rendered neutral/info.
-/// * [restrict] — the record is blocked or forbidden. Rendered danger.
-/// * [warn] — the record is flagged for attention. Rendered warning.
-/// * [autoTag] — the record is automatically labelled. Rendered success.
+/// * [require]: the record must satisfy something. Rendered neutral/info.
+/// * [restrict]: the record is blocked or forbidden. Rendered danger.
+/// * [warn]: the record is flagged for attention. Rendered warning.
+/// * [autoTag]: the record is automatically labelled. Rendered success.
 enum DsPolicyEffect {
   /// Mandate that matching records satisfy the rule's description.
   require,
@@ -63,7 +63,7 @@ DsBadgeVariant _variantForEffect(DsPolicyEffect effect) => switch (effect) {
 /// [description].
 ///
 /// [description] is the human phrase completing the effect, for example
-/// `'a monthly safety inspection'` for [DsPolicyEffect.require] — reading as
+/// `'a monthly safety inspection'` for [DsPolicyEffect.require], reading as
 /// "Require a monthly safety inspection".
 @immutable
 class DsPolicyRule {
@@ -190,11 +190,11 @@ bool _rulesEqual(List<DsPolicyRule> a, List<DsPolicyRule> b) {
 
 /// An Airtable-class policy builder for a [DsDataGrid]'s [columns].
 ///
-/// A policy names a rule set, scopes it to the records matching a filter, and
+/// A policy names a rule set, scopes it to the records matching a filter and
 /// lists the consequences applied to them. The editor stacks four parts:
 ///
 /// * a header with the policy [DsPolicy.name] (a [DsTextField]) and an
-///   enable/disable [DsSwitch] — a disabled policy reads visibly muted;
+///   enable/disable [DsSwitch] (a disabled policy reads visibly muted);
 /// * an optional [DsPolicy.description] field;
 /// * an **Applies when** section: an embedded [DsFilterBar] bound to
 ///   [DsPolicy.filter], with a subtle hint that the policy applies to *all*
@@ -203,8 +203,8 @@ bool _rulesEqual(List<DsPolicyRule> a, List<DsPolicyRule> b) {
 ///   each effect a coloured [DsBadge] plus a [DsSelect], with an "Add rule"
 ///   action.
 ///
-/// The widget is fully controlled: it never holds its own copy of the policy —
-/// every edit reports a brand-new immutable [DsPolicy] through [onChanged], and
+/// The widget is fully controlled: it never holds its own copy of the policy.
+/// Every edit reports a brand-new immutable [DsPolicy] through [onChanged], and
 /// [DsPolicy.appliesTo] can evaluate a record against the same filter the user
 /// authored here. All colours, spacing, radii and typography come from
 /// [DsTokens], so it re-brands with the active theme.
@@ -566,7 +566,7 @@ class _IconAction extends StatelessWidget {
 
 /// A self-contained text input that owns its controller so keystrokes never
 /// reset the field, seeded once from [initialText] (the widget is re-keyed when
-/// its target — the policy field or a rule index — changes).
+/// its target, the policy field or a rule index, changes).
 class _PolicyTextField extends StatefulWidget {
   const _PolicyTextField({
     super.key,
@@ -596,8 +596,8 @@ class _PolicyTextFieldState extends State<_PolicyTextField> {
     super.didUpdateWidget(oldWidget);
     // The parent is the source of truth: when the value flowing in changes
     // (a rule removed/reordered above this row, or a whole new policy swapped
-    // in) reseed the controller. Comparing against the controller's own text —
-    // not oldWidget — means an in-progress keystroke (which round-trips back as
+    // in) reseed the controller. Comparing against the controller's own text
+    // (not oldWidget) means an in-progress keystroke (which round-trips back as
     // the same string) never reseeds, so the cursor is left alone.
     if (widget.initialText != _controller.text) {
       _controller.value = TextEditingValue(

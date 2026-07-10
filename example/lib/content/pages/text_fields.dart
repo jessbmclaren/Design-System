@@ -1,18 +1,18 @@
-// Pure Dart — NO Flutter imports.
+// Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
 /// Forms → Text fields.
 final PatternPage textFieldsPage = PatternPage(
   id: 'text-fields',
-  group: DocGroup.forms,
+  group: DocGroup.inputs,
   navTitle: 'Text fields',
   title: 'Text fields',
   description:
       'The text field is the workhorse of every form: a single- or multi-line '
       'input that pairs a persistent label with optional hint, helper and error '
       'text so people always know what to type and how they are doing. '
-      '`DsTextField` handles the full lifecycle — an empty prompt, a filled '
-      'value, guidance beneath the control, and a clear validation error — while '
+      '`DsTextField` handles the full lifecycle (an empty prompt, a filled '
+      'value, guidance beneath the control and a clear validation error) while '
       'exposing `keyboardType`, `obscureText`, `prefixIcon` and `maxLines` so '
       'one component covers everything from a work email to a masked password to '
       'a multi-line note.',
@@ -20,10 +20,10 @@ final PatternPage textFieldsPage = PatternPage(
   blocks: const [
     ProseBlock(
       'Keep the label visible at all times and let the `hintText` show an '
-      'example of a valid entry rather than repeat the label. Reach for '
+      'example of a valid entry rather than repeat the label. Use '
       '`helperText` to explain a format or constraint before the user acts, and '
       'switch to `errorText` only once a field has been touched and found '
-      'invalid — the two never appear together. Set `keyboardType` to match the '
+      'invalid. The two never appear together. Set `keyboardType` to match the '
       'content so the right on-screen keyboard appears, and use `obscureText` '
       'for secrets.',
     ),
@@ -32,12 +32,12 @@ final PatternPage textFieldsPage = PatternPage(
     'Always pair a field with a visible label so its purpose survives once a value is entered.',
     'Use helperText for guidance about format or constraints, and errorText for validation feedback.',
     'Set keyboardType to match the content (email, number, phone) so the right keyboard appears.',
-    'Keep the placeholder or hint distinct from the label — show an example, not a repeat.',
+    'Keep the placeholder or hint distinct from the label: show an example, not a repeat.',
   ],
   donts: const [
     "Don't use the hint as the only label; it disappears the moment someone types.",
     "Don't show an error before the user has interacted with the field.",
-    "Don't pack unrelated fields tightly together — give each room and a clear boundary.",
+    "Don't pack unrelated fields tightly together. Give each room and a clear boundary.",
   ],
   code: '''
 Column(
