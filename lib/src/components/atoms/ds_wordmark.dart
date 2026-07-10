@@ -38,8 +38,11 @@ class DsWordmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
+    // No explicit fontFamily: the style inherits the theme's resolved family,
+    // which already maps the default token onto the bundled package-prefixed
+    // font and carries any brand override. Naming the raw token here would
+    // bypass that mapping and miss the bundled font entirely.
     final base = TextStyle(
-      fontFamily: tokens.fontFamily,
       fontSize: fontSize,
       color: color ?? tokens.colorText,
       height: 1,
