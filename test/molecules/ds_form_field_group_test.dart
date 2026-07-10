@@ -82,6 +82,43 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('goes two-up in a card wider than minRowWidth, below the old '
+        'window breakpoint', (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          legend: 'Name',
+          children: [
+            DsTextField(label: 'First name'),
+            DsTextField(label: 'Last name'),
+          ],
+        ),
+        surfaceSize: const Size(440, 900),
+      );
+      await tester.pump();
+
+      expect(find.byType(Wrap), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('stacks when narrower than minRowWidth', (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          legend: 'Name',
+          children: [
+            DsTextField(label: 'First name'),
+            DsTextField(label: 'Last name'),
+          ],
+        ),
+        surfaceSize: const Size(320, 900),
+      );
+      await tester.pump();
+
+      expect(find.byType(Wrap), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('stacks children when columns is 1', (tester) async {
       await pumpDs(
         tester,

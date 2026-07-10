@@ -1,6 +1,6 @@
 # Form field group
 
-A form field group gathers related inputs under one legend so a long form reads as a handful of labelled sections rather than an undifferentiated stack of boxes. `DsFormFieldGroup` renders an optional legend and description, then lays out its `children` with a consistent `spacing`: it flows fields two-per-row on medium and wider layouts and collapses to a single stacked column below `DsBreakpoints.medium`, so the same markup fits a 320dp phone and a desktop pane without overflow. The whole block is wrapped in a semantic container announced by the legend. It gives assistive technology the same "fieldset and legend" grouping a native form would.
+A form field group gathers related inputs under one legend so a long form reads as a handful of labelled sections rather than an undifferentiated stack of boxes. `DsFormFieldGroup` renders an optional legend and description, then lays out its `children` with a consistent `spacing`: it flows fields two-per-row once the group is wide enough to hold them and stacks to a single column when it is narrower, so the same markup fits a 320dp phone and a desktop pane without overflow. The threshold tracks the group's own width, so a pair of fields sits side by side inside a card as soon as there is room. The whole block is wrapped in a semantic container announced by the legend. It gives assistive technology the same "fieldset and legend" grouping a native form would.
 
 ![Desktop (1280dp)](img/form-field-group_desktop.png)
 
@@ -18,7 +18,7 @@ A form field group gathers related inputs under one legend so a long form reads 
 - Write a legend that is a noun phrase for the section, such as "Shipping address" or "Contact details", not an instruction.
 - Add a short description when the group needs context the legend cannot carry, such as why the information is collected.
 - Keep the default two columns for short, similar-width fields, and set `columns: 1` for long or full-width inputs like a street address.
-- Rely on the built-in responsive layout instead of hand-rolling Rows; the group already stacks to one column on compact screens.
+- Rely on the built-in responsive layout instead of hand-rolling Rows; the group already stacks to one column when it is too narrow for two.
 - Let a shared `spacing` set the rhythm within a group, and use a larger gap between separate groups so the sections stay distinct.
 
 **Don't**
@@ -31,8 +31,8 @@ A form field group gathers related inputs under one legend so a long form reads 
 ## Example
 
 ```dart
-// Related fields under one legend. The group flows two-per-row on wide
-// layouts and stacks to a single column on phones automatically.
+// Related fields under one legend. The group flows two-per-row when it has
+// room and stacks to a single column when it is narrower.
 DsFormFieldGroup(
   legend: 'Contact details',
   description: 'We only use this to send order updates.',

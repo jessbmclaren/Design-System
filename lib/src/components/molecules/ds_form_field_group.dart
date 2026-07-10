@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 
@@ -27,12 +26,15 @@ import '../../tokens/ds_typography.dart';
 /// The group adapts to the available width, never overflowing down to a 320dp
 /// phone:
 ///
-/// * On compact layouts (narrower than [DsBreakpoints.medium]) the children
-///   stack full-width, one per row.
-/// * On medium and wider layouts, when [columns] is `2` (the default), the
+/// * When the group is narrower than [minRowWidth] the children stack
+///   full-width, one per row.
+/// * At [minRowWidth] and wider, when [columns] is `2` (the default), the
 ///   children flow two-per-row via a [Wrap], each taking half the available
 ///   width less the gutter. Set [columns] to `1` to keep a single stacked
 ///   column at every size.
+///
+/// The threshold tracks the group's own width, not the window, so a pair of
+/// fields goes side by side inside a narrow card as soon as there is room.
 ///
 /// The widget is purely declarative (it starts no timers or animations), so
 /// it renders identically in screenshots and live use.
@@ -60,6 +62,7 @@ class DsFormFieldGroup extends StatelessWidget {
     required this.children,
     this.spacing = 16,
     this.columns = 2,
+    this.minRowWidth = 360,
   }) : assert(columns == 1 || columns == 2, 'columns must be 1 or 2');
 
   /// Optional heading that names the group. Rendered with the medium label
@@ -82,6 +85,12 @@ class DsFormFieldGroup extends StatelessWidget {
   /// layouts. Either `1` (always stacked) or `2` (two-per-row when there is
   /// room). Defaults to `2`. Compact layouts always use a single column.
   final int columns;
+
+  /// The minimum width, in logical pixels, at which the group lays two columns
+  /// side by side. Below it the fields stack full-width. The threshold tracks
+  /// the group's own width, not the window, so a pair of fields goes two-up
+  /// inside a narrow card as soon as there is room. Defaults to `360`.
+  final double minRowWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +125,9 @@ class DsFormFieldGroup extends StatelessWidget {
           final width = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : MediaQuery.sizeOf(context).width;
-          final isWide =
-              DsBreakpoints.windowSizeFor(width) >= DsWindowSize.medium;
+          final canRow = width >= minRowWidth;
 
-          final Widget fields = (isWide && columns == 2 && children.length > 1)
+          final Widget fields = (canRow && columns == 2 && children.length > 1)
               ? _buildTwoColumn(width)
               : _buildStacked();
 
