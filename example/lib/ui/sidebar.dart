@@ -9,10 +9,20 @@ import 'docs_style.dart';
 /// Page ids shown with a tick in the nav: the set being worked through for the
 /// Engen theme. Edit this list to move the ticks around.
 const Set<String> _tickedPageIds = {
+  // Foundations
   'design-tokens',
   'motion',
   'iconography',
+  // Sign in and sign up, and the atoms and molecules they are built from
+  'sign-in',
+  'sign-up',
   'action-buttons',
+  'text-fields',
+  'form-field-group',
+  'icon',
+  'icon-button',
+  'box',
+  'wordmark',
 };
 
 /// The grouped navigation sidebar listing every documentation page.
