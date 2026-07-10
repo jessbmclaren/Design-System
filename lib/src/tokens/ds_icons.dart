@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 /// The design system's icon vocabulary.
 ///
 /// Components (and the products that consume the system) reference glyphs by
 /// their **semantic role** (`DsIcons.close`, `DsIcons.success`) rather than
-/// reaching for `Icons.*` directly. Centralising the vocabulary here is what
-/// makes the iconography a *system*: the family policy lives in one place, and
-/// a future migration to a real Lucide font is a single file's edit, not a
-/// codebase-wide audit.
+/// reaching for [LucideIcons] (or `Icons.*`) directly. Centralising the
+/// vocabulary here is what makes the iconography a *system*: the family policy
+/// lives in one place, and re-branding the icon set is a single file's edit,
+/// not a codebase-wide audit.
 ///
-/// ## Family policy (Lucide-styled)
+/// ## Family policy (Lucide)
 ///
-/// The set is chosen to read like Lucide, with thin, consistent, open line work:
+/// The set is drawn from [Lucide](https://lucide.dev) (thin, consistent, open
+/// line work) via the `flutter_lucide` package:
 ///
 /// * **Outlined line glyphs** are the default for actions, affordances and
 ///   status (close, edit, upload, info, warning, success, error).
 /// * **Bare strokes** for pure directional marks (chevrons, arrows, add,
-///   close, filter) that have no shape to outline.
+///   remove) that have no shape to outline.
 /// * **Filled is reserved for true-state** glyphs where the fill carries the
-///   meaning: a selected rating [star]. Everything else stays outlined.
-/// * **The rounded family is banned**: it reads as consumer-playful, the wrong
-///   register for a dense, professional product. Any rounded Material glyph is
-///   mapped to its sharp / outlined equivalent here.
+///   meaning: a selected rating [star]. Lucide is an outline-only set with no
+///   solid star, so that one true-state glyph keeps its Material solid form;
+///   the empty rating step ([starOutline]) uses the Lucide outline star, giving
+///   a clear filled/empty contrast.
 ///
 /// To re-brand the iconography, a consumer forks this one file and remaps the
 /// roles to their own [IconData]; the rest of the system follows automatically.
@@ -29,121 +31,122 @@ abstract final class DsIcons {
   // --- Directional ----------------------------------------------------------
 
   /// A right-pointing chevron (disclosure, "see more").
-  static const IconData chevronRight = Icons.chevron_right;
+  static const IconData chevronRight = LucideIcons.chevron_right;
 
   /// A downward chevron (expand, open a dropdown).
-  static const IconData expandMore = Icons.expand_more;
+  static const IconData expandMore = LucideIcons.chevron_down;
 
   /// An upward chevron (collapse).
-  static const IconData expandLess = Icons.expand_less;
+  static const IconData expandLess = LucideIcons.chevron_up;
 
   /// Move a row up in an ordered list.
-  static const IconData moveUp = Icons.keyboard_arrow_up;
+  static const IconData moveUp = LucideIcons.chevron_up;
 
   /// Move a row down in an ordered list.
-  static const IconData moveDown = Icons.keyboard_arrow_down;
+  static const IconData moveDown = LucideIcons.chevron_down;
 
   /// Ascending sort.
-  static const IconData arrowUp = Icons.arrow_upward;
+  static const IconData arrowUp = LucideIcons.arrow_up;
 
   /// Descending sort.
-  static const IconData arrowDown = Icons.arrow_downward;
+  static const IconData arrowDown = LucideIcons.arrow_down;
 
   /// Forward navigation.
-  static const IconData arrowForward = Icons.arrow_forward;
+  static const IconData arrowForward = LucideIcons.arrow_right;
 
   /// Back navigation.
-  static const IconData arrowBack = Icons.arrow_back_ios_new;
+  static const IconData arrowBack = LucideIcons.arrow_left;
 
   // --- Actions --------------------------------------------------------------
 
   /// Dismiss / clear / remove-from-view.
-  static const IconData close = Icons.close;
+  static const IconData close = LucideIcons.x;
 
-  /// Confirm / done (sharp, not rounded).
-  static const IconData check = Icons.check;
+  /// Confirm / done.
+  static const IconData check = LucideIcons.check;
 
   /// Add / create.
-  static const IconData add = Icons.add;
+  static const IconData add = LucideIcons.plus;
 
   /// Remove / subtract.
-  static const IconData remove = Icons.remove;
+  static const IconData remove = LucideIcons.minus;
 
   /// Edit in place.
-  static const IconData edit = Icons.edit_outlined;
+  static const IconData edit = LucideIcons.pencil;
 
   /// Delete.
-  static const IconData delete = Icons.delete_outline;
+  static const IconData delete = LucideIcons.trash_2;
 
   /// Copy to clipboard.
-  static const IconData copy = Icons.copy;
+  static const IconData copy = LucideIcons.copy;
 
   /// Open a filter.
-  static const IconData filter = Icons.filter_list;
+  static const IconData filter = LucideIcons.list_filter;
 
   /// An overflow menu (horizontal).
-  static const IconData moreHorizontal = Icons.more_horiz;
+  static const IconData moreHorizontal = LucideIcons.ellipsis;
 
   /// An overflow menu (vertical).
-  static const IconData moreVertical = Icons.more_vert;
+  static const IconData moreVertical = LucideIcons.ellipsis_vertical;
 
   /// Opens in a new context / external link.
-  static const IconData externalLink = Icons.open_in_new;
+  static const IconData externalLink = LucideIcons.external_link;
 
   /// Upload a file.
-  static const IconData upload = Icons.cloud_upload_outlined;
+  static const IconData upload = LucideIcons.cloud_upload;
 
   /// A completed upload.
-  static const IconData uploadDone = Icons.cloud_done_outlined;
+  static const IconData uploadDone = LucideIcons.cloud_check;
 
   /// A date / calendar affordance.
-  static const IconData calendar = Icons.calendar_today;
+  static const IconData calendar = LucideIcons.calendar;
 
   // --- Status ---------------------------------------------------------------
 
   /// Success / positive confirmation.
-  static const IconData success = Icons.check_circle_outline;
+  static const IconData success = LucideIcons.circle_check;
 
   /// Informational.
-  static const IconData info = Icons.info_outline;
+  static const IconData info = LucideIcons.info;
 
-  /// A caution (outlined, never the rounded amber glyph).
-  static const IconData warning = Icons.warning_amber;
+  /// A caution.
+  static const IconData warning = LucideIcons.triangle_alert;
 
   /// An error / failure.
-  static const IconData error = Icons.error_outline;
+  static const IconData error = LucideIcons.circle_alert;
 
   // --- Selection & true-state ----------------------------------------------
 
-  /// A selected rating step: filled, because the fill is the state.
+  /// A selected rating step: filled, because the fill is the state. Kept as the
+  /// Material solid star, since Lucide has no solid star (see the family policy).
   static const IconData star = Icons.star;
 
-  /// An unselected rating step.
-  static const IconData starOutline = Icons.star_border;
+  /// An unselected rating step (Lucide outline star).
+  static const IconData starOutline = LucideIcons.star;
 
   /// An empty checkbox.
-  static const IconData checkboxBlank = Icons.check_box_outline_blank;
+  static const IconData checkboxBlank = LucideIcons.square;
 
-  /// A ticked checkbox (outlined, to sit with the line family).
-  static const IconData checkboxChecked = Icons.check_box_outlined;
+  /// A ticked checkbox.
+  static const IconData checkboxChecked = LucideIcons.square_check;
 
   // --- Entities -------------------------------------------------------------
 
   /// A person / user.
-  static const IconData user = Icons.person_outline;
+  static const IconData user = LucideIcons.user;
 
   /// A file / document.
-  static const IconData file = Icons.insert_drive_file_outlined;
+  static const IconData file = LucideIcons.file;
 
   /// A folder.
-  static const IconData folder = Icons.folder_open_outlined;
+  static const IconData folder = LucideIcons.folder_open;
 
   /// A shipment / vehicle.
-  static const IconData shipping = Icons.local_shipping_outlined;
+  static const IconData shipping = LucideIcons.truck;
 
   /// A workspace / group of records.
-  static const IconData workspace = Icons.workspaces_outline;
+  static const IconData workspace = LucideIcons.layers;
 
   /// A placeholder for an image that failed to load.
-  static const IconData brokenImage = Icons.broken_image_outlined;
+  static const IconData brokenImage = LucideIcons.image_off;
 }

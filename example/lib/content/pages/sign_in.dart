@@ -8,15 +8,15 @@ final PatternPage signInPage = PatternPage(
   navTitle: 'Sign in',
   title: 'Sign in',
   description:
-      'The sign-in view is the front door to your product — a single, centred '
+      'The sign-in view is the front door to your product: a single, centred '
       'card that welcomes people back and gets them in with as little friction '
       'as possible. `DsSignInView` leads with your brand mark and a warm '
       'greeting, then a compact `form` (a username and a password), a '
-      'forgot-password link, and a full-width primary action. A footer offers '
-      'the other path — creating an account — so returning and new people each '
+      'forgot-password link and a full-width primary action. A footer offers '
+      'the other path (creating an account), so returning and new people each '
       'land somewhere. The card owns none of the form\'s state or validation; '
       'you pass the fields in and handle submission, so the same view backs a '
-      'password sign-in, a magic link, or an SSO hand-off just by changing what '
+      'password sign-in, a magic link or an SSO hand-off just by changing what '
       'you put in `form` and `primaryAction`.',
   hasLiveDemo: true,
   blocks: const [
@@ -38,7 +38,7 @@ final PatternPage signInPage = PatternPage(
         'creating an account (the footer).',
     'Put the forgot-password link right by the password field, where people '
         'reach for it.',
-    'Surface a failed sign-in clearly — a banner above the form — and keep the '
+    'Surface a failed sign-in clearly (a banner above the form) and keep the '
         'fields filled so they can correct one thing.',
   ],
   donts: const [
@@ -46,7 +46,7 @@ final PatternPage signInPage = PatternPage(
         'are enough, everything else buries them.',
     "Don't hide which action signs in; the full-width primary button should be "
         'unmistakable.',
-    "Don't scold in field copy — a hint guides, an error explains, neither "
+    "Don't scold in field copy; a hint guides, an error explains, neither "
         'blames.',
     "Don't reinvent the inputs; use `DsTextField` so the form matches every "
         'other form in the product.',

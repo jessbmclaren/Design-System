@@ -63,8 +63,8 @@ class DsSignInView extends StatefulWidget {
   /// The full-width primary action that navigates the user onward.
   final DsSignInAction primaryAction;
 
-  /// An optional form body — typically a column of `DsTextField`s (username,
-  /// password) — rendered between the description and the primary action. When
+  /// An optional form body, typically a column of `DsTextField`s (username,
+  /// password), rendered between the description and the primary action. When
   /// omitted the view reads as a redirect / SSO card; when provided it reads as
   /// a credential sign-in. The view lays it out but owns none of its state.
   final Widget? form;
