@@ -63,10 +63,12 @@ export 'src/components/molecules/ds_toast.dart';
 export 'src/components/molecules/ds_tooltip.dart';
 // Organisms
 export 'src/components/organisms/ds_bar_chart.dart';
+export 'src/components/organisms/ds_board_view.dart';
 export 'src/components/organisms/ds_business_verification.dart';
 export 'src/components/organisms/ds_context_view.dart';
 export 'src/components/organisms/ds_data_grid.dart';
 export 'src/components/organisms/ds_data_table.dart';
+export 'src/components/organisms/ds_filter_bar.dart';
 export 'src/components/organisms/ds_focus_view.dart';
 export 'src/components/organisms/ds_line_chart.dart';
 export 'src/components/organisms/ds_list.dart';
@@ -76,5 +78,6 @@ export 'src/components/organisms/ds_progress_stepper.dart';
 export 'src/components/organisms/ds_settings_view.dart';
 export 'src/components/organisms/ds_sign_in_view.dart';
 export 'src/components/organisms/ds_sign_up_view.dart';
+export 'src/components/organisms/ds_sort_builder.dart';
 // Templates
 export 'src/components/templates/ds_page_scaffold.dart';

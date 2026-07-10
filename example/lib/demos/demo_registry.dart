@@ -23,6 +23,9 @@ import 'line_chart_demo.dart';
 import 'meter_chart_demo.dart';
 import 'data_grid_demo.dart';
 import 'cell_types_demo.dart';
+import 'grouping_demo.dart';
+import 'filtering_sorting_demo.dart';
+import 'board_view_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
@@ -75,6 +78,9 @@ final Map<String, Widget Function()> _demos = {
   'meter-chart': () => const MeterChartDemo(),
   'data-grid': () => const DataGridDemo(),
   'cell-types': () => const CellTypesDemo(),
+  'grouping': () => const GroupingDemo(),
+  'filtering-sorting': () => const FilteringSortingDemo(),
+  'board-view': () => const BoardViewDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),

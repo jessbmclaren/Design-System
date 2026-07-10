@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers.dart';
@@ -40,6 +41,31 @@ void main() {
 
     await tester.tap(find.text('Open'));
     await tester.pump();
+
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
+  testWidgets('opens by keyboard (focus the trigger and press Enter)', (
+    WidgetTester tester,
+  ) async {
+    // Regression: the trigger must be Tab-focusable and Enter/Space-activatable,
+    // so the menu is not pointer-only.
+    await pumpDs(
+      tester,
+      const DsMenu(
+        trigger: Text('Open'),
+        items: <DsMenuItem>[
+          DsMenuItem(label: 'Edit'),
+          DsMenuItem(label: 'Delete'),
+        ],
+      ),
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
 
     expect(find.text('Edit'), findsOneWidget);
     expect(find.text('Delete'), findsOneWidget);

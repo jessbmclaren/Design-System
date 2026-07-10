@@ -112,9 +112,21 @@ class DsSelect<T> extends StatelessWidget {
       );
     }
 
-    final selectedTextStyle = tokens.bodyMd.toTextStyle(color: tokens.colorText);
+    // DropdownButtonFormField applies `style` as the DefaultTextStyle for its
+    // own value/hint/menu text, replacing the ambient one — so a family-less
+    // token style would strip the effective font family and render tofu. Bake
+    // the ambient family (the theme's effective font) into these styles so the
+    // dropdown text keeps it.
+    final ambient = DefaultTextStyle.of(context).style;
+    final selectedTextStyle = tokens.bodyMd.toTextStyle(color: tokens.colorText).copyWith(
+          fontFamily: ambient.fontFamily,
+          fontFamilyFallback: ambient.fontFamilyFallback,
+        );
     final placeholderStyle =
-        tokens.bodyMd.toTextStyle(color: tokens.formPlaceholderTextColor);
+        tokens.bodyMd.toTextStyle(color: tokens.formPlaceholderTextColor).copyWith(
+              fontFamily: ambient.fontFamily,
+              fontFamilyFallback: ambient.fontFamilyFallback,
+            );
 
     final decoration = InputDecoration(
       isDense: true,

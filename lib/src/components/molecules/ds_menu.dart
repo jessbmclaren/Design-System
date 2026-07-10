@@ -128,19 +128,35 @@ class DsMenu extends StatelessWidget {
       ),
       menuChildren: <Widget>[_DsMenuSurface(tokens: tokens, items: items)],
       builder: (BuildContext context, MenuController controller, Widget? child) {
+        void toggle() {
+          if (controller.isOpen) {
+            controller.close();
+          } else {
+            controller.open();
+          }
+        }
+
         return Semantics(
           button: true,
           expanded: controller.isOpen,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
+          onTap: toggle,
+          // FocusableActionDetector makes the trigger reachable by Tab and
+          // activatable by Enter/Space (via the ambient ActivateIntent), so the
+          // menu is fully keyboard-operable, not pointer-only.
+          child: FocusableActionDetector(
+            actions: <Type, Action<Intent>>{
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (_) {
+                  toggle();
+                  return null;
+                },
+              ),
             },
-            child: child,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: toggle,
+              child: child,
+            ),
           ),
         );
       },

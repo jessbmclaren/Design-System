@@ -34,6 +34,26 @@ List<DsGridRow> _rows() => [
       }),
     ];
 
+/// Rows with repeated group values: two Active (different owners) and one
+/// Pending, so grouping produces multi-row groups and nested subgroups.
+List<DsGridRow> _groupedRows() => [
+      DsGridRow(id: '1', cells: {
+        'name': 'Acme Corp', 'status': 'Active', 'owner': 'Ada Lovelace',
+        'amount': 1240, 'due': DateTime(2026, 7, 1), 'active': true,
+        'progress': 0.8, 'link': 'Open',
+      }),
+      DsGridRow(id: '2', cells: {
+        'name': 'Northwind', 'status': 'Active', 'owner': 'Grace Hopper',
+        'amount': 8900, 'due': DateTime(2026, 8, 15), 'active': false,
+        'progress': 0.35, 'link': 'Open',
+      }),
+      DsGridRow(id: '3', cells: {
+        'name': 'Globex', 'status': 'Pending', 'owner': 'Ada Lovelace',
+        'amount': 320, 'due': DateTime(2026, 6, 20), 'active': true,
+        'progress': 0.1, 'link': 'Open',
+      }),
+    ];
+
 void main() {
   group('DsDataGrid', () {
     testWidgets('renders headers and cell values (wide)', (tester) async {
@@ -363,6 +383,151 @@ void main() {
               body: SizedBox(
                 height: 700,
                 child: DsDataGrid(columns: _columns, rows: _rows()),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'overflow at ${w}dp');
+      }
+    });
+
+    testWidgets('flat grouping renders group headers with counts and aggregates',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 500,
+          child: DsDataGrid(
+            columns: _columns,
+            rows: _groupedRows(),
+            groupBy: const ['status'],
+            aggregations: const {'amount': DsAggregation.sum},
+          ),
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pump();
+      // Two rows are Active, one is Pending; each group is a labelled button
+      // announcing its record count and expanded state.
+      expect(
+        find.bySemanticsLabel('Active group, 2 records, expanded'),
+        findsOneWidget,
+      );
+      expect(
+        find.bySemanticsLabel('Pending group, 1 record, expanded'),
+        findsOneWidget,
+      );
+      // The summed Amount aggregation (1240 + 8900) shows in the Active header,
+      // aligned under its column, and only there.
+      expect(find.text(r'$10,140.00'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a progress aggregation formats as a percentage like its cells',
+        (tester) async {
+      // Regression: averaging a 0..1 progress column must read as a percentage
+      // in the group header, matching the "80%" style of the cells it summarises.
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 500,
+          child: DsDataGrid(
+            columns: _columns,
+            rows: _groupedRows(), // Active: 0.8, 0.35 -> avg 0.575 -> 57%.
+            groupBy: const ['status'],
+            aggregations: const {'progress': DsAggregation.average},
+          ),
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pump();
+      // The average renders as a percentage (not a raw 0.575) and appears only
+      // in the Active group's header.
+      expect(find.text('57%'), findsOneWidget);
+    });
+
+    testWidgets('nested subgroups render an outer and inner header',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 500,
+          child: DsDataGrid(
+            columns: _columns,
+            rows: _groupedRows(),
+            groupBy: const ['status', 'owner'],
+          ),
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pump();
+      // Outer group by status…
+      expect(
+        find.bySemanticsLabel('Active group, 2 records, expanded'),
+        findsOneWidget,
+      );
+      // …then an inner subgroup by owner within it.
+      expect(
+        find.bySemanticsLabel('Grace Hopper group, 1 record, expanded'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('collapsing a group hides its rows', (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 500,
+          child: DsDataGrid(
+            columns: _columns,
+            rows: _groupedRows(),
+            groupBy: const ['status'],
+          ),
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pump();
+      // Both Active rows are visible up front.
+      expect(find.text('Acme Corp'), findsOneWidget);
+      expect(find.text('Northwind'), findsOneWidget);
+      // Toggling the Active header collapses the group…
+      await tester.tap(
+        find.bySemanticsLabel('Active group, 2 records, expanded'),
+      );
+      await tester.pump();
+      // …hiding its rows in both the frozen and scrolling panes.
+      expect(find.text('Acme Corp'), findsNothing);
+      expect(find.text('Northwind'), findsNothing);
+      expect(
+        find.bySemanticsLabel('Active group, 2 records, collapsed'),
+        findsOneWidget,
+      );
+      // A sibling group is unaffected.
+      expect(find.text('Globex'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('grouping with a frozen column has no overflow across widths',
+        (tester) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.devicePixelRatio = 1.0;
+      for (final w in <double>[320, 768, 1440]) {
+        tester.view.physicalSize = Size(w, 1000);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: DsTheme.light(),
+            home: Scaffold(
+              body: SizedBox(
+                height: 700,
+                child: DsDataGrid(
+                  columns: _columns,
+                  rows: _groupedRows(),
+                  groupBy: const ['status'],
+                  aggregations: const {'amount': DsAggregation.sum},
+                ),
               ),
             ),
           ),

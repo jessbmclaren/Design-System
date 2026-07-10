@@ -86,6 +86,40 @@ enum DsColumnAlign {
   end,
 }
 
+/// How a column is summarised within a group when [DsDataGrid.groupBy] is set.
+///
+/// The result is rendered in each group's header band, aligned under the
+/// column it summarises (see [DsDataGrid.aggregations]):
+///
+/// * [none] — no summary is shown (the default for an unlisted column).
+/// * [count] — the number of rows in the group with a non-null value.
+/// * [sum] — the total of the group's numeric values.
+/// * [average] — the mean of the group's numeric values.
+/// * [min] — the smallest of the group's numeric values.
+/// * [max] — the largest of the group's numeric values.
+///
+/// The four numeric aggregations ignore non-numeric and null values and render
+/// nothing when a group has no numeric value; [count] applies to any column.
+enum DsAggregation {
+  /// No summary is shown for the column.
+  none,
+
+  /// The count of non-null values in the group.
+  count,
+
+  /// The sum of the group's numeric values.
+  sum,
+
+  /// The mean of the group's numeric values.
+  average,
+
+  /// The smallest of the group's numeric values.
+  min,
+
+  /// The largest of the group's numeric values.
+  max,
+}
+
 /// A single choice offered by a [DsGridColumn] for the select and status cell
 /// types.
 ///
@@ -327,6 +361,25 @@ class DsGridSort {
 /// or `status` cell opens a menu of [DsGridColumn.options]; and a `multiSelect`
 /// cell opens a checkable menu. `progress` cells are never editable.
 ///
+/// ## Grouping
+///
+/// When [groupBy] lists one or more column keys the rows (after the grid's own
+/// sort) are partitioned into groups, outermost key first. A single key yields
+/// flat groups; several keys nest them (group → subgroup → …). Each group
+/// renders a collapsible header band spanning the full grid width: a disclosure
+/// chevron, the group's value label (resolved through the column's
+/// [DsGridColumn.options] for select and status columns, and shown as
+/// "Ungrouped" for a null or empty value) and the record count. Per-column
+/// summaries requested through [aggregations] render in that band, aligned under
+/// the columns they summarise. Collapsing a group hides its rows — and any
+/// subgroups — in both the frozen and scrolling panes, which stay row-aligned
+/// because both iterate the same ordered sequence of header and row segments at
+/// matching heights. Collapse state is held internally per group path, starts
+/// from [initiallyExpanded] and is keyboard-toggleable: each band is a semantics
+/// button announcing its label, count and expanded state. Grouping also applies
+/// to the stacked-card layout, where a collapsible header precedes each group's
+/// cards. When [groupBy] is empty the grid renders exactly as an ungrouped one.
+///
 /// ## Accessibility & screenshots
 ///
 /// Header cells expose a semantics button with a sort key and an announced sort
@@ -352,6 +405,9 @@ class DsDataGrid extends StatefulWidget {
     this.caption,
     this.editable = false,
     this.onCellChanged,
+    this.groupBy = const [],
+    this.aggregations = const {},
+    this.initiallyExpanded = true,
   });
 
   /// The column definitions, in display order. Columns with
@@ -414,6 +470,24 @@ class DsDataGrid extends StatefulWidget {
   final void Function(String rowId, String columnKey, Object? value)?
       onCellChanged;
 
+  /// The column keys to group the rows by, outermost first. A single key
+  /// produces flat groups; several keys nest them (group → subgroup → …).
+  /// Defaults to `const []`, which leaves the grid ungrouped and renders exactly
+  /// as before. Keys that do not match a [DsGridColumn] still group by the raw
+  /// cell value.
+  final List<String> groupBy;
+
+  /// The per-column summary to show in each group's header band, keyed by
+  /// [DsGridColumn.key]. An unlisted column (or one mapped to
+  /// [DsAggregation.none]) shows no summary. Only consulted when [groupBy] is
+  /// non-empty. Defaults to `const {}`.
+  final Map<String, DsAggregation> aggregations;
+
+  /// Whether groups start expanded when [groupBy] is set. Defaults to true. Each
+  /// group's collapse state is then held internally and can be toggled from its
+  /// header band.
+  final bool initiallyExpanded;
+
   @override
   State<DsDataGrid> createState() => _DsDataGridState();
 }
@@ -437,6 +511,11 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   /// Internal selection, used only when [DsDataGrid.selectedRowIds] is null.
   Set<String> _internalSelection = <String>{};
+
+  /// Per-group-path expansion overrides. A path absent from the map falls back
+  /// to [DsDataGrid.initiallyExpanded]; toggling a group header writes the
+  /// opposite here so only user-changed groups are remembered.
+  final Map<String, bool> _expansionOverrides = <String, bool>{};
 
   /// The row id of the cell currently in an inline text editor, or null when no
   /// cell is being edited. Paired with [_editingColumnKey].
@@ -949,16 +1028,34 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   Widget _buildCompact(DsTokens tokens, double? height) {
     final rows = _displayRows;
-    final list = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < rows.length; i++) ...[
-          if (i > 0) const SizedBox(height: DsSpacing.sm),
-          _buildCard(tokens, rows[i]),
+    final Widget list;
+    if (widget.groupBy.isEmpty) {
+      list = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const SizedBox(height: DsSpacing.sm),
+            _buildCard(tokens, rows[i]),
+          ],
         ],
-      ],
-    );
+      );
+    } else {
+      final segments = _visibleSegments(rows);
+      list = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < segments.length; i++) ...[
+            if (i > 0) const SizedBox(height: DsSpacing.sm),
+            if (segments[i].group != null)
+              _groupHeaderCard(tokens, segments[i].group!)
+            else
+              _buildCard(tokens, segments[i].row!),
+          ],
+        ],
+      );
+    }
     if (height == null) return list;
     final scrollable = Scrollbar(
       controller: _verticalController,
@@ -1074,7 +1171,15 @@ class _DsDataGridState extends State<DsDataGrid> {
     final scrollContentWidth =
         scrollableColumns.fold<double>(0, (sum, c) => sum + _columnWidth(c));
 
-    final contentHeight = rows.length * widget.rowHeight;
+    // With grouping active the body iterates group-header and data-row segments
+    // rather than bare rows, so the content height counts every visible segment
+    // (each one row-height tall) instead of just the rows.
+    final grouped = widget.groupBy.isNotEmpty;
+    final segments =
+        grouped ? _visibleSegments(rows) : const <_GridSegment>[];
+    final lineCount = grouped ? segments.length : rows.length;
+
+    final contentHeight = lineCount * widget.rowHeight;
     final headerHeight = _headerHeight;
     final availableBody = height != null
         ? math.max(0.0, height - headerHeight - 1)
@@ -1090,17 +1195,29 @@ class _DsDataGridState extends State<DsDataGrid> {
       scrollContentWidth,
     );
 
-    final body = _buildBody(
-      tokens,
-      rows,
-      pinnedColumns,
-      scrollableColumns,
-      pinnedWidth,
-      hasPinned,
-      scrollContentWidth,
-      contentHeight,
-      bodyHeight,
-    );
+    final body = grouped
+        ? _buildGroupedBody(
+            tokens,
+            segments,
+            pinnedColumns,
+            scrollableColumns,
+            pinnedWidth,
+            hasPinned,
+            scrollContentWidth,
+            contentHeight,
+            bodyHeight,
+          )
+        : _buildBody(
+            tokens,
+            rows,
+            pinnedColumns,
+            scrollableColumns,
+            pinnedWidth,
+            hasPinned,
+            scrollContentWidth,
+            contentHeight,
+            bodyHeight,
+          );
 
     return SizedBox(
       width: maxWidth,
@@ -1271,6 +1388,575 @@ class _DsDataGridState extends State<DsDataGrid> {
         ),
       ),
     );
+  }
+
+  // --- Grouped body ---------------------------------------------------------
+
+  /// The grouped analogue of [_buildBody]. Both the frozen and scrolling panes
+  /// iterate the *same* ordered [segments] — a mix of group-header bands and
+  /// data-row segments, each exactly one [DsDataGrid.rowHeight] tall — so the
+  /// two panes stay row-aligned exactly as they do without grouping. A header
+  /// segment renders its chevron + label in the frozen pane and its aggregations
+  /// in the scrolling pane; a collapsed group simply contributes no row
+  /// segments, hiding its rows in both panes at once.
+  Widget _buildGroupedBody(
+    DsTokens tokens,
+    List<_GridSegment> segments,
+    List<DsGridColumn> pinnedColumns,
+    List<DsGridColumn> scrollableColumns,
+    double pinnedWidth,
+    bool hasPinned,
+    double scrollContentWidth,
+    double contentHeight,
+    double bodyHeight,
+  ) {
+    final bodyRow = Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasPinned)
+          SizedBox(
+            width: pinnedWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final segment in segments)
+                  if (segment.group != null)
+                    _groupHeaderFrozen(tokens, segment.group!)
+                  else
+                    _rowSegment(
+                      tokens,
+                      segment.row!,
+                      Row(
+                        children: [
+                          if (widget.selectable)
+                            _selectionCell(tokens, segment.row!),
+                          for (final column in pinnedColumns)
+                            _dataCell(tokens, column, segment.row!),
+                        ],
+                      ),
+                    ),
+              ],
+            ),
+          ),
+        if (hasPinned) _seam(tokens),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width =
+                  math.max(scrollContentWidth, constraints.maxWidth);
+              return SingleChildScrollView(
+                controller: _bodyHController,
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final segment in segments)
+                        if (segment.group != null)
+                          _groupHeaderScroll(
+                            tokens,
+                            segment.group!,
+                            scrollableColumns,
+                            showLabel: !hasPinned,
+                          )
+                        else
+                          _rowSegment(
+                            tokens,
+                            segment.row!,
+                            Row(
+                              children: [
+                                for (final column in scrollableColumns)
+                                  _dataCell(tokens, column, segment.row!),
+                              ],
+                            ),
+                          ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+
+    return SizedBox(
+      height: bodyHeight,
+      child: Scrollbar(
+        controller: _verticalController,
+        child: SingleChildScrollView(
+          controller: _verticalController,
+          child: SizedBox(height: contentHeight, child: bodyRow),
+        ),
+      ),
+    );
+  }
+
+  /// The frozen-pane part of a group header band: an offset-tinted strip, one
+  /// row-height tall, carrying the disclosure chevron, the group label and the
+  /// record count, indented by the group's depth. The whole strip is a
+  /// keyboard-focusable semantics button that toggles the group.
+  Widget _groupHeaderFrozen(DsTokens tokens, _GroupNode node) {
+    final expanded = _isExpanded(node.path);
+    final indent = DsSpacing.sm + node.depth * DsSpacing.lg;
+    final band = Container(
+      height: widget.rowHeight,
+      decoration: BoxDecoration(
+        color: tokens.offsetBackgroundColor,
+        border: Border(bottom: BorderSide(color: tokens.colorBorder)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(left: indent, right: DsSpacing.sm),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: _groupLabelRow(tokens, node, expanded, flexible: true),
+        ),
+      ),
+    );
+    return _groupToggleButton(node, expanded, band, labelled: true);
+  }
+
+  /// The scrolling-pane part of a group header band: the per-column
+  /// aggregations, aligned under the same [scrollableColumns] widths as the data
+  /// cells so they line up with their columns and scroll with them. When there
+  /// is no frozen pane ([showLabel] is true) the chevron + label is overlaid at
+  /// the leading edge here instead, and this strip becomes the toggle button.
+  Widget _groupHeaderScroll(
+    DsTokens tokens,
+    _GroupNode node,
+    List<DsGridColumn> scrollableColumns, {
+    required bool showLabel,
+  }) {
+    final expanded = _isExpanded(node.path);
+    final aggRow = Row(
+      children: [
+        for (final column in scrollableColumns)
+          _aggregationCell(tokens, column, node),
+      ],
+    );
+    final Widget inner;
+    if (showLabel) {
+      final indent = DsSpacing.sm + node.depth * DsSpacing.lg;
+      inner = Stack(
+        children: [
+          Positioned.fill(child: ExcludeSemantics(child: aggRow)),
+          Positioned(
+            left: indent,
+            top: 0,
+            bottom: 0,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _groupLabelRow(tokens, node, expanded, flexible: false),
+            ),
+          ),
+        ],
+      );
+    } else {
+      inner = aggRow;
+    }
+    final band = Container(
+      height: widget.rowHeight,
+      decoration: BoxDecoration(
+        color: tokens.offsetBackgroundColor,
+        border: Border(bottom: BorderSide(color: tokens.colorBorder)),
+      ),
+      child: inner,
+    );
+    return _groupToggleButton(node, expanded, band, labelled: showLabel);
+  }
+
+  /// Wraps a header [band] in the ink + tap affordance that toggles the group.
+  /// When [labelled] the wrapper is the announced semantics button for the
+  /// group; otherwise (the mirror strip in the other pane) its semantics are
+  /// excluded so a group is announced exactly once.
+  Widget _groupToggleButton(
+    _GroupNode node,
+    bool expanded,
+    Widget band, {
+    required bool labelled,
+  }) {
+    final interactive = Material(
+      type: MaterialType.transparency,
+      child: InkWell(onTap: () => _toggleGroup(node.path), child: band),
+    );
+    if (labelled) {
+      return Semantics(
+        button: true,
+        label: _groupSemanticsLabel(node, expanded),
+        excludeSemantics: true,
+        child: interactive,
+      );
+    }
+    return ExcludeSemantics(child: interactive);
+  }
+
+  /// The chevron + label + count shown in a group header band. [flexible] lets
+  /// the label shrink to the available width (used in the bounded frozen pane);
+  /// otherwise it is capped so it can sit safely in an unbounded overlay.
+  Widget _groupLabelRow(
+    DsTokens tokens,
+    _GroupNode node,
+    bool expanded, {
+    required bool flexible,
+  }) {
+    final label = Text(
+      node.label,
+      style: tokens.labelMd.toTextStyle(color: tokens.colorText),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        DsIcon(
+          icon: expanded ? Icons.expand_more : Icons.chevron_right,
+          size: DsIconSize.sm,
+          color: tokens.colorSecondaryText,
+        ),
+        const SizedBox(width: DsSpacing.xs),
+        if (flexible)
+          Flexible(child: label)
+        else
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 320),
+            child: label,
+          ),
+        const SizedBox(width: DsSpacing.sm),
+        Text(
+          '· ${node.rows.length}',
+          style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+        ),
+      ],
+    );
+  }
+
+  /// A single aggregation slot in a header band, sized to [column]'s width and
+  /// aligned like its data cells so the summary lines up beneath the column.
+  /// Renders nothing when the column has no aggregation (or no applicable
+  /// value), keeping the slot's width so later columns stay aligned.
+  Widget _aggregationCell(DsTokens tokens, DsGridColumn column, _GroupNode node) {
+    final aggregation = widget.aggregations[column.key] ?? DsAggregation.none;
+    final text = aggregation == DsAggregation.none
+        ? null
+        : _aggregationLabel(column, aggregation, node.rows);
+    return SizedBox(
+      width: _columnWidth(column),
+      height: widget.rowHeight,
+      child: text == null
+          ? null
+          : Padding(
+              padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
+              child: Align(
+                alignment: _alignmentOf(column.effectiveAlign),
+                child: Text(
+                  text,
+                  style: tokens.labelSm.toTextStyle(color: tokens.colorText),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+    );
+  }
+
+  /// The collapsible group header shown above each group's cards in the
+  /// stacked-card layout: a bordered, offset-tinted card with a chevron, the
+  /// label, the record count and — when expanded — a wrap of the group's
+  /// aggregations. The whole card is a semantics button that toggles the group.
+  Widget _groupHeaderCard(DsTokens tokens, _GroupNode node) {
+    final expanded = _isExpanded(node.path);
+    final indent = node.depth * DsSpacing.lg;
+    final radius = BorderRadius.circular(tokens.formBorderRadius);
+
+    final aggregations = <Widget>[];
+    for (final column in widget.columns) {
+      final aggregation = widget.aggregations[column.key] ?? DsAggregation.none;
+      if (aggregation == DsAggregation.none) continue;
+      final text = _aggregationLabel(column, aggregation, node.rows);
+      if (text == null) continue;
+      aggregations.add(
+        Text(
+          '${column.title}: $text',
+          style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+        ),
+      );
+    }
+
+    final content = Container(
+      decoration: BoxDecoration(
+        color: tokens.offsetBackgroundColor,
+        border: Border.all(color: tokens.colorBorder),
+        borderRadius: radius,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DsSpacing.md,
+        vertical: DsSpacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              DsIcon(
+                icon: expanded ? Icons.expand_more : Icons.chevron_right,
+                size: DsIconSize.sm,
+                color: tokens.colorSecondaryText,
+              ),
+              const SizedBox(width: DsSpacing.xs),
+              Expanded(
+                child: Text(
+                  node.label,
+                  style: tokens.labelMd.toTextStyle(color: tokens.colorText),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: DsSpacing.sm),
+              Text(
+                '· ${node.rows.length}',
+                style:
+                    tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+              ),
+            ],
+          ),
+          if (expanded && aggregations.isNotEmpty) ...[
+            const SizedBox(height: DsSpacing.xs),
+            Wrap(
+              spacing: DsSpacing.md,
+              runSpacing: DsSpacing.xxs,
+              children: aggregations,
+            ),
+          ],
+        ],
+      ),
+    );
+
+    return Padding(
+      padding: EdgeInsets.only(left: indent),
+      child: Semantics(
+        button: true,
+        label: _groupSemanticsLabel(node, expanded),
+        excludeSemantics: true,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: radius,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(onTap: () => _toggleGroup(node.path), child: content),
+        ),
+      ),
+    );
+  }
+
+  // --- Grouping model -------------------------------------------------------
+
+  /// Whether the group at [path] is currently expanded, honouring any user
+  /// toggle and otherwise falling back to [DsDataGrid.initiallyExpanded].
+  bool _isExpanded(String path) =>
+      _expansionOverrides[path] ?? widget.initiallyExpanded;
+
+  /// Flips the expansion of the group at [path].
+  void _toggleGroup(String path) {
+    setState(() => _expansionOverrides[path] = !_isExpanded(path));
+  }
+
+  /// The announced label for a group header band, e.g.
+  /// "Active group, 12 records, expanded".
+  String _groupSemanticsLabel(_GroupNode node, bool expanded) =>
+      '${node.label} group, ${node.rows.length} '
+      '${node.rows.length == 1 ? 'record' : 'records'}, '
+      '${expanded ? 'expanded' : 'collapsed'}';
+
+  /// Builds the ordered, flattened list of segments to render for [rows]: each
+  /// group contributes a header segment, then — when expanded — either its
+  /// subgroups' segments or its own row segments.
+  List<_GridSegment> _visibleSegments(List<DsGridRow> rows) {
+    final out = <_GridSegment>[];
+    _collectSegments(_groupLevel(rows, 0, ''), out);
+    return out;
+  }
+
+  void _collectSegments(List<_GroupNode> nodes, List<_GridSegment> out) {
+    for (final node in nodes) {
+      out.add(_GridSegment.header(node));
+      if (!_isExpanded(node.path)) continue;
+      if (node.children.isEmpty) {
+        for (final row in node.rows) {
+          out.add(_GridSegment.row(row));
+        }
+      } else {
+        _collectSegments(node.children, out);
+      }
+    }
+  }
+
+  /// Partitions [rows] by the [DsDataGrid.groupBy] key at [depth], preserving
+  /// first-seen order, and recurses into the next key to build subgroups.
+  List<_GroupNode> _groupLevel(
+    List<DsGridRow> rows,
+    int depth,
+    String parentPath,
+  ) {
+    final key = widget.groupBy[depth];
+    final column = _columnForKey(key);
+    final order = <String>[];
+    final buckets = <String, List<DsGridRow>>{};
+    final raws = <String, Object?>{};
+    for (final row in rows) {
+      final raw = row.cells[key];
+      final bucketKey = _groupBucketKey(raw);
+      final existing = buckets[bucketKey];
+      if (existing == null) {
+        buckets[bucketKey] = <DsGridRow>[row];
+        raws[bucketKey] = raw;
+        order.add(bucketKey);
+      } else {
+        existing.add(row);
+      }
+    }
+    final nodes = <_GroupNode>[];
+    for (final bucketKey in order) {
+      final path =
+          parentPath.isEmpty ? bucketKey : '$parentPath $bucketKey';
+      final groupRows = buckets[bucketKey]!;
+      final children = depth + 1 < widget.groupBy.length
+          ? _groupLevel(groupRows, depth + 1, path)
+          : const <_GroupNode>[];
+      nodes.add(_GroupNode(
+        path: path,
+        depth: depth,
+        label: _groupLabel(column, raws[bucketKey]),
+        rows: groupRows,
+        children: children,
+      ));
+    }
+    return nodes;
+  }
+
+  /// A stable partition key for a raw group value. A null or empty value shares
+  /// one "Ungrouped" bucket; dates and lists get canonical string keys so equal
+  /// values group together.
+  String _groupBucketKey(Object? raw) {
+    final string = _asString(raw);
+    if (raw == null || (string != null && string.isEmpty)) {
+      return ' ungrouped';
+    }
+    if (raw is DateTime) return 'date:${raw.toIso8601String()}';
+    if (raw is List) {
+      return 'list:${raw.map((e) => e?.toString() ?? '').join('')}';
+    }
+    return 'val:$raw';
+  }
+
+  /// The display label for a group, resolving select and status values through
+  /// [DsGridColumn.options] and reading a null / empty value as "Ungrouped".
+  String _groupLabel(DsGridColumn? column, Object? raw) {
+    final string = _asString(raw);
+    if (raw == null || (string != null && string.isEmpty)) return 'Ungrouped';
+    if (column != null &&
+        string != null &&
+        (column.type == DsCellType.singleSelect ||
+            column.type == DsCellType.status ||
+            column.type == DsCellType.multiSelect)) {
+      final option = _optionFor(column, string);
+      if (option != null) return option.effectiveLabel;
+    }
+    return _groupValueText(column, raw);
+  }
+
+  /// A readable string for a group value, formatting dates, currency and numbers
+  /// the way their cells render and falling back to the raw value's text.
+  String _groupValueText(DsGridColumn? column, Object? raw) {
+    final type = column?.type;
+    if (type == DsCellType.date) {
+      final date = _asDate(raw);
+      if (date != null) return _formatDate(date);
+    } else if (type == DsCellType.currency) {
+      final number = _asNum(raw);
+      if (number != null) {
+        return '${column!.currencySymbol ?? r'$'}'
+            '${_formatNumber(number, decimals: 2)}';
+      }
+    } else if (type == DsCellType.number) {
+      final number = _asNum(raw);
+      if (number != null) return _formatNumber(number);
+    } else if (type == DsCellType.multiSelect) {
+      final list = _asStringList(raw);
+      if (list != null) {
+        return [
+          for (final item in list)
+            _optionFor(column!, item)?.effectiveLabel ?? item,
+        ].join(', ');
+      }
+    }
+    final string = _asString(raw);
+    if (string != null) return string;
+    return raw?.toString() ?? '';
+  }
+
+  /// Computes an aggregation's display text over a group's [rows], or null when
+  /// there is nothing to show (no aggregation, or no numeric value for the
+  /// numeric aggregations).
+  String? _aggregationLabel(
+    DsGridColumn column,
+    DsAggregation aggregation,
+    List<DsGridRow> rows,
+  ) {
+    switch (aggregation) {
+      case DsAggregation.none:
+        return null;
+      case DsAggregation.count:
+        var count = 0;
+        for (final row in rows) {
+          if (row.cells[column.key] != null) count++;
+        }
+        return _formatNumber(count);
+      case DsAggregation.sum:
+      case DsAggregation.average:
+      case DsAggregation.min:
+      case DsAggregation.max:
+        final values = <num>[];
+        for (final row in rows) {
+          final number = _asNum(row.cells[column.key]);
+          if (number != null) values.add(number);
+        }
+        if (values.isEmpty) return null;
+        final num result;
+        if (aggregation == DsAggregation.sum) {
+          result = values.reduce((a, b) => a + b);
+        } else if (aggregation == DsAggregation.average) {
+          result = values.reduce((a, b) => a + b) / values.length;
+        } else if (aggregation == DsAggregation.min) {
+          result = values.reduce(math.min);
+        } else {
+          result = values.reduce(math.max);
+        }
+        return _formatAggregationValue(column, aggregation, result);
+    }
+  }
+
+  /// Formats a numeric aggregation [value] to match its column: currency keeps
+  /// its symbol and two decimals, an average shows up to two decimals, and every
+  /// other case uses the grid's grouped number formatting.
+  String _formatAggregationValue(
+    DsGridColumn column,
+    DsAggregation aggregation,
+    num value,
+  ) {
+    if (column.type == DsCellType.currency) {
+      final symbol = column.currencySymbol ?? r'$';
+      return '$symbol${_formatNumber(value, decimals: 2)}';
+    }
+    // A progress column stores a 0..1 fraction rendered as a percentage in its
+    // cells; its aggregate must read the same way, not as a raw fraction.
+    if (column.type == DsCellType.progress) {
+      return '${(value.clamp(0, 1) * 100).round()}%';
+    }
+    if (aggregation == DsAggregation.average &&
+        value != value.roundToDouble()) {
+      return _formatNumber(value, decimals: 2);
+    }
+    return _formatNumber(value);
   }
 
   Widget _seam(DsTokens tokens) => SizedBox(
@@ -1935,6 +2621,44 @@ class _DsDataGridState extends State<DsDataGrid> {
         return x.toLowerCase().compareTo(y.toLowerCase());
     }
   }
+}
+
+// --- Grouping model ---------------------------------------------------------
+
+/// One node in the grid's group tree: a group (or subgroup) at a given [depth],
+/// its resolved display [label], the [rows] it contains (recursively) and its
+/// [children] subgroups (empty at the innermost grouping level).
+///
+/// [path] is a stable, unique key identifying this group within the tree; the
+/// grid uses it to remember collapse state across rebuilds.
+@immutable
+class _GroupNode {
+  const _GroupNode({
+    required this.path,
+    required this.depth,
+    required this.label,
+    required this.rows,
+    required this.children,
+  });
+
+  final String path;
+  final int depth;
+  final String label;
+  final List<DsGridRow> rows;
+  final List<_GroupNode> children;
+}
+
+/// A single item in the flattened render sequence of a grouped body: either a
+/// group header band ([group] set) or a data row ([row] set). Exactly one of the
+/// two is non-null, which lets both the frozen and scrolling panes walk the same
+/// ordered list and stay row-aligned.
+@immutable
+class _GridSegment {
+  const _GridSegment.header(_GroupNode this.group) : row = null;
+  const _GridSegment.row(DsGridRow this.row) : group = null;
+
+  final _GroupNode? group;
+  final DsGridRow? row;
 }
 
 // --- Alignment helpers ------------------------------------------------------
