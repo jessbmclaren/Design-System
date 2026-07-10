@@ -27,6 +27,12 @@ abstract final class DsBreakpoints {
   /// Lower bound of the expanded window class.
   static const double expanded = 840;
 
+  /// The maximum width of a page's main content area on wide screens, in
+  /// logical pixels. Constrain content to this and centre the surplus so a
+  /// layout does not sprawl across a large desktop. `DsPageScaffold` caps its
+  /// body at this by default.
+  static const double contentMaxWidth = 960;
+
   /// Resolves the window size class for [width].
   static DsWindowSize windowSizeFor(double width) {
     if (width >= expanded) return DsWindowSize.expanded;

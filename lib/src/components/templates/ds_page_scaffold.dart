@@ -22,7 +22,7 @@ class DsPageScaffold extends StatelessWidget {
     this.actions = const [],
     this.leading,
     required this.body,
-    this.maxContentWidth = 960,
+    this.maxContentWidth = DsBreakpoints.contentMaxWidth,
   });
 
   /// The page title, shown in the header.

@@ -45,11 +45,14 @@ Every component is built to be usable by everyone, across screen sizes and text 
 - Controls are keyboard-focusable and activate on Enter and Space. A disabled control leaves the focus order.
 - Tap targets are at least 48dp.
 - Colour pairs meet WCAG AA contrast. Never rely on colour alone to carry meaning, pair it with a label or an icon.
-- A field's error is announced with its label (see `DsTextField.errorText`).
+- Focus order follows reading order, and related controls are grouped in a `Semantics(container: true)` node (see `DsFormFieldGroup`).
+- A field's error is announced with its label (see `DsTextField.errorText`), and a state change that is not otherwise spoken is announced rather than left silent.
 
 **Responsiveness and devices.**
-- Every component works from a 320dp phone to a wide desktop without overflow. Widget tests assert no overflow at 320dp and at a large width, so add one for each new component.
-- Respond to the component's own width, not the window: measure with a `LayoutBuilder` and a content threshold (see `DsFormFieldGroup.minRowWidth`). Reach for `DsBreakpoints` only when a genuine window-class decision is needed.
+- Every component works across the device spectrum, from a 320dp small phone to a 1920dp large desktop, without overflow. `example/test/device_matrix_test.dart` sweeps each page's demo across `[320, 360, 390, 414, 600, 768, 834, 1024, 1280, 1440, 1920]`; a component's own test asserts no overflow at 320dp and at a wide width.
+- Layout adapts across the Material 3 window classes in `DsBreakpoints`: **compact** (below 600), **medium** (600 to 840) and **expanded** (840 and up). Use `DsBreakpoints.of(context)` only for a genuine window-class decision.
+- Prefer responding to the component's own width, not the window: measure with a `LayoutBuilder` and a content threshold (see `DsFormFieldGroup.minRowWidth`), so one component fits a narrow card and a wide pane.
+- On wide desktops, constrain the main content to `DsBreakpoints.contentMaxWidth` and centre the surplus, so a layout does not sprawl to 1920dp.
 - Honour the user's text scale. Text wraps or ellipsizes, it never clips.
 
 **Motion.**

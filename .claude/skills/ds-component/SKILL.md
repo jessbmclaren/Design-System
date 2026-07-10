@@ -26,7 +26,7 @@ Add `export 'src/components/<layer>/ds_<name>.dart';` to `lib/design_system.dart
 
 ## 4. Test it (as an expert tester)
 
-Add `test/<layer>/ds_<name>_test.dart` covering: it renders, its interaction fires, its disabled and pending states, no overflow at 320dp and at a wide width, and its semantic label. Atoms also get a golden test across the light, dark and skinned themes. Run `flutter analyze` and `flutter test` clean.
+Add `test/<layer>/ds_<name>_test.dart` covering: it renders, its interaction fires, its disabled and pending states, no overflow at 320dp and at a wide width, and its semantic label. If the component has a docs demo, `example/test/device_matrix_test.dart` also sweeps it from 320dp to 1920dp. Atoms also get a golden test across the light, dark and skinned themes. Run `flutter analyze` and `flutter test` clean.
 
 ## 5. Document it
 
