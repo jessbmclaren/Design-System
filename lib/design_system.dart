@@ -74,10 +74,12 @@ export 'src/components/organisms/ds_line_chart.dart';
 export 'src/components/organisms/ds_list.dart';
 export 'src/components/organisms/ds_meter_chart.dart';
 export 'src/components/organisms/ds_onboarding_wizard.dart';
+export 'src/components/organisms/ds_policy_builder.dart';
 export 'src/components/organisms/ds_progress_stepper.dart';
 export 'src/components/organisms/ds_settings_view.dart';
 export 'src/components/organisms/ds_sign_in_view.dart';
 export 'src/components/organisms/ds_sign_up_view.dart';
 export 'src/components/organisms/ds_sort_builder.dart';
+export 'src/components/organisms/ds_tree_view.dart';
 // Templates
 export 'src/components/templates/ds_page_scaffold.dart';

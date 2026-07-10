@@ -31,6 +31,8 @@ import 'pages/cell_types.dart';
 import 'pages/grouping.dart';
 import 'pages/filtering_sorting.dart';
 import 'pages/board_view.dart';
+import 'pages/group_hierarchy.dart';
+import 'pages/policies.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
@@ -90,6 +92,8 @@ final List<PatternPage> allPages = [
   groupingPage,
   filteringSortingPage,
   boardViewPage,
+  groupHierarchyPage,
+  policiesPage,
   // layout
   fullPageLayoutsPage,
   listsPage,

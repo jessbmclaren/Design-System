@@ -26,6 +26,8 @@ import 'cell_types_demo.dart';
 import 'grouping_demo.dart';
 import 'filtering_sorting_demo.dart';
 import 'board_view_demo.dart';
+import 'group_hierarchy_demo.dart';
+import 'policies_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
@@ -81,6 +83,8 @@ final Map<String, Widget Function()> _demos = {
   'grouping': () => const GroupingDemo(),
   'filtering-sorting': () => const FilteringSortingDemo(),
   'board-view': () => const BoardViewDemo(),
+  'group-hierarchy': () => const GroupHierarchyDemo(),
+  'policies': () => const PoliciesDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),
