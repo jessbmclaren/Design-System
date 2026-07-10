@@ -44,6 +44,9 @@ class DsTextField extends StatelessWidget {
     this.enabled = true,
     this.maxLines = 1,
     this.focusNode,
+    this.textInputAction,
+    this.onSubmitted,
+    this.autofocus = false,
   });
 
   /// The text shown above the input describing what it collects.
@@ -93,6 +96,16 @@ class DsTextField extends StatelessWidget {
   /// An optional focus node controlling the field's focus.
   final FocusNode? focusNode;
 
+  /// The action button shown on the keyboard, such as next or done.
+  final TextInputAction? textInputAction;
+
+  /// Called when the user submits the field, for example via the keyboard's
+  /// done action.
+  final ValueChanged<String>? onSubmitted;
+
+  /// Whether the field requests focus as soon as it is shown.
+  final bool autofocus;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -136,7 +149,10 @@ class DsTextField extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
+            autofocus: autofocus,
             onChanged: onChanged,
+            onFieldSubmitted: onSubmitted,
+            textInputAction: textInputAction,
             obscureText: obscureText,
             keyboardType: keyboardType,
             enabled: enabled,

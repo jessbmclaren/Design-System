@@ -80,6 +80,12 @@ abstract final class DsIcons {
   /// Copy to clipboard.
   static const IconData copy = LucideIcons.copy;
 
+  /// Reveal a hidden value, such as a password.
+  static const IconData visibility = LucideIcons.eye;
+
+  /// Hide a value, such as a password.
+  static const IconData visibilityOff = LucideIcons.eye_off;
+
   /// Open a filter.
   static const IconData filter = LucideIcons.list_filter;
 
