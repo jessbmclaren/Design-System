@@ -204,7 +204,7 @@ final PatternPage designTokensPage = PatternPage(
       rows: [
         VariableRow(name: 'overlays', type: 'DsOverlayStyle', example: 'dialog', description: 'The type of overlay used. Valid values are dialog (default) and drawer.'),
         VariableRow(name: 'overlayBorderRadius', type: 'double', example: '8', description: 'The border radius used for overlays.'),
-        VariableRow(name: 'overlayBackdropColor', type: 'Color', example: '#F9E4F1', description: 'The backdrop colour shown behind an open overlay.'),
+        VariableRow(name: 'overlayBackdropColor', type: 'Color', example: '#661A1B25', description: 'The backdrop colour shown behind an open overlay: a translucent scrim (ARGB) over the page.'),
       ],
     ),
   ],

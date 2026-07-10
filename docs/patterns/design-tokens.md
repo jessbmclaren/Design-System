@@ -173,7 +173,7 @@ The `overlays` token controls whether a focused overlay (such as `DsFocusView`) 
 | --- | --- | --- | --- |
 | `overlays` | `DsOverlayStyle` | `dialog` | The type of overlay used. Valid values are dialog (default) and drawer. |
 | `overlayBorderRadius` | `double` | `8` | The border radius used for overlays. |
-| `overlayBackdropColor` | `Color` | `#F9E4F1` | The backdrop colour shown behind an open overlay. |
+| `overlayBackdropColor` | `Color` | `#661A1B25` | The backdrop colour shown behind an open overlay: a translucent scrim (ARGB) over the page. |
 
 ![Desktop (1280dp)](img/design-tokens_desktop.png)
 

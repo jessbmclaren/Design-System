@@ -8,6 +8,7 @@ import 'pattern_page_content.dart';
 import 'pages/design_tokens.dart';
 import 'pages/motion.dart';
 import 'pages/iconography.dart';
+import 'pages/breakpoints.dart';
 import 'pages/accordion.dart';
 import 'pages/avatar.dart';
 import 'pages/divider.dart';
@@ -77,6 +78,7 @@ final List<PatternPage> allPages = [
   designTokensPage,
   motionPage,
   iconographyPage,
+  breakpointsPage,
   // Actions
   actionButtonsPage,
   backLinkPage,

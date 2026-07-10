@@ -86,8 +86,9 @@ abstract final class DsColors {
   /// switches.
   static const Color formAccent = Color(0xFF0074D4);
 
-  /// The backdrop colour shown behind an open overlay.
-  static const Color overlayBackdrop = Color(0xFFF9E4F1);
+  /// The backdrop colour shown behind an open overlay: a translucent scrim
+  /// derived from [textPrimary] so the page recedes without changing hue.
+  static const Color overlayBackdrop = Color(0x661A1B25);
 
   // ---------------------------------------------------------------------------
   // Badges: neutral
