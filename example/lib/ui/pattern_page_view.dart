@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../content/doc_registry.dart';
 import '../content/pattern_page_content.dart';
 import '../demos/demo_registry.dart';
+import '../playground/playground.dart';
+import '../playground/playground_registry.dart';
 import 'code_block.dart';
 import 'device_frame.dart';
 import 'do_dont.dart';
@@ -40,6 +42,7 @@ class _PatternPageViewState extends State<PatternPageView> {
     final theme = Theme.of(context);
     final tokens = DsTokens.of(context);
     final demo = demoFor(page.id);
+    final playground = playgroundFor(page.id);
 
     if (_showMarkdown) {
       return MarkdownView(
@@ -77,7 +80,14 @@ class _PatternPageViewState extends State<PatternPageView> {
                   _block(block),
                   const SizedBox(height: 20),
                 ],
-                if (page.hasLiveDemo && demo != null) ...[
+                if (playground != null) ...[
+                  const SizedBox(height: 4),
+                  PlaygroundPanel(
+                    key: ValueKey('pg-${page.id}'),
+                    spec: playground,
+                  ),
+                  const SizedBox(height: 32),
+                ] else if (page.hasLiveDemo && demo != null) ...[
                   const SizedBox(height: 4),
                   DeviceFrame(child: demo),
                   const SizedBox(height: 32),
