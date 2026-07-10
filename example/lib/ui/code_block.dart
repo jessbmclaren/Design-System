@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
+
+import 'docs_style.dart';
 
 /// Holds the light and dark Dart highlighters, initialised once in `main`.
 class CodeHighlighters {
@@ -17,7 +20,8 @@ class CodeHighlighters {
       brightness == Brightness.dark ? dark : light;
 }
 
-/// A syntax-highlighted, copyable Dart code block.
+/// A syntax-highlighted, copyable Dart code block. The surface follows the
+/// docs theme: a calm light panel in light mode, a near-black panel in dark.
 class CodeBlock extends StatefulWidget {
   const CodeBlock({super.key, required this.code});
 
@@ -33,52 +37,42 @@ class _CodeBlockState extends State<CodeBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final surface = isDark ? const Color(0xFF15171C) : const Color(0xFF1E2230);
+    final docs = DocsColors.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFBFBFD);
+    final border = docs.separator;
+    final muted = docs.textSecondary;
     final highlighters = CodeHighlighters.instance;
+    final highlighter =
+        highlighters == null ? null : (isDark ? highlighters.dark : highlighters.light);
 
     final Widget codeText;
-    if (highlighters != null) {
-      // Always use the dark code theme for contrast on the dark surface.
+    if (highlighter != null) {
       codeText = Text.rich(
-        highlighters.dark.highlight(widget.code),
-        style: const TextStyle(fontFamily: 'monospace', fontSize: 13, height: 1.5),
+        highlighter.highlight(widget.code),
+        style: DocsType.mono(docs.textPrimary),
       );
     } else {
       codeText = SelectableText(
         widget.code,
-        style: const TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 13,
-          height: 1.5,
-          color: Color(0xFFE6E8EF),
-        ),
+        style: DocsType.mono(docs.textPrimary),
       );
     }
 
     return Container(
       decoration: BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        borderRadius: BorderRadius.circular(DocsRadii.md),
+        border: Border.all(color: border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 8, 0),
+            padding: const EdgeInsets.fromLTRB(14, 10, 8, 0),
             child: Row(
               children: [
-                Text(
-                  'Dart',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
-                  ),
-                ),
+                Text('Dart', style: DocsType.caption(muted)),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () async {
@@ -90,14 +84,12 @@ class _CodeBlockState extends State<CodeBlock> {
                     });
                   },
                   icon: Icon(
-                    _copied ? Icons.check : Icons.copy_outlined,
-                    size: 15,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    _copied ? LucideIcons.check : LucideIcons.copy,
+                    size: 14,
+                    color: muted,
                   ),
-                  label: Text(
-                    _copied ? 'Copied' : 'Copy',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
-                  ),
+                  label: Text(_copied ? 'Copied' : 'Copy',
+                      style: DocsType.footnote(muted)),
                 ),
               ],
             ),

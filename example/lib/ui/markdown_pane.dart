@@ -1,10 +1,11 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 import '../content/doc_registry.dart';
 import '../content/pattern_page_content.dart';
 import '../markdown/emitter.dart';
+import 'docs_style.dart';
 
 /// The full-page "View as Markdown" view.
 ///
@@ -20,57 +21,50 @@ class MarkdownView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     final markdown = emitMarkdown(page, index: pageIndex);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: tokens.colorBorder)),
+            color: docs.surface,
+            border: Border(bottom: BorderSide(color: docs.separator)),
           ),
           child: Row(
             children: [
               TextButton.icon(
                 onPressed: onClose,
-                icon: const Icon(Icons.arrow_back, size: 16),
+                icon: const Icon(LucideIcons.arrow_left, size: 15),
                 label: const Text('Back to page'),
-                style: TextButton.styleFrom(
-                  foregroundColor: tokens.actionPrimaryColorText,
-                ),
+                style: TextButton.styleFrom(foregroundColor: docs.link),
               ),
               const Spacer(),
-              Icon(Icons.description_outlined,
-                  size: 15, color: tokens.colorSecondaryText),
+              Icon(LucideIcons.file_text, size: 14, color: docs.textTertiary),
               const SizedBox(width: 6),
-              Text(
-                '${page.id}.md',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                  color: tokens.colorSecondaryText,
+              Flexible(
+                child: Text(
+                  '${page.id}.md',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: DocsType.mono(docs.textSecondary),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
               _CopyButton(text: markdown),
             ],
           ),
         ),
         Expanded(
           child: Container(
-            color: tokens.offsetBackgroundColor,
+            color: docs.canvas,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(28),
               child: SelectableText(
                 markdown,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                  height: 1.65,
-                  color: tokens.colorText,
-                ),
+                style: DocsType.mono(docs.textPrimary, height: 1.65),
               ),
             ),
           ),
@@ -93,6 +87,7 @@ class _CopyButtonState extends State<_CopyButton> {
 
   @override
   Widget build(BuildContext context) {
+    final docs = DocsColors.of(context);
     return TextButton.icon(
       onPressed: () async {
         await Clipboard.setData(ClipboardData(text: widget.text));
@@ -102,8 +97,9 @@ class _CopyButtonState extends State<_CopyButton> {
           if (mounted) setState(() => _copied = false);
         });
       },
-      icon: Icon(_copied ? Icons.check : Icons.copy_outlined, size: 15),
+      icon: Icon(_copied ? LucideIcons.check : LucideIcons.copy, size: 15),
       label: Text(_copied ? 'Copied' : 'Copy'),
+      style: TextButton.styleFrom(foregroundColor: docs.textSecondary),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 import '../ui/code_block.dart';
+import '../ui/docs_style.dart';
 
 /// A single interactive control in a component [PlaygroundSpec].
 ///
@@ -142,17 +143,18 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     final spec = widget.spec;
 
-    final stage = DecoratedBox(
+    final stage = Container(
       decoration: BoxDecoration(
-        color: tokens.offsetBackgroundColor,
-        border: Border.all(color: tokens.colorBorder),
-        borderRadius: BorderRadius.circular(tokens.borderRadius),
+        color: docs.surface,
+        border: Border.all(color: docs.separator),
+        borderRadius: BorderRadius.circular(DocsRadii.lg),
+        boxShadow: DocsShadows.card,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(DsSpacing.xl),
+        padding: const EdgeInsets.all(24),
         child: Center(
           child: Builder(builder: (context) => spec.builder(context, _values)),
         ),
@@ -166,11 +168,7 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
         Row(
           children: [
             Expanded(
-              child: Text(
-                'Playground',
-                style: tokens.headingXs
-                    .toTextStyle(color: tokens.colorSecondaryText),
-              ),
+              child: Text('Playground', style: DocsType.headline(docs.textPrimary)),
             ),
             DsButton(
               label: 'Reset',
@@ -179,10 +177,10 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
             ),
           ],
         ),
-        const SizedBox(height: DsSpacing.md),
+        const SizedBox(height: 12),
         for (final knob in spec.knobs) ...[
           _control(knob),
-          const SizedBox(height: DsSpacing.md),
+          const SizedBox(height: 12),
         ],
       ],
     );
@@ -197,7 +195,7 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: SizedBox(height: 260, child: stage)),
-                  const SizedBox(width: DsSpacing.xl),
+                  const SizedBox(width: 24),
                   SizedBox(width: 300, child: knobs),
                 ],
               );
@@ -206,14 +204,14 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 220, child: stage),
-                const SizedBox(height: DsSpacing.lg),
+                const SizedBox(height: 16),
                 knobs,
               ],
             );
           },
         ),
         if (spec.code != null) ...[
-          const SizedBox(height: DsSpacing.lg),
+          const SizedBox(height: 16),
           CodeBlock(code: spec.code!(_values)),
         ],
       ],

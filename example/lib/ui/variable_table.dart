@@ -1,39 +1,38 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 import '../content/pattern_page_content.dart';
+import 'docs_style.dart';
 
 /// Renders a [VariablesBlock] as a NAME / TYPE / EXAMPLE VALUE table with a
-/// per-row description, matching the appearance-variables reference layout:
-/// a light monospace pill for the name (hugging its text), plain type text,
-/// a value pill and the description on its own line beneath.
+/// per-row description: a light monospace pill for the name (hugging its text),
+/// plain type text, a value pill and the description on its own line beneath.
 class VariableTable extends StatelessWidget {
   const VariableTable({super.key, required this.block});
 
   final VariablesBlock block;
 
-  // Column proportions, tuned to the reference: a wide name column, a
-  // narrower type column and a value column.
+  // Column proportions: a wide name column, a narrower type column and a value
+  // column.
   static const int _nameFlex = 5;
   static const int _typeFlex = 3;
   static const int _valueFlex = 4;
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final theme = Theme.of(context);
+    final docs = DocsColors.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (block.title != null) ...[
-          Text(block.title!, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
+          Text(block.title!, style: DocsType.title3(docs.textPrimary)),
+          const SizedBox(height: 10),
         ],
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: tokens.colorBorder),
-            borderRadius: BorderRadius.circular(8),
+            color: docs.surface,
+            border: Border.all(color: docs.separator),
+            borderRadius: BorderRadius.circular(DocsRadii.md),
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -57,16 +56,12 @@ class _HeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final style = TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w700,
-      letterSpacing: 0.6,
-      color: tokens.colorSecondaryText,
-    );
+    final docs = DocsColors.of(context);
+    // Primary ink so the small uppercase labels clear 4.5:1 on the fill panel.
+    final style = DocsType.sectionHeader(docs.textPrimary);
     return Container(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: docs.fill,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       child: Row(
         children: [
           Expanded(flex: VariableTable._nameFlex, child: Text('NAME', style: style)),
@@ -90,14 +85,13 @@ class _VariableRowView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final theme = Theme.of(context);
+    final docs = DocsColors.of(context);
 
     return Container(
       decoration: BoxDecoration(
         border: last
             ? null
-            : Border(bottom: BorderSide(color: tokens.colorBorder)),
+            : Border(bottom: BorderSide(color: docs.separator)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
@@ -114,13 +108,16 @@ class _VariableRowView extends StatelessWidget {
                   child: _Pill(text: row.name),
                 ),
               ),
-              // TYPE: plain text.
+              // TYPE: plain text. Ellipsised so a long single-word type can't
+              // char-wrap into a tall cell at narrow widths.
               Expanded(
                 flex: VariableTable._typeFlex,
                 child: Text(
                   row.type,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: tokens.colorText),
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: DocsType.footnote(docs.textPrimary),
                 ),
               ),
               // EXAMPLE VALUE: a pill, with a colour swatch for hex values.
@@ -137,8 +134,8 @@ class _VariableRowView extends StatelessWidget {
                           height: 14,
                           decoration: BoxDecoration(
                             color: _parseHex(row.example),
-                            borderRadius: BorderRadius.circular(3),
-                            border: Border.all(color: tokens.colorBorder),
+                            borderRadius: BorderRadius.circular(DocsRadii.xs),
+                            border: Border.all(color: docs.separator),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -152,11 +149,7 @@ class _VariableRowView extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           // Description: its own line, full width, in secondary text.
-          Text(
-            row.description,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: tokens.colorSecondaryText, height: 1.45),
-          ),
+          Text(row.description, style: DocsType.footnote(docs.textSecondary)),
         ],
       ),
     );
@@ -170,23 +163,19 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: tokens.colorBorder.withValues(alpha: 0.6)),
+        color: docs.fill,
+        borderRadius: BorderRadius.circular(DocsRadii.xs),
+        border: Border.all(color: docs.separator),
       ),
       child: Text(
         text,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 12.5,
-          color: tokens.colorText,
-        ),
+        style: DocsType.mono(docs.textPrimary, size: 12.5),
       ),
     );
   }

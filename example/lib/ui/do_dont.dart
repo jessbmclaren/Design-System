@@ -1,5 +1,7 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
+
+import 'docs_style.dart';
 
 /// The "Do" / "Don't" guidance cards shown on a pattern page.
 class DoDont extends StatelessWidget {
@@ -13,27 +15,16 @@ class DoDont extends StatelessWidget {
     final wide = MediaQuery.sizeOf(context).width >= 720;
     final cards = <Widget>[
       if (dos.isNotEmpty)
-        _GuidanceCard(
-          positive: true,
-          title: 'Do',
-          items: dos,
-        ),
+        _GuidanceCard(positive: true, title: 'Do', items: dos),
       if (donts.isNotEmpty)
-        _GuidanceCard(
-          positive: false,
-          title: "Don't",
-          items: donts,
-        ),
+        _GuidanceCard(positive: false, title: "Don't", items: donts),
     ];
 
     if (!wide) {
       return Column(
         children: [
           for (final c in cards)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: c,
-            ),
+            Padding(padding: const EdgeInsets.only(bottom: 14), child: c),
         ],
       );
     }
@@ -66,81 +57,50 @@ class _GuidanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final accentBg = positive
-        ? tokens.badgeSuccessColorBackground
-        : tokens.badgeDangerColorBackground;
-    final accentFg = positive
-        ? tokens.badgeSuccessColorText
-        : tokens.badgeDangerColorText;
-    final accentBorder = positive
-        ? tokens.badgeSuccessColorBorder
-        : tokens.badgeDangerColorBorder;
+    final docs = DocsColors.of(context);
+    final accent = positive ? docs.positive : docs.negative;
+    final accentSoft = positive ? docs.positiveSoft : docs.negativeSoft;
+    final glyph = positive ? LucideIcons.check : LucideIcons.x;
 
     return Container(
       decoration: BoxDecoration(
-        color: tokens.formBackgroundColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: tokens.colorBorder),
+        color: docs.surface,
+        borderRadius: BorderRadius.circular(DocsRadii.lg),
+        border: Border.all(color: docs.separator),
+        boxShadow: DocsShadows.card,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                width: 26,
+                height: 26,
                 decoration: BoxDecoration(
-                  color: accentBg,
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: accentBorder),
+                  color: accentSoft,
+                  borderRadius: BorderRadius.circular(DocsRadii.sm),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      positive ? Icons.check : Icons.close,
-                      size: 14,
-                      color: accentFg,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: accentFg,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
+                child: Icon(glyph, size: 15, color: accent),
               ),
+              const SizedBox(width: 10),
+              Text(title, style: DocsType.headline(accent)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           for (final item in items)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: 12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 6, right: 8),
-                    child: Container(
-                      width: 5,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: tokens.colorSecondaryText,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
+                    padding: const EdgeInsets.only(top: 2, right: 10),
+                    child: Icon(glyph, size: 15, color: accent),
                   ),
                   Expanded(
-                    child: Text(
-                      item,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    child: Text(item, style: DocsType.callout(docs.textSecondary)),
                   ),
                 ],
               ),

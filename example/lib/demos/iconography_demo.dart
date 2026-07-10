@@ -1,6 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
+import '../ui/docs_style.dart';
+
 /// Live demo for the Iconography page: the full `DsIcons` vocabulary, each glyph
 /// shown with the semantic role it is referenced by. Screenshot safe.
 class IconographyDemo extends StatelessWidget {
@@ -46,35 +48,40 @@ class IconographyDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     return Wrap(
-      spacing: DsSpacing.sm,
-      runSpacing: DsSpacing.sm,
+      spacing: 12,
+      runSpacing: 12,
       children: [
         for (final (name, icon) in _icons)
+          // A fixed-size cell so every tile in the catalogue is exactly the
+          // same height, giving a clean matrix rather than a ragged grid.
           SizedBox(
-            width: 116,
+            width: DocsMetrics.iconCellWidth,
+            height: DocsMetrics.iconCellHeight,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: tokens.colorBackground,
-                border: Border.all(color: tokens.colorBorder),
-                borderRadius: BorderRadius.circular(tokens.borderRadius),
+                color: docs.surface,
+                border: Border.all(color: docs.separator),
+                borderRadius: BorderRadius.circular(DocsRadii.md),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: DsSpacing.sm,
-                  vertical: DsSpacing.md,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    DsIcon(icon: icon, size: DsIconSize.lg),
-                    const SizedBox(height: DsSpacing.sm),
+                    DsIcon(
+                      icon: icon,
+                      size: DsIconSize.lg,
+                      color: docs.textPrimary,
+                    ),
+                    const SizedBox(height: 10),
                     Text(
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: tokens.labelSm
-                          .toTextStyle(color: tokens.colorSecondaryText),
+                      textAlign: TextAlign.center,
+                      style: DocsType.caption(docs.textTertiary),
                     ),
                   ],
                 ),

@@ -1,5 +1,5 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +11,7 @@ import '../playground/playground_registry.dart';
 import 'code_block.dart';
 import 'device_frame.dart';
 import 'do_dont.dart';
+import 'docs_style.dart';
 import 'markdown_pane.dart';
 import 'variable_table.dart';
 
@@ -39,8 +40,7 @@ class _PatternPageViewState extends State<PatternPageView> {
   @override
   Widget build(BuildContext context) {
     final page = widget.page;
-    final theme = Theme.of(context);
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     final demo = demoFor(page.id);
     final playground = playgroundFor(page.id);
 
@@ -52,73 +52,97 @@ class _PatternPageViewState extends State<PatternPageView> {
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DocsMetrics.pagePaddingX,
+        vertical: DocsMetrics.pagePaddingY,
+      ),
       children: [
         Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 860),
+            constraints:
+                const BoxConstraints(maxWidth: DocsMetrics.readingMaxWidth),
             // Replays a gentle fade-and-rise each time the page changes.
             child: _EntranceTransition(
               key: ValueKey(page.id),
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Eyebrow(label: page.group.label),
-                const SizedBox(height: 12),
-                Text(page.title, style: theme.textTheme.displaySmall),
-                const SizedBox(height: 16),
-                _Prose(page.description, large: true),
-                const SizedBox(height: 16),
-                _ActionBar(
-                  onViewMarkdown: () => setState(() => _showMarkdown = true),
-                ),
-                const SizedBox(height: 28),
-                for (final block in page.blocks) ...[
-                  _block(block),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Eyebrow(label: page.group.label),
+                  const SizedBox(height: 14),
+                  // Scales the tight display title down on very narrow columns
+                  // (a long single word at 320dp) rather than wrapping or clipping.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      page.title,
+                      maxLines: 1,
+                      softWrap: false,
+                      style: DocsType.hero(docs.textPrimary),
+                    ),
+                  ),
                   const SizedBox(height: 20),
-                ],
-                if (playground != null) ...[
-                  const SizedBox(height: 4),
-                  PlaygroundPanel(
-                    key: ValueKey('pg-${page.id}'),
-                    spec: playground,
+                  _Prose(page.description, large: true),
+                  const SizedBox(height: 20),
+                  _ActionBar(
+                    onViewMarkdown: () => setState(() => _showMarkdown = true),
                   ),
                   const SizedBox(height: 32),
-                ] else if (page.hasLiveDemo && demo != null) ...[
-                  const SizedBox(height: 4),
-                  DeviceFrame(child: demo),
-                  const SizedBox(height: 32),
+                  for (final block in page.blocks) ...[
+                    _block(block),
+                    const SizedBox(height: 22),
+                  ],
+                  if (playground != null) ...[
+                    const SizedBox(height: 4),
+                    PlaygroundPanel(
+                      key: ValueKey('pg-${page.id}'),
+                      spec: playground,
+                    ),
+                    const SizedBox(height: 36),
+                  ] else if (page.hasLiveDemo && demo != null) ...[
+                    const SizedBox(height: 4),
+                    DeviceFrame(child: demo),
+                    const SizedBox(height: 36),
+                  ],
+                  if (page.dos.isNotEmpty || page.donts.isNotEmpty) ...[
+                    Text('Guidelines', style: DocsType.title2(docs.textPrimary)),
+                    const SizedBox(height: 18),
+                    DoDont(dos: page.dos, donts: page.donts),
+                    const SizedBox(height: 36),
+                  ],
+                  if (page.code != null) ...[
+                    Text('Example', style: DocsType.title2(docs.textPrimary)),
+                    const SizedBox(height: 18),
+                    CodeBlock(code: page.code!.trim()),
+                    const SizedBox(height: 36),
+                  ],
+                  if (page.related.isNotEmpty) ...[
+                    const SizedBox(height: 44),
+                    Divider(color: docs.separator, height: 1),
+                    const SizedBox(height: 20),
+                    Text('See also', style: DocsType.title3(docs.textPrimary)),
+                    const SizedBox(height: 16),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Cards keep their comfortable width on wide layouts and
+                        // shrink to the column when it is narrower than one card.
+                        final w = constraints.maxWidth < 264
+                            ? constraints.maxWidth
+                            : 264.0;
+                        return Wrap(
+                          spacing: 14,
+                          runSpacing: 14,
+                          children: [
+                            for (final id in page.related)
+                              if (pageIndex[id] != null)
+                                _RelatedCard(page: pageIndex[id]!, width: w),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                  const SizedBox(height: 64),
                 ],
-                if (page.dos.isNotEmpty || page.donts.isNotEmpty) ...[
-                  Text('Guidelines', style: theme.textTheme.headlineSmall),
-                  const SizedBox(height: 16),
-                  DoDont(dos: page.dos, donts: page.donts),
-                  const SizedBox(height: 32),
-                ],
-                if (page.code != null) ...[
-                  Text('Example', style: theme.textTheme.headlineSmall),
-                  const SizedBox(height: 16),
-                  CodeBlock(code: page.code!.trim()),
-                  const SizedBox(height: 32),
-                ],
-                if (page.related.isNotEmpty) ...[
-                  const SizedBox(height: 40),
-                  Divider(color: tokens.colorBorder),
-                  const SizedBox(height: 16),
-                  Text('See also', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      for (final id in page.related)
-                        if (pageIndex[id] != null)
-                          _RelatedCard(page: pageIndex[id]!),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 60),
-              ],
               ),
             ),
           ),
@@ -128,11 +152,12 @@ class _PatternPageViewState extends State<PatternPageView> {
   }
 
   Widget _block(ContentBlock block) {
+    final docs = DocsColors.of(context);
     return switch (block) {
       ProseBlock(:final text) => _Prose(text),
       SubheadingBlock(:final text) => Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Text(text, style: Theme.of(context).textTheme.headlineSmall),
+          padding: const EdgeInsets.only(top: 14),
+          child: Text(text, style: DocsType.title3(docs.textPrimary)),
         ),
       VariablesBlock() => VariableTable(block: block),
     };
@@ -146,23 +171,22 @@ class _Prose extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     final base = large
-        ? Theme.of(context).textTheme.bodyLarge
-        : Theme.of(context).textTheme.bodyMedium;
+        ? DocsType.lead(docs.textSecondary)
+        : DocsType.body(docs.textPrimary);
     return MarkdownBody(
       data: text,
       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        p: base?.copyWith(
-          color: large ? tokens.colorSecondaryText : tokens.colorText,
-          height: 1.55,
-          fontSize: large ? 17 : null,
-        ),
-        code: TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 13.5,
-          backgroundColor: tokens.offsetBackgroundColor,
-          color: tokens.actionPrimaryColorText,
+        p: base,
+        a: TextStyle(color: docs.link, decoration: TextDecoration.none),
+        // Inline code stays calm ink on a whisper-subtle fill so the paragraph
+        // reads as one block rather than scattered accent colour.
+        code: DocsType.mono(docs.codeInk, size: large ? 15 : 13.5, height: 1.4)
+            .copyWith(backgroundColor: docs.fill),
+        codeblockDecoration: BoxDecoration(
+          color: docs.fill,
+          borderRadius: BorderRadius.circular(DocsRadii.sm),
         ),
       ),
     );
@@ -177,65 +201,48 @@ class _ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
           onTap: onViewMarkdown,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(DocsRadii.sm),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.description_outlined,
-                    size: 16, color: tokens.actionPrimaryColorText),
-                const SizedBox(width: 6),
+                Icon(LucideIcons.file_text, size: 15, color: docs.link),
+                const SizedBox(width: 7),
                 Text(
                   'View as Markdown',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: tokens.actionPrimaryColorText,
-                  ),
+                  style: DocsType.callout(docs.link)
+                      .copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Divider(color: tokens.colorBorder, height: 1),
+        const SizedBox(height: 10),
+        Divider(color: docs.separator, height: 1),
       ],
     );
   }
 }
 
-/// The small uppercase tag above a page title.
+/// The small accent label above a page title. Borderless and quiet, letting the
+/// title carry the weight.
 class _Eyebrow extends StatelessWidget {
   const _Eyebrow({required this.label});
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final accent = tokens.actionPrimaryColorText;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: accent.withValues(alpha: 0.20)),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.7,
-          color: accent,
-        ),
-      ),
+    final docs = DocsColors.of(context);
+    return Text(
+      label.toUpperCase(),
+      style: DocsType.eyebrow(docs.textSecondary),
     );
   }
 }
@@ -250,8 +257,8 @@ class _EntranceTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: DsMotion.durationOf(context, DsMotion.slow),
-      curve: DsMotion.emphasized,
+      duration: const Duration(milliseconds: 360),
+      curve: const Cubic(0.2, 0, 0, 1),
       builder: (context, t, child) => Opacity(
         opacity: t.clamp(0.0, 1.0),
         child: Transform.translate(
@@ -267,8 +274,9 @@ class _EntranceTransition extends StatelessWidget {
 /// A "See also" link. Fixed height so a row of these always lines up, with a
 /// small lift on hover.
 class _RelatedCard extends StatefulWidget {
-  const _RelatedCard({required this.page});
+  const _RelatedCard({required this.page, this.width = 264});
   final PatternPage page;
+  final double width;
 
   @override
   State<_RelatedCard> createState() => _RelatedCardState();
@@ -279,30 +287,28 @@ class _RelatedCardState extends State<_RelatedCard> {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
+    final docs = DocsColors.of(context);
     final page = widget.page;
-    final radius = BorderRadius.circular(10);
+    final radius = BorderRadius.circular(DocsRadii.lg);
     return SizedBox(
-      width: 262,
-      height: 86,
+      width: widget.width,
+      height: 92,
       child: MouseRegion(
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: AnimatedContainer(
-          duration: DsMotion.durationOf(context, DsMotion.fast),
-          curve: DsMotion.standard,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
           transform: _hover
               ? Matrix4.translationValues(0, -3, 0)
               : Matrix4.identity(),
           decoration: BoxDecoration(
-            color: tokens.formBackgroundColor,
+            color: docs.surface,
             borderRadius: radius,
             border: Border.all(
-              color: _hover
-                  ? tokens.actionPrimaryColorText.withValues(alpha: 0.45)
-                  : tokens.colorBorder,
+              color: _hover ? docs.separatorStrong : docs.separator,
             ),
-            boxShadow: _hover ? DsElevation.medium : DsElevation.none,
+            boxShadow: _hover ? DocsShadows.card : DocsShadows.none,
           ),
           child: Material(
             color: Colors.transparent,
@@ -310,30 +316,26 @@ class _RelatedCardState extends State<_RelatedCard> {
               borderRadius: radius,
               onTap: () => context.go('/patterns/${page.id}'),
               child: Padding(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(page.group.label.toUpperCase(),
-                        style: TextStyle(
-                            fontSize: 10.5,
-                            letterSpacing: 0.6,
-                            color: tokens.colorSecondaryText,
-                            fontWeight: FontWeight.w700)),
+                        style: DocsType.sectionHeader(docs.textTertiary)),
                     Row(
                       children: [
                         Expanded(
                           child: Text(page.navTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleSmall),
+                              style: DocsType.headline(docs.textPrimary)),
                         ),
                         AnimatedSlide(
-                          duration: DsMotion.durationOf(context, DsMotion.fast),
+                          duration: const Duration(milliseconds: 160),
                           offset: _hover ? const Offset(0.2, 0) : Offset.zero,
-                          child: Icon(Icons.arrow_forward,
-                              size: 16, color: tokens.actionPrimaryColorText),
+                          child: Icon(LucideIcons.arrow_right,
+                              size: 16, color: docs.accent),
                         ),
                       ],
                     ),
