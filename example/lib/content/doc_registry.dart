@@ -33,6 +33,8 @@ import 'pages/filtering_sorting.dart';
 import 'pages/board_view.dart';
 import 'pages/group_hierarchy.dart';
 import 'pages/policies.dart';
+import 'pages/data_import.dart';
+import 'pages/record_panel.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
@@ -94,6 +96,8 @@ final List<PatternPage> allPages = [
   boardViewPage,
   groupHierarchyPage,
   policiesPage,
+  dataImportPage,
+  recordPanelPage,
   // layout
   fullPageLayoutsPage,
   listsPage,

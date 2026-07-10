@@ -28,6 +28,8 @@ import 'filtering_sorting_demo.dart';
 import 'board_view_demo.dart';
 import 'group_hierarchy_demo.dart';
 import 'policies_demo.dart';
+import 'data_import_demo.dart';
+import 'record_panel_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
@@ -85,6 +87,8 @@ final Map<String, Widget Function()> _demos = {
   'board-view': () => const BoardViewDemo(),
   'group-hierarchy': () => const GroupHierarchyDemo(),
   'policies': () => const PoliciesDemo(),
+  'data-import': () => const DataImportDemo(),
+  'record-panel': () => const RecordPanelDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),
