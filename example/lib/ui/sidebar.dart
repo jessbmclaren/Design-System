@@ -43,12 +43,15 @@ class Sidebar extends StatelessWidget {
                       size: 18, color: tokens.buttonPrimaryColorText),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  'Design System',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                Expanded(
+                  child: Text(
+                    'Design System',
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),
