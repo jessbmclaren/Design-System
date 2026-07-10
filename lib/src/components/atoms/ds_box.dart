@@ -24,9 +24,8 @@ import 'package:flutter/material.dart';
 ///
 /// The widget is purely declarative: it starts no timers or animations and is
 /// therefore safe to render in screenshots and golden tests. With no explicit
-/// [width] or [height] it takes the size of its child and collapses down to a
-/// 320dp phone, and any content that might overflow is the responsibility of
-/// the (caller-provided) child.
+/// [width] or [height] it takes the size of its child, and any content that
+/// might overflow is the responsibility of the (caller-provided) child.
 class DsBox extends StatelessWidget {
   /// Creates a tokened layout box.
   ///

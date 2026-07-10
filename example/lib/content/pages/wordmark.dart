@@ -10,9 +10,10 @@ final PatternPage wordmarkPage = PatternPage(
   description:
       '`DsWordmark` sets a product name as two-tone text: a `primary` part in a '
       'lighter weight followed by an optional `accent` part in a heavier weight, '
-      'for example "acme" then "id". The family, weight and colour come from the '
-      'active theme, so the mark re-skins alongside the rest of the system. The '
-      'name itself is content rather than a token, so you pass the parts in. '
+      'for example "acme" then "id". The family and colour come from the active '
+      'theme, so the mark re-skins alongside the rest of the system; the two '
+      'weights are fixed. The name itself is content rather than a token, so you '
+      'pass the parts in. '
       'Screen readers read the whole mark as one name.',
   hasLiveDemo: false,
   dos: const [

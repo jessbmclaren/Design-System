@@ -2,7 +2,7 @@
 
 A box is the design system's primitive for wrapping a subtree in tokened spacing, a background, a border, a corner radius and elevation: everything you would otherwise hand-write on a raw `Container` and `BoxDecoration`. `DsBox` is deliberately colour-neutral: every colour defaults to `null`, so an undecorated box is as cheap as a `Padding`, and you opt into surface treatment by passing theme tokens read from `DsTokens.of(context)` (`colorBackground`, `colorBorder` and `borderRadius`) rather than literal hex. Use it to build cards, panels, callouts and inset regions whose padding and radius track the theme, so a single token change re-skins every surface at once.
 
-Feed `DsBox` values from the theme rather than raw colours: pass `tokens.colorBackground` for the fill, `tokens.colorBorder` for the stroke, `tokens.borderRadius` for the corners and a `DsElevation` step such as `DsElevation.low` for the shadow. A box with no explicit `width` or `height` sizes to its child and collapses to a 320dp phone; supplying an `alignment` makes it expand to fill the available space, as `Container` does.
+Feed `DsBox` values from the theme rather than raw colours: pass `tokens.colorBackground` for the fill, `tokens.colorBorder` for the stroke, `tokens.borderRadius` for the corners and a `DsElevation` step such as `DsElevation.low` for the shadow. A box with no explicit `width` or `height` sizes to its child; supplying an `alignment` makes it expand to fill the available space, as `Container` does.
 
 ![Desktop (1280dp)](img/box_desktop.png)
 

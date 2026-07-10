@@ -25,9 +25,8 @@ final PatternPage boxPage = PatternPage(
       '`tokens.colorBackground` for the fill, `tokens.colorBorder` for the '
       'stroke, `tokens.borderRadius` for the corners and a `DsElevation` step '
       'such as `DsElevation.low` for the shadow. A box with no explicit '
-      '`width` or `height` sizes to its child and collapses to a '
-      '320dp phone; supplying an `alignment` makes it expand to fill the '
-      'available space, as `Container` does.',
+      '`width` or `height` sizes to its child; supplying an `alignment` makes '
+      'it expand to fill the available space, as `Container` does.',
     ),
   ],
   dos: const [

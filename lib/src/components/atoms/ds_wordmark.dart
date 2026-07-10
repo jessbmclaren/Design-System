@@ -7,8 +7,9 @@ import '../../tokens/ds_typography.dart';
 ///
 /// [DsWordmark] sets a product name as text, with an optional [accent] suffix
 /// in a heavier weight so the mark reads with a subtle two-tone emphasis (for
-/// example "acme" followed by "id"). The family, weights and colour come from
-/// the active theme, so the mark re-skins with the rest of the system.
+/// example "acme" followed by "id"). The family and colour come from the
+/// active theme, so the mark re-skins with the rest of the system; the two
+/// weights are fixed.
 ///
 /// The name itself is content rather than a token, so the caller passes it in.
 /// A brand that keeps its name in its own theme can build the wordmark there
