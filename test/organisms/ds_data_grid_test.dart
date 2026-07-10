@@ -122,6 +122,234 @@ void main() {
       expect(find.textContaining('No records'), findsOneWidget);
     });
 
+    testWidgets('is read-only when editable is false', (tester) async {
+      Object? changed;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 200,
+          child: DsDataGrid(
+            columns: const [
+              DsGridColumn(key: 'name', title: 'Name', editable: true),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'name': 'Acme Corp'})],
+            onCellChanged: (_, _, v) => changed = v,
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      // The column opts in but the grid master switch is off: no editor opens.
+      expect(find.bySemanticsLabel('Edit Name'), findsNothing);
+      await tester.tap(find.text('Acme Corp'));
+      await tester.pump();
+      expect(find.byType(TextField), findsNothing);
+      expect(changed, isNull);
+    });
+
+    testWidgets('editing a text cell commits via onCellChanged', (tester) async {
+      String? key;
+      Object? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 200,
+          child: DsDataGrid(
+            editable: true,
+            columns: const [
+              DsGridColumn(key: 'name', title: 'Name', editable: true),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'name': 'Acme Corp'})],
+            onCellChanged: (rowId, columnKey, v) {
+              key = columnKey;
+              value = v;
+            },
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      await tester.tap(find.text('Acme Corp'));
+      await tester.pump();
+      expect(find.byType(TextField), findsOneWidget);
+      await tester.enterText(find.byType(TextField), 'Northwind');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(key, 'name');
+      expect(value, 'Northwind');
+    });
+
+    testWidgets('tapping an editable checkbox toggles immediately', (tester) async {
+      Object? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 200,
+          child: DsDataGrid(
+            editable: true,
+            columns: const [
+              DsGridColumn(
+                key: 'active',
+                title: 'Active',
+                type: DsCellType.checkbox,
+                editable: true,
+              ),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'active': true})],
+            onCellChanged: (_, _, v) => value = v,
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      await tester.tap(find.bySemanticsLabel('Edit Active').first);
+      await tester.pump();
+      expect(value, false);
+    });
+
+    testWidgets('editing a select cell commits the chosen option value', (tester) async {
+      Object? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 300,
+          child: DsDataGrid(
+            editable: true,
+            columns: const [
+              DsGridColumn(
+                key: 'status',
+                title: 'Status',
+                type: DsCellType.status,
+                editable: true,
+                options: [
+                  DsGridOption(value: 'active', label: 'Active'),
+                  DsGridOption(value: 'grounded', label: 'Grounded'),
+                ],
+              ),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'status': 'active'})],
+            onCellChanged: (_, _, v) => value = v,
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      await tester.tap(find.bySemanticsLabel('Edit Status').first);
+      await tester.pump();
+      // The menu option only exists in the overlay, so this uniquely targets it.
+      await tester.tap(find.text('Grounded'));
+      await tester.pump();
+      expect(value, 'grounded');
+    });
+
+    testWidgets('cells edit in the stacked-card layout too', (tester) async {
+      Object? value;
+      await pumpDs(
+        tester,
+        DsDataGrid(
+          editable: true,
+          compactBreakpoint: 640,
+          columns: const [
+            DsGridColumn(key: 'name', title: 'Name', editable: true),
+          ],
+          rows: [DsGridRow(id: 'r1', cells: const {'name': 'Acme Corp'})],
+          onCellChanged: (_, _, v) => value = v,
+        ),
+        surfaceSize: const Size(320, 700),
+      );
+      await tester.pump();
+      await tester.tap(find.text('Acme Corp'));
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), 'Globex');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(value, 'Globex');
+    });
+
+    testWidgets('editable badge cells announce their value to assistive tech',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 200,
+          child: DsDataGrid(
+            editable: true,
+            columns: const [
+              DsGridColumn(
+                key: 'status',
+                title: 'Status',
+                type: DsCellType.status,
+                width: 160,
+                editable: true,
+                options: [DsGridOption(value: 'active', label: 'Active')],
+              ),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'status': 'active'})],
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      // The value is on the "Edit" control itself, not stranded in a child node.
+      final node = tester.getSemantics(find.bySemanticsLabel('Edit Status'));
+      expect(node.value, 'Active');
+    });
+
+    testWidgets('editing a rating sets the tapped star count', (tester) async {
+      Object? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 200,
+          child: DsDataGrid(
+            editable: true,
+            columns: const [
+              DsGridColumn(
+                key: 'condition',
+                title: 'Condition',
+                type: DsCellType.rating,
+                width: 160,
+                editable: true,
+              ),
+            ],
+            rows: [DsGridRow(id: 'r1', cells: const {'condition': 2})],
+            onCellChanged: (_, _, v) => value = v,
+          ),
+        ),
+        surfaceSize: const Size(800, 400),
+      );
+      await tester.pump();
+      // Tapping a star emits a new rating (the exact star hit is layout
+      // dependent, but any tap must report an int in range).
+      await tester.tap(find.byIcon(Icons.star).first);
+      await tester.pump();
+      expect(value, isA<int>());
+      expect(value, inInclusiveRange(0, 5));
+    });
+
+    testWidgets('a caption that wraps does not overflow a fixed-height grid',
+        (tester) async {
+      // Regression: the caption height must not be under-reserved (a wrapped
+      // two-line caption once overflowed the body by ~20px on a phone).
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 240,
+          child: DsDataGrid(
+            caption:
+                'A deliberately long caption that will wrap onto more than one '
+                'line inside a narrow phone-width grid',
+            columns: _columns,
+            rows: _rows(),
+            compactBreakpoint: 640,
+          ),
+        ),
+        surfaceSize: const Size(320, 700),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('no overflow across device widths', (tester) async {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);

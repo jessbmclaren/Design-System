@@ -22,6 +22,7 @@ import 'bar_chart_demo.dart';
 import 'line_chart_demo.dart';
 import 'meter_chart_demo.dart';
 import 'data_grid_demo.dart';
+import 'cell_types_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
@@ -73,6 +74,7 @@ final Map<String, Widget Function()> _demos = {
   'line-chart': () => const LineChartDemo(),
   'meter-chart': () => const MeterChartDemo(),
   'data-grid': () => const DataGridDemo(),
+  'cell-types': () => const CellTypesDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),

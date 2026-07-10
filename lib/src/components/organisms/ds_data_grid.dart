@@ -2,9 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
+import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
@@ -84,6 +86,45 @@ enum DsColumnAlign {
   end,
 }
 
+/// A single choice offered by a [DsGridColumn] for the select and status cell
+/// types.
+///
+/// An option binds a stored [value] (the key written back through
+/// [DsDataGrid.onCellChanged]) to an optional display [label]. Provide a
+/// [variant] to tint the option's badge with one of the shared semantic badge
+/// styles, or a [color] to paint an explicit swatch that overrides the variant.
+/// Options are used both to render a cell's label and colour and to populate
+/// the menu shown while editing a [DsCellType.singleSelect],
+/// [DsCellType.multiSelect] or [DsCellType.status] cell.
+@immutable
+class DsGridOption {
+  /// Creates a grid option.
+  ///
+  /// Only [value] is required. When [label] is null the [value] is shown
+  /// verbatim (see [effectiveLabel]).
+  const DsGridOption({
+    required this.value,
+    this.label,
+    this.variant,
+    this.color,
+  });
+
+  /// The stored value / key written back when this option is chosen.
+  final String value;
+
+  /// The human-readable label shown for this option. Falls back to [value].
+  final String? label;
+
+  /// An optional semantic badge variant for select and status chips.
+  final DsBadgeVariant? variant;
+
+  /// An optional explicit swatch colour. When set it overrides [variant].
+  final Color? color;
+
+  /// The label actually rendered, resolving to [value] when [label] is null.
+  String get effectiveLabel => label ?? value;
+}
+
 /// The definition of a single column in a [DsDataGrid].
 ///
 /// A column binds a stable [key] (used to look up each row's value in
@@ -91,7 +132,9 @@ enum DsColumnAlign {
 /// the cell is rendered and sorted. Columns describe their own [width],
 /// [minWidth], whether they are [frozen] (pinned to the leading edge), whether
 /// they are [sortable] and [resizable], their [align]ment, an optional header
-/// [icon] and, for [DsCellType.currency], a [currencySymbol].
+/// [icon] and, for [DsCellType.currency], a [currencySymbol]. A column can also
+/// opt into inline [editable] editing and, for the select and status types,
+/// declare its choice set through [options].
 @immutable
 class DsGridColumn {
   /// Creates a column definition.
@@ -113,6 +156,8 @@ class DsGridColumn {
     this.align,
     this.icon,
     this.currencySymbol,
+    this.editable = false,
+    this.options,
   });
 
   /// The stable identifier used to read this column's value from each row and
@@ -151,6 +196,17 @@ class DsGridColumn {
   /// The currency symbol prefixed to [DsCellType.currency] values. Defaults to
   /// `$` when null.
   final String? currencySymbol;
+
+  /// Whether cells in this column can be edited inline. Editing is only offered
+  /// when both this flag and [DsDataGrid.editable] are true; otherwise the
+  /// column renders read-only exactly as before.
+  final bool editable;
+
+  /// The choice set for [DsCellType.singleSelect], [DsCellType.multiSelect] and
+  /// [DsCellType.status] columns. The options render each cell's label and
+  /// colour and populate the menu shown while editing. Optional (and unused)
+  /// for other cell types.
+  final List<DsGridOption>? options;
 
   /// The alignment actually used, resolving the [type] default when [align] is
   /// null.
@@ -258,6 +314,19 @@ class DsGridSort {
 /// provided (changes are reported via [onSelectionChanged]); otherwise it is
 /// held internally. Selected rows use [DsTokens.offsetBackgroundColor].
 ///
+/// ## Editing
+///
+/// When [editable] is true, cells in columns that opt in via
+/// [DsGridColumn.editable] become editable inline in both the wide table and
+/// the stacked-card layout. Editing is *controlled*: committing an edit reports
+/// the new value through [onCellChanged] and expects the parent to update
+/// [rows]. Only one cell edits at a time and Escape always cancels. Each cell
+/// type edits in the way that suits it — a `text`, `number` or `currency` cell
+/// opens an inline field; a `date` cell opens the Material date picker; a
+/// `checkbox` toggles and a `rating` sets its stars in place; a `singleSelect`
+/// or `status` cell opens a menu of [DsGridColumn.options]; and a `multiSelect`
+/// cell opens a checkable menu. `progress` cells are never editable.
+///
 /// ## Accessibility & screenshots
 ///
 /// Header cells expose a semantics button with a sort key and an announced sort
@@ -281,6 +350,8 @@ class DsDataGrid extends StatefulWidget {
     this.compactBreakpoint = 640,
     this.emptyState,
     this.caption,
+    this.editable = false,
+    this.onCellChanged,
   });
 
   /// The column definitions, in display order. Columns with
@@ -326,9 +397,22 @@ class DsDataGrid extends StatefulWidget {
   /// centred "No records" message.
   final Widget? emptyState;
 
-  /// An optional caption rendered above the grid and used as its accessible
-  /// description.
+  /// An optional caption rendered as a heading above the grid, exposed to
+  /// assistive technology as a heading so it introduces the table in reading
+  /// order.
   final String? caption;
+
+  /// The master switch for inline editing. A cell is only editable when this is
+  /// true *and* its [DsGridColumn.editable] is true. Defaults to false, leaving
+  /// the grid entirely read-only.
+  final bool editable;
+
+  /// Called when an inline edit commits, with the row id, column key and the
+  /// new value. The grid is a controlled editing component: it does not mutate
+  /// [rows] itself, so the parent should apply the change and pass the updated
+  /// rows back.
+  final void Function(String rowId, String columnKey, Object? value)?
+      onCellChanged;
 
   @override
   State<DsDataGrid> createState() => _DsDataGridState();
@@ -354,6 +438,17 @@ class _DsDataGridState extends State<DsDataGrid> {
   /// Internal selection, used only when [DsDataGrid.selectedRowIds] is null.
   Set<String> _internalSelection = <String>{};
 
+  /// The row id of the cell currently in an inline text editor, or null when no
+  /// cell is being edited. Paired with [_editingColumnKey].
+  String? _editingRowId;
+
+  /// The column key of the cell currently in an inline text editor.
+  String? _editingColumnKey;
+
+  /// The live overlay entry for an open select / multi-select menu, kept so at
+  /// most one is shown at a time and so it can be dismissed and disposed.
+  OverlayEntry? _optionsOverlay;
+
   /// Horizontal padding inside header and data cells. Resolved from the window
   /// size class each build so expanded windows breathe a little more.
   double _cellPaddingX = DsSpacing.md;
@@ -371,10 +466,17 @@ class _DsDataGridState extends State<DsDataGrid> {
   void didUpdateWidget(DsDataGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncWidths();
+    // Stop editing if the grid was switched out of edit mode.
+    if (!widget.editable) {
+      _editingRowId = null;
+      _editingColumnKey = null;
+      _dismissOptionsOverlay();
+    }
   }
 
   @override
   void dispose() {
+    _dismissOptionsOverlay();
     _bodyHController.removeListener(_syncHeaderOffset);
     _verticalController.dispose();
     _headerHController.dispose();
@@ -504,6 +606,241 @@ class _DsDataGridState extends State<DsDataGrid> {
     _setSelection(next);
   }
 
+  // --- Editing --------------------------------------------------------------
+
+  /// Whether editing is offered for [type]. Everything is editable except
+  /// [DsCellType.progress], which is always read-only.
+  bool _supportsEditing(DsCellType type) => type != DsCellType.progress;
+
+  /// Whether a cell in [column] can be edited given the grid's master switch,
+  /// the column opt-in and the cell type.
+  bool _isCellEditable(DsGridColumn column) =>
+      widget.editable && column.editable && _supportsEditing(column.type);
+
+  /// Whether the cell at [row]/[column] is currently showing an inline editor.
+  bool _isEditingCell(DsGridRow row, DsGridColumn column) =>
+      _editingRowId == row.id && _editingColumnKey == column.key;
+
+  /// A short, screen-reader-friendly string for the current value of an
+  /// editable cell, used as the `value` of its "Edit …" semantics button so the
+  /// current value is announced on the control itself (not stranded in a
+  /// separate child node). Returns null when the value is empty or is already
+  /// conveyed another way (a checkbox uses `checked`).
+  String? _editSemanticValue(DsGridColumn column, DsGridRow row) {
+    final value = row.cells[column.key];
+    switch (column.type) {
+      case DsCellType.checkbox:
+      case DsCellType.progress:
+        return null;
+      case DsCellType.text:
+      case DsCellType.link:
+      case DsCellType.user:
+        final string = _asString(value);
+        return (string == null || string.isEmpty) ? null : string;
+      case DsCellType.number:
+        final number = _asNum(value);
+        return number == null ? null : _formatNumber(number);
+      case DsCellType.currency:
+        final number = _asNum(value);
+        if (number == null) return null;
+        final symbol = column.currencySymbol ?? r'$';
+        return '$symbol${_formatNumber(number, decimals: 2)}';
+      case DsCellType.date:
+        final date = _asDate(value);
+        return date == null ? null : _formatDate(date);
+      case DsCellType.singleSelect:
+      case DsCellType.status:
+        final string = _asString(value);
+        if (string == null || string.isEmpty) return null;
+        return _optionFor(column, string)?.effectiveLabel ?? string;
+      case DsCellType.multiSelect:
+        final list = _asStringList(value);
+        if (list == null || list.isEmpty) return null;
+        return [
+          for (final item in list) _optionFor(column, item)?.effectiveLabel ?? item,
+        ].join(', ');
+      case DsCellType.rating:
+        final number = _asNum(value);
+        return number == null ? null : '${number.round()} of 5';
+    }
+  }
+
+  /// Finds the option in [column] whose value equals [value], or null.
+  DsGridOption? _optionFor(DsGridColumn column, String value) {
+    final options = column.options;
+    if (options == null) return null;
+    for (final option in options) {
+      if (option.value == value) return option;
+    }
+    return null;
+  }
+
+  /// Reports a committed edit to the parent. The grid does not mutate its own
+  /// rows; a controlled parent applies the change.
+  void _emit(DsGridRow row, DsGridColumn column, Object? value) {
+    widget.onCellChanged?.call(row.id, column.key, value);
+  }
+
+  /// Opens the inline text editor for the given cell.
+  void _startInlineEdit(DsGridRow row, DsGridColumn column) {
+    _dismissOptionsOverlay();
+    setState(() {
+      _editingRowId = row.id;
+      _editingColumnKey = column.key;
+    });
+  }
+
+  /// Clears the inline editor, but only if it is still showing the given cell —
+  /// so a late commit from a torn-down editor cannot cancel a newer edit.
+  void _cancelEditFor(String rowId, String columnKey) {
+    if (_editingRowId == rowId && _editingColumnKey == columnKey) {
+      setState(() {
+        _editingRowId = null;
+        _editingColumnKey = null;
+      });
+    }
+  }
+
+  /// Removes and forgets any open select / multi-select overlay.
+  void _dismissOptionsOverlay() {
+    _optionsOverlay?.remove();
+    _optionsOverlay = null;
+  }
+
+  /// Dispatches a tap on an editable cell to the right editor for its type.
+  void _beginEdit(BuildContext context, DsGridColumn column, DsGridRow row) {
+    switch (column.type) {
+      case DsCellType.text:
+      case DsCellType.number:
+      case DsCellType.currency:
+      case DsCellType.link:
+      case DsCellType.user:
+        _startInlineEdit(row, column);
+      case DsCellType.date:
+        _openDatePicker(context, column, row);
+      case DsCellType.singleSelect:
+      case DsCellType.status:
+        _openSelectMenu(context, column, row, multi: false);
+      case DsCellType.multiSelect:
+        _openSelectMenu(context, column, row, multi: true);
+      case DsCellType.checkbox:
+        _emit(row, column, !(_asBool(row.cells[column.key]) ?? false));
+      case DsCellType.rating:
+      case DsCellType.progress:
+        break;
+    }
+  }
+
+  /// Commits an inline text edit, coercing per the column type and reverting on
+  /// a failed number parse.
+  void _commitInline(DsGridColumn column, DsGridRow row, String raw) {
+    switch (column.type) {
+      case DsCellType.number:
+      case DsCellType.currency:
+        final parsed = _parseEditableNumber(raw);
+        if (parsed != null) _emit(row, column, parsed);
+      case DsCellType.text:
+      case DsCellType.link:
+      case DsCellType.user:
+        _emit(row, column, raw);
+      default:
+        break;
+    }
+    _cancelEditFor(row.id, column.key);
+  }
+
+  /// Opens the Material date picker for a [DsCellType.date] cell and commits the
+  /// chosen day.
+  Future<void> _openDatePicker(
+    BuildContext context,
+    DsGridColumn column,
+    DsGridRow row,
+  ) async {
+    final current = _asDate(row.cells[column.key]) ?? DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: DateTime(current.year - 100),
+      lastDate: DateTime(current.year + 100, 12, 31),
+    );
+    // The picker is an async gap; the grid may have been disposed while it was
+    // open, so don't push a late edit into a torn-down parent.
+    if (!mounted) return;
+    if (picked != null) _emit(row, column, picked);
+  }
+
+  /// Opens an anchored menu of [DsGridColumn.options] for a select or status
+  /// cell. When [multi] is true the menu is a checkable multi-select that
+  /// commits a `List<String>`; otherwise choosing a row commits its value.
+  void _openSelectMenu(
+    BuildContext context,
+    DsGridColumn column,
+    DsGridRow row, {
+    required bool multi,
+  }) {
+    _dismissOptionsOverlay();
+    final overlay = Overlay.of(context);
+    final box = context.findRenderObject() as RenderBox?;
+    final overlayBox = overlay.context.findRenderObject() as RenderBox?;
+    if (box == null || overlayBox == null) return;
+    final tokens = DsTokens.of(context);
+    final anchorOffset = box.localToGlobal(Offset.zero, ancestor: overlayBox);
+    final anchorSize = box.size;
+    final overlaySize = overlayBox.size;
+    final options = column.options ?? const <DsGridOption>[];
+
+    late final OverlayEntry entry;
+    Widget panel;
+    if (multi) {
+      final selected = _asStringList(row.cells[column.key])?.toSet() ??
+          <String>{};
+      panel = _MultiSelectOverlayPanel(
+        tokens: tokens,
+        options: options,
+        initialSelected: selected,
+        onCommit: (values) {
+          _dismissOptionsOverlay();
+          _emit(row, column, values);
+        },
+      );
+    } else {
+      final current = _asString(row.cells[column.key]);
+      panel = _overlaySurface(
+        tokens,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < options.length; i++)
+              _optionRow(
+                tokens,
+                option: options[i],
+                selected: options[i].value == current,
+                multi: false,
+                autofocus: options[i].value == current,
+                onTap: () {
+                  _dismissOptionsOverlay();
+                  _emit(row, column, options[i].value);
+                },
+              ),
+          ],
+        ),
+      );
+    }
+
+    entry = OverlayEntry(
+      builder: (_) => _AnchoredOverlay(
+        anchorOffset: anchorOffset,
+        anchorSize: anchorSize,
+        overlaySize: overlaySize,
+        onDismiss: _dismissOptionsOverlay,
+        child: panel,
+      ),
+    );
+    _optionsOverlay = entry;
+    overlay.insert(entry);
+  }
+
   // --- Build ----------------------------------------------------------------
 
   @override
@@ -525,42 +862,58 @@ class _DsDataGridState extends State<DsDataGrid> {
                 : DsSpacing.md;
 
         final caption = widget.caption;
-        final captionReserve = caption == null
-            ? 0.0
-            : (tokens.bodySm.fontSize * (tokens.bodySm.height ?? 1.4)) +
-                DsSpacing.sm;
-        final double? bodyBudget =
-            viewportHeight == null ? null : viewportHeight - captionReserve;
 
-        final Widget core;
-        if (widget.rows.isEmpty) {
-          core = _buildEmpty(tokens, bodyBudget);
-        } else if (maxWidth < widget.compactBreakpoint) {
-          core = _buildCompact(tokens, bodyBudget);
-        } else {
-          core = _buildTable(tokens, maxWidth, bodyBudget);
+        // Builds the grid body (table, cards or empty state) at a given height.
+        // A null height means "size to content"; the fill sentinel
+        // ([double.infinity]) means "fill the bounded space I am handed and
+        // scroll". The fill sentinel lets a caption above a fixed-height grid
+        // claim its own (possibly wrapped) height while the body takes exactly
+        // what remains — no fragile estimate of the caption's height.
+        Widget bodyFor(double? height) {
+          if (widget.rows.isEmpty) return _buildEmpty(tokens, height);
+          if (maxWidth < widget.compactBreakpoint) {
+            return _buildCompact(tokens, height);
+          }
+          return _buildTable(tokens, maxWidth, height);
         }
 
-        if (caption == null) return core;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: DsSpacing.sm),
-              child: Semantics(
-                container: true,
-                label: caption,
-                child: Text(
-                  caption,
-                  style: tokens.bodySm.toTextStyle(
-                    color: tokens.colorSecondaryText,
-                  ),
-                ),
+        if (caption == null) return bodyFor(viewportHeight);
+
+        final captionWidget = Padding(
+          padding: const EdgeInsets.only(bottom: DsSpacing.sm),
+          child: Semantics(
+            container: true,
+            header: true,
+            label: caption,
+            child: Text(
+              caption,
+              style: tokens.bodySm.toTextStyle(
+                color: tokens.colorSecondaryText,
               ),
             ),
-            core,
-          ],
+          ),
+        );
+
+        // Unbounded height: caption above a content-sized body.
+        if (viewportHeight == null) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [captionWidget, bodyFor(null)],
+          );
+        }
+
+        // Bounded height: the caption takes its natural (possibly wrapped)
+        // height and the body fills whatever remains.
+        return SizedBox(
+          height: viewportHeight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              captionWidget,
+              Expanded(child: bodyFor(double.infinity)),
+            ],
+          ),
         );
       },
     );
@@ -586,7 +939,9 @@ class _DsDataGridState extends State<DsDataGrid> {
       ),
       child: content,
     );
-    if (height == null) return framed;
+    // The fill sentinel: the empty frame stretches to fill the bounded slot it
+    // is given (an [Expanded] under a caption).
+    if (height == null || height == double.infinity) return framed;
     return SizedBox(height: math.max(0, height), child: framed);
   }
 
@@ -605,15 +960,19 @@ class _DsDataGridState extends State<DsDataGrid> {
       ],
     );
     if (height == null) return list;
+    final scrollable = Scrollbar(
+      controller: _verticalController,
+      child: SingleChildScrollView(
+        controller: _verticalController,
+        child: list,
+      ),
+    );
+    // The fill sentinel: scroll within whatever bounded height the parent
+    // ([Expanded] under a caption) hands down, without a fixed box.
+    if (height == double.infinity) return scrollable;
     return SizedBox(
       height: math.max(0, height),
-      child: Scrollbar(
-        controller: _verticalController,
-        child: SingleChildScrollView(
-          controller: _verticalController,
-          child: list,
-        ),
-      ),
+      child: scrollable,
     );
   }
 
@@ -650,16 +1009,7 @@ class _DsDataGridState extends State<DsDataGrid> {
               const SizedBox(width: DsSpacing.md),
               Expanded(
                 flex: 3,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _cellContent(
-                    tokens,
-                    column,
-                    row.cells[column.key],
-                    dense: false,
-                    align: DsColumnAlign.end,
-                  ),
-                ),
+                child: _cardValue(tokens, column, row),
               ),
             ],
           ),
@@ -698,6 +1048,22 @@ class _DsDataGridState extends State<DsDataGrid> {
   // --- Table ----------------------------------------------------------------
 
   Widget _buildTable(DsTokens tokens, double maxWidth, double? height) {
+    // The fill sentinel: measure the bounded height the parent ([Expanded]
+    // under a caption) actually hands down, so the header + scrolling body sum
+    // to exactly that — never overflowing by a mis-estimated caption height.
+    if (height == double.infinity) {
+      return LayoutBuilder(
+        builder: (context, constraints) => _buildTableSized(
+          tokens,
+          maxWidth,
+          constraints.maxHeight.isFinite ? constraints.maxHeight : null,
+        ),
+      );
+    }
+    return _buildTableSized(tokens, maxWidth, height);
+  }
+
+  Widget _buildTableSized(DsTokens tokens, double maxWidth, double? height) {
     final rows = _displayRows;
     final pinnedColumns = _pinnedColumns;
     final scrollableColumns = _scrollableColumns;
@@ -1079,24 +1445,262 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   Widget _dataCell(DsTokens tokens, DsGridColumn column, DsGridRow row) {
     final align = column.effectiveAlign;
-    final content = _cellContent(
-      tokens,
-      column,
-      row.cells[column.key],
-      dense: true,
-      align: align,
-    );
-    return SizedBox(
-      width: _columnWidth(column),
+    final width = _columnWidth(column);
+
+    // A cell being edited fills its padding with the inline text editor.
+    if (_isEditingCell(row, column)) {
+      return SizedBox(
+        width: width,
+        height: widget.rowHeight,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: _cellPaddingX,
+            vertical: DsSpacing.xs,
+          ),
+          child: _inlineEditor(tokens, column, row, dense: true, align: align),
+        ),
+      );
+    }
+
+    final editable = _isCellEditable(column);
+
+    // Editable ratings are interactive in place (per-star), so they carry no
+    // whole-cell tap affordance.
+    final Widget content = editable && column.type == DsCellType.rating
+        ? _ratingRowInteractive(tokens, column, row, dense: true)
+        : _cellContent(tokens, column, row.cells[column.key],
+            dense: true, align: align);
+
+    Widget cell = SizedBox(
+      width: width,
       height: widget.rowHeight,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
         child: Align(alignment: _alignmentOf(align), child: content),
       ),
     );
+
+    if (editable && column.type != DsCellType.rating) {
+      cell = _wrapEditable(tokens, column, row, cell);
+    }
+    return cell;
   }
 
   // --- Cell renderers -------------------------------------------------------
+
+  /// Builds the value shown in a stacked-card row, honouring edit state: the
+  /// inline editor when editing, an interactive star row for an editable
+  /// rating, or the read-only content wrapped in a tap-to-edit affordance.
+  Widget _cardValue(DsTokens tokens, DsGridColumn column, DsGridRow row) {
+    if (_isEditingCell(row, column)) {
+      return _inlineEditor(
+        tokens,
+        column,
+        row,
+        dense: false,
+        align: DsColumnAlign.end,
+      );
+    }
+    final editable = _isCellEditable(column);
+    if (editable && column.type == DsCellType.rating) {
+      return Align(
+        alignment: Alignment.centerRight,
+        child: _ratingRowInteractive(tokens, column, row, dense: false),
+      );
+    }
+    final display = Align(
+      alignment: Alignment.centerRight,
+      child: _cellContent(
+        tokens,
+        column,
+        row.cells[column.key],
+        dense: false,
+        align: DsColumnAlign.end,
+      ),
+    );
+    if (!editable) return display;
+    return _wrapEditable(tokens, column, row, display);
+  }
+
+  /// Wraps a read-only cell [child] in a tap-to-edit affordance: an [InkWell]
+  /// with a hover / pressed state and a semantics button labelled for the
+  /// column, whose tap opens the appropriate editor for the cell type.
+  Widget _wrapEditable(
+    DsTokens tokens,
+    DsGridColumn column,
+    DsGridRow row,
+    Widget child,
+  ) {
+    final bool? checked = column.type == DsCellType.checkbox
+        ? (_asBool(row.cells[column.key]) ?? false)
+        : null;
+    // A checkbox conveys its value via `checked`; every other type announces
+    // the current value through `value` so it is spoken on the control itself.
+    final String? value =
+        checked == null ? _editSemanticValue(column, row) : null;
+    return Builder(
+      builder: (context) => Semantics(
+        button: true,
+        checked: checked,
+        label: 'Edit ${column.title}',
+        value: value,
+        // The visual content is excluded so its value is announced once (via
+        // `value`), not duplicated by a nested badge/avatar node; the activate
+        // action is wired here so the button works for screen readers too.
+        onTap: () => _beginEdit(context, column, row),
+        child: ExcludeSemantics(
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: () => _beginEdit(context, column, row),
+              borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The inline text editor used for the text, number, currency, link and user
+  /// cell types. Numbers and currency values are edited as their raw number
+  /// (no grouping or symbol).
+  Widget _inlineEditor(
+    DsTokens tokens,
+    DsGridColumn column,
+    DsGridRow row, {
+    required bool dense,
+    required DsColumnAlign align,
+  }) {
+    final value = row.cells[column.key];
+    final String initial;
+    final TextInputType keyboardType;
+    if (column.type == DsCellType.number ||
+        column.type == DsCellType.currency) {
+      final number = _asNum(value);
+      initial = number == null ? '' : _plainNumberText(number);
+      keyboardType =
+          const TextInputType.numberWithOptions(decimal: true, signed: true);
+    } else {
+      initial = _asString(value) ?? '';
+      keyboardType = TextInputType.text;
+    }
+    return _CellTextEditor(
+      key: ValueKey<String>('${row.id} ${column.key}'),
+      tokens: tokens,
+      dense: dense,
+      align: align,
+      initialText: initial,
+      keyboardType: keyboardType,
+      semanticsLabel: 'Edit ${column.title}',
+      onCommit: (text) => _commitInline(column, row, text),
+      onCancel: () => _cancelEditFor(row.id, column.key),
+    );
+  }
+
+  /// An interactive five-star row for an editable [DsCellType.rating] cell.
+  /// Tapping a star sets the rating to that many stars; tapping the current
+  /// highest star clears it back by one, giving a way to reach zero.
+  Widget _ratingRowInteractive(
+    DsTokens tokens,
+    DsGridColumn column,
+    DsGridRow row, {
+    required bool dense,
+  }) {
+    final current = (_asNum(row.cells[column.key]) ?? 0).clamp(0, 5).round();
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < 5; i++)
+          Semantics(
+            button: true,
+            label: 'Set ${column.title} to ${i + 1}',
+            child: InkWell(
+              onTap: () => _emit(row, column, current == i + 1 ? i : i + 1),
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
+                child: DsIcon(
+                  icon: i < current ? Icons.star : Icons.star_border,
+                  size: DsIconSize.sm,
+                  color: i < current ? tokens.colorPrimary : tokens.colorBorder,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// A single row in a select / multi-select overlay menu. In [multi] mode a
+  /// leading checkbox glyph shows the staged state; otherwise a trailing check
+  /// marks the current value.
+  Widget _optionRow(
+    DsTokens tokens, {
+    required DsGridOption option,
+    required bool selected,
+    required bool multi,
+    required bool autofocus,
+    required VoidCallback onTap,
+  }) {
+    final swatch = _optionSwatch(tokens, option);
+    return InkWell(
+      onTap: onTap,
+      autofocus: autofocus,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 40),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DsSpacing.md,
+            vertical: DsSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              if (multi) ...[
+                _GridCheck(value: selected, size: _checkboxSize),
+                const SizedBox(width: DsSpacing.sm),
+              ] else if (swatch != null) ...[
+                _swatchDot(swatch),
+                const SizedBox(width: DsSpacing.sm),
+              ],
+              Expanded(
+                child: Text(
+                  option.effectiveLabel,
+                  style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (!multi && selected) ...[
+                const SizedBox(width: DsSpacing.sm),
+                DsIcon(
+                  icon: Icons.check,
+                  size: DsIconSize.sm,
+                  color: tokens.formAccentColor,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Renders a single select / status / multi-select [value] as a badge,
+  /// resolving its label and colour through [DsGridColumn.options] when a
+  /// matching option exists and falling back to [fallbackVariant] otherwise.
+  Widget _optionBadge(
+    DsTokens tokens,
+    DsGridColumn column,
+    String value, {
+    required DsBadgeVariant fallbackVariant,
+  }) {
+    final option = _optionFor(column, value);
+    final label = option?.effectiveLabel ?? value;
+    final color = option?.color;
+    if (color != null) return _colorBadge(tokens, label, color);
+    return DsBadge(label: label, variant: option?.variant ?? fallbackVariant);
+  }
 
   Widget _cellContent(
     DsTokens tokens,
@@ -1146,7 +1750,12 @@ class _DsDataGridState extends State<DsDataGrid> {
         final string = _asString(value);
         return string == null || string.isEmpty
             ? emDash
-            : DsBadge(label: string, variant: _variantForStatus(string));
+            : _optionBadge(
+                tokens,
+                column,
+                string,
+                fallbackVariant: _variantForStatus(string),
+              );
       case DsCellType.multiSelect:
         final list = _asStringList(value);
         if (list == null || list.isEmpty) return emDash;
@@ -1156,7 +1765,15 @@ class _DsDataGridState extends State<DsDataGrid> {
             runSpacing: DsSpacing.xs,
             alignment:
                 align == DsColumnAlign.end ? WrapAlignment.end : WrapAlignment.start,
-            children: [for (final item in list) DsBadge(label: item)],
+            children: [
+              for (final item in list)
+                _optionBadge(
+                  tokens,
+                  column,
+                  item,
+                  fallbackVariant: DsBadgeVariant.neutral,
+                ),
+            ],
           );
         }
         return _guarded(
@@ -1165,7 +1782,12 @@ class _DsDataGridState extends State<DsDataGrid> {
             children: [
               for (var i = 0; i < list.length; i++) ...[
                 if (i > 0) const SizedBox(width: DsSpacing.xs),
-                DsBadge(label: list[i]),
+                _optionBadge(
+                  tokens,
+                  column,
+                  list[i],
+                  fallbackVariant: DsBadgeVariant.neutral,
+                ),
               ],
             ],
           ),
@@ -1447,6 +2069,108 @@ String _formatDate(DateTime date) {
 /// wired through [DsGridRow.onTap].
 void _noop() {}
 
+/// Formats [value] as a plain, ungrouped string suitable for inline editing: an
+/// integer keeps no decimals and a whole double drops its trailing `.0`.
+String _plainNumberText(num value) {
+  if (value is int) return value.toString();
+  if (value == value.roundToDouble()) return value.toStringAsFixed(0);
+  return value.toString();
+}
+
+/// Parses editable numeric input, tolerating grouping commas and surrounding
+/// whitespace. Returns null (a revert) when the field is empty or unparseable.
+num? _parseEditableNumber(String raw) {
+  final cleaned = raw.trim().replaceAll(',', '');
+  if (cleaned.isEmpty) return null;
+  return num.tryParse(cleaned);
+}
+
+/// The swatch colour for [option] in a menu row: its explicit colour, else a
+/// representative colour derived from its badge variant, else null.
+Color? _optionSwatch(DsTokens tokens, DsGridOption option) {
+  if (option.color != null) return option.color;
+  return switch (option.variant) {
+    DsBadgeVariant.success => tokens.badgeSuccessColorText,
+    DsBadgeVariant.warning => tokens.badgeWarningColorText,
+    DsBadgeVariant.danger => tokens.badgeDangerColorText,
+    DsBadgeVariant.neutral => tokens.badgeNeutralColorText,
+    null => null,
+  };
+}
+
+/// A small round colour swatch used in option menus and colour badges.
+Widget _swatchDot(Color color) => Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+
+/// A badge for a select / status value that carries an explicit swatch [color],
+/// drawn as a tinted pill with a leading dot rather than one of the shared
+/// [DsBadge] variants.
+Widget _colorBadge(DsTokens tokens, String label, Color color) {
+  return DecoratedBox(
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(tokens.badgeBorderRadius),
+      border: Border.all(color: color.withValues(alpha: 0.5)),
+    ),
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.badgePaddingX,
+        vertical: tokens.badgePaddingY,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _swatchDot(color),
+          SizedBox(width: tokens.badgePaddingX),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: tokens.colorText,
+                fontSize: tokens.badgeLabelFontSize,
+                fontWeight: tokens.badgeLabelFontWeight,
+                height: 1.0,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// The themed floating surface shared by the select and multi-select menus,
+/// mirroring [DsMenu]'s panel: a form-background fill, a 1px border, the overlay
+/// corner radius and a medium drop shadow.
+Widget _overlaySurface(DsTokens tokens, Widget child) {
+  final radius = BorderRadius.circular(tokens.overlayBorderRadius);
+  return Material(
+    type: MaterialType.transparency,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: tokens.formBackgroundColor,
+        borderRadius: radius,
+        border: Border.all(color: tokens.colorBorder),
+        boxShadow: DsElevation.medium,
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+            child: child,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 /// A compact, read-only checkbox glyph used inside dense grid cells and the
 /// select-all / row-select controls.
 ///
@@ -1505,6 +2229,309 @@ class _ResizeHandle extends StatelessWidget {
         child: const SizedBox(
           width: _DsDataGridState._resizeHandleWidth,
           height: double.infinity,
+        ),
+      ),
+    );
+  }
+}
+
+/// The inline text field shown while editing a text, number, currency, link or
+/// user cell.
+///
+/// It autofocuses and traps keyboard focus, commits on Enter or when focus is
+/// lost while it is still mounted, and cancels on Escape. A single guard makes
+/// sure a value is committed or cancelled exactly once, and the focus listener
+/// is removed before disposal so tearing the editor down cannot fire a stray
+/// commit.
+class _CellTextEditor extends StatefulWidget {
+  const _CellTextEditor({
+    super.key,
+    required this.tokens,
+    required this.dense,
+    required this.align,
+    required this.initialText,
+    required this.keyboardType,
+    required this.semanticsLabel,
+    required this.onCommit,
+    required this.onCancel,
+  });
+
+  final DsTokens tokens;
+  final bool dense;
+  final DsColumnAlign align;
+  final String initialText;
+  final TextInputType keyboardType;
+  final String semanticsLabel;
+  final ValueChanged<String> onCommit;
+  final VoidCallback onCancel;
+
+  @override
+  State<_CellTextEditor> createState() => _CellTextEditorState();
+}
+
+class _CellTextEditorState extends State<_CellTextEditor> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.initialText);
+  final FocusNode _focusNode = FocusNode();
+  bool _handled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    // Remove the listener first so tearing the editor down (for example when
+    // another cell begins editing) does not fire a stray commit.
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) _commit();
+  }
+
+  void _commit() {
+    if (_handled) return;
+    _handled = true;
+    widget.onCommit(_controller.text);
+  }
+
+  void _cancel() {
+    if (_handled) return;
+    _handled = true;
+    widget.onCancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = widget.tokens;
+    final radius = BorderRadius.circular(tokens.formBorderRadius);
+    final border = OutlineInputBorder(
+      borderRadius: radius,
+      borderSide: BorderSide(color: tokens.colorBorder),
+    );
+    return Semantics(
+      label: widget.semanticsLabel,
+      child: CallbackShortcuts(
+        bindings: <ShortcutActivator, VoidCallback>{
+          const SingleActivator(LogicalKeyboardKey.escape): _cancel,
+        },
+        child: TextField(
+          controller: _controller,
+          focusNode: _focusNode,
+          autofocus: true,
+          keyboardType: widget.keyboardType,
+          textAlign: _textAlignOf(widget.align),
+          textAlignVertical: TextAlignVertical.center,
+          cursorColor: tokens.formAccentColor,
+          style: (widget.dense ? tokens.bodySm : tokens.bodyMd)
+              .toTextStyle(color: tokens.colorText),
+          onSubmitted: (_) => _commit(),
+          decoration: InputDecoration(
+            isDense: true,
+            filled: true,
+            fillColor: tokens.formBackgroundColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: DsSpacing.sm,
+              vertical: DsSpacing.xs,
+            ),
+            border: border,
+            enabledBorder: border,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: radius,
+              borderSide: BorderSide(color: tokens.formHighlightColorBorder),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The full-screen layer that hosts an open select / multi-select menu: a
+/// transparent barrier that dismisses on an outside tap, plus the [child] panel
+/// positioned just beneath the tapped cell and clamped within the overlay.
+/// Escape dismisses the menu and taps inside the panel are absorbed.
+class _AnchoredOverlay extends StatelessWidget {
+  const _AnchoredOverlay({
+    required this.anchorOffset,
+    required this.anchorSize,
+    required this.overlaySize,
+    required this.onDismiss,
+    required this.child,
+  });
+
+  final Offset anchorOffset;
+  final Size anchorSize;
+  final Size overlaySize;
+  final VoidCallback onDismiss;
+  final Widget child;
+
+  static const double _margin = DsSpacing.sm;
+  static const double _maxWidth = 320;
+
+  @override
+  Widget build(BuildContext context) {
+    final double top = anchorOffset.dy + anchorSize.height + DsSpacing.xxs;
+    final double maxLeft =
+        math.max(_margin, overlaySize.width - _maxWidth - _margin);
+    final double left = anchorOffset.dx.clamp(_margin, maxLeft);
+    final double maxHeight = math.max(120.0, overlaySize.height - top - _margin);
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: onDismiss,
+          ),
+        ),
+        Positioned(
+          left: left,
+          top: top.clamp(
+            _margin,
+            math.max(_margin, overlaySize.height - _margin),
+          ),
+          child: CallbackShortcuts(
+            bindings: <ShortcutActivator, VoidCallback>{
+              const SingleActivator(LogicalKeyboardKey.escape): onDismiss,
+            },
+            child: FocusScope(
+              child: GestureDetector(
+                // Absorb taps on the panel so they never reach the barrier.
+                behavior: HitTestBehavior.opaque,
+                onTap: () {},
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: math.min(anchorSize.width, _maxWidth),
+                    maxWidth: _maxWidth,
+                    maxHeight: maxHeight,
+                  ),
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The checkable menu shown while editing a [DsCellType.multiSelect] cell.
+///
+/// The selection is staged locally so toggling options does not commit until
+/// "Done" is chosen; Escape or an outside tap cancels via the enclosing
+/// [_AnchoredOverlay].
+class _MultiSelectOverlayPanel extends StatefulWidget {
+  const _MultiSelectOverlayPanel({
+    required this.tokens,
+    required this.options,
+    required this.initialSelected,
+    required this.onCommit,
+  });
+
+  final DsTokens tokens;
+  final List<DsGridOption> options;
+  final Set<String> initialSelected;
+  final ValueChanged<List<String>> onCommit;
+
+  @override
+  State<_MultiSelectOverlayPanel> createState() =>
+      _MultiSelectOverlayPanelState();
+}
+
+class _MultiSelectOverlayPanelState extends State<_MultiSelectOverlayPanel> {
+  late final Set<String> _selected = <String>{...widget.initialSelected};
+
+  void _toggle(String value) {
+    setState(() {
+      if (!_selected.add(value)) _selected.remove(value);
+    });
+  }
+
+  List<String> _ordered() {
+    final known = {for (final option in widget.options) option.value};
+    return [
+      // Declared options first, in their display order…
+      for (final option in widget.options)
+        if (_selected.contains(option.value)) option.value,
+      // …then any staged value not in the option set, preserved rather than
+      // silently dropped (e.g. a legacy tag the column no longer declares).
+      for (final value in _selected)
+        if (!known.contains(value)) value,
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = widget.tokens;
+    return _overlaySurface(
+      tokens,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < widget.options.length; i++)
+            _row(tokens, widget.options[i], autofocus: i == 0),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: tokens.colorBorder)),
+            ),
+            child: InkWell(
+              onTap: () => widget.onCommit(_ordered()),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Center(
+                  child: Text(
+                    'Done',
+                    style: tokens.labelMd.toTextStyle(
+                      color: tokens.actionPrimaryColorText,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(DsTokens tokens, DsGridOption option, {required bool autofocus}) {
+    final selected = _selected.contains(option.value);
+    return InkWell(
+      onTap: () => _toggle(option.value),
+      autofocus: autofocus,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 40),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DsSpacing.md,
+            vertical: DsSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              _GridCheck(
+                value: selected,
+                size: _DsDataGridState._checkboxSize,
+              ),
+              const SizedBox(width: DsSpacing.sm),
+              Expanded(
+                child: Text(
+                  option.effectiveLabel,
+                  style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

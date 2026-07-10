@@ -46,8 +46,8 @@ final PatternPage dataGridPage = PatternPage(
         'convention — numbers, currency and progress to the trailing edge.',
     'Let the grid own sort and selection for simple tables; lift them to `onSort` '
         'and `onSelectionChanged` only when your data source needs to react.',
-    'Give the grid a `caption` — it labels the table for assistive technology and '
-        'reads as its heading.',
+    'Give the grid a `caption` — it renders as a heading above the table and is '
+        'exposed to assistive technology as one, introducing the grid in reading order.',
     'Keep column widths honest: set a realistic `width` and a `minWidth` that '
         'still shows the value, and let dense columns resize.',
   ],
