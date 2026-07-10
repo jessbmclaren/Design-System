@@ -6,6 +6,15 @@ import '../content/doc_registry.dart';
 import '../content/pattern_page_content.dart';
 import 'docs_style.dart';
 
+/// Page ids shown with a tick in the nav: the set being worked through for the
+/// Engen theme. Edit this list to move the ticks around.
+const Set<String> _tickedPageIds = {
+  'design-tokens',
+  'motion',
+  'iconography',
+  'action-buttons',
+};
+
 /// The grouped navigation sidebar listing every documentation page.
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.currentId, this.onNavigate});
@@ -140,13 +149,24 @@ class _NavItem extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-            child: Text(
-              page.navTitle,
-              style: DocsType.navItem(
-                // link (not accent) clears 4.5:1 over the accentSoft wash.
-                selected ? docs.link : docs.textPrimary,
-                selected: selected,
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    page.navTitle,
+                    overflow: TextOverflow.ellipsis,
+                    style: DocsType.navItem(
+                      // link (not accent) clears 4.5:1 over the accentSoft wash.
+                      selected ? docs.link : docs.textPrimary,
+                      selected: selected,
+                    ),
+                  ),
+                ),
+                if (_tickedPageIds.contains(page.id)) ...[
+                  const SizedBox(width: 8),
+                  Icon(LucideIcons.check, size: 14, color: docs.accent),
+                ],
+              ],
             ),
           ),
         ),
