@@ -53,6 +53,7 @@ class DocsApp extends StatefulWidget {
 
 class _DocsAppState extends State<DocsApp> {
   ThemeMode _mode = ThemeMode.light;
+  DocsSkin _skin = kDocsSkins.first;
 
   late final GoRouter _router = GoRouter(
     initialLocation: '/patterns/${allPages.first.id}',
@@ -78,16 +79,25 @@ class _DocsAppState extends State<DocsApp> {
     });
   }
 
+  void _selectSkin(DocsSkin skin) {
+    if (skin == _skin) return;
+    setState(() => _skin = skin);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ThemeController(
       mode: _mode,
       toggle: _toggle,
+      skin: _skin,
+      selectSkin: _selectSkin,
       child: MaterialApp.router(
         title: 'Design System',
         debugShowCheckedModeBanner: false,
-        theme: DsTheme.light(),
-        darkTheme: DsTheme.dark(),
+        // Brand is a token override on the same themes; light/dark still works
+        // for every skin.
+        theme: DsTheme.light(tokens: _skin.lightTokens()),
+        darkTheme: DsTheme.dark(tokens: _skin.darkTokens()),
         themeMode: _mode,
         routerConfig: _router,
       ),
