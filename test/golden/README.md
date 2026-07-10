@@ -52,6 +52,19 @@ dsGoldenMatrix('atom', 'chip', () => const DsChip(label: 'Active'));
 Keep instances **deterministic** — no network images, no time- or
 random-dependent data — or the goldens will flake.
 
+## Fonts
+
+`golden_helpers.dart` loads two font families before capturing so glyphs
+render for real instead of as boxes:
+
+- **Inter** — the four bundled faces from `fonts/`, under the family the default
+  theme uses (`packages/design_system/Inter`).
+- **MaterialIcons** — resolved from the active Flutter SDK cache at runtime
+  (`<sdk>/bin/cache/artifacts/material_fonts/`), so `DsIcons`/`Icons.*` glyphs
+  appear. This is derived from the running Dart executable / `FLUTTER_ROOT` — no
+  machine-specific path — which is another reason to **pin the Flutter version**
+  (a different SDK can ship a different icon font).
+
 ## CI caveat (important)
 
 Golden PNGs are **platform-sensitive**: font hinting and anti-aliasing differ
