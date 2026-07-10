@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 
@@ -44,7 +45,7 @@ class DsListItem extends StatelessWidget {
 
     final Widget? resolvedTrailing = trailing ??
         (onTap != null
-            ? Icon(Icons.chevron_right, color: tokens.colorSecondaryText)
+            ? Icon(DsIcons.chevronRight, color: tokens.colorSecondaryText)
             : null);
 
     final row = Padding(

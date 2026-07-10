@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_spacing.dart';
@@ -231,7 +232,7 @@ class _RevealControl extends StatelessWidget {
               ),
               const SizedBox(width: DsSpacing.xs),
               Icon(
-                expanded ? Icons.expand_less : Icons.expand_more,
+                expanded ? DsIcons.expandLess : DsIcons.expandMore,
                 size: 20,
                 color: tokens.actionSecondaryColorText,
               ),

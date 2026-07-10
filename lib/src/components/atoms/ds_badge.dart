@@ -32,7 +32,7 @@ enum DsBadgeVariant { neutral, success, warning, danger }
 /// const DsBadge(
 ///   label: 'Paid',
 ///   variant: DsBadgeVariant.success,
-///   icon: Icons.check_circle_outline,
+///   icon: DsIcons.success,
 /// )
 /// ```
 class DsBadge extends StatelessWidget {

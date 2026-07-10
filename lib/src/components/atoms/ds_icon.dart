@@ -12,10 +12,10 @@ import '../../tokens/ds_icon_size.dart';
 /// theme — including in white-label builds where that colour is themed.
 ///
 /// ```dart
-/// const DsIcon(icon: Icons.check_circle_outline)
+/// const DsIcon(icon: DsIcons.success)
 ///
 /// DsIcon(
-///   icon: Icons.warning_amber,
+///   icon: DsIcons.warning,
 ///   size: DsIconSize.lg,
 ///   color: DsTokens.of(context).colorDanger,
 ///   semanticLabel: 'Warning',
@@ -50,7 +50,7 @@ class DsIcon extends StatelessWidget {
     super.key,
   });
 
-  /// The glyph to render, e.g. `Icons.check`.
+  /// The glyph to render, e.g. `DsIcons.check`.
   final IconData icon;
 
   /// The rendered size in logical pixels. Prefer a [DsIconSize] step.

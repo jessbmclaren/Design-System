@@ -21,7 +21,7 @@ import '../../tokens/ds_elevation.dart';
 /// ```dart
 /// DsTooltip(
 ///   message: 'Copy to clipboard',
-///   child: IconButton(icon: const Icon(Icons.copy), onPressed: () {}),
+///   child: IconButton(icon: const Icon(DsIcons.copy), onPressed: () {}),
 /// )
 /// ```
 class DsTooltip extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -172,7 +173,7 @@ class DsSelect<T> extends StatelessWidget {
         dropdownColor: tokens.formBackgroundColor,
         borderRadius: radius,
         icon: Icon(
-          Icons.expand_more,
+          DsIcons.expandMore,
           size: DsIconSize.md,
           color: tokens.colorSecondaryText,
         ),

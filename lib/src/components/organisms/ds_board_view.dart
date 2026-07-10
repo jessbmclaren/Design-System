@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_elevation.dart';
@@ -467,7 +468,7 @@ class _DsBoardViewState extends State<DsBoardView> {
               child: Padding(
                 padding: const EdgeInsets.all(DsSpacing.xs),
                 child: DsIcon(
-                  icon: collapsed ? Icons.expand_more : Icons.expand_less,
+                  icon: collapsed ? DsIcons.expandMore : DsIcons.expandLess,
                   size: DsIconSize.md,
                   color: tokens.colorSecondaryText,
                 ),
@@ -609,7 +610,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         if (other.index != lane.index)
           DsMenuItem(
             label: 'Move to ${other.label}',
-            icon: Icons.arrow_forward,
+            icon: DsIcons.arrowForward,
             onSelected: () => _emitMove(row.id, other),
           ),
     ];
@@ -619,7 +620,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         height: _menuTrigger,
         child: Center(
           child: DsIcon(
-            icon: Icons.more_vert,
+            icon: DsIcons.moreVertical,
             size: DsIconSize.md,
             color: tokens.colorSecondaryText,
             semanticLabel: 'Move $title',
@@ -744,7 +745,7 @@ class _DsBoardViewState extends State<DsBoardView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             DsIcon(
-              icon: b ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+              icon: b ? DsIcons.checkboxChecked : DsIcons.checkboxBlank,
               size: DsIconSize.sm,
               color: b ? tokens.formAccentColor : tokens.colorSecondaryText,
             ),
@@ -791,7 +792,7 @@ class _DsBoardViewState extends State<DsBoardView> {
           Padding(
             padding: const EdgeInsets.only(right: 1),
             child: DsIcon(
-              icon: i < filled ? Icons.star : Icons.star_border,
+              icon: i < filled ? DsIcons.star : DsIcons.starOutline,
               size: DsIconSize.sm,
               color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
             ),

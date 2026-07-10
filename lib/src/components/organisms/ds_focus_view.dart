@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 
@@ -76,7 +77,7 @@ class DsFocusView extends StatelessWidget {
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: onClose,
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(DsIcons.close),
                   iconSize: 20,
                   color: tokens.colorSecondaryText,
                   tooltip: 'Close',

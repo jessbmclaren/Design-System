@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -159,7 +160,7 @@ class DsImg extends StatelessWidget {
       color: tokens.offsetBackgroundColor,
       child: Center(
         child: Icon(
-          Icons.broken_image_outlined,
+          DsIcons.brokenImage,
           size: DsIconSize.xl,
           color: tokens.colorSecondaryText,
         ),

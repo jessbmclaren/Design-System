@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 import '../../theme/ds_tokens_extension.dart';
 
 /// A back navigation link that returns the user to a previous screen or list.
@@ -40,7 +41,7 @@ class DsBackLink extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.arrow_back_ios_new,
+                DsIcons.arrowBack,
                 size: 14,
                 color: tokens.actionPrimaryColorText,
               ),

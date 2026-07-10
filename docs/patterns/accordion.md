@@ -1,8 +1,8 @@
 # Accordion
 
-An accordion stacks a set of collapsible sections so a long or dense page collapses to a scannable list of headers, and people expand only the parts they care about. Build one with `DsAccordion` and a list of `DsAccordionItem`s — each pairs a single-line header (with an optional leading icon and an auto-rotating chevron) with a body that animates open and closed. By default the accordion is single-open: expanding one section collapses the rest, keeping focus on a single answer; set `allowMultiple: true` when sections are independent and people may want several open at once. Reach for it to tame FAQs, settings groups, and progressive detail — not to hide content people must not miss.
+An accordion stacks a set of collapsible sections, so a long or dense page collapses to a short list of headers and people open only the parts they want. Build one with `DsAccordion` and a list of `DsAccordionItem`s. Each pairs a single-line header (with an optional leading icon and an auto-rotating chevron) with a body that animates open and closed. By default the accordion is single-open: expanding one section collapses the rest; set `allowMultiple: true` when sections are independent and people may want several open at once. Use it for FAQs and settings groups, not for content people must not miss.
 
-Set `initiallyExpanded: true` on the item people most likely need first so the accordion opens with useful content already visible. In single-open mode only the first such item stays open; the rest resolve closed. A collapsed body is removed from the tree entirely, so assistive technology never reads hidden content, and each header exposes its expanded state to screen readers.
+Set `initiallyExpanded: true` on the item people most likely need first, so the accordion opens with useful content already visible. In single-open mode only the first such item stays open and the rest start closed. A collapsed body is removed from the tree entirely, so assistive technology never reads hidden content. Each header exposes its expanded state to screen readers.
 
 ![Desktop (1280dp)](img/accordion_desktop.png)
 
@@ -16,19 +16,19 @@ Set `initiallyExpanded: true` on the item people most likely need first so the a
 
 **Do**
 
-- Use an accordion to break long content into short, self-describing sections.
-- Write header titles that summarise the section in one scannable line.
+- Use an accordion to break long content into short, self-contained sections.
+- Write header titles that summarise the section in one line.
 - Keep the default single-open mode when only one answer is relevant at a time.
 - Set allowMultiple: true when sections are independent and often read together.
-- Open the most important section with initiallyExpanded so the page is useful at a glance.
+- Open the most important section with initiallyExpanded so the page is useful straight away.
 - Add a leading icon when it helps people recognise a section faster.
 
 **Don't**
 
 - Don't hide essential information or required actions inside a collapsed section.
-- Don't nest accordions inside accordions — flatten the structure instead.
+- Don't nest accordions inside accordions; flatten the structure instead.
 - Don't write header titles so long they ellipsize away their meaning.
-- Don't use an accordion for a single section — a plain heading and body is clearer.
+- Don't use an accordion for a single section; a plain heading and body is clearer.
 
 ## Example
 

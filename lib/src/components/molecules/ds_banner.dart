@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_spacing.dart';
@@ -95,25 +96,25 @@ class DsBanner extends StatelessWidget {
           tokens.badgeNeutralColorBackground,
           tokens.badgeNeutralColorText,
           tokens.badgeNeutralColorBorder,
-          Icons.info_outline,
+          DsIcons.info,
         ),
       DsBannerVariant.success => (
           tokens.badgeSuccessColorBackground,
           tokens.badgeSuccessColorText,
           tokens.badgeSuccessColorBorder,
-          Icons.check_circle_outline,
+          DsIcons.success,
         ),
       DsBannerVariant.warning => (
           tokens.badgeWarningColorBackground,
           tokens.badgeWarningColorText,
           tokens.badgeWarningColorBorder,
-          Icons.warning_amber_rounded,
+          DsIcons.warning,
         ),
       DsBannerVariant.danger => (
           tokens.badgeDangerColorBackground,
           tokens.badgeDangerColorText,
           tokens.badgeDangerColorBorder,
-          Icons.error_outline,
+          DsIcons.error,
         ),
     };
 
@@ -220,7 +221,7 @@ class DsBanner extends StatelessWidget {
   Widget _buildClose(Color foreground) {
     return IconButton(
       onPressed: onDismiss,
-      icon: const Icon(Icons.close),
+      icon: const Icon(DsIcons.close),
       iconSize: 18,
       color: foreground,
       visualDensity: VisualDensity.compact,

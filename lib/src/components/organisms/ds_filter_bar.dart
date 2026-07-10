@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -707,7 +708,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
           child: DsButton(
             label: count == 0 ? 'Filter' : 'Filter ($count)',
             variant: DsButtonVariant.secondary,
-            icon: Icons.filter_list,
+            icon: DsIcons.filter,
             onPressed: () => setState(() => _open = !_open),
           ),
         ),
@@ -772,7 +773,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
         DsButton(
           label: 'Add condition',
           variant: DsButtonVariant.secondary,
-          icon: Icons.add,
+          icon: DsIcons.add,
           onPressed: _addCondition,
         ),
         if (hasConditions)
@@ -796,7 +797,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
     final operator = _operatorSelect(index, condition);
     final value = _valueEditor(tokens, index, condition);
     final remove = _IconAction(
-      icon: Icons.close,
+      icon: DsIcons.close,
       tooltip: 'Remove filter condition',
       onTap: () => _removeCondition(index),
     );
@@ -1109,7 +1110,7 @@ class _OptionChips extends StatelessWidget {
       textColor: isSelected ? tokens.colorText : tokens.colorSecondaryText,
       trailing: isSelected
           ? DsIcon(
-              icon: Icons.check,
+              icon: DsIcons.check,
               size: DsIconSize.xs,
               color: tokens.colorText,
             )

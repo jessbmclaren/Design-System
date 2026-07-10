@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -89,7 +90,7 @@ class DsDropzone extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           DsIcon(
-            icon: Icons.cloud_upload_outlined,
+            icon: DsIcons.upload,
             size: DsIconSize.xl,
             color: tokens.colorSecondaryText,
           ),
@@ -123,7 +124,7 @@ class DsDropzone extends StatelessWidget {
               child: DsButton(
                 label: 'Browse',
                 variant: DsButtonVariant.secondary,
-                icon: Icons.folder_open_outlined,
+                icon: DsIcons.folder,
                 onPressed: interactive ? onBrowse : null,
               ),
             ),
@@ -194,7 +195,7 @@ class _FileChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             DsIcon(
-              icon: Icons.insert_drive_file_outlined,
+              icon: DsIcons.file,
               size: DsIconSize.sm,
               color: tokens.colorSecondaryText,
             ),
@@ -220,7 +221,7 @@ class _FileChip extends StatelessWidget {
                   onTap: onClear,
                   child: const Padding(
                     padding: EdgeInsets.all(DsSpacing.xs),
-                    child: DsIcon(icon: Icons.close, size: DsIconSize.sm),
+                    child: DsIcon(icon: DsIcons.close, size: DsIconSize.sm),
                   ),
                 ),
               ),

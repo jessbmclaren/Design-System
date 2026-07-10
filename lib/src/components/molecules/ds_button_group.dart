@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -180,7 +181,7 @@ class _DsOverflowMenu extends StatelessWidget {
                 height: DsButtonGroup._moreButtonWidth,
                 child: Center(
                   child: Icon(
-                    Icons.more_horiz,
+                    DsIcons.moreHorizontal,
                     size: DsIconSize.lg,
                     color: tokens.colorText,
                   ),

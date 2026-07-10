@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 
@@ -165,7 +166,7 @@ class DsAvatar extends StatelessWidget {
     }
 
     return Icon(
-      icon ?? Icons.person,
+      icon ?? DsIcons.user,
       size: size * 0.56,
       color: foreground,
     );

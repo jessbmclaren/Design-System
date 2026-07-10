@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
@@ -572,8 +573,8 @@ class _DsTreeRowState extends State<_DsTreeRow> {
                 child: Center(
                   child: DsIcon(
                     icon: widget.expanded
-                        ? Icons.expand_more
-                        : Icons.chevron_right,
+                        ? DsIcons.expandMore
+                        : DsIcons.chevronRight,
                     size: DsIconSize.sm,
                     color: tokens.colorSecondaryText,
                   ),

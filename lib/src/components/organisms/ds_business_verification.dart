@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -388,7 +389,7 @@ class _SuccessState extends StatelessWidget {
                   border: Border.all(color: tokens.badgeSuccessColorBorder),
                 ),
                 child: DsIcon(
-                  icon: Icons.check_rounded,
+                  icon: DsIcons.check,
                   size: DsIconSize.xl,
                   color: tokens.badgeSuccessColorText,
                   semanticLabel: 'Success',

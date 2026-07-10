@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
@@ -1610,7 +1611,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       mainAxisSize: MainAxisSize.min,
       children: [
         DsIcon(
-          icon: expanded ? Icons.expand_more : Icons.chevron_right,
+          icon: expanded ? DsIcons.expandMore : DsIcons.chevronRight,
           size: DsIconSize.sm,
           color: tokens.colorSecondaryText,
         ),
@@ -1699,7 +1700,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           Row(
             children: [
               DsIcon(
-                icon: expanded ? Icons.expand_more : Icons.chevron_right,
+                icon: expanded ? DsIcons.expandMore : DsIcons.chevronRight,
                 size: DsIconSize.sm,
                 color: tokens.colorSecondaryText,
               ),
@@ -2009,7 +2010,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         if (active != null) ...[
           const SizedBox(width: DsSpacing.xs),
           DsIcon(
-            icon: active.ascending ? Icons.arrow_upward : Icons.arrow_downward,
+            icon: active.ascending ? DsIcons.arrowUp : DsIcons.arrowDown,
             size: DsIconSize.xs,
             color: tokens.colorSecondaryText,
           ),
@@ -2307,7 +2308,7 @@ class _DsDataGridState extends State<DsDataGrid> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
                 child: DsIcon(
-                  icon: i < current ? Icons.star : Icons.star_border,
+                  icon: i < current ? DsIcons.star : DsIcons.starOutline,
                   size: DsIconSize.sm,
                   color: i < current ? tokens.colorPrimary : tokens.colorBorder,
                 ),
@@ -2360,7 +2361,7 @@ class _DsDataGridState extends State<DsDataGrid> {
               if (!multi && selected) ...[
                 const SizedBox(width: DsSpacing.sm),
                 DsIcon(
-                  icon: Icons.check,
+                  icon: DsIcons.check,
                   size: DsIconSize.sm,
                   color: tokens.formAccentColor,
                 ),
@@ -2527,7 +2528,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 1),
             child: DsIcon(
-              icon: i < filled ? Icons.star : Icons.star_border,
+              icon: i < filled ? DsIcons.star : DsIcons.starOutline,
               size: DsIconSize.sm,
               color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
             ),
@@ -2924,10 +2925,10 @@ class _GridCheck extends StatelessWidget {
         ),
       ),
       child: checked
-          ? const Icon(Icons.check, size: DsIconSize.xs, color: Colors.white)
+          ? const Icon(DsIcons.check, size: DsIconSize.xs, color: Colors.white)
           : indeterminate
               ? const Icon(
-                  Icons.remove,
+                  DsIcons.remove,
                   size: DsIconSize.xs,
                   color: Colors.white,
                 )

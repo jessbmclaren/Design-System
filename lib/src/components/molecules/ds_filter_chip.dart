@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../atoms/ds_chip.dart';
@@ -90,7 +91,7 @@ class DsFilterChip<T> extends StatelessWidget {
           textColor: tokens.colorSecondaryText,
           borderColor: tokens.colorBorder,
           trailing: Icon(
-            Icons.add,
+            DsIcons.add,
             size: tokens.badgeLabelFontSize + 2,
             color: tokens.colorSecondaryText,
           ),
@@ -155,7 +156,7 @@ class _ClearButton extends StatelessWidget {
         child: InkResponse(
           onTap: onTap,
           radius: size,
-          child: Icon(Icons.close, size: size, color: color),
+          child: Icon(DsIcons.close, size: size, color: color),
         ),
       ),
     );

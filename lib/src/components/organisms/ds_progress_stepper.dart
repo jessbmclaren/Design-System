@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
@@ -223,7 +224,7 @@ class _StepMarker extends StatelessWidget {
       background = tokens.buttonPrimaryColorBackground;
       borderColor = tokens.buttonPrimaryColorBackground;
       marker = Icon(
-        Icons.check,
+        DsIcons.check,
         size: 16,
         color: tokens.buttonPrimaryColorText,
       );

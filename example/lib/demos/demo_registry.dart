@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'design_tokens_demo.dart';
 import 'motion_demo.dart';
+import 'iconography_demo.dart';
 import 'accordion_demo.dart';
 import 'avatar_demo.dart';
 import 'divider_demo.dart';
@@ -62,6 +63,7 @@ import 'waiting_screens_demo.dart';
 final Map<String, Widget Function()> _demos = {
   'design-tokens': () => const DesignTokensDemo(),
   'motion': () => const MotionDemo(),
+  'iconography': () => const IconographyDemo(),
   'accordion': () => const AccordionDemo(),
   'avatar': () => const AvatarDemo(),
   'divider': () => const DividerDemo(),

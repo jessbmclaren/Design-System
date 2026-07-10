@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_elevation.dart';
@@ -359,7 +360,7 @@ class _CloseButton extends StatelessWidget {
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             child: Center(
               child: Icon(
-                Icons.close,
+                DsIcons.close,
                 size: DsIconSize.md,
                 color: color,
               ),

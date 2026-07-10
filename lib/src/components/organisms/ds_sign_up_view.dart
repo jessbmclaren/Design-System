@@ -38,7 +38,7 @@ import '../atoms/ds_button.dart';
 ///
 /// ```dart
 /// DsSignUpView(
-///   brandIcon: Icons.workspaces_outline,
+///   brandIcon: DsIcons.workspace,
 ///   title: 'Create your workspace',
 ///   description: 'Start your 14-day trial. No card required.',
 ///   form: DsFormFieldGroup(children: [/* DsTextFields */]),

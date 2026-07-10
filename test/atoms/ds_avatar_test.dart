@@ -16,14 +16,14 @@ void main() {
   ) async {
     await pumpDs(tester, const DsAvatar());
 
-    expect(find.byIcon(Icons.person), findsOneWidget);
+    expect(find.byIcon(DsIcons.user), findsOneWidget);
   });
 
   testWidgets('renders a supplied icon when there is no name', (tester) async {
     await pumpDs(tester, const DsAvatar(icon: Icons.star));
 
     expect(find.byIcon(Icons.star), findsOneWidget);
-    expect(find.byIcon(Icons.person), findsNothing);
+    expect(find.byIcon(DsIcons.user), findsNothing);
   });
 
   testWidgets('exposes the name as an accessible image label', (tester) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -420,7 +421,7 @@ class DsPolicyBuilder extends StatelessWidget {
           child: DsButton(
             label: 'Add rule',
             variant: DsButtonVariant.secondary,
-            icon: Icons.add,
+            icon: DsIcons.add,
             onPressed: _addRule,
           ),
         ),
@@ -464,7 +465,7 @@ class DsPolicyBuilder extends StatelessWidget {
       onChanged: (text) => _setRule(index, rule.copyWith(description: text)),
     );
     final remove = _IconAction(
-      icon: Icons.close,
+      icon: DsIcons.close,
       tooltip: 'Remove rule',
       onTap: () => _removeRule(index),
     );

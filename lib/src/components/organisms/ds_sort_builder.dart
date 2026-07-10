@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -150,7 +151,7 @@ class DsSortBuilder extends StatelessWidget {
                   child: DsButton(
                     label: 'Add sort',
                     variant: DsButtonVariant.secondary,
-                    icon: Icons.add,
+                    icon: DsIcons.add,
                     onPressed: _add,
                   ),
                 ),
@@ -198,17 +199,17 @@ class DsSortBuilder extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _IconAction(
-          icon: Icons.keyboard_arrow_up,
+          icon: DsIcons.moveUp,
           tooltip: 'Move sort earlier',
           onTap: index == 0 ? null : () => _move(index, -1),
         ),
         _IconAction(
-          icon: Icons.keyboard_arrow_down,
+          icon: DsIcons.moveDown,
           tooltip: 'Move sort later',
           onTap: index == value.length - 1 ? null : () => _move(index, 1),
         ),
         _IconAction(
-          icon: Icons.close,
+          icon: DsIcons.close,
           tooltip: 'Remove sort',
           onTap: () => _removeAt(index),
         ),
@@ -277,7 +278,7 @@ class _DirectionToggle extends StatelessWidget {
             _segment(
               tokens,
               label: 'Asc',
-              icon: Icons.arrow_upward,
+              icon: DsIcons.arrowUp,
               semanticsLabel: 'Sort ascending',
               selected: ascending,
               onTap: () => onChanged(true),
@@ -285,7 +286,7 @@ class _DirectionToggle extends StatelessWidget {
             _segment(
               tokens,
               label: 'Desc',
-              icon: Icons.arrow_downward,
+              icon: DsIcons.arrowDown,
               semanticsLabel: 'Sort descending',
               selected: !ascending,
               onTap: () => onChanged(false),

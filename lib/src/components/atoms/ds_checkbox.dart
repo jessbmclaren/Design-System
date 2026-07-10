@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -73,7 +74,7 @@ class DsCheckbox extends StatelessWidget {
       ),
       child: value
           ? const Icon(
-              Icons.check,
+              DsIcons.check,
               size: DsIconSize.xs,
               color: Colors.white,
             )

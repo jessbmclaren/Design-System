@@ -58,12 +58,12 @@ class DsMenuItem {
 ///
 /// ```dart
 /// DsMenu(
-///   trigger: const DsIcon(icon: Icons.more_horiz, semanticLabel: 'More'),
+///   trigger: const DsIcon(icon: DsIcons.moreHorizontal, semanticLabel: 'More'),
 ///   items: [
-///     DsMenuItem(label: 'Edit', icon: Icons.edit_outlined, onSelected: _edit),
+///     DsMenuItem(label: 'Edit', icon: DsIcons.edit, onSelected: _edit),
 ///     DsMenuItem(
 ///       label: 'Delete',
-///       icon: Icons.delete_outline,
+///       icon: DsIcons.delete,
 ///       destructive: true,
 ///       onSelected: _delete,
 ///     ),

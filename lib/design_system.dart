@@ -11,6 +11,7 @@ export 'src/tokens/ds_chart_palette.dart';
 export 'src/tokens/ds_colors.dart';
 export 'src/tokens/ds_elevation.dart';
 export 'src/tokens/ds_icon_size.dart';
+export 'src/tokens/ds_icons.dart';
 export 'src/tokens/ds_radii.dart';
 export 'src/tokens/ds_spacing.dart';
 export 'src/tokens/ds_typography.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -55,7 +56,7 @@ class DsLink extends StatelessWidget {
   final IconData? trailingIcon;
 
   /// Whether the link opens an external destination. Appends an
-  /// [Icons.open_in_new] glyph and annotates the semantics as a link.
+  /// [DsIcons.externalLink] glyph and annotates the semantics as a link.
   final bool external;
 
   @override
@@ -120,7 +121,7 @@ class DsLink extends StatelessWidget {
         ],
         if (external) ...[
           const SizedBox(width: DsSpacing.xs),
-          Icon(Icons.open_in_new, size: DsIconSize.xs, color: resolvedColor),
+          Icon(DsIcons.externalLink, size: DsIconSize.xs, color: resolvedColor),
         ],
       ],
     );

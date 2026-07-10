@@ -38,7 +38,7 @@ class DsToastAction {
 /// DsToast.show(
 ///   context,
 ///   message: 'Changes saved',
-///   icon: Icons.check_circle_outline,
+///   icon: DsIcons.success,
 ///   action: DsToastAction(label: 'Undo', onPressed: _undo),
 /// );
 /// ```

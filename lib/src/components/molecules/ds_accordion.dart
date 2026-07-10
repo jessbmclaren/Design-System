@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -60,7 +61,7 @@ class DsAccordionItem {
 ///   items: const [
 ///     DsAccordionItem(
 ///       title: 'Shipping',
-///       leading: Icon(Icons.local_shipping_outlined),
+///       leading: Icon(DsIcons.shipping),
 ///       child: Text('Ships within two business days.'),
 ///     ),
 ///     DsAccordionItem(
@@ -240,7 +241,7 @@ class _DsAccordionSection extends StatelessWidget {
                     duration: motion,
                     curve: curve,
                     child: Icon(
-                      Icons.expand_more,
+                      DsIcons.expandMore,
                       size: DsIconSize.md,
                       color: tokens.colorSecondaryText,
                     ),
