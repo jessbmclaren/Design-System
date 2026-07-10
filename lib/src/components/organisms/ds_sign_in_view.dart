@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_elevation.dart';
+import '../../tokens/ds_icon_size.dart';
+import '../../tokens/ds_icons.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
+import '../atoms/ds_icon.dart';
 
 /// The primary call to action shown in a [DsSignInView].
 ///
@@ -110,6 +113,7 @@ class _DsSignInViewState extends State<DsSignInView> {
               color: tokens.formBackgroundColor,
               border: Border.all(color: tokens.colorBorder),
               borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
+              boxShadow: DsElevation.medium,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -126,7 +130,7 @@ class _DsSignInViewState extends State<DsSignInView> {
                 Text(
                   widget.title,
                   textAlign: TextAlign.center,
-                  style: tokens.headingMd.toTextStyle(
+                  style: tokens.headingLg.toTextStyle(
                     color: tokens.colorText,
                   ),
                 ),
@@ -190,14 +194,17 @@ class _BrandMark extends StatelessWidget {
     return Align(
       alignment: Alignment.center,
       child: Container(
-        width: 56,
-        height: 56,
+        padding: const EdgeInsets.all(DsSpacing.md),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
+          color: color,
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          border: Border.all(color: color.withValues(alpha: 0.24)),
+          boxShadow: DsElevation.medium,
         ),
-        child: Icon(icon, size: 28, color: color),
+        child: DsIcon(
+          icon: icon,
+          size: DsIconSize.xl,
+          color: tokens.buttonPrimaryColorText,
+        ),
       ),
     );
   }
@@ -242,9 +249,9 @@ class _RevealControl extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: DsSpacing.xs),
-              Icon(
-                expanded ? DsIcons.expandLess : DsIcons.expandMore,
-                size: 20,
+              DsIcon(
+                icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
+                size: DsIconSize.lg,
                 color: tokens.actionSecondaryColorText,
               ),
             ],

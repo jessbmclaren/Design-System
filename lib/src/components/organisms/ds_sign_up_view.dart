@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
+import '../../tokens/ds_elevation.dart';
+import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_box.dart';
 import '../atoms/ds_button.dart';
+import '../atoms/ds_icon.dart';
 
 /// A centred sign-up screen scaffold.
 ///
@@ -229,6 +232,7 @@ class _FormCard extends StatelessWidget {
         color: tokens.formBackgroundColor,
         border: Border.all(color: tokens.colorBorder),
         borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
+        boxShadow: DsElevation.medium,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -245,7 +249,7 @@ class _FormCard extends StatelessWidget {
             header: true,
             child: Text(
               title,
-              style: tokens.headingMd.toTextStyle(color: tokens.colorText),
+              style: tokens.headingLg.toTextStyle(color: tokens.colorText),
             ),
           ),
           if (description != null) ...[
@@ -311,14 +315,17 @@ class _BrandMark extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        width: 56,
-        height: 56,
+        padding: const EdgeInsets.all(DsSpacing.md),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
+          color: color,
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          border: Border.all(color: color.withValues(alpha: 0.24)),
+          boxShadow: DsElevation.medium,
         ),
-        child: Icon(icon, size: 28, color: color),
+        child: DsIcon(
+          icon: icon,
+          size: DsIconSize.xl,
+          color: tokens.buttonPrimaryColorText,
+        ),
       ),
     );
   }
