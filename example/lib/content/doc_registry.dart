@@ -82,6 +82,10 @@ import 'pages/takeover.dart';
 import 'pages/address_field_group.dart';
 import 'pages/upload_field.dart';
 import 'pages/verification_rail.dart';
+import 'pages/auth_shell.dart';
+import 'pages/cookie_banner.dart';
+import 'pages/cookie_preferences.dart';
+import 'pages/tour_card.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
@@ -139,6 +143,8 @@ final List<PatternPage> allPages = [
   focusViewPage,
   contextViewPage,
   takeoverPage,
+  cookieBannerPage,
+  cookiePreferencesPage,
   // Data
   dataGridPage,
   cellTypesPage,
@@ -156,6 +162,7 @@ final List<PatternPage> allPages = [
   sparklinePage,
   // Layout
   authGradientPage,
+  authShellPage,
   boxPage,
   brandBloomPage,
   fadeSlideInPage,
@@ -170,6 +177,7 @@ final List<PatternPage> allPages = [
   settingsSignInPage,
   businessVerificationPage,
   setupGuidePage,
+  tourCardPage,
   additionalContextPage,
   redirectsPage,
 ];
