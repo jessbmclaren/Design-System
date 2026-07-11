@@ -223,28 +223,31 @@ class _DsCheckboxState extends State<DsCheckbox> {
       ),
     );
 
-    if (widget.errorText == null) return interactive;
-
+    // The Column is always the root, whether or not an error shows, so
+    // toggling errorText only adds or removes the error line. A stable tree
+    // shape keeps the InkWell element alive across the rebuild, which
+    // preserves keyboard focus and lets the focus ring track reality.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         interactive,
-        // Spoken through the control's semantics node above, so the visible
-        // text is excluded to avoid a double announcement.
-        ExcludeSemantics(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: labelChild != null
-                  ? DsCheckbox._boxSize + DsCheckbox._labelGap
-                  : 0,
-            ),
-            child: Text(
-              widget.errorText!,
-              style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+        if (widget.errorText != null)
+          // Spoken through the control's semantics node above, so the visible
+          // text is excluded to avoid a double announcement.
+          ExcludeSemantics(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: labelChild != null
+                    ? DsCheckbox._boxSize + DsCheckbox._labelGap
+                    : 0,
+              ),
+              child: Text(
+                widget.errorText!,
+                style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+              ),
             ),
           ),
-        ),
       ],
     );
   }

@@ -4,6 +4,7 @@ import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../tokens/ds_spacing.dart';
+import '../../util/ds_motion.dart';
 
 // ---------------------------------------------------------------------------
 // Model (pure Dart, no Flutter): the rules and grading used by the meter. It
@@ -24,15 +25,32 @@ class DsPasswordRule {
   final bool met;
 }
 
+// Hoisted so per-keystroke grading does not recompile them. The letter
+// classes are unicode-aware, so a Cyrillic or Greek capital counts as an
+// uppercase letter, and a special character is anything that is neither a
+// letter nor a number.
+final RegExp _upperCaseLetter = RegExp(r'\p{Lu}', unicode: true);
+final RegExp _lowerCaseLetter = RegExp(r'\p{Ll}', unicode: true);
+final RegExp _digit = RegExp('[0-9]');
+final RegExp _specialCharacter = RegExp(r'[^\p{L}\p{N}]', unicode: true);
+
 /// The standard password rule set, in display order.
+///
+/// The letter rules recognise any script, not just Latin, and the special
+/// character rule matches anything that is neither a letter nor a number.
+/// Length counts user-perceived characters (grapheme clusters), so an emoji
+/// counts once. Whitespace is a character like any other: spaces satisfy the
+/// special character rule and a whitespace-only value is graded on its own
+/// merits rather than treated as empty, so trim input first if your form
+/// forbids it.
 List<DsPasswordRule> dsPasswordRules(String value) => <DsPasswordRule>[
-  DsPasswordRule('At least 8 characters', value.length >= 8),
-  DsPasswordRule('One uppercase letter', RegExp('[A-Z]').hasMatch(value)),
-  DsPasswordRule('One lowercase letter', RegExp('[a-z]').hasMatch(value)),
-  DsPasswordRule('One number', RegExp('[0-9]').hasMatch(value)),
+  DsPasswordRule('At least 8 characters', value.characters.length >= 8),
+  DsPasswordRule('One uppercase letter', _upperCaseLetter.hasMatch(value)),
+  DsPasswordRule('One lowercase letter', _lowerCaseLetter.hasMatch(value)),
+  DsPasswordRule('One number', _digit.hasMatch(value)),
   DsPasswordRule(
     'One special character',
-    RegExp(r'[^A-Za-z0-9]').hasMatch(value),
+    _specialCharacter.hasMatch(value),
   ),
 ];
 
@@ -120,9 +138,11 @@ bool _hasSequence(String value) {
 
 // The classic "word + short number + optional symbols" anti-pattern, for
 // example McLaren26! or Bridge2024!. It meets the rules but is highly
-// guessable.
+// guessable. The word part is capped at 24 letters: beyond that the value
+// reads as a passphrase rather than a guessable single word, so the penalty
+// no longer applies.
 final RegExp _wordNumberSymbol = RegExp(
-  r'^[A-Za-z]+[0-9]{1,4}[^A-Za-z0-9]{0,3}$',
+  r'^[A-Za-z]{1,24}[0-9]{1,4}[^A-Za-z0-9]{0,3}$',
 );
 
 /// Grades [value] into a [DsPasswordTier].
@@ -137,14 +157,19 @@ final RegExp _wordNumberSymbol = RegExp(
 ///
 /// Pass [brandWords] to treat a brand's own names as guessable: a password
 /// built on the product name is as weak as any dictionary word. Matching is
-/// case-insensitive.
+/// case-insensitive by lowercasing both sides, which cannot round-trip
+/// locale-specific uppercasings (STRASSE is the capital form of straße but
+/// lowercases to strasse), so list spelling variants such as straße and
+/// strasse as separate entries. Length thresholds count user-perceived
+/// characters (grapheme clusters), matching [dsPasswordRules].
 DsPasswordTier dsPasswordTier(
   String value, {
   Set<String> brandWords = const <String>{},
 }) {
   if (value.isEmpty) return DsPasswordTier.tooWeak;
+  final int length = value.characters.length;
   final met = dsPasswordRules(value).where((rule) => rule.met).length;
-  if (met < 3 || value.length < 8) return DsPasswordTier.tooWeak;
+  if (met < 3 || length < 8) return DsPasswordTier.tooWeak;
 
   final lower = value.toLowerCase();
   final guessable =
@@ -156,7 +181,7 @@ DsPasswordTier dsPasswordTier(
   // A known-weak word or the word+number+symbol shape stays low even when
   // every rule is met.
   if (guessable) {
-    return (value.length >= 14 && met == 5)
+    return (length >= 14 && met == 5)
         ? DsPasswordTier.weak
         : DsPasswordTier.tooWeak;
   }
@@ -164,8 +189,8 @@ DsPasswordTier dsPasswordTier(
   var score = 0;
   if (met >= 4) score++;
   if (met == 5) score++;
-  if (value.length >= 12) score++;
-  if (value.length >= 16) score++;
+  if (length >= 12) score++;
+  if (length >= 16) score++;
   if (_hasRepeat(value)) score--;
   if (_hasSequence(value)) score--;
   score = score.clamp(0, 4);
@@ -219,7 +244,8 @@ int _segmentsFilled(DsPasswordTier tier) => switch (tier) {
 /// strength word beneath it and a two-column checklist that marks each rule
 /// as it is met. Every colour comes from [DsTokens], so it re-skins with the
 /// theme. The meter bar is decorative for assistive technology; the strength
-/// word and the checklist text carry the state.
+/// word is a live region so tier changes are announced as the user types, and
+/// each checklist row exposes its met state as a checked flag.
 class DsPasswordStrength extends StatelessWidget {
   /// Creates a password strength readout.
   const DsPasswordStrength({
@@ -228,6 +254,16 @@ class DsPasswordStrength extends StatelessWidget {
     this.showChecklist = true,
     this.brandWords = const <String>{},
   });
+
+  /// The width the readout falls back to when its host provides none (a Row
+  /// or a horizontal list), so the meter segments and rule rows have
+  /// something to fill.
+  static const double _fallbackWidth = 240;
+
+  /// The narrowest column (before text scaling) that still fits a rule label
+  /// without wrapping it over several lines. Below it the checklist collapses
+  /// to a single column.
+  static const double _minChecklistItemWidth = 140;
 
   /// The password being evaluated.
   final String value;
@@ -251,73 +287,106 @@ class DsPasswordStrength extends StatelessWidget {
     );
     final filled = value.isEmpty ? 0 : _segmentsFilled(tier);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        // The bar restates what the strength word says, so it is hidden from
-        // assistive technology rather than announced twice.
-        ExcludeSemantics(
-          child: Row(
-            children: <Widget>[
-              for (var i = 0; i < 3; i++) ...<Widget>[
-                if (i > 0) const SizedBox(width: DsSpacing.xs),
-                Expanded(
-                  child: Container(
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: i < filled ? strength.color : tokens.colorBorder,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-        if (value.isNotEmpty) ...<Widget>[
-          const SizedBox(height: DsSpacing.xs),
-          Text(
-            strength.label,
-            style: tokens.labelSm.toTextStyle(color: strength.color),
-          ),
-        ],
-        if (showChecklist) ...<Widget>[
-          const SizedBox(height: DsSpacing.sm),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // Two columns that always fill the available width. Without a
-              // bounded width to split, the rules stack instead.
-              if (!constraints.hasBoundedWidth) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    for (final rule in rules)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: DsSpacing.xs),
-                        child: _RuleRow(rule: rule),
-                      ),
-                  ],
-                );
-              }
-              final itemWidth = ((constraints.maxWidth - DsSpacing.md) / 2)
-                  .clamp(0.0, double.infinity);
-              return Wrap(
-                spacing: DsSpacing.md,
-                runSpacing: DsSpacing.xs,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final Widget readout = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            // The bar restates what the strength word says, so it is hidden
+            // from assistive technology rather than announced twice.
+            ExcludeSemantics(
+              child: Row(
                 children: <Widget>[
-                  for (final rule in rules)
-                    SizedBox(
-                      width: itemWidth,
-                      child: _RuleRow(rule: rule),
+                  for (var i = 0; i < 3; i++) ...<Widget>[
+                    if (i > 0) const SizedBox(width: DsSpacing.xs),
+                    Expanded(
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: i < filled
+                              ? strength.color
+                              : tokens.colorBorder,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ),
+                  ],
                 ],
-              );
-            },
-          ),
-        ],
-      ],
+              ),
+            ),
+            if (value.isNotEmpty) ...<Widget>[
+              const SizedBox(height: DsSpacing.xs),
+              // A live region so assistive technology announces the tier as
+              // it changes under the user's typing.
+              Semantics(
+                container: true,
+                liveRegion: true,
+                child: Text(
+                  strength.label,
+                  style: tokens.labelSm.toTextStyle(color: strength.color),
+                ),
+              ),
+            ],
+            if (showChecklist) ...<Widget>[
+              const SizedBox(height: DsSpacing.sm),
+              _Checklist(rules: rules),
+            ],
+          ],
+        );
+        // The meter segments and rule rows split whatever width the host
+        // provides; a host with none to offer (a Row, a horizontal list)
+        // gets a fixed-width readout instead of a failed layout.
+        if (constraints.hasBoundedWidth) return readout;
+        return SizedBox(width: _fallbackWidth, child: readout);
+      },
+    );
+  }
+}
+
+/// The rule checklist: two columns where each fits a label at the ambient
+/// text scale, one column otherwise.
+class _Checklist extends StatelessWidget {
+  const _Checklist({required this.rules});
+
+  final List<DsPasswordRule> rules;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double itemWidth = (constraints.maxWidth - DsSpacing.md) / 2;
+        // Two columns only when each is wide enough for a rule label at the
+        // ambient text scale; otherwise one column keeps each rule on a line
+        // or two instead of wrapping into a tall sliver.
+        final double minItemWidth = MediaQuery.textScalerOf(
+          context,
+        ).scale(DsPasswordStrength._minChecklistItemWidth);
+        if (itemWidth < minItemWidth) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              for (final rule in rules)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: DsSpacing.xs),
+                  child: _RuleRow(rule: rule),
+                ),
+            ],
+          );
+        }
+        return Wrap(
+          spacing: DsSpacing.md,
+          runSpacing: DsSpacing.xs,
+          children: <Widget>[
+            for (final rule in rules)
+              SizedBox(
+                width: itemWidth,
+                child: _RuleRow(rule: rule),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -331,19 +400,25 @@ class _RuleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    return Row(
-      children: <Widget>[
-        _CheckDot(met: rule.met),
-        const SizedBox(width: DsSpacing.sm),
-        Expanded(
-          child: Text(
-            rule.label,
-            style: tokens.bodySm.toTextStyle(
-              color: rule.met ? tokens.colorText : tokens.colorSecondaryText,
+    // The row reads as one node with a checked state, so assistive
+    // technology hears whether the rule is met rather than a bare label.
+    return Semantics(
+      container: true,
+      checked: rule.met,
+      child: Row(
+        children: <Widget>[
+          _CheckDot(met: rule.met),
+          const SizedBox(width: DsSpacing.sm),
+          Expanded(
+            child: Text(
+              rule.label,
+              style: tokens.bodySm.toTextStyle(
+                color: rule.met ? tokens.colorText : tokens.colorSecondaryText,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -391,7 +466,9 @@ class _CheckDot extends StatelessWidget {
 /// weak or below (a common word, a brand word or a predictable shape), it
 /// swaps to guidance on avoiding guessable passwords. It renders nothing for
 /// an empty value or a password graded fair or better, so it can sit
-/// permanently beneath the meter.
+/// permanently beneath the meter. The message is a polite live region, and
+/// the hint resizes through an [AnimatedSize] (immediate under reduced
+/// motion) so the form beneath it does not jump.
 class DsPasswordStrengthHint extends StatelessWidget {
   /// Creates a password guidance line.
   const DsPasswordStrengthHint({
@@ -409,9 +486,10 @@ class DsPasswordStrengthHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (value.isEmpty) return const SizedBox.shrink();
-    final String? message;
-    if (!dsPasswordMeetsAll(value)) {
+    String? message;
+    if (value.isEmpty) {
+      message = null;
+    } else if (!dsPasswordMeetsAll(value)) {
       message =
           'Use at least 8 characters with upper- and lower-case '
           'letters, a number and a symbol.';
@@ -423,20 +501,45 @@ class DsPasswordStrengthHint extends StatelessWidget {
         _ => null,
       };
     }
-    if (message == null) return const SizedBox.shrink();
-    final tokens = DsTokens.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Icon(DsIcons.error, size: DsIconSize.sm, color: tokens.colorDanger),
-        const SizedBox(width: DsSpacing.xs),
-        Expanded(
-          child: Text(
-            message,
-            style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
-          ),
+    final Widget child;
+    if (message == null) {
+      child = const SizedBox.shrink();
+    } else {
+      final tokens = DsTokens.of(context);
+      // A live region: the warning swaps in under the user's typing, so it
+      // is announced without stealing focus.
+      child = Semantics(
+        container: true,
+        liveRegion: true,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              DsIcons.error,
+              size: DsIconSize.sm,
+              color: tokens.colorDanger,
+            ),
+            const SizedBox(width: DsSpacing.xs),
+            Expanded(
+              child: Text(
+                message,
+                style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+              ),
+            ),
+          ],
         ),
-      ],
+      );
+    }
+    // The hint grows and collapses smoothly so the form beneath it does not
+    // jump. Under reduced motion the wrapper is skipped for an immediate
+    // resize: an AnimatedSize must not be given Duration.zero, as a
+    // zero-length animation completes during its own layout pass.
+    if (DsMotion.reduced(context)) return child;
+    return AnimatedSize(
+      duration: DsMotion.base,
+      curve: DsMotion.standard,
+      alignment: Alignment.topCenter,
+      child: child,
     );
   }
 }

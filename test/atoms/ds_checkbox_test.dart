@@ -222,6 +222,45 @@ void main() {
       expect(reported, isTrue);
     });
 
+    testWidgets('adding errorText while focused keeps focus so Space still '
+        'toggles', (tester) async {
+      bool? reported;
+      String? error;
+      late StateSetter rebuild;
+      await pumpDs(
+        tester,
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return DsCheckbox(
+              value: false,
+              onChanged: (v) => reported = v,
+              label: 'Accept terms',
+              errorText: error,
+            );
+          },
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Validation fires while the control is focused. The tree keeps its
+      // shape (the Column is always the root), so the InkWell survives the
+      // rebuild and keyboard focus stays on the control.
+      rebuild(() => error = 'You must accept the terms');
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(reported, isTrue);
+
+      // The focus ring still reflects a genuinely focused control.
+      final container =
+          tester.widget<AnimatedContainer>(find.byType(AnimatedContainer));
+      expect((container.decoration! as BoxDecoration).boxShadow, isNotNull);
+    });
+
     testWidgets('keeps the box centred on a single-line label',
         (tester) async {
       await pumpDs(

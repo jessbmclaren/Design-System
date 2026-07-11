@@ -23,7 +23,11 @@ import '../../util/ds_motion.dart';
 /// callback renders the switch as disabled at a reduced opacity and stops it
 /// responding to input. Provide an optional [label] to describe what the switch
 /// controls; it sits to the right of the track, wraps on narrow layouts and is
-/// associated with the control so tapping either toggles the value.
+/// associated with the control so tapping either toggles the value. The label
+/// is spoken once through the control's own semantics node. Pass a
+/// [semanticLabel] to override the announced name, which is essential when the
+/// switch has no visible [label], for example in a settings row whose text
+/// lives outside the control.
 ///
 /// ```dart
 /// DsSwitch(
@@ -39,6 +43,7 @@ class DsSwitch extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.label,
+    this.semanticLabel,
   });
 
   /// Whether the switch is currently on.
@@ -51,6 +56,11 @@ class DsSwitch extends StatefulWidget {
 
   /// An optional description shown to the right of the track.
   final String? label;
+
+  /// Overrides the name announced to assistive technology. Defaults to
+  /// [label]. Provide one when the switch has no visible [label], so a bare
+  /// switch is not announced as an anonymous toggle.
+  final String? semanticLabel;
 
   // The track is a 44x26 pill; the thumb is a 22dp circle inset by 2dp, so it
   // travels 18dp between the off and on positions.
@@ -145,9 +155,14 @@ class _DsSwitchState extends State<DsSwitch> {
         if (labelText != null) ...[
           SizedBox(width: tokens.inputFieldPaddingX),
           Flexible(
-            child: Text(
-              labelText,
-              style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+            // Spoken through the control's semantics node below, so the
+            // visible text is excluded to avoid a double announcement, as
+            // DsCheckbox does for a plain label.
+            child: ExcludeSemantics(
+              child: Text(
+                labelText,
+                style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+              ),
             ),
           ),
         ],
@@ -157,7 +172,7 @@ class _DsSwitchState extends State<DsSwitch> {
     return Semantics(
       toggled: value,
       enabled: enabled,
-      label: labelText,
+      label: widget.semanticLabel ?? labelText,
       child: Opacity(
         opacity: enabled ? 1 : 0.5,
         child: Material(

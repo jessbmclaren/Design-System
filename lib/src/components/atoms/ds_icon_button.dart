@@ -12,10 +12,11 @@ import '../../tokens/ds_icon_size.dart';
 /// surface rather than a raised button.
 ///
 /// It is built on [IconButton], so it is keyboard-focusable, activates on Enter
-/// and Space, exposes a button role to assistive technology and surfaces
-/// [semanticLabel] as both the accessible name and a tooltip. Always provide a
-/// meaningful [semanticLabel]: an icon alone carries no text for a screen
-/// reader.
+/// and Space and exposes a button role to assistive technology. [semanticLabel]
+/// becomes the button's tooltip, the stock Material pattern: screen readers
+/// announce the tooltip as the control's name, though the semantics label
+/// itself stays empty. Always provide a meaningful [semanticLabel]: an icon
+/// alone carries no text for a screen reader.
 ///
 /// Keyboard focus draws a ring around the circle in the theme's
 /// [DsTokens.formAccentColor], so focus reads differently from hover. The tap
@@ -43,7 +44,9 @@ class DsIconButton extends StatelessWidget {
   /// removes it from the focus order.
   final VoidCallback? onPressed;
 
-  /// The accessible name, announced by screen readers and shown as a tooltip.
+  /// The name screen readers announce, carried on the button's tooltip (the
+  /// stock Material pattern) rather than on the semantics label, and shown as
+  /// a tooltip on hover and long press.
   final String semanticLabel;
 
   /// The control diameter, in logical pixels.

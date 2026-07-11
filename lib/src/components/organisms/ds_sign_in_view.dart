@@ -9,6 +9,15 @@ import '../atoms/ds_icon.dart';
 import '../atoms/ds_icon_button.dart';
 import 'ds_sign_up_view.dart' show DsHeadingAlignment;
 
+/// The extra trailing inset applied to the heading block while a corner close
+/// button is shown, so heading glyphs never paint beneath it. The button's
+/// 48dp padded tap target ([kMinInteractiveDimension]) sits [DsSpacing.sm] in
+/// from the card edge; the body padding already covers [DsSpacing.xl] of that
+/// span and a further [DsSpacing.sm] keeps a visible gap between the last
+/// glyph and the button. Mirrors the sign-up card.
+const double _headingCloseInset =
+    kMinInteractiveDimension + DsSpacing.sm + DsSpacing.sm - DsSpacing.xl;
+
 /// The primary call to action shown in a [DsSignInView].
 ///
 /// This describes the label of the view's full-width primary button and the
@@ -97,8 +106,8 @@ class DsSignInView extends StatefulWidget {
   final Widget? footer;
 
   /// Optional content rendered edge-to-edge below the card's padded body, in
-  /// a tinted band with a hairline top border. The band touches the card's
-  /// edges and the card's bottom corner radius clips it.
+  /// a tinted band with a top border in the standard border colour. The band
+  /// touches the card's edges and the card's bottom corner radius clips it.
   final Widget? footerBand;
 
   /// The label for the expand/reveal control. When null, no reveal is shown.
@@ -109,7 +118,8 @@ class DsSignInView extends StatefulWidget {
   final Widget? additionalContext;
 
   /// Called when the close button in the card's top corner is tapped. When
-  /// null no close affordance is shown.
+  /// null no close affordance is shown. While the button is shown the heading
+  /// block is inset at its trailing edge so the title never paints beneath it.
   final VoidCallback? onClose;
 
   /// Whether the card draws a hairline border. Set false for a shadow-only
@@ -191,7 +201,11 @@ class _DsSignInViewState extends State<DsSignInView> {
             ),
             decoration: BoxDecoration(
               color: tokens.offsetBackgroundColor,
-              border: Border(top: BorderSide(color: tokens.colorBorderSubtle)),
+              // The standard border tier, not the subtle hairline: the subtle
+              // tier sits below 1.1:1 against the band tint in the Engen
+              // light skin, so it vanishes exactly where the band needs an
+              // edge.
+              border: Border(top: BorderSide(color: tokens.colorBorder)),
             ),
             child: widget.footerBand,
           ),
@@ -211,31 +225,49 @@ class _DsSignInViewState extends State<DsSignInView> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (widget.brandIcon != null) ...[
-          _BrandMark(
-            icon: widget.brandIcon!,
-            color: widget.brandColor ?? tokens.buttonPrimaryColorBackground,
-            alignment: centred ? Alignment.center : Alignment.centerLeft,
+        // While a close button floats in the corner the heading block gives
+        // up its trailing edge to it, so title and description glyphs never
+        // paint beneath the icon.
+        Padding(
+          padding: EdgeInsets.only(
+            right: widget.onClose != null ? _headingCloseInset : 0,
           ),
-          const SizedBox(height: DsSpacing.lg),
-        ],
-        Text(
-          widget.title,
-          textAlign: textAlign,
-          style: tokens.headingLg.toTextStyle(
-            color: tokens.colorText,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.brandIcon != null) ...[
+                _BrandMark(
+                  icon: widget.brandIcon!,
+                  color: widget.brandColor ??
+                      tokens.buttonPrimaryColorBackground,
+                  alignment: centred ? Alignment.center : Alignment.centerLeft,
+                ),
+                const SizedBox(height: DsSpacing.lg),
+              ],
+              Semantics(
+                header: true,
+                child: Text(
+                  widget.title,
+                  textAlign: textAlign,
+                  style: tokens.headingLg.toTextStyle(
+                    color: tokens.colorText,
+                  ),
+                ),
+              ),
+              if (widget.description != null) ...[
+                const SizedBox(height: DsSpacing.sm),
+                Text(
+                  widget.description!,
+                  textAlign: textAlign,
+                  style: tokens.bodySm.toTextStyle(
+                    color: tokens.colorSecondaryText,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-        if (widget.description != null) ...[
-          const SizedBox(height: DsSpacing.sm),
-          Text(
-            widget.description!,
-            textAlign: textAlign,
-            style: tokens.bodySm.toTextStyle(
-              color: tokens.colorSecondaryText,
-            ),
-          ),
-        ],
         const SizedBox(height: DsSpacing.xl),
         if (widget.form != null) ...[
           widget.form!,

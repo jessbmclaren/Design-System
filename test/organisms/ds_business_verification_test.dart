@@ -106,6 +106,92 @@ void main() {
       expect(find.text('Verification submitted'), findsOneWidget);
     });
 
+    testWidgets('backing out of the first step fires onCancel',
+        (tester) async {
+      var cancelled = 0;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 800,
+          child: DsBusinessVerification(onCancel: () => cancelled++),
+        ),
+      );
+
+      expect(find.text('Back'), findsOneWidget);
+      await tester.tap(find.text('Back'));
+      await tester.pump();
+
+      expect(cancelled, 1);
+      expect(find.text('Business type'), findsWidgets,
+          reason: 'cancelling leaves the flow on its first step');
+    });
+
+    testWidgets('without onCancel the first step has no back affordance',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const SizedBox(height: 800, child: DsBusinessVerification()),
+      );
+
+      expect(find.text('Back'), findsNothing);
+    });
+
+    testWidgets('a replaced identity body lifts the consent gate',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 800,
+          child: DsBusinessVerification(
+            stepBodyBuilder: (context, stepIndex, body) =>
+                stepIndex == 2 ? const Text('Custom identity step') : body,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+      expect(find.text('Custom identity step'), findsOneWidget);
+
+      // The stock consent checkbox is gone with the stock body, so the flow
+      // must not stay gated on it.
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+      expect(find.text('Review your details'), findsOneWidget);
+    });
+
+    testWidgets('canAdvance overrides a step\'s stock gating', (tester) async {
+      var allow = false;
+      late StateSetter setHarnessState;
+      await pumpDs(
+        tester,
+        SizedBox(
+          height: 800,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              setHarnessState = setState;
+              return DsBusinessVerification(
+                canAdvance: (stepIndex) => stepIndex == 0 ? allow : null,
+              );
+            },
+          ),
+        ),
+      );
+
+      // The override gates step 0, which the stock flow never does.
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+      expect(find.text('Legal name'), findsNothing);
+
+      setHarnessState(() => allow = true);
+      await tester.pump();
+      await tester.tap(find.text('Continue'));
+      await tester.pump();
+      expect(find.text('Legal name'), findsWidgets);
+    });
+
     testWidgets('renders without overflow on a small phone', (tester) async {
       await pumpDs(
         tester,

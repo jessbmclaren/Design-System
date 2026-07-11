@@ -85,6 +85,51 @@ void main() {
     expect(changed, isFalse);
   });
 
+  testWidgets('a disabled select does not validate', (tester) async {
+    final formKey = GlobalKey<FormState>();
+    await pumpDs(
+      tester,
+      Form(
+        key: formKey,
+        child: DsSelect<String>(
+          label: 'Country',
+          value: null,
+          options: options,
+          enabled: false,
+          onChanged: (_) {},
+          validator: (value) => value == null ? 'Country is required' : null,
+        ),
+      ),
+    );
+
+    // The user cannot operate a disabled control, so its validator must not
+    // be able to block the form with an unfixable error.
+    expect(formKey.currentState!.validate(), isTrue);
+    await tester.pump();
+    expect(find.text('Country is required'), findsNothing);
+  });
+
+  testWidgets('a disabled select does not save', (tester) async {
+    final formKey = GlobalKey<FormState>();
+    var savedCalls = 0;
+    await pumpDs(
+      tester,
+      Form(
+        key: formKey,
+        child: DsSelect<String>(
+          value: 'be',
+          options: options,
+          enabled: false,
+          onChanged: (_) {},
+          onSaved: (_) => savedCalls++,
+        ),
+      ),
+    );
+
+    formKey.currentState!.save();
+    expect(savedCalls, 0);
+  });
+
   testWidgets('renders the error message', (tester) async {
     await pumpDs(
       tester,

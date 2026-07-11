@@ -13,6 +13,12 @@ import '../../util/ds_motion.dart';
 /// dots do not animate: the widget renders a static, full ellipsis instead,
 /// so the copy still reads as "in progress".
 ///
+/// The dots never apply the ambient text scale themselves. Inside a
+/// [WidgetSpan] the host paragraph already scales every inline child, so a
+/// self-scaling ellipsis would render at the scale squared. The paragraph
+/// therefore scales the dots exactly once, in step with the sentence they
+/// trail.
+///
 /// The dots change several times a second, so by default they are excluded
 /// from semantics and the sentence they trail carries the meaning. Keep the
 /// state announced through that text (or a live region around it), not
@@ -94,22 +100,30 @@ class _DsAnimatedEllipsisState extends State<DsAnimatedEllipsis>
     final style = widget.style ?? DefaultTextStyle.of(context).style;
     final reserved = '.' * widget.dotCount;
 
+    // The dots must not scale themselves: the paragraph hosting the
+    // WidgetSpan applies the ambient text scale to every inline child, so an
+    // inner scale on top of that would square it (2x becomes 4x).
+    const textScaler = TextScaler.noScaling;
+
     final Widget dots;
     if (DsMotion.reduced(context)) {
       // A still frame: the full ellipsis, so the copy still reads as ongoing.
-      dots = Text(reserved, style: style);
+      dots = Text(reserved, style: style, textScaler: textScaler);
     } else {
       dots = Stack(
         children: [
           // Reserve the full width invisibly so the preceding sentence never
           // shifts as dots come and go.
-          Opacity(opacity: 0, child: Text(reserved, style: style)),
+          Opacity(
+            opacity: 0,
+            child: Text(reserved, style: style, textScaler: textScaler),
+          ),
           AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
               final steps = widget.dotCount + 1;
               final count = (_controller.value * steps).floor() % steps;
-              return Text('.' * count, style: style);
+              return Text('.' * count, style: style, textScaler: textScaler);
             },
           ),
         ],

@@ -90,6 +90,110 @@ void main() {
     );
   });
 
+  testWidgets('falls back to stacked when long labels cannot fit the row',
+      (tester) async {
+    await pumpDs(
+      tester,
+      SizedBox(
+        width: 600,
+        child: DsFooterActions(
+          primaryLabel: 'Verifizierungsunterlagen hochladen und fortfahren',
+          onPrimary: () {},
+          backLabel: 'Zurueck zur vorherigen Angabe',
+          onBack: () {},
+          leading: const Text('Schritt 2 von 4'),
+        ),
+      ),
+      textScale: 1.3,
+    );
+
+    // 600dp clears the default minRowWidth, but the row's intrinsic width
+    // does not fit, so the cluster stacks rather than overflowing.
+    expect(tester.takeException(), isNull);
+    final primary = tester.getCenter(
+      find.text('Verifizierungsunterlagen hochladen und fortfahren'),
+    );
+    final back =
+        tester.getCenter(find.text('Zurueck zur vorherigen Angabe'));
+    expect(primary.dy, lessThan(back.dy));
+  });
+
+  testWidgets('stacks in the documented order: primary, back, tertiary, '
+      'caption', (tester) async {
+    await pumpDs(
+      tester,
+      SizedBox(
+        width: 320,
+        child: DsFooterActions(
+          primaryLabel: 'Continue',
+          onPrimary: () {},
+          backLabel: 'Back',
+          onBack: () {},
+          tertiaryLabel: 'Save and finish later',
+          onTertiary: () {},
+          leading: const Text('Step 2 of 4'),
+        ),
+      ),
+      surfaceSize: const Size(360, 700),
+    );
+
+    final primaryY = tester.getCenter(find.text('Continue')).dy;
+    final backY = tester.getCenter(find.text('Back')).dy;
+    final tertiaryY =
+        tester.getCenter(find.text('Save and finish later')).dy;
+    final leadingY = tester.getCenter(find.text('Step 2 of 4')).dy;
+    expect(primaryY, lessThan(backY));
+    expect(backY, lessThan(tertiaryY));
+    expect(tertiaryY, lessThan(leadingY));
+  });
+
+  testWidgets('minRowWidth infinity stacks under an unbounded width',
+      (tester) async {
+    await pumpDs(
+      tester,
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DsFooterActions(
+          primaryLabel: 'Continue',
+          onPrimary: () {},
+          backLabel: 'Back',
+          onBack: () {},
+          minRowWidth: double.infinity,
+        ),
+      ),
+    );
+
+    // With no width to measure against, the cluster sizes itself to its
+    // widest piece and stacks, as the doc defines, instead of crashing.
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getCenter(find.text('Continue')).dy,
+      lessThan(tester.getCenter(find.text('Back')).dy),
+    );
+  });
+
+  testWidgets('a finite minRowWidth keeps the row under an unbounded width',
+      (tester) async {
+    await pumpDs(
+      tester,
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DsFooterActions(
+          primaryLabel: 'Continue',
+          onPrimary: () {},
+          backLabel: 'Back',
+          onBack: () {},
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    final back = tester.getCenter(find.text('Back'));
+    final primary = tester.getCenter(find.text('Continue'));
+    expect((back.dy - primary.dy).abs(), lessThan(1));
+    expect(back.dx, lessThan(primary.dx));
+  });
+
   testWidgets('a null onPrimary disables the primary action', (tester) async {
     await pumpDs(
       tester,

@@ -120,6 +120,86 @@ void main() {
       );
     });
 
+    testWidgets('marks the title as a header for assistive technology',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Welcome back',
+          primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.text('Welcome back')),
+        isSemantics(isHeader: true),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('insets the heading clear of the close button when onClose '
+        'is set', (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          headingAlignment: DsHeadingAlignment.start,
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+          onClose: () {},
+        ),
+        surfaceSize: const Size(320, 800),
+      );
+
+      // The heading block ends before the close button's padded tap target,
+      // so no title glyph can paint beneath the icon.
+      final close = tester.getRect(find.byType(IconButton));
+      expect(
+        tester.getRect(find.text('Sign in to your account')).right,
+        lessThanOrEqualTo(close.left),
+      );
+      final insetWidth =
+          tester.getSize(find.text('Sign in to your account')).width;
+
+      // Without a close button the heading keeps the full body width.
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          headingAlignment: DsHeadingAlignment.start,
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+        ),
+        surfaceSize: const Size(320, 800),
+      );
+      expect(
+        tester.getSize(find.text('Sign in to your account')).width,
+        greaterThan(insetWidth),
+      );
+    });
+
+    testWidgets('draws the footer band top border with the standard border '
+        'colour and keeps the reveal divider subtle', (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+          footerBand: const Text('New here?'),
+          additionalContextLabel: 'More options',
+          additionalContext: const Text('Enterprise SSO.'),
+        ),
+      );
+
+      final tokens = DsTokens.of(tester.element(find.byType(DsSignInView)));
+      final decoration = tester
+          .widget<Container>(find.byWidgetPredicate(_isFooterBand))
+          .decoration! as BoxDecoration;
+      expect((decoration.border! as Border).top.color, tokens.colorBorder);
+
+      final divider = tester.widget<Divider>(find.byType(Divider));
+      expect(divider.color, tokens.colorBorderSubtle);
+    });
+
     testWidgets('renders the footer band edge to edge in a tinted strip',
         (tester) async {
       await pumpDs(

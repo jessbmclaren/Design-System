@@ -143,24 +143,29 @@ void main() {
     expect(tester.widget<Text>(find.text('View details')).maxLines, 3);
   });
 
-  testWidgets('padded extends the tap target to 48dp without growing the '
-      'laid-out size', (tester) async {
+  testWidgets('padded reserves a 48dp-high row and taps across it fire',
+      (tester) async {
     var taps = 0;
     await pumpDs(
       tester,
       DsLink(label: 'Open', onPressed: () => taps++, padded: true),
     );
 
+    // The target is real layout space, so it survives lists and columns.
     final rect = tester.getRect(find.byType(DsLink));
-    // The layout box keeps its natural, sub-48dp height.
-    expect(rect.height, lessThan(48));
+    expect(rect.height, greaterThanOrEqualTo(48));
 
-    // A tap just past the visible edge, within the 48dp zone, still fires.
-    await tester.tapAt(rect.center + Offset(0, (rect.height / 2) + 6));
+    // A tap near the row's edge, past the visible text, still fires.
+    await tester.tapAt(Offset(rect.center.dx, rect.bottom - 2));
+    expect(taps, 1);
+
+    // The reserved space ends at the row: a tap beyond it misses.
+    await tester.tapAt(Offset(rect.center.dx, rect.bottom + 4));
     expect(taps, 1);
   });
 
-  testWidgets('without padded the same edge tap misses', (tester) async {
+  testWidgets('without padded a tap just past the link misses',
+      (tester) async {
     var taps = 0;
     await pumpDs(
       tester,

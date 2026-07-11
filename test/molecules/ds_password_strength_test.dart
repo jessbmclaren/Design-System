@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,6 +27,46 @@ void main() {
     test('rules reflect the value', () {
       final met = dsPasswordRules('ab').map((r) => r.met).toList();
       expect(met, <bool>[false, false, true, false, false]);
+    });
+
+    test('letter rules recognise non-Latin scripts', () {
+      // 'Пароль12' has a capital П, lowercase 'ароль' and two digits; the
+      // checklist and the caption agree that only a special character is
+      // missing.
+      final rules = dsPasswordRules('Пароль12');
+      expect(rules[1].met, isTrue);
+      expect(rules[2].met, isTrue);
+      expect(rules[3].met, isTrue);
+      expect(rules[4].met, isFalse);
+      expect(
+        dsFirstUnmetPasswordRule('Пароль12'),
+        'Please use at least one special character',
+      );
+    });
+
+    test('special characters are anything neither letter nor number', () {
+      expect(dsPasswordRules('Aa1!aaaa')[4].met, isTrue);
+      expect(dsPasswordRules('Aa1 aaaa')[4].met, isTrue); // space
+      expect(dsPasswordRules('Aa1Яaaaa')[4].met, isFalse); // letters only
+    });
+
+    test('length rules count grapheme clusters, not UTF-16 code units', () {
+      // Four emoji are eight code units but four characters.
+      expect(dsPasswordRules('😀😀😀😀')[0].met, isFalse);
+      expect(dsPasswordRules('😀😀😀😀' * 2)[0].met, isTrue);
+      // The tier steps count the same way: this value is 16 code units but
+      // only 12 characters, so it clears the 12 step and not the 16 step.
+      expect(dsPasswordTier('Aa1!Aa1!😀🎉😀🎉'), DsPasswordTier.good);
+    });
+
+    test('the shape penalty is bounded, so long compound words recover', () {
+      // A 37-letter unique word plus a digit is a passphrase, not the
+      // guessable word+number+symbol shape, and grades on length and
+      // variety.
+      expect(
+        dsPasswordTier('Rindfleischetikettierungsueberwachung1'),
+        DsPasswordTier.good,
+      );
     });
 
     test('each rule flips exactly at its boundary', () {
@@ -287,6 +329,103 @@ void main() {
       await tester.pump();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('keeps two checklist columns when each fits a label', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsPasswordStrength(value: 'Aa1!aaaa'),
+        surfaceSize: const Size(320, 640),
+      );
+      final starts = <double>{
+        for (final rule in dsPasswordRules('Aa1!aaaa'))
+          tester.getTopLeft(find.text(rule.label)).dx,
+      };
+      expect(starts, hasLength(2));
+    });
+
+    testWidgets('collapses to one column at 320dp with a 2x text scale', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsPasswordStrength(value: 'Aa1!aaaa'),
+        surfaceSize: const Size(320, 640),
+        textScale: 2.0,
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      // Stacked rules all start at the same x position.
+      final starts = <double>{
+        for (final rule in dsPasswordRules('Aa1!aaaa'))
+          tester.getTopLeft(find.text(rule.label)).dx,
+      };
+      expect(starts, hasLength(1));
+    });
+
+    testWidgets('falls back to a fixed width in an unbounded-width host', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[DsPasswordStrength(value: 'Aa1!aaaa')],
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final size = tester.getSize(find.byType(DsPasswordStrength));
+      expect(size.width.isFinite, isTrue);
+      expect(find.text('Weak'), findsOneWidget);
+    });
+
+    testWidgets('renders inside a very narrow host without overflowing', (
+      tester,
+    ) async {
+      // The heavily wrapped labels make the single-column readout tall, so
+      // the host provides the vertical scrolling.
+      await pumpDs(
+        tester,
+        const SingleChildScrollView(
+          child: SizedBox(
+            width: 60,
+            child: DsPasswordStrength(value: 'Aa1!aa'),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('announces the strength word as a live region', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsPasswordStrength(value: 'Aa1!aaaa', showChecklist: false),
+      );
+      final node = tester.getSemantics(find.text('Weak'));
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      handle.dispose();
+    });
+
+    testWidgets('checklist rows expose their met state as a checked flag', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsPasswordStrength(value: 'Aa1!aaaa'));
+      expect(
+        tester.getSemantics(find.text('One number')).flagsCollection.isChecked,
+        ui.CheckedState.isTrue,
+      );
+      await pumpDs(tester, const DsPasswordStrength(value: ''));
+      expect(
+        tester.getSemantics(find.text('One number')).flagsCollection.isChecked,
+        ui.CheckedState.isFalse,
+      );
+      handle.dispose();
+    });
   });
 
   group('DsPasswordStrengthHint', () {
@@ -332,6 +471,33 @@ void main() {
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('is a live region inside an AnimatedSize', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsPasswordStrengthHint(value: 'Password1!'));
+      expect(find.byType(AnimatedSize), findsOneWidget);
+      final node = tester.getSemantics(
+        find.textContaining("isn't strong enough"),
+      );
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      handle.dispose();
+    });
+
+    testWidgets('collapses to zero height once the password improves', (
+      tester,
+    ) async {
+      await pumpDs(tester, const DsPasswordStrengthHint(value: 'Password1!'));
+      expect(
+        tester.getSize(find.byType(DsPasswordStrengthHint)).height,
+        greaterThan(0),
+      );
+      await pumpDs(
+        tester,
+        const DsPasswordStrengthHint(value: 'Axcr1935!kdz'),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(DsPasswordStrengthHint)).height, 0);
     });
   });
 }

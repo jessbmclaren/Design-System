@@ -12,8 +12,10 @@ import '../atoms/ds_spinner.dart';
 /// session is established: a centred [DsSpinner] over a [headline] with a
 /// trailing [DsAnimatedEllipsis], an optional supporting line beneath and an
 /// optional [header] slot (typically a wordmark) pinned to the top leading
-/// corner. The whole block enters through a [DsFadeSlideIn], on a
-/// [DsAuthGradient] backdrop by default.
+/// corner. The header band spans the full width inside the screen's safe
+/// area, and header text that outgrows it ellipsises on one line instead of
+/// clipping off the edge. The whole block enters through a [DsFadeSlideIn],
+/// on a [DsAuthGradient] backdrop by default.
 ///
 /// The screen holds no timers and never advances itself; the caller swaps it
 /// out when the operation completes. Under reduced motion every part settles
@@ -128,7 +130,28 @@ class DsWaitingScreen extends StatelessWidget {
           ),
         ),
         if (header != null)
-          Positioned(top: unit * 3, left: unit * 3, child: header!),
+          // The band spans the width and sits inside its own SafeArea, so a
+          // wordmark clears a notch and wide content ellipsises within the
+          // viewport instead of walking off it.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(unit * 3, unit * 3, unit * 3, 0),
+                child: DefaultTextStyle.merge(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: header!,
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -82,6 +82,73 @@ void main() {
       expect(find.text('We never share it.'), findsNothing);
     });
 
+    testWidgets('a failing validator wins over errorText, so exactly one '
+        'caption shows', (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        Form(
+          key: formKey,
+          child: DsTextField(
+            label: 'Email',
+            errorText: 'From errorText',
+            validator: (_) => 'From validator',
+          ),
+        ),
+      );
+
+      // Until the validator runs, the errorText prop shows.
+      expect(find.text('From errorText'), findsOneWidget);
+
+      formKey.currentState!.validate();
+      await tester.pump();
+      expect(find.text('From validator'), findsOneWidget);
+      expect(find.text('From errorText'), findsNothing);
+    });
+
+    testWidgets('helperText is suppressed while a validator error shows',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        Form(
+          key: formKey,
+          child: DsTextField(
+            label: 'Email',
+            helperText: 'We never share it.',
+            validator: (_) => 'Email is required',
+          ),
+        ),
+      );
+
+      expect(find.text('We never share it.'), findsOneWidget);
+
+      formKey.currentState!.validate();
+      // Let the decorator's helper-to-error fade finish: the outgoing helper
+      // stays in the tree until the transition completes.
+      await tester.pumpAndSettle();
+      expect(find.text('Email is required'), findsOneWidget);
+      expect(find.text('We never share it.'), findsNothing);
+    });
+
+    testWidgets('passes autofill hints and the keyboard suggestion switches '
+        'through', (tester) async {
+      await pumpDs(
+        tester,
+        const DsTextField(
+          label: 'Email',
+          autofillHints: <String>[AutofillHints.email],
+          autocorrect: false,
+          enableSuggestions: false,
+        ),
+      );
+
+      final TextField field = tester.widget(find.byType(TextField));
+      expect(field.autofillHints, <String>[AutofillHints.email]);
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isFalse);
+    });
+
     testWidgets('obscureText hides the input', (tester) async {
       await pumpDs(
         tester,

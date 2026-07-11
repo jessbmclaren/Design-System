@@ -1,8 +1,28 @@
+import 'dart:math' as math;
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers.dart';
+
+/// WCAG relative luminance of an sRGB colour.
+double _luminance(Color c) {
+  double channel(double v) {
+    return v <= 0.03928
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+  }
+
+  return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+}
+
+/// WCAG contrast ratio between two colours (1..21).
+double _contrast(Color a, Color b) {
+  final la = _luminance(a);
+  final lb = _luminance(b);
+  return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+}
 
 void main() {
   group('DsButton', () {
@@ -117,6 +137,71 @@ void main() {
       await tester.pump();
 
       expect(tester.getSize(find.byType(FilledButton)), restingSize);
+    });
+
+    testWidgets('pending keeps the enabled fill and the spinner in the '
+        'variant text colour', (tester) async {
+      await pumpDs(
+        tester,
+        DsButton(label: 'Saving', pending: true, onPressed: () {}),
+      );
+      await tester.pump();
+
+      final tokens = DsTokens.of(tester.element(find.byType(DsButton)));
+      final style =
+          tester.widget<FilledButton>(find.byType(FilledButton)).style!;
+      // The button is busy, not disabled: the resolved fill stays the
+      // enabled background so the spinner holds its contrast.
+      expect(
+        style.backgroundColor!.resolve({WidgetState.disabled}),
+        tokens.buttonPrimaryColorBackground,
+      );
+      expect(
+        style.foregroundColor!.resolve({WidgetState.disabled}),
+        tokens.buttonPrimaryColorText,
+      );
+      final spinner = tester.widget<DsSpinner>(find.byType(DsSpinner));
+      expect(spinner.color, tokens.buttonPrimaryColorText);
+    });
+
+    testWidgets('the pending spinner clears 3:1 against its fill in every '
+        'shipped theme', (tester) async {
+      final themes = <String, DsTokens>{
+        'light': DsTokens.light(),
+        'dark': DsTokens.dark(),
+        'engenLight': DsSkins.engenLight(),
+        'engenDark': DsSkins.engenDark(),
+      };
+      for (final entry in themes.entries) {
+        final ratio = _contrast(
+          entry.value.buttonPrimaryColorText,
+          entry.value.buttonPrimaryColorBackground,
+        );
+        expect(
+          ratio,
+          greaterThanOrEqualTo(3.0),
+          reason: 'pending spinner on ${entry.key}: '
+              '${ratio.toStringAsFixed(2)}:1',
+        );
+      }
+    });
+
+    testWidgets('removal mid-press does not throw', (tester) async {
+      await pumpDs(tester, DsButton(label: 'Save', onPressed: () {}));
+
+      final gesture =
+          await tester.startGesture(tester.getCenter(find.byType(DsButton)));
+      await tester.pump(const Duration(milliseconds: 40));
+
+      // Removing the button cancels the press, which flips the pressed state
+      // after the element is deactivated. The state listener must read its
+      // cached reduce-motion flag, never MediaQuery through the context.
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      expect(tester.takeException(), isNull);
+
+      await gesture.up();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('pending is announced as the label, busy', (tester) async {

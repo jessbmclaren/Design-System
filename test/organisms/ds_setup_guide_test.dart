@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -401,9 +403,10 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the header announces itself as a disclosure button', (
+    testWidgets('the header announces its title once as a disclosure button', (
       tester,
     ) async {
+      final handle = tester.ensureSemantics();
       await pumpDs(
         tester,
         DsSetupGuide(
@@ -412,15 +415,15 @@ void main() {
         ),
       );
 
-      // The label is announced (possibly merged with the header's own text).
-      expect(find.bySemanticsLabel(RegExp('Setup guide')), findsWidgets);
+      // One merged node carries the title exactly once, with the done count.
+      final node = tester.getSemantics(find.text('Setup guide'));
+      expect(node.label, 'Setup guide\n0 of 1');
 
       // The header annotates itself as an expandable button.
       Semantics header() => tester.widget<Semantics>(
             find.byWidgetPredicate(
               (widget) =>
-                  widget is Semantics &&
-                  widget.properties.label == 'Setup guide',
+                  widget is Semantics && widget.properties.expanded != null,
             ),
           );
       expect(header().properties.button, isTrue);
@@ -429,6 +432,123 @@ void main() {
       await tester.tap(find.text('Setup guide'));
       await tester.pump();
       expect(header().properties.expanded, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('done and locked rows state their status to a screen reader', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsSetupGuide(
+          title: 'Setup guide',
+          tasks: const [
+            DsSetupTask(label: 'Verify your email', done: true),
+            DsSetupTask(label: 'Go live', locked: true),
+          ],
+        ),
+      );
+
+      // A done task reads as checked.
+      final done = tester.getSemantics(find.text('Verify your email'));
+      expect(done.flagsCollection.isChecked, ui.CheckedState.isTrue);
+
+      // A locked task reads as a disabled row with a Locked hint.
+      final locked = tester.getSemantics(find.text('Go live'));
+      expect(locked.flagsCollection.isEnabled, ui.Tristate.isFalse);
+      expect(locked.hint, 'Locked');
+      handle.dispose();
+    });
+
+    testWidgets('an interrupted cross-off rewinds, then replays when done', (
+      tester,
+    ) async {
+      const open = DsSetupTask(
+        label: 'Verify your email',
+        animateCrossOff: true,
+      );
+      const done = DsSetupTask(
+        label: 'Verify your email',
+        done: true,
+        animateCrossOff: true,
+      );
+
+      await pumpDs(
+        tester,
+        const DsSetupGuide(title: 'Setup guide', tasks: [open]),
+      );
+      await pumpDs(
+        tester,
+        const DsSetupGuide(title: 'Setup guide', tasks: [done]),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // The completion is withdrawn mid-strike: the row is restored and the
+      // controller stops, so nothing keeps ticking behind it.
+      await pumpDs(
+        tester,
+        const DsSetupGuide(title: 'Setup guide', tasks: [open]),
+      );
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Verify your email'), findsOneWidget);
+      expect(tester.binding.transientCallbackCount, 0);
+
+      // A later, genuine completion plays the cross-off from the start.
+      await pumpDs(
+        tester,
+        const DsSetupGuide(title: 'Setup guide', tasks: [done]),
+      );
+      final crossOffRow = find.descendant(
+        of: find.byType(DsSetupGuide),
+        matching: find.byType(ClipRect),
+      );
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(tester.getSize(crossOffRow).height, greaterThan(0));
+      await tester.pump(const Duration(seconds: 2));
+      expect(tester.getSize(crossOffRow).height, 0);
+    });
+
+    testWidgets('a maxHeight below the fixed chrome clamps, not overflows', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsSetupGuide(
+          title: 'Setup guide',
+          maxHeight: 80,
+          tasks: [DsSetupTask(label: 'Add your vehicles', onTap: () {})],
+        ),
+      );
+
+      // The budget clamps up to the chrome's height, so the header and bar
+      // render intact and only the task list is starved.
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getSize(find.byType(DsSetupGuide)).height,
+        greaterThan(80),
+      );
+      expect(find.text('Setup guide'), findsOneWidget);
+    });
+
+    testWidgets('a collapsed card under a tight maxHeight does not overflow', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsSetupGuide(
+          title: 'Setup guide',
+          initiallyCollapsed: true,
+          maxHeight: 110,
+          tasks: [DsSetupTask(label: 'Add your vehicles', onTap: () {})],
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getSize(find.byType(DsSetupGuide)).height,
+        lessThanOrEqualTo(110),
+      );
     });
   });
 }

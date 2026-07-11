@@ -160,6 +160,59 @@ void main() {
       expect(reported, isTrue);
     });
 
+    testWidgets('announces its label exactly once', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsSwitch(value: true, label: 'Email alerts', onChanged: (_) {}),
+      );
+
+      // The visible text is excluded from semantics, so the control's node
+      // carries the name once rather than merging a second copy in.
+      expect(
+        tester.getSemantics(find.byType(DsSwitch)),
+        isSemantics(
+          isToggled: true,
+          label: 'Email alerts',
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('semanticLabel names a bare switch and overrides the visible '
+        'label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsSwitch(
+          value: false,
+          semanticLabel: 'Marketing emails',
+          onChanged: (_) {},
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byType(DsSwitch)).label,
+        'Marketing emails',
+      );
+
+      await pumpDs(
+        tester,
+        DsSwitch(
+          value: false,
+          label: 'Marketing',
+          semanticLabel: 'Marketing emails',
+          onChanged: (_) {},
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byType(DsSwitch)).label,
+        'Marketing emails',
+      );
+      expect(find.text('Marketing'), findsOneWidget);
+      handle.dispose();
+    });
+
     testWidgets('does not overflow at 320x640', (tester) async {
       await pumpDs(
         tester,

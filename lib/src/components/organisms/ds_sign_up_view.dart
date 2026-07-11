@@ -10,6 +10,15 @@ import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_icon_button.dart';
 
+/// The extra trailing inset applied to an auth card's heading block while a
+/// corner close button is shown, so heading glyphs never paint beneath it.
+/// The button's 48dp padded tap target ([kMinInteractiveDimension]) sits
+/// [DsSpacing.sm] in from the card edge; the body padding already covers
+/// [DsSpacing.xl] of that span and a further [DsSpacing.sm] keeps a visible
+/// gap between the last glyph and the button.
+const double _headingCloseInset =
+    kMinInteractiveDimension + DsSpacing.sm + DsSpacing.sm - DsSpacing.xl;
+
 /// How an auth card's heading block is aligned.
 ///
 /// Applies to the title, the description and any brand header above them.
@@ -144,7 +153,8 @@ class DsSignUpView extends StatelessWidget {
   final Widget? aside;
 
   /// Called when the close button in the card's top corner is tapped. When
-  /// null no close affordance is shown.
+  /// null no close affordance is shown. While the button is shown the heading
+  /// block is inset at its trailing edge so the title never paints beneath it.
   final VoidCallback? onClose;
 
   /// Whether the card draws a hairline border. Set false for a shadow-only
@@ -311,36 +321,51 @@ class _FormCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (header != null) ...[
-                  Align(alignment: headerAlignment, child: header),
-                  const SizedBox(height: DsSpacing.lg),
-                ] else if (brandIcon != null) ...[
-                  _BrandMark(
-                    icon: brandIcon!,
-                    color: brandColor ?? tokens.buttonPrimaryColorBackground,
-                    alignment: headerAlignment,
+                // While a close button floats in the corner the heading block
+                // gives up its trailing edge to it, so title and description
+                // glyphs never paint beneath the icon.
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: onClose != null ? _headingCloseInset : 0,
                   ),
-                  const SizedBox(height: DsSpacing.lg),
-                ],
-                Semantics(
-                  header: true,
-                  child: Text(
-                    title,
-                    textAlign: textAlign,
-                    style:
-                        tokens.headingLg.toTextStyle(color: tokens.colorText),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (header != null) ...[
+                        Align(alignment: headerAlignment, child: header),
+                        const SizedBox(height: DsSpacing.lg),
+                      ] else if (brandIcon != null) ...[
+                        _BrandMark(
+                          icon: brandIcon!,
+                          color: brandColor ??
+                              tokens.buttonPrimaryColorBackground,
+                          alignment: headerAlignment,
+                        ),
+                        const SizedBox(height: DsSpacing.lg),
+                      ],
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          title,
+                          textAlign: textAlign,
+                          style: tokens.headingLg
+                              .toTextStyle(color: tokens.colorText),
+                        ),
+                      ),
+                      if (description != null) ...[
+                        const SizedBox(height: DsSpacing.sm),
+                        Text(
+                          description!,
+                          textAlign: textAlign,
+                          style: tokens.bodySm.toTextStyle(
+                            color: tokens.colorSecondaryText,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (description != null) ...[
-                  const SizedBox(height: DsSpacing.sm),
-                  Text(
-                    description!,
-                    textAlign: textAlign,
-                    style: tokens.bodySm.toTextStyle(
-                      color: tokens.colorSecondaryText,
-                    ),
-                  ),
-                ],
                 if (aboveForm != null) ...[
                   const SizedBox(height: DsSpacing.sm),
                   aboveForm!,

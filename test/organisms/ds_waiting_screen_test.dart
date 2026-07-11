@@ -135,6 +135,54 @@ void main() {
       expect(region.properties.liveRegion, isTrue);
     });
 
+    testWidgets('the header band bounds wide content to the viewport',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsWaitingScreen(
+          headline: 'Signing you in',
+          header: Text(
+            'averyverylongbrandwordmarkline',
+            style: TextStyle(fontSize: 24),
+          ),
+        ),
+        surfaceSize: const Size(320, 640),
+      );
+      await tester.pump(DsMotion.expressive);
+
+      // The slot spans left and right, so a wide wordmark ellipsises on one
+      // line inside the viewport instead of clipping silently off its edge.
+      final rect = tester.getRect(find.text('averyverylongbrandwordmarkline'));
+      expect(rect.left, greaterThan(0));
+      expect(rect.right, lessThanOrEqualTo(320));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the header sits inside the safe area', (tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.padding = const FakeViewPadding(top: 40);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPadding);
+
+      // Pump without the shared helper: its MediaQuery override would drop
+      // the simulated view padding this test relies on.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: DsTheme.light(),
+          home: const DsWaitingScreen(
+            headline: 'Signing you in',
+            header: Text('brand'),
+          ),
+        ),
+      );
+      await tester.pump(DsMotion.expressive);
+
+      expect(
+        tester.getTopLeft(find.text('brand')).dy,
+        greaterThanOrEqualTo(40),
+      );
+    });
+
     testWidgets('does not overflow at 320dp', (tester) async {
       await pumpDs(
         tester,

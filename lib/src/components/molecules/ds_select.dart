@@ -107,13 +107,15 @@ class DsSelect<T> extends StatelessWidget {
   final String? errorText;
 
   /// Whether the control is interactive. Defaults to `true`. When `false` the
-  /// field is dimmed and cannot be opened.
+  /// field is dimmed and cannot be opened, and it sits the form out: its
+  /// [validator] does not run and [onSaved] is not called, so a disabled
+  /// select can never block a form with an error the user cannot fix.
   final bool enabled;
 
   /// Validates the selected value inside a [Form]. Return null for a valid
   /// value or the message to show beneath the field. The message renders in
   /// the same caption style as [errorText] and moves the border to the danger
-  /// colour.
+  /// colour. Not run while the control is disabled.
   final FormFieldValidator<T>? validator;
 
   /// When the [validator] runs. Defaults to the enclosing [Form]'s mode; set
@@ -121,7 +123,8 @@ class DsSelect<T> extends StatelessWidget {
   /// picked an option, so an untouched field never shows a required error.
   final AutovalidateMode? autovalidateMode;
 
-  /// Called with the selected value when the enclosing [Form] is saved.
+  /// Called with the selected value when the enclosing [Form] is saved. Not
+  /// called while the control is disabled.
   final FormFieldSetter<T>? onSaved;
 
   @override
@@ -217,9 +220,12 @@ class DsSelect<T> extends StatelessWidget {
           color: tokens.colorSecondaryText,
         ),
         onChanged: isEnabled ? onChanged : null,
-        validator: validator,
+        // A disabled control cannot be operated, so it neither validates nor
+        // saves; otherwise Form.validate() could fail on an error the user
+        // has no way to fix.
+        validator: isEnabled ? validator : null,
         autovalidateMode: autovalidateMode,
-        onSaved: onSaved,
+        onSaved: isEnabled ? onSaved : null,
         items: [
           for (final option in options)
             DropdownMenuItem<T>(

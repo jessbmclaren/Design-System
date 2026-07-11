@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
@@ -22,17 +25,26 @@ import '../atoms/ds_button.dart';
 ///
 /// ## Responsiveness
 ///
-/// The cluster measures its own width with a [LayoutBuilder], not the window,
-/// so it adapts inside a narrow card as readily as on a full page:
+/// The cluster measures its own width, not the window, so it adapts inside a
+/// narrow card as readily as on a full page:
 ///
 /// * At [minRowWidth] and wider the actions sit in a single row with the
 ///   primary action last, on the trailing edge, and [leading] pinned to the
-///   start.
+///   start. When the row's own content cannot fit the available width, for
+///   example long translated labels or a large text scale, the cluster falls
+///   back to the stacked layout instead of overflowing, whatever
+///   [minRowWidth] says.
 /// * Below [minRowWidth] the cluster stacks vertically with every button
-///   full-width and the primary action first, the standard mobile ordering,
-///   with [leading] centred beneath the buttons.
+///   full-width and the primary action first, the standard mobile ordering.
+///   The back action follows, then the tertiary action and finally the
+///   [leading] caption, both centred, so the action cluster stays together.
 ///
 /// The tertiary action renders centred beneath the cluster in both layouts.
+///
+/// Under an unbounded width (a horizontal scroll view, say) there is no
+/// width to measure against, so the cluster sizes itself to its content: it
+/// keeps the row unless [minRowWidth] is [double.infinity], which stacks at
+/// the width of the widest piece.
 ///
 /// ```dart
 /// DsFooterActions(
@@ -104,100 +116,449 @@ class DsFooterActions extends StatelessWidget {
 
   /// Optional content pinned to the start edge of the row layout, such as a
   /// "Step 2 of 4" caption. When the cluster stacks it sits centred beneath
-  /// the buttons instead.
+  /// the buttons and the tertiary action instead.
   final Widget? leading;
 
   /// The width below which the cluster stacks vertically.
   ///
   /// The threshold tracks the cluster's own width, not the window. Pass `0`
-  /// to keep the row at every width or [double.infinity] to always stack,
-  /// for a parent that has already made the layout decision.
+  /// to prefer the row at every width or [double.infinity] to always stack,
+  /// for a parent that has already made the layout decision. Whatever the
+  /// threshold, a row whose content cannot fit the available width falls
+  /// back to the stacked layout rather than overflowing.
   final double minRowWidth;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final stacked = constraints.maxWidth.isFinite &&
-            constraints.maxWidth < minRowWidth;
+    final leading = this.leading;
+    final Widget? back = backLabel == null
+        ? null
+        : DsButton(
+            label: backLabel!,
+            onPressed: onBack,
+            variant: backVariant,
+          );
+    final Widget? tertiary = tertiaryLabel == null
+        ? null
+        : DsButton(
+            label: tertiaryLabel!,
+            onPressed: onTertiary,
+            variant: DsButtonVariant.tertiary,
+          );
 
-        final primary = DsButton(
+    // One set of children serves both layouts; the render object measures
+    // their intrinsic widths, picks row or stacked and stretches the buttons
+    // itself when stacking, so no piece is ever built twice.
+    return _FooterCluster(
+      minRowWidth: minRowWidth,
+      hasLeading: leading != null,
+      hasBack: back != null,
+      hasTertiary: tertiary != null,
+      textDirection: Directionality.of(context),
+      children: <Widget>[
+        ?leading,
+        ?back,
+        DsButton(
           label: primaryLabel,
           onPressed: onPrimary,
           pending: primaryPending,
           trailingIcon: primaryTrailingIcon,
-          fullWidth: stacked,
-        );
-        final Widget? back = backLabel == null
-            ? null
-            : DsButton(
-                label: backLabel!,
-                onPressed: onBack,
-                variant: backVariant,
-                fullWidth: stacked,
-              );
-        final Widget? tertiary = tertiaryLabel == null
-            ? null
-            : DsButton(
-                label: tertiaryLabel!,
-                onPressed: onTertiary,
-                variant: DsButtonVariant.tertiary,
-              );
-        final leading = this.leading;
-
-        if (stacked) {
-          // Primary first, full-width, so the main action stays under the
-          // thumb on a narrow screen; supporting pieces follow beneath.
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              primary,
-              if (back != null) ...[
-                const SizedBox(height: DsSpacing.sm),
-                back,
-              ],
-              if (leading != null) ...[
-                const SizedBox(height: DsSpacing.md),
-                Align(child: leading),
-              ],
-              if (tertiary != null) ...[
-                const SizedBox(height: DsSpacing.md),
-                Align(child: tertiary),
-              ],
-            ],
-          );
-        }
-
-        final row = Row(
-          children: [
-            // Consume the leading space so the actions sit on the trailing
-            // edge; Expanded also bounds wide leading content so it cannot
-            // overflow.
-            Expanded(
-              child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: leading ?? const SizedBox.shrink(),
-              ),
-            ),
-            if (back != null) ...[
-              back,
-              const SizedBox(width: DsSpacing.md),
-            ],
-            primary,
-          ],
-        );
-        if (tertiary == null) return row;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            row,
-            const SizedBox(height: DsSpacing.md),
-            Align(child: tertiary),
-          ],
-        );
-      },
+        ),
+        ?tertiary,
+      ],
     );
+  }
+}
+
+/// The layout host for [DsFooterActions]: a row that measures its own
+/// content and falls back to the stacked arrangement when the row cannot
+/// fit.
+class _FooterCluster extends MultiChildRenderObjectWidget {
+  const _FooterCluster({
+    required this.minRowWidth,
+    required this.hasLeading,
+    required this.hasBack,
+    required this.hasTertiary,
+    required this.textDirection,
+    required super.children,
+  });
+
+  final double minRowWidth;
+  final bool hasLeading;
+  final bool hasBack;
+  final bool hasTertiary;
+  final TextDirection textDirection;
+
+  @override
+  _RenderFooterCluster createRenderObject(BuildContext context) {
+    return _RenderFooterCluster(
+      minRowWidth: minRowWidth,
+      hasLeading: hasLeading,
+      hasBack: hasBack,
+      hasTertiary: hasTertiary,
+      textDirection: textDirection,
+    );
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderFooterCluster renderObject,
+  ) {
+    renderObject
+      ..minRowWidth = minRowWidth
+      ..hasLeading = hasLeading
+      ..hasBack = hasBack
+      ..hasTertiary = hasTertiary
+      ..textDirection = textDirection;
+  }
+}
+
+class _FooterClusterParentData extends ContainerBoxParentData<RenderBox> {}
+
+/// The named children of the cluster, resolved from the child list.
+class _FooterSlots {
+  _FooterSlots({
+    required this.leading,
+    required this.back,
+    required this.primary,
+    required this.tertiary,
+  });
+
+  final RenderBox? leading;
+  final RenderBox? back;
+  final RenderBox primary;
+  final RenderBox? tertiary;
+}
+
+class _RenderFooterCluster extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _FooterClusterParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _FooterClusterParentData> {
+  _RenderFooterCluster({
+    required double minRowWidth,
+    required bool hasLeading,
+    required bool hasBack,
+    required bool hasTertiary,
+    required TextDirection textDirection,
+  })  : _minRowWidth = minRowWidth,
+        _hasLeading = hasLeading,
+        _hasBack = hasBack,
+        _hasTertiary = hasTertiary,
+        _textDirection = textDirection;
+
+  /// The gap between the back and primary actions in the row layout, and
+  /// above the tertiary action and the caption.
+  static const double _gap = DsSpacing.md;
+
+  /// The tighter gap between the stacked primary and back buttons.
+  static const double _stackGap = DsSpacing.sm;
+
+  double _minRowWidth;
+  set minRowWidth(double value) {
+    if (_minRowWidth == value) return;
+    _minRowWidth = value;
+    markNeedsLayout();
+  }
+
+  bool _hasLeading;
+  set hasLeading(bool value) {
+    if (_hasLeading == value) return;
+    _hasLeading = value;
+    markNeedsLayout();
+  }
+
+  bool _hasBack;
+  set hasBack(bool value) {
+    if (_hasBack == value) return;
+    _hasBack = value;
+    markNeedsLayout();
+  }
+
+  bool _hasTertiary;
+  set hasTertiary(bool value) {
+    if (_hasTertiary == value) return;
+    _hasTertiary = value;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _FooterClusterParentData) {
+      child.parentData = _FooterClusterParentData();
+    }
+  }
+
+  _FooterSlots _resolveSlots() {
+    RenderBox? child = firstChild;
+    RenderBox? leading;
+    RenderBox? back;
+    RenderBox? tertiary;
+    if (_hasLeading) {
+      leading = child;
+      child = childAfter(child!);
+    }
+    if (_hasBack) {
+      back = child;
+      child = childAfter(child!);
+    }
+    final primary = child!;
+    if (_hasTertiary) {
+      tertiary = childAfter(primary);
+    }
+    return _FooterSlots(
+      leading: leading,
+      back: back,
+      primary: primary,
+      tertiary: tertiary,
+    );
+  }
+
+  /// The width the row layout needs to hold its content without overflow:
+  /// the buttons at their intrinsic widths plus the caption's minimum.
+  double _rowNeed(_FooterSlots slots) {
+    var need = slots.primary.getMaxIntrinsicWidth(double.infinity);
+    final back = slots.back;
+    if (back != null) {
+      need += _gap + back.getMaxIntrinsicWidth(double.infinity);
+    }
+    final leading = slots.leading;
+    if (leading != null) {
+      need += _gap + leading.getMinIntrinsicWidth(double.infinity);
+    }
+    final tertiary = slots.tertiary;
+    if (tertiary != null) {
+      need = math.max(need, tertiary.getMaxIntrinsicWidth(double.infinity));
+    }
+    return need;
+  }
+
+  /// Whether the cluster stacks for the given incoming width. Below
+  /// [_minRowWidth] it stacks by request; above it, it still stacks when the
+  /// row's own content cannot fit. An unbounded width has nothing to measure
+  /// against, so only an explicitly infinite threshold stacks there.
+  bool _shouldStack(_FooterSlots slots, double maxWidth) {
+    if (!maxWidth.isFinite) return _minRowWidth == double.infinity;
+    return maxWidth < _minRowWidth || _rowNeed(slots) > maxWidth;
+  }
+
+  Size _computeLayout(BoxConstraints constraints, {required bool dry}) {
+    final slots = _resolveSlots();
+    Size layoutChild(RenderBox child, BoxConstraints childConstraints) {
+      if (dry) return child.getDryLayout(childConstraints);
+      child.layout(childConstraints, parentUsesSize: true);
+      return child.size;
+    }
+
+    void place(RenderBox child, double x, double y, double contentWidth) {
+      if (dry) return;
+      final parentData = child.parentData! as _FooterClusterParentData;
+      final dx = _textDirection == TextDirection.ltr
+          ? x
+          : contentWidth - x - child.size.width;
+      parentData.offset = Offset(dx, y);
+    }
+
+    final maxWidth = constraints.maxWidth;
+    final bounded = maxWidth.isFinite;
+
+    if (_shouldStack(slots, maxWidth)) {
+      // Stacked: full-width primary first, back beneath, then the centred
+      // tertiary action and the centred caption.
+      final width = bounded
+          ? maxWidth
+          : [
+              for (final child in [
+                slots.leading,
+                slots.back,
+                slots.primary,
+                slots.tertiary,
+              ])
+                if (child != null) child.getMaxIntrinsicWidth(double.infinity),
+            ].reduce(math.max);
+      final stretch = BoxConstraints(minWidth: width, maxWidth: width);
+      final centred = BoxConstraints(maxWidth: width);
+
+      final primarySize = layoutChild(slots.primary, stretch);
+      place(slots.primary, 0, 0, width);
+      var height = primarySize.height;
+
+      final back = slots.back;
+      if (back != null) {
+        final backSize = layoutChild(back, stretch);
+        place(back, 0, height + _stackGap, width);
+        height += _stackGap + backSize.height;
+      }
+      final tertiary = slots.tertiary;
+      if (tertiary != null) {
+        final tertiarySize = layoutChild(tertiary, centred);
+        place(tertiary, (width - tertiarySize.width) / 2, height + _gap, width);
+        height += _gap + tertiarySize.height;
+      }
+      final leading = slots.leading;
+      if (leading != null) {
+        final leadingSize = layoutChild(leading, centred);
+        place(leading, (width - leadingSize.width) / 2, height + _gap, width);
+        height += _gap + leadingSize.height;
+      }
+      return constraints.constrain(Size(width, height));
+    }
+
+    // Row: the actions sit on the trailing edge and the caption takes
+    // whatever width remains at the start.
+    final loose = BoxConstraints(maxWidth: bounded ? maxWidth : double.infinity);
+    final primarySize = layoutChild(slots.primary, loose);
+    final back = slots.back;
+    final backSize = back == null ? Size.zero : layoutChild(back, loose);
+    var actionsWidth = primarySize.width;
+    if (back != null) actionsWidth += _gap + backSize.width;
+
+    final leading = slots.leading;
+    Size leadingSize = Size.zero;
+    if (leading != null) {
+      final available = bounded
+          ? math.max(0.0, maxWidth - actionsWidth - _gap)
+          : double.infinity;
+      leadingSize = layoutChild(leading, BoxConstraints(maxWidth: available));
+    }
+
+    final width = bounded
+        ? maxWidth
+        : actionsWidth + (leading == null ? 0 : _gap + leadingSize.width);
+    final rowHeight = math.max(
+      primarySize.height,
+      math.max(backSize.height, leadingSize.height),
+    );
+
+    place(
+      slots.primary,
+      width - primarySize.width,
+      (rowHeight - primarySize.height) / 2,
+      width,
+    );
+    if (back != null) {
+      place(
+        back,
+        width - primarySize.width - _gap - backSize.width,
+        (rowHeight - backSize.height) / 2,
+        width,
+      );
+    }
+    if (leading != null) {
+      place(leading, 0, (rowHeight - leadingSize.height) / 2, width);
+    }
+
+    var height = rowHeight;
+    final tertiary = slots.tertiary;
+    if (tertiary != null) {
+      final tertiarySize =
+          layoutChild(tertiary, BoxConstraints(maxWidth: width));
+      place(
+        tertiary,
+        (width - tertiarySize.width) / 2,
+        rowHeight + _gap,
+        width,
+      );
+      height += _gap + tertiarySize.height;
+    }
+    return constraints.constrain(Size(width, height));
+  }
+
+  @override
+  void performLayout() {
+    size = _computeLayout(constraints, dry: false);
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    return _computeLayout(constraints, dry: true);
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    // The stacked fallback means the cluster never needs more than its
+    // widest single piece.
+    var width = 0.0;
+    for (var child = firstChild; child != null; child = childAfter(child)) {
+      width = math.max(width, child.getMinIntrinsicWidth(height));
+    }
+    return width;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    if (_minRowWidth == double.infinity) {
+      var width = 0.0;
+      for (var child = firstChild; child != null; child = childAfter(child)) {
+        width = math.max(width, child.getMaxIntrinsicWidth(height));
+      }
+      return width;
+    }
+    return _rowNeed(_resolveSlots());
+  }
+
+  double _intrinsicHeight(
+    double width,
+    double Function(RenderBox child, double width) heightOf,
+  ) {
+    final slots = _resolveSlots();
+    if (_shouldStack(slots, width)) {
+      var height = heightOf(slots.primary, width);
+      if (slots.back != null) {
+        height += _stackGap + heightOf(slots.back!, width);
+      }
+      if (slots.tertiary != null) {
+        height += _gap + heightOf(slots.tertiary!, width);
+      }
+      if (slots.leading != null) {
+        height += _gap + heightOf(slots.leading!, width);
+      }
+      return height;
+    }
+    var height = heightOf(slots.primary, width);
+    if (slots.back != null) {
+      height = math.max(height, heightOf(slots.back!, width));
+    }
+    if (slots.leading != null) {
+      height = math.max(height, heightOf(slots.leading!, width));
+    }
+    if (slots.tertiary != null) {
+      height += _gap + heightOf(slots.tertiary!, width);
+    }
+    return height;
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _intrinsicHeight(
+        width,
+        (child, width) => child.getMinIntrinsicHeight(width),
+      );
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _intrinsicHeight(
+        width,
+        (child, width) => child.getMaxIntrinsicHeight(width),
+      );
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) {
+    return defaultComputeDistanceToFirstActualBaseline(baseline);
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    return defaultHitTestChildren(result, position: position);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    defaultPaint(context, offset);
   }
 }

@@ -17,8 +17,10 @@ import '../atoms/ds_field_label.dart';
 /// switch to the danger colour and the label is read out with the error by
 /// assistive technology. Inside a [Form], pass a [validator] instead and the
 /// field reports its own message when the form validates; [autovalidateMode]
-/// controls when that happens. Set [optional] to mark the field with a
-/// subdued Optional label rather than decorating the required majority.
+/// controls when that happens. Exactly one caption shows at a time: a failing
+/// [validator]'s message wins over [errorText], and either error suppresses
+/// [helperText]. Set [optional] to mark the field with a subdued Optional
+/// label rather than decorating the required majority.
 ///
 /// All colours, spacing, radii and typography are read from [DsTokens] so the
 /// field re-skins automatically with the active theme:
@@ -59,6 +61,9 @@ class DsTextField extends StatelessWidget {
     this.autovalidateMode,
     this.inputFormatters,
     this.onSaved,
+    this.autofillHints,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
   });
 
   /// The text shown above the input describing what it collects.
@@ -68,20 +73,27 @@ class DsTextField extends StatelessWidget {
 
   /// Whether to append a subdued Optional marker to the [label]. Ignored when
   /// no label is set.
+  ///
+  /// An optional field must not pair the marker with a [validator] that
+  /// requires a value: the field cannot guard against the combination and
+  /// would show Optional above a required error.
   final bool optional;
 
   /// Placeholder text shown inside the empty field.
   final String? hintText;
 
-  /// Guidance shown beneath the field. Ignored when [errorText] is set.
+  /// Guidance shown beneath the field. Suppressed while [errorText] or a
+  /// failing [validator]'s message shows, so only one caption renders.
   final String? helperText;
 
   /// The error message shown beneath the field.
   ///
   /// When non-null the field enters its error state: the border and caption use
-  /// the danger colour and the message is announced with the [label]. For
-  /// [Form]-driven validation prefer [validator], which reports its message
-  /// through the field itself.
+  /// the danger colour and the message is announced with the [label]. Exactly
+  /// one caption shows at a time: a failing [validator]'s message takes
+  /// precedence over [errorText], and either error suppresses [helperText].
+  /// For [Form]-driven validation prefer [validator], which reports its
+  /// message through the field itself.
   final String? errorText;
 
   /// Controls the text being edited. When null, the field manages its own
@@ -155,10 +167,23 @@ class DsTextField extends StatelessWidget {
   /// Called with the final value when the enclosing [Form] is saved.
   final FormFieldSetter<String>? onSaved;
 
+  /// Hints for the platform's autofill service, for example
+  /// `[AutofillHints.email]`. When null the field does not participate in
+  /// autofill.
+  final Iterable<String>? autofillHints;
+
+  /// Whether the keyboard may autocorrect what the user types. Leave on for
+  /// prose; turn off for identifiers and secrets.
+  final bool autocorrect;
+
+  /// Whether the keyboard may offer predictive suggestions. Turn off
+  /// alongside [autocorrect] for values that must never reach the keyboard's
+  /// suggestion engine, such as passwords.
+  final bool enableSuggestions;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final bool hasError = errorText != null;
 
     // The horizontal inset stays on the shared input token; the vertical
     // inset is the text field's own token, so a skin can retune the field
@@ -176,10 +201,6 @@ class DsTextField extends StatelessWidget {
         borderSide: BorderSide(color: color, width: width),
       );
     }
-
-    final Color captionColor =
-        hasError ? tokens.colorDanger : tokens.colorSecondaryText;
-    final String? caption = hasError ? errorText : helperText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,6 +225,9 @@ class DsTextField extends StatelessWidget {
             textInputAction: textInputAction,
             obscureText: obscureText,
             keyboardType: keyboardType,
+            autofillHints: autofillHints,
+            autocorrect: autocorrect,
+            enableSuggestions: enableSuggestions,
             enabled: enabled,
             readOnly: readOnly,
             maxLines: obscureText ? 1 : maxLines,
@@ -223,24 +247,22 @@ class DsTextField extends StatelessWidget {
               suffixIcon: suffixIcon,
               counterStyle:
                   tokens.labelSm.toTextStyle(color: tokens.colorSecondaryText),
-              // The caption for [helperText] and [errorText] is rendered by
-              // this widget below, so the field's built-in helper text is
-              // suppressed to avoid duplication. Messages from [validator]
-              // do render through the decoration, styled to match the
-              // caption. The border reflects both error paths.
+              // The decorator owns the single caption slot beneath the
+              // field. [TextFormField] only overrides the decoration's
+              // errorText while its [validator] is failing, so the validator
+              // message wins over [errorText], and the decorator shows the
+              // helper only while no error shows. The error borders cover
+              // both error paths.
+              helperText: helperText,
+              helperStyle: tokens.bodySm
+                  .toTextStyle(color: tokens.colorSecondaryText),
+              helperMaxLines: 3,
+              errorText: errorText,
               errorStyle: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
               errorMaxLines: 3,
               border: borderWith(tokens.colorBorder, 1),
-              enabledBorder: borderWith(
-                hasError ? tokens.colorDanger : tokens.colorBorder,
-                hasError ? 1.6 : 1,
-              ),
-              focusedBorder: borderWith(
-                hasError
-                    ? tokens.colorDanger
-                    : tokens.formHighlightColorBorder,
-                1.6,
-              ),
+              enabledBorder: borderWith(tokens.colorBorder, 1),
+              focusedBorder: borderWith(tokens.formHighlightColorBorder, 1.6),
               errorBorder: borderWith(tokens.colorDanger, 1.6),
               focusedErrorBorder: borderWith(tokens.colorDanger, 1.6),
               disabledBorder: borderWith(
@@ -250,13 +272,6 @@ class DsTextField extends StatelessWidget {
             ),
           ),
         ),
-        if (caption != null) ...<Widget>[
-          const SizedBox(height: 6),
-          Text(
-            caption,
-            style: tokens.bodySm.toTextStyle(color: captionColor),
-          ),
-        ],
       ],
     );
   }

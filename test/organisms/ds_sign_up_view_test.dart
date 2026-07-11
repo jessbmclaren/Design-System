@@ -246,6 +246,52 @@ void main() {
       expect(find.byType(DsIconButton), findsNothing);
     });
 
+    testWidgets('insets the heading clear of the close button when onClose '
+        'is set', (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Create your account',
+          description: 'Start your 14-day trial.',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+          onClose: () {},
+        ),
+        surfaceSize: const Size(320, 800),
+      );
+
+      // The heading block ends before the close button's padded tap target,
+      // so no title or description glyph can paint beneath the icon.
+      final close = tester.getRect(find.byType(IconButton));
+      expect(
+        tester.getRect(find.text('Create your account')).right,
+        lessThanOrEqualTo(close.left),
+      );
+      expect(
+        tester.getRect(find.text('Start your 14-day trial.')).right,
+        lessThanOrEqualTo(close.left),
+      );
+      final insetWidth = tester.getSize(find.text('Create your account')).width;
+
+      // Without a close button the heading keeps the full body width.
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Create your account',
+          description: 'Start your 14-day trial.',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+        surfaceSize: const Size(320, 800),
+      );
+      expect(
+        tester.getSize(find.text('Create your account')).width,
+        greaterThan(insetWidth),
+      );
+    });
+
     testWidgets('draws the card border by default and drops it on request',
         (tester) async {
       BoxDecoration cardDecoration() {

@@ -1,7 +1,4 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
@@ -42,9 +39,10 @@ enum DsLinkVariant {
 /// label's natural width.
 ///
 /// A link inside running text keeps a compact tap area. When the link stands
-/// alone as a touch action, set [padded] to extend the tap target to the 48dp
-/// accessible minimum; the extra area is invisible and takes no layout space,
-/// so nothing around the link moves.
+/// alone as a touch action, set [padded] to reserve a row at least 48dp tall
+/// for the tap target, the accessible minimum. The reserved height is real
+/// layout space, so the target survives lists and tight columns instead of
+/// bleeding into or being clipped by neighbouring rows.
 class DsLink extends StatefulWidget {
   /// Creates a textual hyperlink.
   const DsLink({
@@ -79,13 +77,15 @@ class DsLink extends StatefulWidget {
   /// Defaults to a single line.
   final int maxLines;
 
-  /// Whether to extend the tap target to at least 48dp in each dimension.
+  /// Whether to reserve a tap target at least 48dp tall.
   ///
-  /// The visible link keeps its natural size and the surrounding layout does
-  /// not shift; taps landing in the invisible surround are routed to the
-  /// link. The extended area only responds where an ancestor's bounds reach,
-  /// so it suits a link with breathing room rather than one packed inside a
-  /// tight row.
+  /// The visible text keeps its natural size and centres vertically within
+  /// the reserved row, so the link occupies real layout space, as DsCheckbox
+  /// does. The whole row responds to taps wherever it sits, including inside
+  /// a ListView. Two limits remain: only the height is reserved, so a very
+  /// short label can still present a target narrower than 48dp, and the
+  /// extra height shifts the surrounding layout, so [padded] suits a link
+  /// standing alone rather than one inline with running text.
   final bool padded;
 
   /// The minimum accessible tap target, applied when [padded] is set.
@@ -175,7 +175,33 @@ class _DsLinkState extends State<DsLink> {
       ],
     );
 
-    Widget link = Semantics(
+    // A comfortable tap area without forcing a full 48dp block: inline links
+    // live within running text.
+    Widget target = Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DsSpacing.xs,
+        vertical: DsSpacing.xs,
+      ),
+      child: content,
+    );
+
+    if (widget.padded) {
+      // Reserve real layout space for the accessible minimum, as DsCheckbox
+      // does: the row is at least 48dp tall and every point of it hits the
+      // link, so the target holds inside lists and columns. The width hugs
+      // the label under loose constraints, so the link does not claim taps
+      // across the whole row unless the parent stretches it.
+      target = ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: DsLink._minTapTarget),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          widthFactor: 1,
+          child: target,
+        ),
+      );
+    }
+
+    return Semantics(
       link: true,
       enabled: enabled,
       child: MouseRegion(
@@ -187,82 +213,9 @@ class _DsLinkState extends State<DsLink> {
           onTap: widget.onPressed,
           onFocusChange: (focused) => setState(() => _focused = focused),
           borderRadius: BorderRadius.circular(tokens.borderRadius),
-          // A comfortable tap area without forcing a full 48dp block: inline
-          // links live within running text.
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DsSpacing.xs,
-              vertical: DsSpacing.xs,
-            ),
-            child: content,
-          ),
+          child: target,
         ),
       ),
-    );
-
-    if (widget.padded) {
-      link = _MinHitTarget(
-        minSize: const Size(DsLink._minTapTarget, DsLink._minTapTarget),
-        child: link,
-      );
-    }
-    return link;
-  }
-}
-
-/// Extends a child's hit-test area to [minSize] without changing its layout.
-///
-/// The child keeps its natural laid-out size, so nothing around it moves. A
-/// pointer landing in the invisible surround, centred on the child, is routed
-/// to the child's centre, the same redirect Material's padded tap targets use.
-class _MinHitTarget extends SingleChildRenderObjectWidget {
-  const _MinHitTarget({required this.minSize, super.child});
-
-  final Size minSize;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _RenderMinHitTarget(minSize);
-  }
-
-  @override
-  void updateRenderObject(
-    BuildContext context,
-    _RenderMinHitTarget renderObject,
-  ) {
-    renderObject.minSize = minSize;
-  }
-}
-
-class _RenderMinHitTarget extends RenderProxyBox {
-  _RenderMinHitTarget(this._minSize);
-
-  Size _minSize;
-  set minSize(Size value) {
-    if (value == _minSize) return;
-    _minSize = value;
-  }
-
-  @override
-  bool hitTest(BoxHitTestResult result, {required Offset position}) {
-    if (size.contains(position)) {
-      return super.hitTest(result, position: position);
-    }
-    final child = this.child;
-    if (child == null) return false;
-    final Rect zone = Rect.fromCenter(
-      center: size.center(Offset.zero),
-      width: math.max(size.width, _minSize.width),
-      height: math.max(size.height, _minSize.height),
-    );
-    if (!zone.contains(position)) return false;
-    final Offset center = child.size.center(Offset.zero);
-    return result.addWithRawTransform(
-      transform: MatrixUtils.forceToPoint(center),
-      position: center,
-      hitTest: (BoxHitTestResult result, Offset position) {
-        return child.hitTest(result, position: position);
-      },
     );
   }
 }

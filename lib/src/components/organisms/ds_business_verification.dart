@@ -55,9 +55,10 @@ typedef DsVerificationStepBuilder = Widget Function(
 ///
 /// The widget owns its step index and all entered values in local state, so the
 /// review step always reflects the latest input and moving back and forward
-/// never loses data. Advancing past the identity step is gated on the consent
-/// checkbox via [DsOnboardingWizard.nextEnabled]; every other step can always
-/// advance. Submitting from the final step swaps the flow for a brief, static
+/// never loses data. While the identity step shows its stock body, advancing
+/// past it is gated on the consent checkbox via
+/// [DsOnboardingWizard.nextEnabled]; every other step can always advance.
+/// Submitting from the final step swaps the flow for a brief, static
 /// success confirmation and invokes [onSubmitted]. With [showReceipt] the
 /// confirmation becomes a receipt with a primary continue action and
 /// [onSubmitted] waits for that action instead.
@@ -70,7 +71,13 @@ typedef DsVerificationStepBuilder = Widget Function(
 ///   hairline divider and the flow title) above the wizard, matching the
 ///   corner close on the auth cards.
 /// * [stepBodyBuilder] lets a caller append fields or validators to any step,
-///   or replace a step body entirely.
+///   or replace a step body entirely. A builder that returns anything other
+///   than the stock identity body takes that step's gating with it: the
+///   consent gate lifts, so a replaced body can never strand the flow on a
+///   checkbox that is no longer there. Reinstate a gate through
+///   [canAdvance].
+/// * [canAdvance] overrides whether a given step may advance, so a custom
+///   step body can gate Continue on its own state.
 /// * [uploadState] and its companions wire an identity document
 ///   [DsUploadField] into the identity step; the caller owns the upload state
 ///   machine.
@@ -98,6 +105,7 @@ class DsBusinessVerification extends StatefulWidget {
     this.onCancel,
     this.onClose,
     this.stepBodyBuilder,
+    this.canAdvance,
     this.uploadState,
     this.uploadProgress = 0,
     this.uploadFileName,
@@ -122,9 +130,10 @@ class DsBusinessVerification extends StatefulWidget {
 
   /// Called when the user backs out of the very first step.
   ///
-  /// [DsOnboardingWizard] surfaces the back action; when the flow is on its
-  /// first step there is nothing to go back to, so the callback lets an
-  /// embedding screen dismiss or cancel the flow.
+  /// When set, the wizard keeps its back action on the first step and routes
+  /// it here, so an embedding screen can dismiss or cancel the flow. When
+  /// null (the default) the first step shows no back action, since there is
+  /// nowhere to go back to.
   final VoidCallback? onCancel;
 
   /// Called when the takeover header's close affordance is activated.
@@ -143,7 +152,21 @@ class DsBusinessVerification extends StatefulWidget {
   /// caller can append market-specific fields or validators beneath the stock
   /// ones, or swap a step body entirely. When null (the default) every step
   /// renders its standard content.
+  ///
+  /// The stock consent gate on the identity step applies only while the
+  /// builder returns that step's body unchanged. A builder that wraps or
+  /// replaces the identity body lifts the gate, so the flow can never
+  /// deadlock behind the stock checkbox; use [canAdvance] to gate the custom
+  /// body on your own state instead.
   final DsVerificationStepBuilder? stepBodyBuilder;
+
+  /// Overrides whether the step at the given zero-based index may advance.
+  ///
+  /// Return true or false to control the Continue action directly, or null to
+  /// keep the stock behaviour for that step (the consent gate on the identity
+  /// step, always enabled elsewhere). When the callback itself is null (the
+  /// default) every step uses the stock behaviour.
+  final bool? Function(int stepIndex)? canAdvance;
 
   /// The state of the identity document upload slot.
   ///
@@ -243,9 +266,19 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
 
   int get _lastStep => _steps.length - 1;
 
-  /// Whether the current step permits advancing. Only the identity step is
-  /// gated: on it the consent checkbox must be ticked.
-  bool get _canAdvance => _step == _identityStep ? _consent : true;
+  /// Whether the current step permits advancing.
+  ///
+  /// A [DsBusinessVerification.canAdvance] override wins outright. Otherwise
+  /// only the identity step is gated, and only while it shows its stock body
+  /// ([identityBodyIsStock]): the consent checkbox must be ticked. A builder
+  /// that wraps or replaces the identity body removes that checkbox from the
+  /// flow's control, so the gate lifts rather than stranding the user.
+  bool _canAdvance({required bool identityBodyIsStock}) {
+    final override = widget.canAdvance?.call(_step);
+    if (override != null) return override;
+    if (_step != _identityStep || !identityBodyIsStock) return true;
+    return _consent;
+  }
 
   @override
   void dispose() {
@@ -303,20 +336,28 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
           : _SuccessState(tokens: tokens);
     } else {
       Widget body = _buildStepBody(tokens);
+      var identityBodyIsStock = true;
       final builder = widget.stepBodyBuilder;
       if (builder != null) {
-        body = builder(context, _step, body);
+        final built = builder(context, _step, body);
+        // A builder that hands the stock body back unchanged keeps the stock
+        // gating; anything else takes the step's gating with it.
+        identityBodyIsStock = identical(built, body);
+        body = built;
       }
+      // The first step's back action backs out of the flow, so it only
+      // appears when there is an onCancel to receive that.
+      final showBack = _step > 0 || widget.onCancel != null;
       content = DsOnboardingWizard(
         // The takeover header carries the title when present, so the wizard
         // drops its own heading rather than saying it twice.
         title: hasHeader ? null : _title,
         steps: _steps,
         currentIndex: _step,
-        onBack: _step > 0 ? _handleBack : null,
+        onBack: showBack ? _handleBack : null,
         onNext: _handleNext,
         nextLabel: _step == _lastStep ? 'Submit' : 'Continue',
-        nextEnabled: _canAdvance,
+        nextEnabled: _canAdvance(identityBodyIsStock: identityBodyIsStock),
         child: body,
       );
     }

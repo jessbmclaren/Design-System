@@ -13,7 +13,11 @@ import 'ds_text_field.dart';
 /// source of truth.
 ///
 /// It forwards the field props a password needs (controller, an [errorText]
-/// caption, submit handling) and owns its own show and hide state.
+/// caption, submit handling) and owns its own show and hide state. The field
+/// declares itself to the platform's autofill service ([AutofillHints.password]
+/// by default, [AutofillHints.newPassword] when [newPassword] is set) and
+/// keeps autocorrect and keyboard suggestions off, so password managers can
+/// fill and save the value and it never reaches the suggestion engine.
 class DsPasswordField extends StatefulWidget {
   /// Creates a password input with a show and hide toggle.
   const DsPasswordField({
@@ -31,6 +35,7 @@ class DsPasswordField extends StatefulWidget {
     this.focusNode,
     this.validator,
     this.autovalidateMode,
+    this.newPassword = false,
   });
 
   /// The text shown above the input. When null, no label row is rendered.
@@ -76,6 +81,13 @@ class DsPasswordField extends StatefulWidget {
   /// When the [validator] runs, forwarded to [DsTextField].
   final AutovalidateMode? autovalidateMode;
 
+  /// Whether this field collects a brand-new password (sign-up or change
+  /// password) rather than an existing one. Switches the autofill hint from
+  /// [AutofillHints.password] to [AutofillHints.newPassword], so password
+  /// managers offer to generate and save a password instead of filling a
+  /// stored one.
+  final bool newPassword;
+
   @override
   State<DsPasswordField> createState() => _DsPasswordFieldState();
 }
@@ -102,6 +114,13 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
       obscureText: _obscured,
+      // Declare the field to password managers and keep the value away from
+      // the keyboard's correction and suggestion engines.
+      autofillHints: <String>[
+        widget.newPassword ? AutofillHints.newPassword : AutofillHints.password,
+      ],
+      autocorrect: false,
+      enableSuggestions: false,
       suffixIcon: IconButton(
         onPressed: widget.enabled ? _toggle : null,
         icon: Icon(

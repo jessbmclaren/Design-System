@@ -51,16 +51,24 @@ class _SignInDemoState extends State<SignInDemo> {
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: DsSpacing.lg),
+          // Both halves of the label row are flexible: the label truncates
+          // with an ellipsis and the link truncates itself, so the row holds
+          // a 320dp viewport at a 2x text scale.
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const DsFieldLabel(label: 'Password'),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: DsLink(
-                    label: 'Forgot your password?',
-                    onPressed: () {},
-                  ),
+              Flexible(
+                child: DefaultTextStyle.merge(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  child: const DsFieldLabel(label: 'Password'),
+                ),
+              ),
+              const SizedBox(width: DsSpacing.sm),
+              Flexible(
+                child: DsLink(
+                  label: 'Forgot your password?',
+                  onPressed: () {},
                 ),
               ),
             ],

@@ -102,6 +102,30 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('scales exactly once inside a WidgetSpan under a 2x scale',
+        (tester) async {
+      const style = TextStyle(fontSize: 20, height: 1);
+      await pumpDs(
+        tester,
+        const Text.rich(
+          TextSpan(
+            style: style,
+            children: [
+              TextSpan(text: 'Preparing your workspace'),
+              WidgetSpan(child: DsAnimatedEllipsis(style: style)),
+            ],
+          ),
+        ),
+        textScale: 2.0,
+      );
+
+      // The host paragraph scales every inline child by the ambient text
+      // scale, so the dots must not scale themselves as well: one line of
+      // the 20px style at 2x is exactly 40px, never 80.
+      final painted = tester.getRect(find.byType(DsAnimatedEllipsis));
+      expect(painted.height, moreOrLessEquals(40, epsilon: 0.5));
+    });
+
     testWidgets('sits inline in waiting copy at 320dp', (tester) async {
       await pumpDs(
         tester,

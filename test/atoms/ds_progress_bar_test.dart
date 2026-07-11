@@ -38,6 +38,36 @@ void main() {
       );
     });
 
+    testWidgets('renders NaN as an empty bar', (tester) async {
+      // A 0/0 progress fraction in a careless caller must not paint a full
+      // bar; the documented behaviour is 0, an empty bar.
+      await pumpDs(tester, const DsProgressBar(value: double.nan));
+      expect(
+        tester
+            .widget<LinearProgressIndicator>(
+              find.byType(LinearProgressIndicator),
+            )
+            .value,
+        0.0,
+      );
+
+      // The animated path treats NaN the same way.
+      await pumpDs(
+        tester,
+        const DsProgressBar(value: double.nan, animate: true),
+      );
+      await tester.pump(const Duration(seconds: 1));
+      expect(tester.takeException(), isNull);
+      expect(
+        tester
+            .widget<LinearProgressIndicator>(
+              find.byType(LinearProgressIndicator),
+            )
+            .value,
+        0.0,
+      );
+    });
+
     testWidgets('honours a custom minHeight', (tester) async {
       await pumpDs(tester, const DsProgressBar(value: 0.5, minHeight: 8));
 

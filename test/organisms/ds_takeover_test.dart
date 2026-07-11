@@ -59,6 +59,55 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('releases focus held inside the background when it mounts',
+        (tester) async {
+      final focusNode = FocusNode(debugLabel: 'background-field');
+      addTearDown(focusNode.dispose);
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+      final fieldKey = GlobalKey();
+
+      Widget page() => Scaffold(
+            body: Center(
+              child: TextField(
+                key: fieldKey,
+                focusNode: focusNode,
+                controller: controller,
+              ),
+            ),
+          );
+
+      await tester.pumpWidget(
+        MaterialApp(theme: DsTheme.light(), home: page()),
+      );
+      await tester.tap(find.byKey(fieldKey));
+      await tester.pump();
+      expect(focusNode.hasFocus, isTrue);
+
+      // Swap the page for a takeover over the same subtree; the GlobalKey
+      // keeps the field's state, including its focus node.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: DsTheme.light(),
+          home: DsTakeover(
+            background: page(),
+            child: const Material(child: Text('Card')),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(focusNode.hasFocus, isFalse);
+
+      // The input connection closed with the focus, so typed input cannot
+      // leak into the background field behind the card.
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(text: 'leaked'),
+      );
+      await tester.pump();
+      expect(controller.text, isEmpty);
+    });
+
     testWidgets('background cannot take focus', (tester) async {
       final node = FocusNode(debugLabel: 'background-field');
       addTearDown(node.dispose);
@@ -116,6 +165,44 @@ void main() {
       await tester.tap(find.text('Card'));
       await tester.pump();
       expect(dismissed, 1);
+    });
+
+    testWidgets('a tap in a transparent gap inside the card does not dismiss',
+        (tester) async {
+      var dismissed = 0;
+      final topKey = GlobalKey();
+      final bottomKey = GlobalKey();
+      await pumpDs(
+        tester,
+        DsTakeover(
+          background: const Text('Dashboard'),
+          barrierDismissible: true,
+          onDismiss: () => dismissed++,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Material(
+                key: topKey,
+                child: const SizedBox(width: 200, height: 60),
+              ),
+              const SizedBox(height: 40),
+              Material(
+                key: bottomKey,
+                child: const SizedBox(width: 200, height: 60),
+              ),
+            ],
+          ),
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      // Tap between the card's two surfaces: inside its footprint, but on a
+      // transparent gap. The card claims it, so nothing dismisses.
+      final top = tester.getBottomLeft(find.byKey(topKey));
+      final bottom = tester.getTopLeft(find.byKey(bottomKey));
+      await tester.tapAt(Offset(top.dx + 100, (top.dy + bottom.dy) / 2));
+      await tester.pump();
+      expect(dismissed, 0);
     });
 
     testWidgets('a barrier tap does nothing while not dismissible',

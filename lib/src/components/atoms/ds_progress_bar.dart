@@ -34,7 +34,7 @@ import '../../util/ds_motion.dart';
 class DsProgressBar extends StatelessWidget {
   /// Creates a determinate progress bar.
   ///
-  /// [value] is clamped into the range 0 to 1.
+  /// [value] is clamped into the range 0 to 1; NaN renders as 0.
   const DsProgressBar({
     super.key,
     required this.value,
@@ -46,7 +46,8 @@ class DsProgressBar extends StatelessWidget {
 
   /// The completed fraction of the task, from 0 (nothing) to 1 (done).
   ///
-  /// Values outside that range are clamped.
+  /// Values outside that range are clamped. NaN, the result of a 0/0
+  /// progress fraction, renders as 0, an empty bar.
   final double value;
 
   /// The thickness of the bar in logical pixels. Defaults to 4.
@@ -71,7 +72,9 @@ class DsProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final clamped = value.clamp(0.0, 1.0).toDouble();
+    // NaN would survive clamp and paint a full bar, the worst reading of "no
+    // progress computable", so it renders empty instead.
+    final clamped = value.isNaN ? 0.0 : value.clamp(0.0, 1.0).toDouble();
 
     Widget buildBar(double fill) {
       return ClipRRect(

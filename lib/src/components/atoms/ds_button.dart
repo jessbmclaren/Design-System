@@ -34,9 +34,10 @@ enum DsButtonVariant {
 ///
 /// Set [pending] while an action is in flight: the label stays mounted at
 /// zero opacity beneath a spinner, so the button keeps its width, presses are
-/// ignored and assistive technology announces the label as busy. Set
-/// [fullWidth] on compact layouts where a button should span the available
-/// width.
+/// ignored and assistive technology announces the label as busy. A pending
+/// button keeps its enabled fill (busy, not disabled), so the spinner holds a
+/// clear contrast against it. Set [fullWidth] on compact layouts where a
+/// button should span the available width.
 ///
 /// Keyboard focus draws a ring in the variant's text colour, so it reads
 /// distinctly from the hover wash. Pressing the button gives a physical,
@@ -96,7 +97,9 @@ class DsButton extends StatefulWidget {
   final IconData? trailingIcon;
 
   /// Whether an action is in flight. Shows a spinner over the label (kept
-  /// mounted at zero opacity so the width holds) and disables the button.
+  /// mounted at zero opacity so the width holds) and blocks presses. The
+  /// fill stays the enabled colour: the button is busy, not disabled, and
+  /// the spinner needs the contrast of the full fill.
   final bool pending;
 
   /// Whether the button expands to fill the available width.
@@ -122,10 +125,25 @@ class _DsButtonState extends State<DsButton>
 
   bool _wasPressed = false;
 
+  /// Cached reduce-motion flag, refreshed in [didChangeDependencies].
+  ///
+  /// [_onStatesChanged] can fire while the element is deactivated: unmounting
+  /// the button mid-press cancels the tap and the InkWell flips the pressed
+  /// state on the shared controller. Looking up MediaQuery through the
+  /// deactivated context would throw, so the listener reads this field
+  /// instead.
+  bool _reduceMotion = false;
+
   @override
   void initState() {
     super.initState();
     _states.addListener(_onStatesChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduceMotion = DsMotion.reduced(context);
   }
 
   @override
@@ -140,7 +158,7 @@ class _DsButtonState extends State<DsButton>
     final pressed = _states.value.contains(WidgetState.pressed);
     if (pressed == _wasPressed) return;
     _wasPressed = pressed;
-    if (DsMotion.reduced(context)) {
+    if (_reduceMotion) {
       _scale.value = 1;
       return;
     }
@@ -270,8 +288,13 @@ class _DsButtonState extends State<DsButton>
             style: FilledButton.styleFrom(
               backgroundColor: background,
               foregroundColor: foreground,
-              disabledBackgroundColor: disabledBackground,
-              disabledForegroundColor: disabledForeground,
+              // Pending is busy, not disabled: the enabled fill stays, so the
+              // spinner (drawn in the variant's text colour) keeps the 3:1
+              // non-text contrast the disabled tint would lose.
+              disabledBackgroundColor:
+                  widget.pending ? background : disabledBackground,
+              disabledForegroundColor:
+                  widget.pending ? foreground : disabledForeground,
               elevation: 0,
               // The scale is the press feedback; drop the ink splash.
               splashFactory: NoSplash.splashFactory,

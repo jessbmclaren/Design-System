@@ -154,6 +154,48 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('the compact form shows a Step n of N caption',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const SizedBox(
+          width: 180,
+          child: DsVerificationRail(sections: sections),
+        ),
+      );
+
+      expect(find.text('Step 2 of 3'), findsOneWidget);
+    });
+
+    testWidgets('the compact form survives many sections without overflow',
+        (tester) async {
+      final manySections = <DsVerificationSection>[
+        for (var i = 0; i < 12; i++)
+          DsVerificationSection(
+            label: 'Section ${i + 1}',
+            state: i < 4
+                ? DsVerificationSectionState.done
+                : i == 4
+                    ? DsVerificationSectionState.active
+                    : DsVerificationSectionState.upcoming,
+          ),
+      ];
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 180,
+          child: DsVerificationRail(sections: manySections),
+        ),
+        surfaceSize: const Size(320, 568),
+      );
+
+      // The summary is one marker, the active label and a caption, so the
+      // section count no longer decides whether the fallback fits.
+      expect(tester.takeException(), isNull);
+      expect(find.text('Section 5'), findsOneWidget);
+      expect(find.text('Step 5 of 12'), findsOneWidget);
+    });
+
     testWidgets('summarises progress accessibly in the compact form',
         (tester) async {
       final handle = tester.ensureSemantics();

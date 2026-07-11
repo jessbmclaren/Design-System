@@ -72,5 +72,26 @@ void main() {
       await tester.pump();
       expect(find.text('Too short'), findsOneWidget);
     });
+
+    testWidgets('declares password autofill and keeps the value out of the '
+        'keyboard suggestion engine', (tester) async {
+      await pumpDs(tester, const DsPasswordField(label: 'Password'));
+
+      final TextField field = tester.widget(find.byType(TextField));
+      expect(field.autofillHints, <String>[AutofillHints.password]);
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isFalse);
+    });
+
+    testWidgets('newPassword switches the autofill hint for sign-up flows',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsPasswordField(label: 'Password', newPassword: true),
+      );
+
+      final TextField field = tester.widget(find.byType(TextField));
+      expect(field.autofillHints, <String>[AutofillHints.newPassword]);
+    });
   });
 }

@@ -60,10 +60,15 @@ class DsVerificationSection {
 /// ## Responsiveness
 ///
 /// The rail watches its own width through a [LayoutBuilder]. Below
-/// [compactBreakpoint] it swaps the vertical list for a compact horizontal
-/// summary: the section markers in a row with the active section's label
-/// alongside. The compact form is informational only, so wire Back and
-/// Continue actions elsewhere on small screens.
+/// [compactBreakpoint] it swaps the vertical list for a compact summary: the
+/// active section's marker and label with a "Step n of N" caption beneath,
+/// which holds its single line however many sections the flow has. The
+/// compact form is informational only, so wire Back and Continue actions
+/// elsewhere on small screens.
+///
+/// The rail never scrolls itself. Like the library's other list-like
+/// components it renders at its natural height, so give it a scrollable
+/// parent when the section list can outgrow the viewport.
 ///
 /// All colours, spacing and type come from [DsTokens], and the widget runs no
 /// timers or animations, so it renders deterministically in screenshots.
@@ -162,17 +167,25 @@ class DsVerificationRail extends StatelessWidget {
     );
   }
 
-  /// The compact horizontal fallback: the markers in a row with the active
-  /// section's label alongside. Informational only, so the markers are not
-  /// tappable here.
+  /// The compact fallback: the active section's marker and label with a
+  /// "Step n of N" caption, so the summary keeps one line however many
+  /// sections the flow has. Informational only, so nothing is tappable here.
   Widget _buildCompact(DsTokens tokens) {
-    String? activeLabel;
-    for (final section in sections) {
-      if (section.state == DsVerificationSectionState.active) {
-        activeLabel = section.label;
+    int? activeIndex;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].state == DsVerificationSectionState.active) {
+        activeIndex = i;
         break;
       }
     }
+    final activeLabel = activeIndex == null ? null : sections[activeIndex].label;
+
+    final done = sections
+        .where((s) => s.state == DsVerificationSectionState.done)
+        .length;
+    final caption = activeIndex == null
+        ? '$done of ${sections.length} complete'
+        : 'Step ${activeIndex + 1} of ${sections.length}';
 
     return Semantics(
       container: true,
@@ -180,27 +193,38 @@ class DsVerificationRail extends StatelessWidget {
       child: ExcludeSemantics(
         child: Row(
           children: <Widget>[
-            for (var i = 0; i < sections.length; i++) ...<Widget>[
-              if (i > 0) const SizedBox(width: DsSpacing.xs),
+            if (activeIndex != null) ...<Widget>[
               _Marker(
                 tokens: tokens,
-                state: sections[i].state,
-                number: i + 1,
+                state: DsVerificationSectionState.active,
+                number: activeIndex + 1,
               ),
-            ],
-            if (activeLabel != null) ...<Widget>[
               const SizedBox(width: DsSpacing.md),
-              Expanded(
-                child: Text(
-                  activeLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: tokens.bodyMd
-                      .copyWith(fontWeight: DsTypography.semiBold)
-                      .toTextStyle(color: tokens.colorText),
-                ),
-              ),
             ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  if (activeLabel != null)
+                    Text(
+                      activeLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: tokens.bodyMd
+                          .copyWith(fontWeight: DsTypography.semiBold)
+                          .toTextStyle(color: tokens.colorText),
+                    ),
+                  Text(
+                    caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: tokens.bodySm
+                        .toTextStyle(color: tokens.colorSecondaryText),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

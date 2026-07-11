@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
@@ -17,6 +19,16 @@ const double _markerSize = 18;
 /// Width of the card in its floating (not [DsSetupGuide.fullWidth])
 /// presentation.
 const double _floatingWidth = 320;
+
+/// Thickness of the header's progress bar.
+const double _barHeight = 4;
+
+/// Minimum height of the card's fixed chrome: the hairline border, the card
+/// padding, the 48dp disclosure header, the progress bar and the gaps around
+/// it. A [DsSetupGuide.maxHeight] below this is clamped up to it, so a
+/// starved budget degrades to a chrome-only card instead of overflowing.
+const double _chromeMinHeight =
+    2 + DsSpacing.lg * 2 + 48 + DsSpacing.sm + _barHeight + DsSpacing.md;
 
 /// One task in a [DsSetupGuide] checklist.
 ///
@@ -118,7 +130,8 @@ class DsSetupGuide extends StatefulWidget {
     this.maxHeight,
   });
 
-  /// The card heading, also the header's semantic label.
+  /// The card heading. The disclosure header announces it once, alongside
+  /// the done count.
   final String title;
 
   /// The tasks to list, in display order. Labels should be unique; they key
@@ -136,12 +149,15 @@ class DsSetupGuide extends StatefulWidget {
 
   /// Whether the card stretches to the width its parent provides instead of
   /// the floating 320dp panel. Use this for a bottom-docked presentation on
-  /// mobile.
+  /// mobile. The parent must bound the card's width: in an unbounded-width
+  /// context, a plain Row slot for instance, wrap the card in an Expanded.
   final bool fullWidth;
 
   /// A height budget for the card. When the task list cannot fit it scrolls
-  /// inside the card instead of clipping off-screen. Null leaves the card at
-  /// its intrinsic height.
+  /// inside the card instead of clipping off-screen. A budget tighter than
+  /// the fixed chrome (border, padding, header and progress bar) is clamped
+  /// up to the chrome's height, so the card never overflows; only the body
+  /// below the bar is starved. Null leaves the card at its intrinsic height.
   final double? maxHeight;
 
   @override
@@ -170,11 +186,11 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
     final progress = total == 0 ? 0.0 : _doneCount / total;
 
     // The header bar is itself the disclosure control: tapping anywhere on it
-    // toggles the task list.
+    // toggles the task list. Its accessible name comes from the title Text
+    // inside; an outer label here would restate it.
     final header = Semantics(
       button: true,
       expanded: !_collapsed,
-      label: widget.title,
       child: InkWell(
         onTap: () => setState(() => _collapsed = !_collapsed),
         borderRadius: BorderRadius.circular(tokens.formBorderRadius),
@@ -229,11 +245,22 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
       ],
     );
 
+    // Collapsed, the card summarises what to tackle next; expanded, it shows
+    // the full list, which scrolls when a maxHeight budget is tighter than
+    // the list.
+    final body = _collapsed
+        ? _NextLine(next: _nextTask, summary: widget.collapsedSummary)
+        : taskList;
+
     return Container(
       width: widget.fullWidth ? double.infinity : _floatingWidth,
+      // A budget below the fixed chrome clamps up to it, so a starved card
+      // shows the header and bar intact instead of overflowing.
       constraints: widget.maxHeight == null
           ? null
-          : BoxConstraints(maxHeight: widget.maxHeight!),
+          : BoxConstraints(
+              maxHeight: math.max(widget.maxHeight!, _chromeMinHeight),
+            ),
       padding: const EdgeInsets.all(DsSpacing.lg),
       decoration: BoxDecoration(
         color: tokens.formBackgroundColor,
@@ -248,17 +275,19 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
           header,
           const SizedBox(height: DsSpacing.sm),
           // Decorative: the header's count already announces the progress.
-          DsProgressBar(value: progress, animate: true, excludeSemantics: true),
+          DsProgressBar(
+            value: progress,
+            minHeight: _barHeight,
+            animate: true,
+            excludeSemantics: true,
+          ),
           const SizedBox(height: DsSpacing.md),
-          // Collapsed, the card summarises what to tackle next; expanded, it
-          // shows the full list, which scrolls when a maxHeight budget is
-          // tighter than the list.
-          if (_collapsed)
-            _NextLine(next: _nextTask, summary: widget.collapsedSummary)
-          else if (widget.maxHeight != null)
-            Flexible(child: SingleChildScrollView(child: taskList))
+          // Under a maxHeight budget the body takes whatever space the chrome
+          // leaves, down to nothing, and scrolls inside it.
+          if (widget.maxHeight != null)
+            Flexible(child: SingleChildScrollView(child: body))
           else
-            taskList,
+            body,
         ],
       ),
     );
@@ -305,6 +334,8 @@ class _NextLine extends StatelessWidget {
 /// and when [DsSetupTask.done] flips true on screen it plays a strike-through
 /// then collapses away, once. Mounting already done renders nothing, and
 /// reduced motion collapses instantly, so the animation never replays.
+/// Flipping done back off mid-animation restores the ordinary row and
+/// rewinds, so a later completion plays the cross-off again from the start.
 class _CrossOffTaskRow extends StatefulWidget {
   const _CrossOffTaskRow({super.key, required this.task});
 
@@ -344,13 +375,20 @@ class _CrossOffTaskRowState extends State<_CrossOffTaskRow>
   @override
   void didUpdateWidget(_CrossOffTaskRow oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Only react to completion happening on screen; the cross-off plays once.
+    // Only react to completion happening on screen; the cross-off plays once
+    // per completion.
     if (widget.task.done && !oldWidget.task.done) {
       if (DsMotion.reduced(context)) {
         _crossOff.value = 1;
       } else if (_crossOff.status == AnimationStatus.dismissed) {
         _crossOff.forward();
       }
+    } else if (!widget.task.done && oldWidget.task.done) {
+      // The completion was withdrawn mid-flight. Stop the controller and
+      // rewind it, so nothing keeps ticking behind the restored row and a
+      // later completion still plays the cross-off from the start.
+      _crossOff.stop();
+      _crossOff.value = 0;
     }
   }
 
@@ -439,10 +477,11 @@ class _TaskRow extends StatelessWidget {
     final onTap =
         (task.done || task.pending || task.locked) ? null : task.onTap;
 
-    // Tappable to-dos grow to the 48dp touch minimum. Static rows keep the
-    // compact density; they are not targets.
+    Widget result;
     if (onTap != null) {
-      return Semantics(
+      // Tappable to-dos grow to the 48dp touch minimum. Static rows keep the
+      // compact density; they are not targets.
+      result = Semantics(
         button: true,
         child: InkWell(
           onTap: onTap,
@@ -454,13 +493,11 @@ class _TaskRow extends StatelessWidget {
           ),
         ),
       );
-    }
-
-    // Locked rows explain the gate on hover and on tap, so touch users learn
-    // why the task is gated too. DsTooltip owns the presentation; only the
-    // tap trigger is layered on through the tooltip theme.
-    if (task.locked && task.lockedMessage != null) {
-      return TooltipTheme(
+    } else if (task.locked && task.lockedMessage != null) {
+      // Locked rows explain the gate on hover and on tap, so touch users
+      // learn why the task is gated too. DsTooltip owns the presentation;
+      // only the tap trigger is layered on through the tooltip theme.
+      result = TooltipTheme(
         data: TooltipTheme.of(context)
             .copyWith(triggerMode: TooltipTriggerMode.tap),
         child: DsTooltip(
@@ -472,8 +509,20 @@ class _TaskRow extends StatelessWidget {
           ),
         ),
       );
+    } else {
+      result = row;
     }
-    return row;
+
+    // State the row's status for assistive technology: a done task reads as
+    // checked and a locked one as a disabled row with a hint, so a screen
+    // reader can tell either apart from an open to-do.
+    if (task.done) {
+      return Semantics(checked: true, child: result);
+    }
+    if (task.locked) {
+      return Semantics(enabled: false, hint: 'Locked', child: result);
+    }
+    return result;
   }
 }
 
