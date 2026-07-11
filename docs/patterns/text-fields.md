@@ -4,6 +4,8 @@ The text field is the workhorse of every form: a single- or multi-line input tha
 
 Keep the label visible at all times and let the `hintText` show an example of a valid entry rather than repeat the label. Use `helperText` to explain a format or constraint before the user acts, and switch to `errorText` only once a field has been touched and found invalid. The two never appear together. Set `keyboardType` to match the content so the right on-screen keyboard appears, and use `obscureText` for secrets.
 
+Inside a `Form`, drive validation through the field rather than by hand: pass a `validator` and set `autovalidateMode: AutovalidateMode.onUserInteraction`, so the message appears only once someone has edited the field. A failing validator takes precedence over `errorText`, and either one hides `helperText`. Mark a genuinely optional field with `optional: true`, which appends a subdued Optional marker to its label, rather than annotating the required majority.
+
 ![Desktop (1280dp)](img/text-fields_desktop.png)
 
 *Desktop (1280dp)*

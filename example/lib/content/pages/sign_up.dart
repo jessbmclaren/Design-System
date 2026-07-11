@@ -30,7 +30,11 @@ final PatternPage signUpPage = PatternPage(
       '`errorText`. The password is captioned by `dsFirstUnmetPasswordRule`, '
       'which names one rule at a time so the error always says the next '
       'thing to fix, and a `DsPasswordStrength` meter beneath the field '
-      'grades the value as it is typed. While the request is in flight, set '
+      'grades the value as it is typed. A `DsPasswordStrengthHint` line sits '
+      'below the meter: it restates the requirements while a basic rule is '
+      'unmet, then, once every rule passes but the value still grades weak, '
+      'warns against a guessable password, and shows nothing otherwise. While '
+      'the request is in flight, set '
       '`submitPending` to show a spinner and block repeat taps; the view '
       'never touches the network or a timer itself, so it renders '
       'identically in a screenshot and in production.',
@@ -99,6 +103,8 @@ DsSignUpView(
       DsPasswordField(
         controller: _password,
         hintText: 'Password',
+        // Cue password managers to generate and save, not fill a stored value.
+        newPassword: true,
         onChanged: (_) => setState(() => _passwordTouched = true),
         // One rule at a time: the first unmet rule is the next fix.
         errorText: _passwordTouched

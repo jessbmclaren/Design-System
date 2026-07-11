@@ -29,6 +29,7 @@ final PatternPage motionPage = PatternPage(
     ),
     SubheadingBlock('Duration scale'),
     VariablesBlock(rows: [
+      VariableRow(name: 'DsMotion.instant', type: 'Duration', example: '0ms', description: 'No motion: an immediate change. What every other duration collapses to under reduced motion.'),
       VariableRow(name: 'DsMotion.fast', type: 'Duration', example: '120ms', description: 'Micro-interactions: hover, press, a toggle flipping.'),
       VariableRow(name: 'DsMotion.base', type: 'Duration', example: '220ms', description: 'The standard transition for most state changes.'),
       VariableRow(name: 'DsMotion.slow', type: 'Duration', example: '360ms', description: 'Larger surfaces (sheets, dialogs, an accordion) where time reads as weight.'),

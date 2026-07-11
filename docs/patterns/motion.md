@@ -8,6 +8,7 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
+| `DsMotion.instant` | `Duration` | `0ms` | No motion: an immediate change. What every other duration collapses to under reduced motion. |
 | `DsMotion.fast` | `Duration` | `120ms` | Micro-interactions: hover, press, a toggle flipping. |
 | `DsMotion.base` | `Duration` | `220ms` | The standard transition for most state changes. |
 | `DsMotion.slow` | `Duration` | `360ms` | Larger surfaces (sheets, dialogs, an accordion) where time reads as weight. |

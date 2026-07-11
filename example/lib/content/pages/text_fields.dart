@@ -27,6 +27,15 @@ final PatternPage textFieldsPage = PatternPage(
       'content so the right on-screen keyboard appears, and use `obscureText` '
       'for secrets.',
     ),
+    ProseBlock(
+      'Inside a `Form`, drive validation through the field rather than by hand: '
+      'pass a `validator` and set `autovalidateMode: '
+      'AutovalidateMode.onUserInteraction`, so the message appears only once '
+      'someone has edited the field. A failing validator takes precedence over '
+      '`errorText`, and either one hides `helperText`. Mark a genuinely '
+      'optional field with `optional: true`, which appends a subdued Optional '
+      'marker to its label, rather than annotating the required majority.',
+    ),
   ],
   dos: const [
     'Always pair a field with a visible label so its purpose survives once a value is entered.',
