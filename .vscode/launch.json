@@ -10,7 +10,7 @@
       "deviceId": "chrome",
       "args": [
         "--web-port=8123",
-        "--web-hostname=localhost"
+        "--web-hostname=127.0.0.1"
       ]
     }
   ]
