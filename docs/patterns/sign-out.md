@@ -32,7 +32,7 @@ Keep the control consistently located across the product so people build muscle 
 ```dart
 Row(
   children: [
-    const CircleAvatar(child: Icon(DsIcons.user)),
+    const DsAvatar(icon: DsIcons.user),
     const SizedBox(width: 12),
     const Expanded(
       child: Column(

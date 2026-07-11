@@ -38,7 +38,7 @@ final PatternPage signOutPage = PatternPage(
   code: '''
 Row(
   children: [
-    const CircleAvatar(child: Icon(DsIcons.user)),
+    const DsAvatar(icon: DsIcons.user),
     const SizedBox(width: 12),
     const Expanded(
       child: Column(

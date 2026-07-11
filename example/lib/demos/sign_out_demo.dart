@@ -15,7 +15,7 @@ class SignOutDemo extends StatelessWidget {
 
     return Row(
       children: [
-        const CircleAvatar(child: Icon(DsIcons.user)),
+        const DsAvatar(icon: DsIcons.user),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

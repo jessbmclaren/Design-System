@@ -8,35 +8,67 @@ final PatternPage onboardingPage = PatternPage(
   navTitle: 'Onboarding',
   title: 'Onboarding',
   description:
-      'Onboarding moves a new person from signed-out to productive with the '
-      'smallest set of steps that matter. Lead with a single, centred welcome '
-      'card that names what they are setting up, states the value in one line '
-      'and offers one obvious primary action. Build it with `DsSignInView`: it '
-      'presents the brand mark, title, description and a full-width Continue '
-      'button, and deliberately collects no credentials of its own so you can '
-      'hand sensitive input to a flow you control and return the user when '
-      'they are done.',
+      'Onboarding is the journey from a first visit to productive use, and '
+      'the kit covers it as stages you compose rather than a single screen. '
+      'A visitor arrives on a page framed by the auth shell, creates an '
+      'account or signs back in, waits out provisioning on a waiting screen, '
+      'clears the setup that blocks first use in a wizard and finishes the '
+      'rest from a setup guide inside the product. Each stage has its own '
+      'pattern page; this one maps the journey and shows the opening moment, '
+      'a welcome card built with `DsSignInView`.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Treat the first screen as an invitation, not a form. Every field or '
-      'step you add before the user reaches value is a chance to lose them, so '
-      'defer anything that is not required to get started. As accounts grow '
-      'more complex, layer additional setup behind the reveal or across a '
-      '`DsProgressStepper` rather than crowding the opening card.',
+      'The flow opens on public pages framed by `DsAuthShell`: a decorative '
+      'backdrop, a wordmark pinned to the top corner, a line of legal links '
+      'along the bottom and a banner slot that hosts the `DsCookieBanner` '
+      'consent bar. Inside the shell sits one card at a time. `DsSignUpView` '
+      'frames registration and `DsSignInView` the return visit; both '
+      'scaffold the card while you own the form and its validation. The '
+      'sign-up and sign-in pages cover their composition in detail, down to '
+      'the password strength meter and the provider buttons.',
+    ),
+    ProseBlock(
+      'Two surfaces bridge the gap between submitting credentials and '
+      'standing in the product. `DsWaitingScreen` holds a brief provisioning '
+      'moment with a large spinner, an animated headline and the same '
+      'gradient backdrop as the shell; it holds no timers, so you swap it '
+      'out when the work completes. The welcome card in the live demo is '
+      '`DsSignInView` with no form: a brand mark, one line of value and a '
+      'single full-width Continue action. Keep this first signed-in moment '
+      'to the one step that matters and defer everything else.',
+    ),
+    ProseBlock(
+      'When setup needs real answers, run it as steps. `DsOnboardingWizard` '
+      'owns the chrome of a multi-step flow (progress header, scrollable '
+      'body, Back and Next actions) while you keep the state and swap the '
+      'body per step. `DsBusinessVerification` is the worked example: four '
+      'short steps that collect and review an organisation\'s details on '
+      'that chrome. A step the user must clear before continuing, such as '
+      'verifying an email, runs as a card in a `DsTakeover` over a blurred, '
+      'inert copy of the page behind it.',
+    ),
+    ProseBlock(
+      'Onboarding does not end at the last wizard step. `DsSetupGuide` '
+      'carries the remaining tasks into the product as a collapsible '
+      'checklist that reads out progress and always points at the next '
+      'actionable item. `DsTourCard` gives the short illustrated walkthrough '
+      'after sign-up; it steps through a few ideas on its own card and '
+      'points at nothing. Both are controlled components, so you decide '
+      'when they appear and what progress they show.',
     ),
   ],
   dos: const [
-    'Keep onboarding to the essential steps needed to reach a first useful moment.',
-    'Make the primary action unmistakable: one full-width button labelled "Continue".',
-    'Collect sensitive credentials on your own secure sign-in, then return the user to where they left off.',
-    'Scale complexity to the person: show more setup only when their account actually needs it.',
-    'State the value in the description so the user knows why the step is worth taking.',
+    'Put only the steps that block first use in the wizard; hand the rest to a setup guide inside the product.',
+    'Frame every page of the flow in the same auth shell so the journey reads as one place.',
+    'Keep the opening card to one primary action and state the value of taking it.',
+    'Show a waiting screen that names the work and sets an expectation when provisioning takes more than a moment.',
+    'Collect sensitive credentials on a flow you control, then return the user to where they left off.',
   ],
   donts: const [
     'Don\'t use onboarding for promotions, cross-sells or unrelated announcements.',
-    'Don\'t collect passwords or payment details on a screen you don\'t fully control.',
-    'Don\'t add steps that aren\'t required to get started; defer the rest.',
+    'Don\'t front-load a long form when a checklist can carry the tasks into the product.',
+    'Don\'t make the tour a gate; the user closes it when they choose.',
     'Don\'t bury the primary action beneath competing links or dense copy.',
   ],
   code: '''
@@ -60,5 +92,16 @@ DsSignInView(
     Shot(pageId: 'onboarding', size: ShotSize.desktop),
     Shot(pageId: 'onboarding', size: ShotSize.phone),
   ],
-  related: ['sign-in', 'additional-context', 'progress-stepping'],
+  related: [
+    'auth-shell',
+    'cookie-banner',
+    'sign-up',
+    'sign-in',
+    'waiting-screens',
+    'onboarding-wizard',
+    'business-verification',
+    'takeover',
+    'setup-guide',
+    'tour-card',
+  ],
 );
