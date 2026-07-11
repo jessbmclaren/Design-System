@@ -99,6 +99,12 @@ class _DocsAppState extends State<DocsApp> {
         theme: DsTheme.light(tokens: _skin.lightTokens()),
         darkTheme: DsTheme.dark(tokens: _skin.darkTokens()),
         themeMode: _mode,
+        // Theme changes move on the system's motion, not the framework's
+        // default 200ms linear, and collapse under reduced motion. The
+        // reduce-motion flag resolves off the View's MediaQuery that runApp
+        // installs above this widget.
+        themeAnimationDuration: DsMotion.durationOf(context, DsMotion.base),
+        themeAnimationCurve: DsMotion.curveOf(context, DsMotion.standard),
         routerConfig: _router,
       ),
     );

@@ -174,7 +174,15 @@ class _NavItem extends StatelessWidget {
                 ),
                 if (_tickedPageIds.contains(page.id)) ...[
                   const SizedBox(width: 8),
-                  Icon(LucideIcons.check, size: 14, color: docs.accent),
+                  // A circled tick in the positive colour reads as "done"; a
+                  // bare accent stroke at this size can be mistaken for a
+                  // disclosure chevron on the row.
+                  Icon(
+                    LucideIcons.circle_check,
+                    size: 14,
+                    color: docs.positive,
+                    semanticLabel: 'In the current working set',
+                  ),
                 ],
               ],
             ),

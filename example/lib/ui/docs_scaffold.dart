@@ -149,6 +149,14 @@ class _SkinSwitcher extends StatelessWidget {
     return PopupMenuButton<DocsSkin>(
       tooltip: 'Switch brand',
       position: PopupMenuPosition.under,
+      // Open on the system's motion tokens, and not at all under reduced
+      // motion (the framework default is a fixed fade that ignores it).
+      popUpAnimationStyle: DsMotion.reduced(context)
+          ? AnimationStyle.noAnimation
+          : AnimationStyle(
+              duration: DsMotion.base,
+              curve: DsMotion.decelerate,
+            ),
       color: docs.surfaceElevated,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -232,8 +240,12 @@ class _ThemeToggle extends StatelessWidget {
             child: AnimatedSwitcher(
               duration: DsMotion.durationOf(context, DsMotion.base),
               // Entrances decelerate, exits accelerate: the motion law.
+              // AnimatedSwitcher runs switchOutCurve un-mirrored against the
+              // falling animation, so the accelerate curve must be flipped to
+              // actually accelerate the exit.
               switchInCurve: DsMotion.curveOf(context, DsMotion.emphasized),
-              switchOutCurve: DsMotion.curveOf(context, DsMotion.accelerate),
+              switchOutCurve:
+                  DsMotion.curveOf(context, DsMotion.accelerate.flipped),
               transitionBuilder: (child, anim) => RotationTransition(
                 turns: Tween<double>(begin: 0.6, end: 1).animate(anim),
                 child: FadeTransition(

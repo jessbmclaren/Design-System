@@ -17,8 +17,9 @@ class _MotionDemoState extends State<MotionDemo>
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    // Base transition plus room for the stagger tail.
-    duration: DsMotion.base + const Duration(milliseconds: 240),
+    // A choreographed reveal is a hero moment: the expressive long, with the
+    // stagger tail carved out of the timeline by DsMotion.stagger below.
+    duration: DsMotion.expressive,
     value: 1, // start revealed so the resting frame is stable.
   );
 
@@ -101,8 +102,11 @@ class _RevealTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    // A staggered slice of the timeline for this tile.
-    final start = (index * 0.14).clamp(0.0, 0.6);
+    // A staggered slice of the timeline for this tile, offset by the
+    // choreography token (which collapses to zero under reduced motion).
+    final start = (DsMotion.stagger(context, index).inMilliseconds /
+            controller.duration!.inMilliseconds)
+        .clamp(0.0, 0.6);
     final fade = CurvedAnimation(
       parent: controller,
       curve: Interval(start, (start + 0.5).clamp(0.0, 1.0), curve: DsMotion.emphasized),
