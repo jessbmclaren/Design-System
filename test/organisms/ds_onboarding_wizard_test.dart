@@ -126,6 +126,76 @@ void main() {
     expect(find.text('Need a hand?'), findsOneWidget);
   });
 
+  testWidgets('shows the stepper for a multi-step flow by default',
+      (tester) async {
+    await pumpDs(
+      tester,
+      bounded(
+        const DsOnboardingWizard(
+          steps: steps,
+          currentIndex: 0,
+          child: Text('Body'),
+        ),
+      ),
+    );
+
+    expect(find.byType(DsProgressStepper), findsOneWidget);
+  });
+
+  testWidgets('hides the stepper when there is a single step',
+      (tester) async {
+    await pumpDs(
+      tester,
+      bounded(
+        const DsOnboardingWizard(
+          steps: [DsWizardStep(label: 'Setup')],
+          currentIndex: 0,
+          title: 'Set up your workspace',
+          child: Text('Body'),
+        ),
+      ),
+    );
+
+    expect(find.byType(DsProgressStepper), findsNothing);
+    expect(find.text('Set up your workspace'), findsOneWidget);
+  });
+
+  testWidgets('hides the stepper when showStepper is false', (tester) async {
+    await pumpDs(
+      tester,
+      bounded(
+        const DsOnboardingWizard(
+          steps: steps,
+          currentIndex: 0,
+          showStepper: false,
+          child: Text('Body'),
+        ),
+      ),
+    );
+
+    expect(find.byType(DsProgressStepper), findsNothing);
+  });
+
+  testWidgets('renders header content above the stepper', (tester) async {
+    await pumpDs(
+      tester,
+      bounded(
+        const DsOnboardingWizard(
+          steps: steps,
+          currentIndex: 0,
+          header: Text('Acme'),
+          child: Text('Body'),
+        ),
+      ),
+    );
+
+    expect(find.text('Acme'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Acme')).dy,
+      lessThan(tester.getTopLeft(find.byType(DsProgressStepper)).dy),
+    );
+  });
+
   testWidgets('renders without overflow on a compact 320dp phone',
       (tester) async {
     await pumpDs(

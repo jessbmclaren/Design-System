@@ -28,10 +28,12 @@ export 'src/util/ds_motion.dart';
 //
 // Atoms
 export 'src/components/atoms/ds_animated_ellipsis.dart';
+export 'src/components/atoms/ds_auth_gradient.dart';
 export 'src/components/atoms/ds_avatar.dart';
 export 'src/components/atoms/ds_back_link.dart';
 export 'src/components/atoms/ds_badge.dart';
 export 'src/components/atoms/ds_box.dart';
+export 'src/components/atoms/ds_brand_bloom.dart';
 export 'src/components/atoms/ds_button.dart';
 export 'src/components/atoms/ds_checkbox.dart';
 export 'src/components/atoms/ds_chip.dart';
@@ -53,6 +55,7 @@ export 'src/components/atoms/ds_switch.dart';
 export 'src/components/atoms/ds_wordmark.dart';
 // Molecules
 export 'src/components/molecules/ds_accordion.dart';
+export 'src/components/molecules/ds_address_field_group.dart';
 export 'src/components/molecules/ds_banner.dart';
 export 'src/components/molecules/ds_button_group.dart';
 export 'src/components/molecules/ds_coachmark.dart';
@@ -61,6 +64,7 @@ export 'src/components/molecules/ds_date_field.dart';
 export 'src/components/molecules/ds_dropzone.dart';
 export 'src/components/molecules/ds_empty_state.dart';
 export 'src/components/molecules/ds_filter_chip.dart';
+export 'src/components/molecules/ds_footer_actions.dart';
 export 'src/components/molecules/ds_form_field_group.dart';
 export 'src/components/molecules/ds_labeled_divider.dart';
 export 'src/components/molecules/ds_list_item.dart';
@@ -74,6 +78,8 @@ export 'src/components/molecules/ds_text_area.dart';
 export 'src/components/molecules/ds_text_field.dart';
 export 'src/components/molecules/ds_toast.dart';
 export 'src/components/molecules/ds_tooltip.dart';
+export 'src/components/molecules/ds_upload_field.dart';
+export 'src/components/molecules/ds_verification_rail.dart';
 // Organisms
 export 'src/components/organisms/ds_bar_chart.dart';
 export 'src/components/organisms/ds_board_view.dart';
@@ -96,6 +102,8 @@ export 'src/components/organisms/ds_setup_guide.dart';
 export 'src/components/organisms/ds_sign_in_view.dart';
 export 'src/components/organisms/ds_sign_up_view.dart';
 export 'src/components/organisms/ds_sort_builder.dart';
+export 'src/components/organisms/ds_takeover.dart';
 export 'src/components/organisms/ds_tree_view.dart';
+export 'src/components/organisms/ds_waiting_screen.dart';
 // Templates
 export 'src/components/templates/ds_page_scaffold.dart';

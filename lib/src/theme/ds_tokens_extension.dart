@@ -130,6 +130,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.shadowLow,
     required this.shadowMedium,
     required this.shadowHigh,
+    // Chrome
+    required this.authWashGradient,
+    required this.bloomColor,
   });
 
   /// The default Design System light appearance.
@@ -232,6 +235,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowLow: DsElevation.low,
       shadowMedium: DsElevation.medium,
       shadowHigh: DsElevation.high,
+      authWashGradient: DsColors.authWash,
+      bloomColor: DsColors.bloom,
     );
   }
 
@@ -284,6 +289,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formAccentColor: const Color(0xFF2388DB),
       formPlaceholderTextColor: const Color(0xFF6B7280),
       overlayBackdropColor: const Color(0x99000000),
+      // The same quiet drift as light, rebuilt from the dark surfaces: the
+      // page background into the offset surface, with the secondary button
+      // fill as the bloom peak.
+      authWashGradient: const [Color(0xFF121317), Color(0xFF1E2025)],
+      bloomColor: const Color(0xFF2A2C33),
     );
   }
 
@@ -627,6 +637,20 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// to [DsElevation.high]; a skin can supply a brand-tinted shadow.
   final List<BoxShadow> shadowHigh;
 
+  // Chrome ----------------------------------------------------------------
+
+  /// The colour stops of the auth wash, painted top to bottom by
+  /// [DsAuthGradient] behind sign-in, sign-up and waiting screens. The
+  /// default drifts from the form background into the secondary button fill,
+  /// a barely-there neutral, so the white-label backdrop stays quiet; a skin
+  /// supplies branded stops. Give it at least two colours.
+  final List<Color> authWashGradient;
+
+  /// The peak colour of the soft radial brand glow painted by [DsBrandBloom].
+  /// The default is a neutral one step deeper than the wash, so the glow is
+  /// present without carrying a hue; a skin supplies its brand tint.
+  final Color bloomColor;
+
   @override
   DsTokens copyWith({
     String? fontFamily,
@@ -717,6 +741,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     List<BoxShadow>? shadowLow,
     List<BoxShadow>? shadowMedium,
     List<BoxShadow>? shadowHigh,
+    List<Color>? authWashGradient,
+    Color? bloomColor,
   }) {
     return DsTokens(
       fontFamily: fontFamily ?? this.fontFamily,
@@ -853,6 +879,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowLow: shadowLow ?? this.shadowLow,
       shadowMedium: shadowMedium ?? this.shadowMedium,
       shadowHigh: shadowHigh ?? this.shadowHigh,
+      authWashGradient: authWashGradient ?? this.authWashGradient,
+      bloomColor: bloomColor ?? this.bloomColor,
     );
   }
 
@@ -861,6 +889,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
     if (other == null) return this;
     Color c(Color a, Color b) => Color.lerp(a, b, t)!;
     double d(double a, double b) => lerpDouble(a, b, t)!;
+    // Element-wise when the stop counts match; otherwise snap at the
+    // midpoint, the same convention as the discrete tokens.
+    List<Color> cs(List<Color> a, List<Color> b) => a.length == b.length
+        ? List<Color>.generate(a.length, (i) => c(a[i], b[i]))
+        : (t < 0.5 ? a : b);
     return DsTokens(
       fontFamily: t < 0.5 ? fontFamily : other.fontFamily,
       fontSizeBase: d(fontSizeBase, other.fontSizeBase),
@@ -1007,6 +1040,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
               shadowMedium,
       shadowHigh:
           BoxShadow.lerpList(shadowHigh, other.shadowHigh, t) ?? shadowHigh,
+      authWashGradient: cs(authWashGradient, other.authWashGradient),
+      bloomColor: c(bloomColor, other.bloomColor),
     );
   }
 
@@ -1104,7 +1139,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
           overlays == other.overlays &&
           listEquals(shadowLow, other.shadowLow) &&
           listEquals(shadowMedium, other.shadowMedium) &&
-          listEquals(shadowHigh, other.shadowHigh);
+          listEquals(shadowHigh, other.shadowHigh) &&
+          listEquals(authWashGradient, other.authWashGradient) &&
+          bloomColor == other.bloomColor;
   }
 
   @override
@@ -1198,5 +1235,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         Object.hashAll(shadowLow),
         Object.hashAll(shadowMedium),
         Object.hashAll(shadowHigh),
+        Object.hashAll(authWashGradient),
+        bloomColor,
       ]);
 }

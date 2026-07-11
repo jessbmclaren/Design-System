@@ -30,6 +30,13 @@ void main() {
       ),
     );
 
+    // A fixed height turns the parent-sized wash into stable pixels.
+    dsGoldenMatrix(
+      'atom',
+      'auth_gradient',
+      () => const SizedBox(height: 160, child: DsAuthGradient()),
+    );
+
     dsGoldenMatrix('atom', 'avatar', () => const DsAvatar(name: 'Ada Lovelace'));
 
     dsGoldenMatrix(
@@ -53,6 +60,16 @@ void main() {
 
     dsGoldenMatrix(
         'atom', 'box', () => const DsBox(child: Text('Boxed content')));
+
+    // Captured over the wash so the glow reads against its natural backdrop.
+    dsGoldenMatrix(
+      'atom',
+      'brand_bloom',
+      () => const SizedBox(
+        height: 160,
+        child: DsAuthGradient(child: DsBrandBloom()),
+      ),
+    );
 
     // A row of every button variant.
     dsGoldenMatrix(

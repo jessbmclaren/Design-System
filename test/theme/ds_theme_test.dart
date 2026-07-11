@@ -156,5 +156,46 @@ void main() {
       expect(base.lerp(copied, 1).colorSuccess, probe);
       expect(base.lerp(copied, 1).textFieldPaddingY, 10);
     });
+
+    test('the auth chrome tokens thread through copyWith, lerp and equality',
+        () {
+      const probeWash = [Color(0xFF111111), Color(0xFF222222)];
+      const probeBloom = Color(0xFF123456);
+      final base = DsTokens.light();
+
+      final copied = base.copyWith(
+        authWashGradient: probeWash,
+        bloomColor: probeBloom,
+      );
+      expect(copied.authWashGradient, probeWash);
+      expect(copied.bloomColor, probeBloom);
+      expect(copied, isNot(equals(base)));
+
+      // Same-length stop lists lerp element-wise.
+      final mid = base.lerp(copied, 0.5);
+      expect(mid.authWashGradient, hasLength(2));
+      expect(
+        mid.authWashGradient.first,
+        Color.lerp(base.authWashGradient.first, probeWash.first, 0.5),
+      );
+      expect(mid.bloomColor, Color.lerp(base.bloomColor, probeBloom, 0.5));
+
+      // Mismatched stop counts snap at the midpoint instead of throwing.
+      final threeStops = base.copyWith(
+        authWashGradient: const [probeBloom, probeBloom, probeBloom],
+      );
+      expect(
+        base.lerp(threeStops, 0.4).authWashGradient,
+        base.authWashGradient,
+      );
+      expect(base.lerp(threeStops, 0.6).authWashGradient, hasLength(3));
+
+      // Equality over the stop list is structural, not identity.
+      final same = base.copyWith(
+        authWashGradient: List<Color>.of(base.authWashGradient),
+      );
+      expect(same, base);
+      expect(same.hashCode, base.hashCode);
+    });
   });
 }

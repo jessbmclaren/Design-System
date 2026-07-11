@@ -124,6 +124,27 @@ abstract final class DsColors {
   static const Color overlayBackdrop = Color(0x661A1B25);
 
   // ---------------------------------------------------------------------------
+  // Auth chrome
+  // ---------------------------------------------------------------------------
+
+  /// The first stop of the default auth wash: the plain form background, so
+  /// the backdrop opens on the same paper as the rest of the page.
+  static const Color authWashStart = formBackground;
+
+  /// The last stop of the default auth wash: the secondary button fill, a
+  /// quiet neutral the page can drift into without reading as a brand
+  /// statement.
+  static const Color authWashEnd = buttonSecondaryBackground;
+
+  /// The colour stops of the default auth wash, painted top to bottom.
+  static const List<Color> authWash = [authWashStart, authWashEnd];
+
+  /// The peak of the default brand bloom: one step deeper than [authWashEnd],
+  /// so the glow reads against the wash while staying neutral. A skin
+  /// supplies its brand tint instead.
+  static const Color bloom = Color(0xFFDCE2E9);
+
+  // ---------------------------------------------------------------------------
   // Signals
   // ---------------------------------------------------------------------------
 

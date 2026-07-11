@@ -35,6 +35,12 @@ class DsSelectOption<T> {
 /// take too much room. For free-form entry use a text field instead; for
 /// multi-select, use a different control.
 ///
+/// Pass a [helperText] to show a subdued line of guidance beneath the field,
+/// and an [errorText] to move it into its error state. Inside a [Form], pass
+/// a [validator] instead and the field reports its own message when the form
+/// validates; [autovalidateMode] controls when that happens and [onSaved]
+/// receives the chosen value when the form is saved.
+///
 /// All colours, spacing, radii and typography are read from [DsTokens], so the
 /// control re-brands with the active theme and never hardcodes appearance.
 ///
@@ -64,8 +70,12 @@ class DsSelect<T> extends StatelessWidget {
     required this.options,
     required this.onChanged,
     this.hintText,
+    this.helperText,
     this.errorText,
     this.enabled = true,
+    this.validator,
+    this.autovalidateMode,
+    this.onSaved,
   });
 
   /// Optional text shown above the field, describing what is being chosen.
@@ -88,13 +98,31 @@ class DsSelect<T> extends StatelessWidget {
   /// Placeholder text shown in the closed field while [value] is `null`.
   final String? hintText;
 
+  /// Guidance shown beneath the field. Ignored when [errorText] is set.
+  final String? helperText;
+
   /// An error message shown beneath the field. When non-null the control also
-  /// adopts its error (danger) border.
+  /// adopts its error (danger) border. For [Form]-driven validation prefer
+  /// [validator], which reports its message through the field itself.
   final String? errorText;
 
   /// Whether the control is interactive. Defaults to `true`. When `false` the
   /// field is dimmed and cannot be opened.
   final bool enabled;
+
+  /// Validates the selected value inside a [Form]. Return null for a valid
+  /// value or the message to show beneath the field. The message renders in
+  /// the same caption style as [errorText] and moves the border to the danger
+  /// colour.
+  final FormFieldValidator<T>? validator;
+
+  /// When the [validator] runs. Defaults to the enclosing [Form]'s mode; set
+  /// [AutovalidateMode.onUserInteraction] to validate only once the user has
+  /// picked an option, so an untouched field never shows a required error.
+  final AutovalidateMode? autovalidateMode;
+
+  /// Called with the selected value when the enclosing [Form] is saved.
+  final FormFieldSetter<T>? onSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +131,12 @@ class DsSelect<T> extends StatelessWidget {
     // A null callback also disables the control, matching Flutter convention.
     final bool isEnabled = enabled && onChanged != null;
     final bool hasError = errorText != null;
+
+    // The caption beneath the field mirrors DsTextField: a manual error wins,
+    // otherwise the helper renders in the secondary colour.
+    final Color captionColor =
+        hasError ? tokens.colorDanger : tokens.colorSecondaryText;
+    final String? caption = hasError ? errorText : helperText;
 
     final radius = BorderRadius.circular(tokens.formBorderRadius);
 
@@ -143,9 +177,14 @@ class DsSelect<T> extends StatelessWidget {
       disabledBorder: borderWith(tokens.colorBorder, 1),
       errorBorder: borderWith(tokens.colorDanger, 1),
       focusedErrorBorder: borderWith(tokens.colorDanger, 2),
-      // The message is rendered below via [errorText]; only the border should
-      // react here so we suppress the default in-decoration error line.
-      errorStyle: const TextStyle(height: 0, fontSize: 0),
+      // A manual [errorText] is rendered below by this widget, so only the
+      // border should react here and the in-decoration error line is
+      // suppressed. Messages from [validator] have no other outlet, so they
+      // render through the decoration, styled to match the caption.
+      errorStyle: hasError
+          ? const TextStyle(height: 0, fontSize: 0)
+          : tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+      errorMaxLines: 3,
       error: hasError ? const SizedBox.shrink() : null,
     );
 
@@ -178,6 +217,9 @@ class DsSelect<T> extends StatelessWidget {
           color: tokens.colorSecondaryText,
         ),
         onChanged: isEnabled ? onChanged : null,
+        validator: validator,
+        autovalidateMode: autovalidateMode,
+        onSaved: onSaved,
         items: [
           for (final option in options)
             DropdownMenuItem<T>(
@@ -208,11 +250,11 @@ class DsSelect<T> extends StatelessWidget {
             const SizedBox(height: 6),
           ],
           field,
-          if (hasError) ...[
+          if (caption != null) ...[
             const SizedBox(height: 6),
             Text(
-              errorText!,
-              style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+              caption,
+              style: tokens.bodySm.toTextStyle(color: captionColor),
             ),
           ],
         ],

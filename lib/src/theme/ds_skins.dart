@@ -133,6 +133,10 @@ abstract final class DsSkins {
       shadowLow: _shadowLow,
       shadowMedium: _shadowMedium,
       shadowHigh: _shadowHigh,
+      // Auth chrome: clean paper drifting into a pale sky wash, with a soft
+      // blue bloom, sampled from the brand's marketing surfaces.
+      authWashGradient: const [Color(0xFFFFFFFF), Color(0xFFEAF2FA)],
+      bloomColor: const Color(0xFF5AA8E0),
     );
   }
 
@@ -183,6 +187,10 @@ abstract final class DsSkins {
         BoxShadow(
             color: Color(0x73000000), offset: Offset(0, 26), blurRadius: 56),
       ],
+      // Auth chrome: the dark page drifting into a deep navy wash, the bloom
+      // dimmed to hold the same soft glow on dark surfaces.
+      authWashGradient: const [Color(0xFF121317), Color(0xFF101B2E)],
+      bloomColor: const Color(0xFF2B5E8F),
     );
   }
 }

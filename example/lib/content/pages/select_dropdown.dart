@@ -23,7 +23,12 @@ final PatternPage selectDropdownPage = PatternPage(
       'rather than something to read end to end. When a submitted value fails '
       'validation, surface the reason through `errorText` directly beneath the '
       'field; the control shifts to its error styling and the message stays '
-      'visible until the choice is corrected.',
+      'visible until the choice is corrected. Guidance that applies before '
+      'any error lives in `helperText`, a subdued line beneath the field '
+      'that an `errorText` temporarily replaces. Inside a `Form`, pass a '
+      '`validator` instead and the field reports its own message when the '
+      'form validates; `autovalidateMode` controls when that happens and '
+      '`onSaved` receives the chosen value when the form is saved.',
     ),
   ],
   dos: const [

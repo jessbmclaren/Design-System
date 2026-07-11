@@ -50,6 +50,7 @@ import 'pages/filter_controls.dart';
 import 'pages/focus_view.dart';
 import 'pages/box.dart';
 import 'pages/button_group.dart';
+import 'pages/footer_actions.dart';
 import 'pages/context_view.dart';
 import 'pages/settings_view.dart';
 import 'pages/onboarding.dart';
@@ -75,6 +76,12 @@ import 'pages/step_header.dart';
 import 'pages/icon_badge.dart';
 import 'pages/animated_ellipsis.dart';
 import 'pages/fade_slide_in.dart';
+import 'pages/auth_gradient.dart';
+import 'pages/brand_bloom.dart';
+import 'pages/takeover.dart';
+import 'pages/address_field_group.dart';
+import 'pages/upload_field.dart';
+import 'pages/verification_rail.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
@@ -87,6 +94,7 @@ final List<PatternPage> allPages = [
   actionButtonsPage,
   backLinkPage,
   buttonGroupPage,
+  footerActionsPage,
   linkPage,
   iconButtonPage,
   // Inputs
@@ -100,6 +108,8 @@ final List<PatternPage> allPages = [
   currencyFieldPage,
   dateFieldPage,
   formFieldGroupPage,
+  addressFieldGroupPage,
+  uploadFieldPage,
   filterControlsPage,
   // Display
   accordionPage,
@@ -120,6 +130,7 @@ final List<PatternPage> allPages = [
   loadingPage,
   progressBarPage,
   progressSteppingPage,
+  verificationRailPage,
   waitingScreensPage,
   // Overlays
   menuPage,
@@ -127,6 +138,7 @@ final List<PatternPage> allPages = [
   coachmarkPage,
   focusViewPage,
   contextViewPage,
+  takeoverPage,
   // Data
   dataGridPage,
   cellTypesPage,
@@ -143,7 +155,9 @@ final List<PatternPage> allPages = [
   meterChartPage,
   sparklinePage,
   // Layout
+  authGradientPage,
   boxPage,
+  brandBloomPage,
   fadeSlideInPage,
   fullPageLayoutsPage,
   settingsViewPage,

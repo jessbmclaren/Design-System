@@ -100,6 +100,116 @@ void main() {
     expect(find.text('Country is required'), findsOneWidget);
   });
 
+  testWidgets('renders helperText beneath the field', (tester) async {
+    await pumpDs(
+      tester,
+      DsSelect<String>(
+        label: 'Country',
+        value: null,
+        hintText: 'Select a country',
+        helperText: 'Where the business is registered',
+        options: options,
+        onChanged: (_) {},
+      ),
+    );
+
+    expect(find.text('Where the business is registered'), findsOneWidget);
+  });
+
+  testWidgets('errorText replaces helperText', (tester) async {
+    await pumpDs(
+      tester,
+      DsSelect<String>(
+        label: 'Country',
+        value: null,
+        hintText: 'Select a country',
+        helperText: 'Where the business is registered',
+        errorText: 'Country is required',
+        options: options,
+        onChanged: (_) {},
+      ),
+    );
+
+    expect(find.text('Country is required'), findsOneWidget);
+    expect(find.text('Where the business is registered'), findsNothing);
+  });
+
+  testWidgets('validator reports its message when the form validates',
+      (tester) async {
+    final formKey = GlobalKey<FormState>();
+    await pumpDs(
+      tester,
+      Form(
+        key: formKey,
+        child: DsSelect<String>(
+          label: 'Country',
+          value: null,
+          hintText: 'Select a country',
+          options: options,
+          onChanged: (_) {},
+          validator: (value) => value == null ? 'Country is required' : null,
+        ),
+      ),
+    );
+
+    expect(find.text('Country is required'), findsNothing);
+
+    formKey.currentState!.validate();
+    await tester.pump();
+
+    expect(find.text('Country is required'), findsOneWidget);
+  });
+
+  testWidgets('validates on user interaction when asked to', (tester) async {
+    await pumpDs(
+      tester,
+      Form(
+        child: DsSelect<String>(
+          label: 'Country',
+          value: null,
+          hintText: 'Select a country',
+          options: options,
+          onChanged: (_) {},
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) =>
+              value == 'us' ? 'Not available in that country' : null,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(DsSelect<String>));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text('United States').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Not available in that country'), findsOneWidget);
+  });
+
+  testWidgets('onSaved receives the value when the form saves',
+      (tester) async {
+    final formKey = GlobalKey<FormState>();
+    String? saved;
+    await pumpDs(
+      tester,
+      Form(
+        key: formKey,
+        child: DsSelect<String>(
+          label: 'Country',
+          value: 'be',
+          options: options,
+          onChanged: (_) {},
+          onSaved: (value) => saved = value,
+        ),
+      ),
+    );
+
+    formKey.currentState!.save();
+    expect(saved, 'be');
+  });
+
   testWidgets('does not overflow at 320x640', (tester) async {
     await pumpDs(
       tester,

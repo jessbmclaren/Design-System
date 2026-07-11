@@ -5,6 +5,7 @@ import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_divider.dart';
+import '../molecules/ds_footer_actions.dart';
 import 'ds_progress_stepper.dart';
 
 /// A single step within a [DsOnboardingWizard].
@@ -35,9 +36,14 @@ class DsWizardStep {
 /// single component back both an "onboarding wizard" and a "setup wizard".
 ///
 /// It composes existing Design System components rather than re-implementing
-/// them: [DsProgressStepper] for the header and [DsButton] for the footer
-/// actions, so it inherits their theming, 48dp touch targets, reduced-motion
-/// behaviour and compact/responsive rendering.
+/// them: [DsProgressStepper] for the header and [DsFooterActions] (a cluster
+/// of [DsButton]s) for the footer actions, so it inherits their theming, 48dp
+/// touch targets, reduced-motion behaviour and compact/responsive rendering.
+///
+/// The chrome bends where a flow needs it to: [header] slots custom content
+/// (a wordmark, an illustration) above the progress stepper, and the stepper
+/// itself can be dropped with [showStepper]. It also hides itself when there
+/// is only one step, where progress has nothing to say.
 ///
 /// ## Layout & responsiveness
 ///
@@ -79,6 +85,8 @@ class DsOnboardingWizard extends StatelessWidget {
     this.nextEnabled = true,
     this.nextPending = false,
     this.footerLeading,
+    this.header,
+    this.showStepper = true,
   });
 
   /// The ordered steps shown in the progress header.
@@ -134,6 +142,17 @@ class DsOnboardingWizard extends StatelessWidget {
   /// ones.
   final Widget? footerLeading;
 
+  /// Optional content shown above the progress stepper, such as a brand
+  /// wordmark or a step illustration. When null the header starts with the
+  /// stepper, as before.
+  final Widget? header;
+
+  /// Whether to show the progress stepper. Defaults to true.
+  ///
+  /// The stepper also hides itself when [steps] has fewer than two entries,
+  /// where there is no progress to show.
+  final bool showStepper;
+
   /// The maximum width the wizard content is constrained to on wide screens.
   static const double _maxContentWidth = 640;
 
@@ -150,22 +169,27 @@ class DsOnboardingWizard extends StatelessWidget {
             : MediaQuery.sizeOf(context).width;
         final compact = width < DsBreakpoints.medium;
         final horizontalPadding = compact ? DsSpacing.lg : DsSpacing.xl;
+        final headerContent = _buildHeader(tokens);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header: progress stepper plus optional title and subtitle.
-            _Constrained(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  DsSpacing.xl,
-                  horizontalPadding,
-                  DsSpacing.lg,
+            // Header: optional custom content and progress stepper plus
+            // optional title and subtitle. Skipped entirely when every part
+            // is absent, so a single-step wizard does not open with an empty
+            // padded band.
+            if (headerContent != null)
+              _Constrained(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    DsSpacing.xl,
+                    horizontalPadding,
+                    DsSpacing.lg,
+                  ),
+                  child: headerContent,
                 ),
-                child: _buildHeader(tokens),
               ),
-            ),
             // Body: the current step, scrollable within the space that remains.
             Expanded(
               child: _Constrained(
@@ -195,89 +219,65 @@ class DsOnboardingWizard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(DsTokens tokens) {
+  /// Builds the header content, or returns null when there is none.
+  Widget? _buildHeader(DsTokens tokens) {
     final title = this.title;
     final subtitle = this.subtitle;
+    final header = this.header;
+    // A single step has no progress to report, so the stepper hides itself.
+    final bool stepperVisible = showStepper && steps.length > 1;
+
+    final children = <Widget>[
+      if (header != null) ...[
+        header,
+        if (stepperVisible || title != null || subtitle != null)
+          const SizedBox(height: DsSpacing.lg),
+      ],
+      if (stepperVisible)
+        DsProgressStepper(steps: _dsSteps, currentIndex: currentIndex),
+      if (title != null) ...[
+        if (stepperVisible) const SizedBox(height: DsSpacing.xl),
+        Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: tokens.headingLg.toTextStyle(color: tokens.colorText),
+          ),
+        ),
+      ],
+      if (subtitle != null) ...[
+        const SizedBox(height: DsSpacing.xs),
+        Text(
+          subtitle,
+          style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+        ),
+      ],
+    ];
+    if (children.isEmpty) return null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [
-        DsProgressStepper(steps: _dsSteps, currentIndex: currentIndex),
-        if (title != null) ...[
-          const SizedBox(height: DsSpacing.xl),
-          Semantics(
-            header: true,
-            child: Text(
-              title,
-              style: tokens.headingLg.toTextStyle(color: tokens.colorText),
-            ),
-          ),
-        ],
-        if (subtitle != null) ...[
-          const SizedBox(height: DsSpacing.xs),
-          Text(
-            subtitle,
-            style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
-          ),
-        ],
-      ],
+      children: children,
     );
   }
 
   Widget _buildFooter(bool compact) {
-    final back = onBack == null
-        ? null
-        : DsButton(
-            label: backLabel,
-            onPressed: onBack,
-            variant: DsButtonVariant.secondary,
-            fullWidth: compact,
-          );
-    final next = DsButton(
-      label: nextLabel,
-      onPressed: nextEnabled ? onNext : null,
-      pending: nextPending,
-      fullWidth: compact,
-    );
-    final footerLeading = this.footerLeading;
-
-    if (compact) {
-      // Stack full-width so nothing overflows on a 320dp phone; the primary
-      // action leads visually.
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          next,
-          if (back != null) ...[
-            const SizedBox(height: DsSpacing.sm),
-            back,
-          ],
-          if (footerLeading != null) ...[
-            const SizedBox(height: DsSpacing.md),
-            Align(alignment: Alignment.center, child: footerLeading),
-          ],
-        ],
-      );
-    }
-
-    return Row(
-      children: [
-        // Consume the leading space so the actions sit on the trailing edge;
-        // Expanded also bounds any wide leading content so it cannot overflow.
-        Expanded(
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: footerLeading ?? const SizedBox.shrink(),
-          ),
-        ),
-        if (back != null) ...[
-          back,
-          const SizedBox(width: DsSpacing.md),
-        ],
-        next,
-      ],
+    // Composed on DsFooterActions, the shared footer cluster. The wizard has
+    // already decided its layout from its own width, so it forces the
+    // cluster's mode rather than letting it re-measure: stacked (primary
+    // first, full-width) on compact, a trailing row otherwise. The Back
+    // action keeps its secondary emphasis, so the footer renders exactly as
+    // it did before the cluster was extracted.
+    return DsFooterActions(
+      primaryLabel: nextLabel,
+      onPrimary: nextEnabled ? onNext : null,
+      primaryPending: nextPending,
+      backLabel: onBack == null ? null : backLabel,
+      onBack: onBack,
+      backVariant: DsButtonVariant.secondary,
+      leading: footerLeading,
+      minRowWidth: compact ? double.infinity : 0,
     );
   }
 

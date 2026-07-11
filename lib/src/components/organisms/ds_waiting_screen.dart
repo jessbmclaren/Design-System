@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+
+import '../../theme/ds_tokens_extension.dart';
+import '../atoms/ds_animated_ellipsis.dart';
+import '../atoms/ds_auth_gradient.dart';
+import '../atoms/ds_fade_slide_in.dart';
+import '../atoms/ds_spinner.dart';
+
+/// The full-page branded loader for the moments between screens.
+///
+/// [DsWaitingScreen] holds attention while an account is provisioned or a
+/// session is established: a centred [DsSpinner] over a [headline] with a
+/// trailing [DsAnimatedEllipsis], an optional supporting line beneath and an
+/// optional [header] slot (typically a wordmark) pinned to the top leading
+/// corner. The whole block enters through a [DsFadeSlideIn], on a
+/// [DsAuthGradient] backdrop by default.
+///
+/// The screen holds no timers and never advances itself; the caller swaps it
+/// out when the operation completes. Under reduced motion every part settles
+/// to a still frame: the entrance shows its settled state, the ellipsis
+/// renders in full and the spinner becomes a static ring.
+///
+/// The headline sits in a polite live region, so assistive technology
+/// announces what is happening as the screen appears.
+///
+/// ```dart
+/// DsWaitingScreen(
+///   header: const DsWordmark(primary: 'acme'),
+///   headline: 'Signing you in',
+///   supportingText: 'This will only take a moment.',
+/// )
+/// ```
+class DsWaitingScreen extends StatelessWidget {
+  /// Creates a full-page waiting screen.
+  const DsWaitingScreen({
+    super.key,
+    required this.headline,
+    this.supportingText,
+    this.header,
+    this.showSpinner = true,
+    this.backdrop = const DsAuthGradient(),
+  });
+
+  /// The short line naming the work in progress, such as "Signing you in".
+  /// An animated ellipsis is appended automatically, so leave the trailing
+  /// dots off.
+  final String headline;
+
+  /// An optional second line setting expectations, such as "This will only
+  /// take a moment." Null shows the headline alone.
+  final String? supportingText;
+
+  /// An optional widget pinned to the top leading corner, typically a
+  /// wordmark, so the wait still reads as part of the product.
+  final Widget? header;
+
+  /// Whether the large spinner shows above the headline. Defaults to true.
+  final bool showSpinner;
+
+  /// The full-bleed layer painted behind the content. Defaults to a
+  /// [DsAuthGradient]; pass a custom widget (a gradient with a bloom, say) or
+  /// null for a plain surface.
+  final Widget? backdrop;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
+    final unit = tokens.spacingUnit;
+    final headlineStyle =
+        tokens.headingLg.toTextStyle(color: tokens.colorText);
+
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (showSpinner) ...[
+          // The headline announces the operation, so the spinner keeps its
+          // plain label without a second live region.
+          const DsSpinner(size: DsSpinnerSize.large),
+          SizedBox(height: unit * 3),
+        ],
+        Semantics(
+          container: true,
+          liveRegion: true,
+          child: Text.rich(
+            TextSpan(
+              text: headline,
+              children: [
+                WidgetSpan(child: DsAnimatedEllipsis(style: headlineStyle)),
+              ],
+            ),
+            style: headlineStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (supportingText != null) ...[
+          SizedBox(height: unit),
+          Text(
+            supportingText!,
+            style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (backdrop != null) Positioned.fill(child: backdrop!),
+        SafeArea(
+          // The scroll view keeps large text scales usable on short
+          // viewports instead of overflowing the centred column.
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: unit * 3,
+                      vertical: unit * 3,
+                    ),
+                    child: DsFadeSlideIn(child: content),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (header != null)
+          Positioned(top: unit * 3, left: unit * 3, child: header!),
+      ],
+    );
+  }
+}

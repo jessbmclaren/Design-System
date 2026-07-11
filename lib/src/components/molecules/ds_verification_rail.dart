@@ -1,0 +1,470 @@
+import 'package:flutter/material.dart';
+
+import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_icons.dart';
+import '../../tokens/ds_spacing.dart';
+import '../../tokens/ds_typography.dart';
+import '../atoms/ds_icon_badge.dart';
+
+/// The progress state of one [DsVerificationSection].
+enum DsVerificationSectionState {
+  /// The section is complete. Its marker shows a check.
+  done,
+
+  /// The section is the one in progress. Its marker and label are emphasised
+  /// and its sub-steps, if any, are shown.
+  active,
+
+  /// The section has not been reached yet. Its marker stays neutral.
+  upcoming,
+}
+
+/// One labelled section of a [DsVerificationRail].
+@immutable
+class DsVerificationSection {
+  /// Creates a rail section.
+  const DsVerificationSection({
+    required this.label,
+    this.state = DsVerificationSectionState.upcoming,
+    this.subSteps = const <String>[],
+  });
+
+  /// The short name of the section, shown beside its marker.
+  final String label;
+
+  /// The section's progress state. Defaults to
+  /// [DsVerificationSectionState.upcoming].
+  final DsVerificationSectionState state;
+
+  /// Optional sub-step labels listed beneath the section while it is
+  /// [DsVerificationSectionState.active]. Hidden in every other state and in
+  /// the compact horizontal layout.
+  final List<String> subSteps;
+}
+
+/// A vertical progress rail for a sectioned flow, such as a verification
+/// takeover.
+///
+/// [DsVerificationRail] lists the flow's sections top to bottom, each with a
+/// circular marker and a label. A done section's marker is a [DsIconBadge]
+/// check, the active section shows its 1-based number on the primary colour
+/// pair and upcoming sections stay on the neutral badge pair. The active
+/// section also expands its optional sub-steps into a dotted list, with
+/// [activeSubStep] naming the one in progress.
+///
+/// The component is controlled: the caller owns which section is in which
+/// state and updates [sections] as the flow advances. When [onSectionSelected]
+/// is set, done sections become tappable so the user can jump back to an
+/// earlier section; active and upcoming sections are never interactive.
+///
+/// ## Responsiveness
+///
+/// The rail watches its own width through a [LayoutBuilder]. Below
+/// [compactBreakpoint] it swaps the vertical list for a compact horizontal
+/// summary: the section markers in a row with the active section's label
+/// alongside. The compact form is informational only, so wire Back and
+/// Continue actions elsewhere on small screens.
+///
+/// All colours, spacing and type come from [DsTokens], and the widget runs no
+/// timers or animations, so it renders deterministically in screenshots.
+///
+/// ```dart
+/// DsVerificationRail(
+///   sections: const [
+///     DsVerificationSection(
+///       label: 'Business',
+///       state: DsVerificationSectionState.active,
+///       subSteps: ['Type', 'Details'],
+///     ),
+///     DsVerificationSection(label: 'Identity'),
+///   ],
+///   activeSubStep: 1,
+///   onSectionSelected: (index) => _jumpTo(index),
+/// )
+/// ```
+class DsVerificationRail extends StatelessWidget {
+  /// Creates a vertical verification progress rail.
+  const DsVerificationRail({
+    super.key,
+    required this.sections,
+    this.activeSubStep = 0,
+    this.onSectionSelected,
+    this.compactBreakpoint = 200,
+  });
+
+  /// The flow's sections, in order. The caller keeps each section's state up
+  /// to date as the flow advances.
+  final List<DsVerificationSection> sections;
+
+  /// The zero-based index of the sub-step in progress within the active
+  /// section. Ignored when the active section has no sub-steps. Defaults
+  /// to 0.
+  final int activeSubStep;
+
+  /// Called with a done section's index when it is tapped, so the user can
+  /// jump back to an earlier section. When null (the default) no section is
+  /// interactive.
+  final ValueChanged<int>? onSectionSelected;
+
+  /// The rail width, in logical pixels, below which the vertical list swaps
+  /// for the compact horizontal summary. Defaults to 200.
+  final double compactBreakpoint;
+
+  /// The marker diameter shared by both layouts.
+  static const double _markerSize = 28;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Resolve a finite width so the label rows' Expanded children never
+        // receive unbounded constraints.
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+        return SizedBox(
+          width: width,
+          child: width < compactBreakpoint
+              ? _buildCompact(tokens)
+              : _buildVertical(tokens),
+        );
+      },
+    );
+  }
+
+  /// The full vertical rail: one row per section, the active section expanded
+  /// into its sub-steps.
+  Widget _buildVertical(DsTokens tokens) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (var i = 0; i < sections.length; i++) ...<Widget>[
+          if (i > 0) const SizedBox(height: DsSpacing.sm),
+          _SectionRow(
+            tokens: tokens,
+            section: sections[i],
+            index: i,
+            count: sections.length,
+            onSelected: _handlerFor(i),
+          ),
+          if (sections[i].state == DsVerificationSectionState.active &&
+              sections[i].subSteps.isNotEmpty)
+            _SubSteps(
+              tokens: tokens,
+              steps: sections[i].subSteps,
+              activeIndex: activeSubStep,
+            ),
+        ],
+      ],
+    );
+  }
+
+  /// The compact horizontal fallback: the markers in a row with the active
+  /// section's label alongside. Informational only, so the markers are not
+  /// tappable here.
+  Widget _buildCompact(DsTokens tokens) {
+    String? activeLabel;
+    for (final section in sections) {
+      if (section.state == DsVerificationSectionState.active) {
+        activeLabel = section.label;
+        break;
+      }
+    }
+
+    return Semantics(
+      container: true,
+      label: _compactSemanticLabel(activeLabel),
+      child: ExcludeSemantics(
+        child: Row(
+          children: <Widget>[
+            for (var i = 0; i < sections.length; i++) ...<Widget>[
+              if (i > 0) const SizedBox(width: DsSpacing.xs),
+              _Marker(
+                tokens: tokens,
+                state: sections[i].state,
+                number: i + 1,
+              ),
+            ],
+            if (activeLabel != null) ...<Widget>[
+              const SizedBox(width: DsSpacing.md),
+              Expanded(
+                child: Text(
+                  activeLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: tokens.bodyMd
+                      .copyWith(fontWeight: DsTypography.semiBold)
+                      .toTextStyle(color: tokens.colorText),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The accessible summary of the compact layout, since its markers carry no
+  /// text of their own.
+  String _compactSemanticLabel(String? activeLabel) {
+    final done = sections
+        .where((s) => s.state == DsVerificationSectionState.done)
+        .length;
+    final progress = '$done of ${sections.length} sections complete';
+    if (activeLabel == null) return progress;
+    return '$activeLabel, $progress';
+  }
+
+  /// The tap handler for the section at [index], or null when the section is
+  /// not interactive. Only done sections can be selected.
+  VoidCallback? _handlerFor(int index) {
+    final onSelected = onSectionSelected;
+    if (onSelected == null) return null;
+    if (sections[index].state != DsVerificationSectionState.done) return null;
+    return () => onSelected(index);
+  }
+}
+
+/// One section's marker and label, tappable when the section is done and the
+/// rail has an [DsVerificationRail.onSectionSelected] callback.
+class _SectionRow extends StatelessWidget {
+  const _SectionRow({
+    required this.tokens,
+    required this.section,
+    required this.index,
+    required this.count,
+    required this.onSelected,
+  });
+
+  final DsTokens tokens;
+  final DsVerificationSection section;
+  final int index;
+  final int count;
+  final VoidCallback? onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final active = section.state == DsVerificationSectionState.active;
+    final upcoming = section.state == DsVerificationSectionState.upcoming;
+
+    final label = Text(
+      section.label,
+      style: tokens.bodyMd
+          .copyWith(
+            fontWeight: active ? DsTypography.semiBold : DsTypography.medium,
+          )
+          .toTextStyle(
+            color: upcoming ? tokens.colorSecondaryText : tokens.colorText,
+          ),
+    );
+
+    final row = ConstrainedBox(
+      // A 48dp minimum keeps tappable rows accessible and gives every row the
+      // same vertical rhythm.
+      constraints: const BoxConstraints(minHeight: 48),
+      child: Row(
+        children: <Widget>[
+          _Marker(tokens: tokens, state: section.state, number: index + 1),
+          const SizedBox(width: DsSpacing.md),
+          Expanded(child: label),
+        ],
+      ),
+    );
+
+    final stateLabel = switch (section.state) {
+      DsVerificationSectionState.done => 'complete',
+      DsVerificationSectionState.active => 'current section',
+      DsVerificationSectionState.upcoming => 'not started',
+    };
+
+    final semanticLabel =
+        '${section.label}, section ${index + 1} of $count, $stateLabel';
+
+    if (onSelected == null) {
+      return Semantics(
+        container: true,
+        label: semanticLabel,
+        child: ExcludeSemantics(child: row),
+      );
+    }
+
+    return Semantics(
+      container: true,
+      button: true,
+      enabled: true,
+      label: semanticLabel,
+      child: ExcludeSemantics(
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          child: InkWell(
+            onTap: onSelected,
+            borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+            child: row,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The circular section marker: a check when done, otherwise the section's
+/// 1-based number on the primary or neutral badge pair.
+class _Marker extends StatelessWidget {
+  const _Marker({
+    required this.tokens,
+    required this.state,
+    required this.number,
+  });
+
+  final DsTokens tokens;
+  final DsVerificationSectionState state;
+  final int number;
+
+  @override
+  Widget build(BuildContext context) {
+    if (state == DsVerificationSectionState.done) {
+      return const DsIconBadge(
+        icon: DsIcons.check,
+        tone: DsIconBadgeTone.primary,
+        size: DsVerificationRail._markerSize,
+      );
+    }
+
+    final active = state == DsVerificationSectionState.active;
+    final background = active
+        ? tokens.buttonPrimaryColorBackground
+        : tokens.badgeNeutralColorBackground;
+    final foreground = active
+        ? tokens.buttonPrimaryColorText
+        : tokens.badgeNeutralColorText;
+
+    return Container(
+      width: DsVerificationRail._markerSize,
+      height: DsVerificationRail._markerSize,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+      child: Text(
+        '$number',
+        style: tokens.labelSm
+            .copyWith(fontWeight: DsTypography.semiBold)
+            .toTextStyle(color: foreground)
+            .copyWith(height: 1),
+      ),
+    );
+  }
+}
+
+/// The dotted sub-step list under the active section, with hairline connector
+/// segments between the dots.
+class _SubSteps extends StatelessWidget {
+  const _SubSteps({
+    required this.tokens,
+    required this.steps,
+    required this.activeIndex,
+  });
+
+  final DsTokens tokens;
+  final List<String> steps;
+  final int activeIndex;
+
+  /// The width of the dot column, centred under the section marker.
+  static const double _dotColumn = 16;
+
+  @override
+  Widget build(BuildContext context) {
+    // Centre the dot column under the marker's centre line.
+    const indent = DsVerificationRail._markerSize / 2 - _dotColumn / 2;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: indent, bottom: DsSpacing.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (var i = 0; i < steps.length; i++) ...<Widget>[
+            if (i > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: _dotColumn / 2 - 0.5),
+                child: Container(
+                  width: 1,
+                  height: DsSpacing.md,
+                  color: tokens.colorBorderSubtle,
+                ),
+              ),
+            _SubStepRow(
+              tokens: tokens,
+              label: steps[i],
+              active: i == activeIndex,
+              index: i,
+              count: steps.length,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// One sub-step: a small dot and its label.
+class _SubStepRow extends StatelessWidget {
+  const _SubStepRow({
+    required this.tokens,
+    required this.label,
+    required this.active,
+    required this.index,
+    required this.count,
+  });
+
+  final DsTokens tokens;
+  final String label;
+  final bool active;
+  final int index;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final row = Row(
+      children: <Widget>[
+        SizedBox(
+          width: _SubSteps._dotColumn,
+          height: _SubSteps._dotColumn,
+          child: Center(
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: active ? tokens.formAccentColor : tokens.colorBorder,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: DsSpacing.md),
+        Expanded(
+          child: Text(
+            label,
+            style: tokens.bodySm
+                .copyWith(
+                  fontWeight:
+                      active ? DsTypography.medium : DsTypography.regular,
+                )
+                .toTextStyle(
+                  color: active ? tokens.colorText : tokens.colorSecondaryText,
+                ),
+          ),
+        ),
+      ],
+    );
+
+    final stateLabel = active ? 'current step' : 'step';
+    return Semantics(
+      container: true,
+      label: '$label, $stateLabel ${index + 1} of $count',
+      child: ExcludeSemantics(child: row),
+    );
+  }
+}

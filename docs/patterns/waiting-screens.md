@@ -4,6 +4,8 @@ A waiting screen holds attention while a long-running operation finishes in the 
 
 Wherever the outcome is delivered asynchronously, let people leave. If the work continues on the server and you can notify them on completion, say so plainly and keep the rest of the product usable. A waiting screen should rarely be a dead end. Reserve a blocking, full-region wait for the cases where continuing without the result genuinely is not possible.
 
+For the brief full-page moments around sign-in and provisioning, `DsWaitingScreen` composes the pieces: a large spinner over a headline with an animated ellipsis, an optional supporting line, an optional header slot for a wordmark and a `DsAuthGradient` backdrop, all entering through a fade-slide. It holds no timers, so the caller swaps it out when the operation completes, and every part settles to a still frame under reduced motion.
+
 ![Desktop (1280dp)](img/waiting-screens_desktop.png)
 
 *Desktop (1280dp)*
@@ -32,6 +34,14 @@ Wherever the outcome is delivered asynchronously, let people leave. If the work 
 ## Example
 
 ```dart
+// The full-page branded loader between screens.
+DsWaitingScreen(
+  header: const DsWordmark(primary: 'acme'),
+  headline: 'Signing you in',
+  supportingText: 'This will only take a moment.',
+);
+
+// …or a region-level wait, composed by hand.
 Container(
   padding: const EdgeInsets.all(32),
   decoration: BoxDecoration(
@@ -69,5 +79,6 @@ Container(
 ## See also
 
 - [Loading](loading.md)
+- [Auth gradient](auth-gradient.md)
 - [Onboarding](onboarding.md)
 - [Redirects](redirects.md)

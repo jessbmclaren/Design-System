@@ -51,6 +51,20 @@ void main() {
       expect(engen.colorWarning, const Color(0xFFD9870B));
     });
 
+    test('the Engen skin brands the auth chrome; the defaults stay neutral',
+        () {
+      final engen = DsSkins.engenLight();
+      expect(
+        engen.authWashGradient,
+        const [Color(0xFFFFFFFF), Color(0xFFEAF2FA)],
+      );
+      expect(engen.bloomColor, const Color(0xFF5AA8E0));
+
+      // The white-label defaults keep the quiet neutral wash.
+      expect(DsTokens.light().authWashGradient, DsColors.authWash);
+      expect(DsTokens.light().bloomColor, DsColors.bloom);
+    });
+
     test('the Engen skin uses solid disabled button tints', () {
       final light = DsSkins.engenLight();
       expect(

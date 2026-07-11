@@ -26,6 +26,15 @@ final PatternPage waitingScreensPage = PatternPage(
       'should rarely be a dead end. Reserve a blocking, full-region wait for the '
       'cases where continuing without the result genuinely is not possible.',
     ),
+    ProseBlock(
+      'For the brief full-page moments around sign-in and provisioning, '
+      '`DsWaitingScreen` composes the pieces: a large spinner over a headline '
+      'with an animated ellipsis, an optional supporting line, an optional '
+      'header slot for a wordmark and a `DsAuthGradient` backdrop, all '
+      'entering through a fade-slide. It holds no timers, so the caller swaps '
+      'it out when the operation completes, and every part settles to a still '
+      'frame under reduced motion.',
+    ),
   ],
   dos: const [
     'State clearly what is happening and roughly how long it will take.',
@@ -41,6 +50,14 @@ final PatternPage waitingScreensPage = PatternPage(
     'Don\'t promise a precise duration you cannot reliably meet.',
   ],
   code: '''
+// The full-page branded loader between screens.
+DsWaitingScreen(
+  header: const DsWordmark(primary: 'acme'),
+  headline: 'Signing you in',
+  supportingText: 'This will only take a moment.',
+);
+
+// …or a region-level wait, composed by hand.
 Container(
   padding: const EdgeInsets.all(32),
   decoration: BoxDecoration(
@@ -78,5 +95,5 @@ Container(
     Shot(pageId: 'waiting-screens', size: ShotSize.desktop),
     Shot(pageId: 'waiting-screens', size: ShotSize.phone),
   ],
-  related: ['loading', 'onboarding', 'redirects'],
+  related: ['loading', 'auth-gradient', 'onboarding', 'redirects'],
 );

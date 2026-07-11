@@ -31,7 +31,13 @@ final PatternPage onboardingWizardPage = PatternPage(
       'leaving `onBack` null, and rename the final action with `nextLabel` '
       '(for example "Finish"). The body lives inside an `Expanded` scroll '
       'view, so give the wizard a bounded height (a page body or an '
-      '`Expanded`) and it fills the space and scrolls long steps.',
+      '`Expanded`) and it fills the space and scrolls long steps. The chrome '
+      'bends where a flow needs it to: `header` slots custom content (a '
+      'wordmark, an illustration) above the progress stepper and '
+      '`showStepper` drops the stepper, which also hides itself when there '
+      'is only one step. The footer is built on `DsFooterActions`, the '
+      'shared footer cluster, so its ordering and stacking match every '
+      'other onboarding surface.',
     ),
   ],
   dos: const [
@@ -72,5 +78,5 @@ DsOnboardingWizard(
     Shot(pageId: 'onboarding-wizard', size: ShotSize.desktop),
     Shot(pageId: 'onboarding-wizard', size: ShotSize.phone),
   ],
-  related: const ['progress-stepping', 'business-verification'],
+  related: const ['progress-stepping', 'footer-actions', 'business-verification'],
 );
