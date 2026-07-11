@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
@@ -229,7 +230,10 @@ class _ThemeToggle extends StatelessWidget {
             width: 34,
             height: 34,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
+              duration: DsMotion.durationOf(context, DsMotion.base),
+              // Entrances decelerate, exits accelerate: the motion law.
+              switchInCurve: DsMotion.curveOf(context, DsMotion.emphasized),
+              switchOutCurve: DsMotion.curveOf(context, DsMotion.accelerate),
               transitionBuilder: (child, anim) => RotationTransition(
                 turns: Tween<double>(begin: 0.6, end: 1).animate(anim),
                 child: FadeTransition(

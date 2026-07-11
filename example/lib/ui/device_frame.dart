@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 import 'docs_style.dart';
@@ -168,8 +169,8 @@ class _Segment extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
+        duration: DsMotion.durationOf(context, DsMotion.base),
+        curve: DsMotion.curveOf(context, DsMotion.standard),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? docs.surface : Colors.transparent,

@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -61,9 +62,12 @@ class _PatternPageViewState extends State<PatternPageView> {
           child: ConstrainedBox(
             constraints:
                 const BoxConstraints(maxWidth: DocsMetrics.readingMaxWidth),
-            // Replays a gentle fade-and-rise each time the page changes.
-            child: _EntranceTransition(
+            // Replays a gentle fade-and-rise each time the page changes,
+            // through the system's own entrance component so the docs move
+            // exactly like the library they document.
+            child: DsFadeSlideIn(
               key: ValueKey(page.id),
+              duration: DsMotion.slow,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -247,30 +251,6 @@ class _Eyebrow extends StatelessWidget {
   }
 }
 
-/// Fades and lifts its child into place once, on first build. Give it a
-/// [ValueKey] tied to the page id so navigation replays the entrance.
-class _EntranceTransition extends StatelessWidget {
-  const _EntranceTransition({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 360),
-      curve: const Cubic(0.2, 0, 0, 1),
-      builder: (context, t, child) => Opacity(
-        opacity: t.clamp(0.0, 1.0),
-        child: Transform.translate(
-          offset: Offset(0, (1 - t) * 12),
-          child: child,
-        ),
-      ),
-      child: child,
-    );
-  }
-}
-
 /// A "See also" link. Fixed height so a row of these always lines up, with a
 /// small lift on hover.
 class _RelatedCard extends StatefulWidget {
@@ -297,8 +277,8 @@ class _RelatedCardState extends State<_RelatedCard> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOutCubic,
+          duration: DsMotion.durationOf(context, DsMotion.fast),
+          curve: DsMotion.curveOf(context, DsMotion.standard),
           transform: _hover
               ? Matrix4.translationValues(0, -3, 0)
               : Matrix4.identity(),
@@ -332,7 +312,8 @@ class _RelatedCardState extends State<_RelatedCard> {
                               style: DocsType.headline(docs.textPrimary)),
                         ),
                         AnimatedSlide(
-                          duration: const Duration(milliseconds: 160),
+                          duration: DsMotion.durationOf(context, DsMotion.fast),
+                          curve: DsMotion.curveOf(context, DsMotion.standard),
                           offset: _hover ? const Offset(0.2, 0) : Offset.zero,
                           child: Icon(LucideIcons.arrow_right,
                               size: 16, color: docs.accent),
