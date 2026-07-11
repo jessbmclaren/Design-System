@@ -2,9 +2,9 @@
 
 A `DsMeterChart` divides a single whole into proportional, labelled segments laid out along one rounded horizontal bar. It is the most compact way to show a part-to-whole breakdown: a budget split, storage by file type or traffic by channel. Each `DsMeterSegment` contributes its `value` and takes a width of `value / total`, so the segments always sum to the full bar and the eye compares shares directly. Colour comes from the design system, not the caller: leave `DsMeterSegment.color` null and each segment draws its hue in order from the validated categorical palette, with a 2px surface-coloured gap between neighbours and rounded outer ends. The optional `title` labels the whole, and the wrapping legend beneath prints each segment's name, value and percentage. Text always uses on-system foreground colours, never a series hue. It is responsive by construction: the bar fills its parent's width and the legend reflows onto multiple lines down to a 320dp phone. It renders a still frame with no timers or animation and exposes the segment count, total and every share to assistive technology.
 
-![Desktop (1280dp)](img/meter-chart_desktop.png)
+![Desktop (1120dp)](img/meter-chart_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/meter-chart_phone.png)
 

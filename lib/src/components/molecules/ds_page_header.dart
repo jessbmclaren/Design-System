@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_breakpoints.dart';
 
 /// A page-level header that pairs a title (and optional subtitle) with a slot
@@ -68,7 +67,7 @@ class DsPageHeader extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         if (subtitle != null && subtitle!.isNotEmpty) ...[
-          const SizedBox(height: DsSpacing.xs),
+          SizedBox(height: tokens.spacingUnit / 2),
           Text(
             subtitle!,
             style: tokens.bodySm
@@ -96,14 +95,14 @@ class DsPageHeader extends StatelessWidget {
                 children: [
                   if (leading != null) ...[
                     leading!,
-                    const SizedBox(width: DsSpacing.md),
+                    SizedBox(width: tokens.spacingUnit * 1.5),
                   ],
                   Expanded(child: titleColumn),
                   if (actions.isNotEmpty) ...[
-                    const SizedBox(width: DsSpacing.lg),
+                    SizedBox(width: tokens.spacingUnit * 2),
                     Wrap(
-                      spacing: DsSpacing.sm,
-                      runSpacing: DsSpacing.sm,
+                      spacing: tokens.spacingUnit,
+                      runSpacing: tokens.spacingUnit,
                       alignment: WrapAlignment.end,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: actions,
@@ -120,16 +119,16 @@ class DsPageHeader extends StatelessWidget {
                     children: [
                       if (leading != null) ...[
                         leading!,
-                        const SizedBox(width: DsSpacing.md),
+                        SizedBox(width: tokens.spacingUnit * 1.5),
                       ],
                       Expanded(child: titleColumn),
                     ],
                   ),
                   if (actions.isNotEmpty) ...[
-                    const SizedBox(height: DsSpacing.md),
+                    SizedBox(height: tokens.spacingUnit * 1.5),
                     Wrap(
-                      spacing: DsSpacing.sm,
-                      runSpacing: DsSpacing.sm,
+                      spacing: tokens.spacingUnit,
+                      runSpacing: tokens.spacingUnit,
                       children: actions,
                     ),
                   ],
@@ -143,7 +142,7 @@ class DsPageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: DsSpacing.lg),
+                padding: EdgeInsets.only(bottom: tokens.spacingUnit * 2),
                 child: headerRow,
               ),
               if (showDivider)

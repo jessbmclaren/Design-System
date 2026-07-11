@@ -4,9 +4,9 @@ A context view is an embedded, non-modal panel pinned to the edge of a layout th
 
 Unlike a modal drawer, a context view is always part of the layout: it does not dim the page or block interaction with what sits beside it. Because it starts no timers or animations, it renders a stable frame and keeps state (scroll position, selection, form entries) intact while the main content changes around it. Provide `onClose` only when the panel is genuinely dismissible; without it the header shows no close button and the panel reads as a permanent part of the workspace.
 
-![Desktop (1280dp)](img/context-view_desktop.png)
+![Desktop (1120dp)](img/context-view_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/context-view_phone.png)
 

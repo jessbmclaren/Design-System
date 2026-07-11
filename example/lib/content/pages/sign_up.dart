@@ -40,6 +40,14 @@ final PatternPage signUpPage = PatternPage(
       'identically in a screenshot and in production.',
     ),
     ProseBlock(
+      'For a glyph-led card, pass `brandIcon` in place of the wordmark '
+      '`header`: it renders in a tinted rounded square above the title, '
+      'filled with `brandColor` or the primary button background when that '
+      'is omitted. A short `description` beneath the title carries '
+      'supporting copy, such as the trial terms, so the form itself stays '
+      'lean.',
+    ),
+    ProseBlock(
       'Earlier revisions of this pattern paired the card with a benefits '
       '`aside`. The slot still exists for trial-style layouts, but this '
       'composition drops it: the single card keeps attention on the form, '
@@ -64,7 +72,11 @@ final PatternPage signUpPage = PatternPage(
   ],
   code: '''
 DsSignUpView(
-  header: const DsWordmark(primary: 'acme', accent: 'id', fontSize: 28),
+  header: DsWordmark(
+    primary: 'acme',
+    accent: 'id',
+    fontSize: tokens.headingXl.fontSize,
+  ),
   headingAlignment: DsHeadingAlignment.center,
   showBorder: false,
   onClose: _abandonSignUp,

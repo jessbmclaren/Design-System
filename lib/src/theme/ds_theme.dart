@@ -41,8 +41,6 @@ abstract final class DsTheme {
     DsTokens tokens,
     Color? seedColor,
   ) {
-    final isLight = brightness == Brightness.light;
-
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor ?? tokens.colorPrimary,
       brightness: brightness,
@@ -54,8 +52,7 @@ abstract final class DsTheme {
       surface: tokens.colorBackground,
       onSurface: tokens.colorText,
       outline: tokens.colorBorder,
-      surfaceContainerHighest:
-          isLight ? const Color(0xFFF6F8FA) : const Color(0xFF1E2025),
+      surfaceContainerHighest: tokens.colorSurfaceMuted,
     );
 
     // Resolve the effective font. When the caller keeps the default family we
@@ -86,7 +83,9 @@ abstract final class DsTheme {
     return base.copyWith(
       textTheme: _textTheme(base.textTheme, tokens, effectiveFamily, effectiveFallback),
       dividerTheme: DividerThemeData(
-        color: tokens.colorBorder,
+        // The hairline tier, so a plain Divider matches DsDivider under a
+        // skin that lightens its hairlines.
+        color: tokens.colorBorderSubtle,
         thickness: 1,
         space: 1,
       ),

@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
-import '../../tokens/ds_typography.dart';
 import '../../util/ds_motion.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_link.dart';
@@ -27,8 +25,13 @@ const double _barHeight = 4;
 /// padding, the 48dp disclosure header, the progress bar and the gaps around
 /// it. A [DsSetupGuide.maxHeight] below this is clamped up to it, so a
 /// starved budget degrades to a chrome-only card instead of overflowing.
-const double _chromeMinHeight =
-    2 + DsSpacing.lg * 2 + 48 + DsSpacing.sm + _barHeight + DsSpacing.md;
+double _chromeMinHeight(DsTokens tokens) =>
+    2 +
+    tokens.spacingUnit * 2 * 2 +
+    48 +
+    tokens.spacingUnit +
+    _barHeight +
+    tokens.spacingUnit * 1.5;
 
 /// One task in a [DsSetupGuide] checklist.
 ///
@@ -205,16 +208,16 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
                   overflow: TextOverflow.ellipsis,
                   style: tokens.labelMd
                       .toTextStyle(color: tokens.colorText)
-                      .copyWith(fontWeight: DsTypography.semiBold),
+                      .copyWith(fontWeight: tokens.strongLabelFontWeight),
                 ),
               ),
-              const SizedBox(width: DsSpacing.sm),
+              SizedBox(width: tokens.spacingUnit),
               Text(
                 '$_doneCount of $total',
                 style:
                     tokens.labelSm.toTextStyle(color: tokens.colorSecondaryText),
               ),
-              const SizedBox(width: DsSpacing.sm),
+              SizedBox(width: tokens.spacingUnit),
               ExcludeSemantics(
                 child: AnimatedRotation(
                   turns: _collapsed ? 0 : 0.5,
@@ -259,9 +262,9 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
       constraints: widget.maxHeight == null
           ? null
           : BoxConstraints(
-              maxHeight: math.max(widget.maxHeight!, _chromeMinHeight),
+              maxHeight: math.max(widget.maxHeight!, _chromeMinHeight(tokens)),
             ),
-      padding: const EdgeInsets.all(DsSpacing.lg),
+      padding: EdgeInsets.all(tokens.spacingUnit * 2),
       decoration: BoxDecoration(
         color: tokens.formBackgroundColor,
         borderRadius: BorderRadius.circular(tokens.formBorderRadius),
@@ -273,7 +276,7 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
         mainAxisSize: MainAxisSize.min,
         children: [
           header,
-          const SizedBox(height: DsSpacing.sm),
+          SizedBox(height: tokens.spacingUnit),
           // Decorative: the header's count already announces the progress.
           DsProgressBar(
             value: progress,
@@ -281,7 +284,7 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
             animate: true,
             excludeSemantics: true,
           ),
-          const SizedBox(height: DsSpacing.md),
+          SizedBox(height: tokens.spacingUnit * 1.5),
           // Under a maxHeight budget the body takes whatever space the chrome
           // leaves, down to nothing, and scrolls inside it.
           if (widget.maxHeight != null)
@@ -311,7 +314,7 @@ class _NextLine extends StatelessWidget {
     if (task == null) {
       if (summary == null) return const SizedBox.shrink();
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+        padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit / 2),
         child: Text(
           summary!,
           maxLines: 1,
@@ -323,7 +326,7 @@ class _NextLine extends StatelessWidget {
     return Row(
       children: [
         Text('Next:', style: muted),
-        const SizedBox(width: DsSpacing.xs),
+        SizedBox(width: tokens.spacingUnit / 2),
         Flexible(child: DsLink(label: task.label, onPressed: task.onTap)),
       ],
     );
@@ -439,11 +442,11 @@ class _TaskRow extends StatelessWidget {
     final labelStyle = tokens.bodySm.toTextStyle(color: color);
 
     final row = Padding(
-      padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+      padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit / 2),
       child: Row(
         children: [
           _Marker(task: task),
-          const SizedBox(width: DsSpacing.md),
+          SizedBox(width: tokens.spacingUnit * 1.5),
           if (strike > 0)
             Flexible(
               child: _StrikeText(
@@ -463,7 +466,7 @@ class _TaskRow extends StatelessWidget {
               ),
             ),
           if (task.pending) ...[
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             const DsBadge(label: 'Pending', variant: DsBadgeVariant.warning),
           ],
           if (task.locked)

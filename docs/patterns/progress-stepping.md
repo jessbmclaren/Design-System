@@ -4,9 +4,9 @@ A progress stepper turns a multi-step task into something the user can follow: i
 
 The stepper communicates position; the footer moves the user through it. Keep those responsibilities separate so the header stays a stable map of the task while the actions stay predictably in the same place on every stage. Because the stepper is purely declarative, drive it from the same index that governs your form state: advance the index only once the current stage validates, and the completed, current and upcoming states stay honest.
 
-![Desktop (1280dp)](img/progress-stepping_desktop.png)
+![Desktop (1120dp)](img/progress-stepping_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/progress-stepping_phone.png)
 

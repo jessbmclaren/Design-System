@@ -4,9 +4,9 @@ The date field collects a single calendar date without the ambiguity of free-for
 
 Constrain the calendar to the dates that make sense: set `firstDate` and `lastDate` so a due date cannot land in the past or a birthday in the future. Keep the `label` visible and let `hintText` show the expected shape rather than repeat the label. Use `helperText` to explain a constraint before the user acts, and swap to `errorText` only after a selection has been made and found invalid. The two never appear together. Passing a `null` `onChanged`, or `enabled: false`, dims the control and blocks the picker.
 
-![Desktop (1280dp)](img/date-field_desktop.png)
+![Desktop (1120dp)](img/date-field_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/date-field_phone.png)
 

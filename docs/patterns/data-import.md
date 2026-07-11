@@ -6,9 +6,9 @@ The wizard is deliberately IO-free: it never touches the filesystem. Your app pa
 
 Because the destination is an ordinary list of `DsGridColumn`s and the output is ordinary `DsGridRow`s, an import lands in exactly the shape the grid, board and record panel already speak. There is no separate import data model to reconcile. Keep the person in control at the preview step: show them what will and will not import before anything is written.
 
-![Desktop (1280dp)](img/data-import_desktop.png)
+![Desktop (1120dp)](img/data-import_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/data-import_phone.png)
 

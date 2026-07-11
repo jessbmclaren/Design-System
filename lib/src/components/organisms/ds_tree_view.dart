@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_icon.dart';
@@ -429,7 +428,8 @@ class _DsTreeViewState extends State<DsTreeView> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ?badge,
-        if (badge != null && custom != null) const SizedBox(width: DsSpacing.sm),
+        if (badge != null && custom != null)
+          SizedBox(width: tokens.spacingUnit),
         ?custom,
       ],
     );
@@ -448,9 +448,9 @@ class _DsTreeViewState extends State<DsTreeView> {
             boxShadow: tokens.shadowMedium,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DsSpacing.md,
-              vertical: DsSpacing.sm,
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacingUnit * 1.5,
+              vertical: tokens.spacingUnit,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -461,7 +461,7 @@ class _DsTreeViewState extends State<DsTreeView> {
                     size: DsIconSize.sm,
                     color: tokens.colorSecondaryText,
                   ),
-                  const SizedBox(width: DsSpacing.sm),
+                  SizedBox(width: tokens.spacingUnit),
                 ],
                 Flexible(
                   child: Text(
@@ -533,9 +533,6 @@ class _DsTreeRow extends StatefulWidget {
 }
 
 class _DsTreeRowState extends State<_DsTreeRow> {
-  /// The leading gutter before the first indent step / chevron.
-  static const double _leadingPad = DsSpacing.sm;
-
   /// The fixed square that holds the disclosure chevron (or its empty slot).
   static const double _chevronSlot = 24;
 
@@ -557,7 +554,9 @@ class _DsTreeRowState extends State<_DsTreeRow> {
     final tokens = widget.tokens;
     final node = widget.node;
     final perLevel = _perLevel;
-    final indentWidth = _leadingPad + widget.depth * perLevel;
+    // The leading gutter before the first indent step / chevron.
+    final leadingPad = tokens.spacingUnit;
+    final indentWidth = leadingPad + widget.depth * perLevel;
 
     final chevron = SizedBox(
       width: _chevronSlot,
@@ -596,7 +595,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
               ),
         ),
         if (node.subtitle != null) ...[
-          const SizedBox(height: DsSpacing.xxs),
+          SizedBox(height: tokens.spacingUnit / 4),
           Text(
             node.subtitle!,
             maxLines: 1,
@@ -617,7 +616,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
                 ? tokens.colorText
                 : tokens.colorSecondaryText,
           ),
-          const SizedBox(width: DsSpacing.sm),
+          SizedBox(width: tokens.spacingUnit),
         ],
         Expanded(child: labelColumn),
       ],
@@ -627,7 +626,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
       children: <Widget>[
         SizedBox(width: indentWidth),
         chevron,
-        const SizedBox(width: DsSpacing.xs),
+        SizedBox(width: tokens.spacingUnit / 2),
         Expanded(
           child: Material(
             type: MaterialType.transparency,
@@ -635,8 +634,8 @@ class _DsTreeRowState extends State<_DsTreeRow> {
               canRequestFocus: false,
               onTap: widget.onSelect,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: DsSpacing.sm + DsSpacing.xxs,
+                padding: EdgeInsets.symmetric(
+                  vertical: tokens.spacingUnit + tokens.spacingUnit / 4,
                 ),
                 child: body,
               ),
@@ -644,15 +643,18 @@ class _DsTreeRowState extends State<_DsTreeRow> {
           ),
         ),
         if (widget.trailing != null) ...[
-          const SizedBox(width: DsSpacing.sm),
+          SizedBox(width: tokens.spacingUnit),
           widget.trailing!,
         ],
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
       ],
     );
 
     final decorated = Container(
-      margin: const EdgeInsets.symmetric(horizontal: DsSpacing.xs, vertical: 1),
+      margin: EdgeInsets.symmetric(
+        horizontal: tokens.spacingUnit / 2,
+        vertical: 1,
+      ),
       decoration: BoxDecoration(
         color: widget.selected ? tokens.offsetBackgroundColor : null,
         borderRadius: BorderRadius.circular(tokens.formBorderRadius),
@@ -666,7 +668,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
         painter: _GuidesPainter(
           depth: widget.depth,
           perLevel: perLevel,
-          leadingPad: _leadingPad,
+          leadingPad: leadingPad,
           color: tokens.colorBorder,
         ),
         child: content,

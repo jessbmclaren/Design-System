@@ -2,7 +2,7 @@
 
 The Design System is theme-driven. Every colour, type ramp, radius and spacing value is a token exposed through the `DsTokens` theme extension, and every component reads its appearance from the active theme. Because nothing is hard-coded, you re-brand the entire system by supplying your own token set to `DsTheme.light` or `DsTheme.dark`. The system is white-label by default.
 
-Read tokens for the active theme with `DsTokens.of(context)`. Switch between `DsTheme.light()` and `DsTheme.dark()` to flip every component at once. Sizes are expressed in logical pixels (`double`); text transforms default to `none` and accept `uppercase`, `lowercase` or `capitalize`. Each heading / body / label ramp row is a property of that level's `DsTypeToken` (`headingXl`, `bodyMd`, …); re-scale a level with `copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: DsTypography.bold))`. The button- and badge-label rows are instead flat tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden individually.
+Read tokens for the active theme with `DsTokens.of(context)`. Switch between `DsTheme.light()` and `DsTheme.dark()` to flip every component at once. Sizes are expressed in logical pixels (`double`); text transforms default to `none` and accept `uppercase`, `lowercase` or `capitalize`. Each heading / body / label ramp row is a property of that level's `DsTypeToken` (`headingXl`, `bodyMd`, …); every level also carries a line `height` multiplier, an optional `letterSpacing` and a `textTransform`, including `bodyMd` and `bodySm`, whose transforms stay at `none` and are omitted from the table. Re-scale a level with `copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: DsTypography.bold))`. The button- and badge-label rows are instead flat tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden individually.
 
 ## Commonly used variables
 
@@ -41,6 +41,9 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `buttonNeutralColorBackground` | `Color` | `#EBEEF1` | The colour used as a background for neutral buttons, which carry third-party or utility actions such as federated sign-in. Defaults to the secondary button background. |
 | `buttonNeutralColorBorder` | `Color` | `#EBEEF1` | The border colour used for neutral buttons. Defaults to the secondary button border. |
 | `buttonNeutralColorText` | `Color` | `#393B3E` | The text colour used for neutral buttons. Defaults to the secondary button text colour. |
+| `buttonTertiaryColorBackground` | `Color` | `transparent` | The background colour for tertiary (text) buttons. Transparent by default, so the label alone carries the action. |
+| `buttonTertiaryColorBorder` | `Color` | `transparent` | The border colour for tertiary (text) buttons. Transparent by default. |
+| `buttonTertiaryColorText` | `Color` | `#0074D4` | The text colour for tertiary (text) buttons. Defaults to the primary action colour. |
 
 ### Text and surfaces
 
@@ -51,6 +54,7 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `colorBorderSubtle` | `Color` | `#D7D7D7` | The hairline tier beneath colorBorder: the quietest rule the system draws, used by dividers and decorative hairlines. Defaults to the border colour. |
 | `formBackgroundColor` | `Color` | `#FFFFFF` | The background colour used for form items. |
 | `offsetBackgroundColor` | `Color` | `#FFFFFF` | The background colour used when highlighting information, like the selected row on a table. |
+| `colorSurfaceMuted` | `Color` | `#F6F8FA` | The muted surface tier: the quiet grey behind code wells, table headers and other recessed panels. Exposed to the Material scheme as surfaceContainerHighest. |
 | `formHighlightColorBorder` | `Color` | `#D7D7D7` | The colour used to highlight form items when focused. |
 | `formAccentColor` | `Color` | `#0074D4` | The colour used to fill form items such as tickboxes, radio buttons and switches. |
 | `formPlaceholderTextColor` | `Color` | `#AAAAAA` | The colour for placeholder text in form items. |
@@ -90,8 +94,20 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `badgeLabelFontSize` | `double` | `14` | The font size for badge label typography. |
 | `badgeLabelFontWeight` | `FontWeight` | `400` | The font weight for badge label typography. |
 | `badgeLabelTextTransform` | `DsTextTransform` | `none` | The text transform for badge label typography. |
+| `strongLabelFontWeight` | `FontWeight` | `600` | The font weight for strong labels: group legends, table headers and other short emphasised runs. |
 
 ## Less commonly used variables
+
+### Interaction states
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `stateHoverOpacity` | `double` | `0.06` | The state-layer alpha painted over a flat control on hover and keyboard focus. |
+| `statePressedOpacity` | `double` | `0.1` | The state-layer alpha painted over a flat control while pressed. |
+| `stateDisabledOpacity` | `double` | `0.5` | The fade shared by the disabled treatments that dim a whole surface: a disabled button's fill, a disabled tertiary button's label and a disabled input's border. |
+| `stateDisabledTextOpacity` | `double` | `0.9` | The fade for a disabled filled button's label. Gentler than stateDisabledOpacity, so the label stays readable on the dimmed fill. |
+| `stateDisabledIconOpacity` | `double` | `0.38` | The fade for a disabled icon-only control's glyph. |
+| `focusRingWidth` | `double` | `2` | The stroke width of the keyboard focus ring on buttons and icon buttons. |
 
 ### Action text decoration
 
@@ -134,25 +150,32 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `badgeBorderRadius` | `double` | `4` | The border radius used for badges. |
 | `buttonPaddingX` | `double` | `16` | The horizontal padding for buttons, the full inset the button paints. |
 | `buttonPaddingY` | `double` | `10` | The vertical padding for buttons, the full inset the button paints. |
+| `buttonMinHeight` | `double` | `40` | The minimum height for buttons. |
+| `buttonIconSize` | `double` | `18` | The size of a glyph inside a button. Defaults to buttonLabelFontSize plus 2; keep the pair in step when a skin re-sizes the label. |
+| `buttonRestBorderWidth` | `double` | `1` | The border stroke width for buttons at rest. |
 | `inputFieldPaddingX` | `double` | `8` | The horizontal padding for input fields in forms. |
 | `inputFieldPaddingY` | `double` | `4` | The vertical padding for input fields in forms. |
 | `textFieldPaddingY` | `double` | `16` | The full vertical padding a bordered text input paints, so a skin can retune the text field without moving every other form control. |
+| `inputBorderWidth` | `double` | `1` | The border stroke width for input fields at rest. |
+| `inputFocusBorderWidth` | `double` | `1.6` | The border stroke width for a focused input field. The error border carries the same emphasis. |
+| `fieldLabelGap` | `double` | `6` | The gap between a field's label and its input. |
+| `boxBorderWidth` | `double` | `1` | The border stroke width a DsBox draws when given a border colour without an explicit width. |
 | `badgePaddingX` | `double` | `6` | The horizontal padding for badges. |
 | `badgePaddingY` | `double` | `2` | The vertical padding for badges. |
 | `tableRowPaddingY` | `double` | `8` | The vertical padding for table rows. |
 
 ## Elevation, icons and weights
 
-Beyond the appearance variables, the system ships a small set of shared primitives that components use directly: an elevation scale, an icon-size scale and a font-weight ramp. The bundled Inter provides all four weights (400 / 500 / 600 / 700), so hierarchy is not limited to regular and bold.
+Elevation is themable: components cast shadows through the three `shadow` tokens, which default to the matching `DsElevation` primitives, so a skin can retint every raised surface at once (usually by deriving a set with `DsElevation.tinted`). Beyond that, the system ships two shared primitives that components use directly: an icon-size scale and a font-weight ramp. The bundled Inter provides all four weights (400 / 500 / 600 / 700), so hierarchy is not limited to regular and bold.
 
-### Elevation (DsElevation)
+### Elevation
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
-| `DsElevation.low` | `List<BoxShadow>` | `resting` | Resting raised surfaces: chips, hovers and list cards. |
-| `DsElevation.medium` | `List<BoxShadow>` | `floating` | Floating surfaces: menus, popovers and toasts. |
-| `DsElevation.high` | `List<BoxShadow>` | `modal` | Modal surfaces: dialogs, drawers and takeovers. |
-| `DsElevation.tinted` | `Color → shadows` | `brand` | A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue. |
+| `shadowLow` | `List<BoxShadow>` | `DsElevation.low` | The resting drop shadow for lightly raised surfaces: chips, hover cards and list cards. |
+| `shadowMedium` | `List<BoxShadow>` | `DsElevation.medium` | The drop shadow for floating surfaces: cards, menus, popovers and toasts. |
+| `shadowHigh` | `List<BoxShadow>` | `DsElevation.high` | The drop shadow for modal surfaces: dialogs, drawers and takeovers. |
+| `DsElevation.tinted` | `Color → shadows` | `brand` | A brand-tinted scale derived from a colour, ready to feed the three shadow tokens above. |
 
 ### Icon size (DsIconSize)
 
@@ -184,9 +207,21 @@ The `overlays` token controls whether a focused overlay (such as `DsFocusView`) 
 | `overlayBorderRadius` | `double` | `8` | The border radius used for overlays. |
 | `overlayBackdropColor` | `Color` | `#661A1B25` | The backdrop colour shown behind an open overlay: a translucent scrim (ARGB) over the page. |
 
-![Desktop (1280dp)](img/design-tokens_desktop.png)
+## Auth chrome and wordmark
 
-*Desktop (1280dp)*
+The auth surfaces (sign-in, sign-up, waiting screens) paint their backdrop from two tokens, and the wordmark's type metrics are tokens too, so a brand can retune the whole first impression without forking a component.
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `authWashGradient` | `List<Color>` | `#FFFFFF → #EBEEF1` | The colour stops of the auth wash, painted top to bottom by DsAuthGradient behind sign-in, sign-up and waiting screens. Give it at least two colours. |
+| `bloomColor` | `Color` | `#DCE2E9` | The peak colour of the soft radial brand glow painted by DsBrandBloom. Neutral by default, so the glow is present without carrying a hue. |
+| `wordmarkFontSize` | `double` | `22` | The default wordmark size, in logical pixels. |
+| `wordmarkLetterSpacing` | `double` | `-0.2` | The wordmark's letter spacing. Slightly negative by default, so the mark sets a little tighter than body text. |
+| `wordmarkHeight` | `double` | `1` | The wordmark's line height multiplier. 1 by default, so the mark occupies exactly its glyph height in chrome and headers. |
+
+![Desktop (1120dp)](img/design-tokens_desktop.png)
+
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/design-tokens_phone.png)
 

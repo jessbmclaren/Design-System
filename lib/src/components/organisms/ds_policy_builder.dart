@@ -3,8 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
@@ -291,13 +289,13 @@ class DsPolicyBuilder extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.formBorderRadius),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(DsSpacing.md),
+            padding: EdgeInsets.all(tokens.spacingUnit * 1.5),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildHeader(tokens, compact),
-                const SizedBox(height: DsSpacing.md),
+                SizedBox(height: tokens.spacingUnit * 1.5),
                 // A disabled policy still edits but reads visibly muted below
                 // the header, so the enable switch stays crisp and reachable.
                 Opacity(
@@ -314,9 +312,9 @@ class DsPolicyBuilder extends StatelessWidget {
                         maxLines: 2,
                         onChanged: _setDescription,
                       ),
-                      const SizedBox(height: DsSpacing.lg),
+                      SizedBox(height: tokens.spacingUnit * 2),
                       _buildAppliesWhen(tokens),
-                      const SizedBox(height: DsSpacing.lg),
+                      SizedBox(height: tokens.spacingUnit * 2),
                       _buildThen(tokens, compact),
                     ],
                   ),
@@ -349,7 +347,7 @@ class DsPolicyBuilder extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           name,
-          const SizedBox(height: DsSpacing.sm),
+          SizedBox(height: tokens.spacingUnit),
           Align(alignment: Alignment.centerLeft, child: toggle),
         ],
       );
@@ -359,10 +357,10 @@ class DsPolicyBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(child: name),
-        const SizedBox(width: DsSpacing.md),
+        SizedBox(width: tokens.spacingUnit * 1.5),
         Padding(
           // Nudge the switch to sit level with the field, not its label.
-          padding: const EdgeInsets.only(bottom: DsSpacing.xs),
+          padding: EdgeInsets.only(bottom: tokens.spacingUnit / 2),
           child: toggle,
         ),
       ],
@@ -375,7 +373,7 @@ class DsPolicyBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _sectionTitle(tokens, 'Applies when'),
-        const SizedBox(height: DsSpacing.sm),
+        SizedBox(height: tokens.spacingUnit),
         DsFilterBar(
           columns: columns,
           value: value.filter,
@@ -384,7 +382,7 @@ class DsPolicyBuilder extends StatelessWidget {
           onChanged: _setFilter,
         ),
         if (value.filter.isEmpty) ...[
-          const SizedBox(height: DsSpacing.sm),
+          SizedBox(height: tokens.spacingUnit),
           Text(
             'This policy applies to all records.',
             style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
@@ -400,7 +398,7 @@ class DsPolicyBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _sectionTitle(tokens, 'Then'),
-        const SizedBox(height: DsSpacing.sm),
+        SizedBox(height: tokens.spacingUnit),
         if (value.rules.isEmpty)
           Align(
             alignment: Alignment.centerLeft,
@@ -412,10 +410,10 @@ class DsPolicyBuilder extends StatelessWidget {
           )
         else
           for (var i = 0; i < value.rules.length; i++) ...[
-            if (i > 0) const SizedBox(height: DsSpacing.sm),
+            if (i > 0) SizedBox(height: tokens.spacingUnit),
             _buildRuleRow(tokens, i, value.rules[i], compact),
           ],
-        const SizedBox(height: DsSpacing.md),
+        SizedBox(height: tokens.spacingUnit * 1.5),
         Align(
           alignment: Alignment.centerLeft,
           child: DsButton(
@@ -454,7 +452,7 @@ class DsPolicyBuilder extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         badge,
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Expanded(child: effectSelect),
       ],
     );
@@ -477,7 +475,7 @@ class DsPolicyBuilder extends StatelessWidget {
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(DsSpacing.sm),
+          padding: EdgeInsets.all(tokens.spacingUnit),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -487,7 +485,7 @@ class DsPolicyBuilder extends StatelessWidget {
                   remove,
                 ],
               ),
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               description,
             ],
           ),
@@ -499,9 +497,9 @@ class DsPolicyBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(flex: 5, child: effectCell),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Expanded(flex: 6, child: description),
-        const SizedBox(width: DsSpacing.xs),
+        SizedBox(width: tokens.spacingUnit / 2),
         remove,
       ],
     );
@@ -514,7 +512,7 @@ class DsPolicyBuilder extends StatelessWidget {
         text,
         style: tokens.labelMd
             .toTextStyle(color: tokens.colorText)
-            .copyWith(fontWeight: DsTypography.semiBold),
+            .copyWith(fontWeight: tokens.strongLabelFontWeight),
       ),
     );
   }

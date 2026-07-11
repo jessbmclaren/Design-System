@@ -98,6 +98,96 @@ void main() {
       expect(focusedShape.side.color, tokens.formAccentColor);
     });
 
+    testWidgets('announces a named, enabled button', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsIconButton(
+          icon: DsIcons.close,
+          semanticLabel: 'Close',
+          onPressed: () {},
+        ),
+      );
+
+      // The name rides on the tooltip (the stock Material pattern); the
+      // semantics label itself stays empty.
+      expect(
+        tester.getSemantics(find.byType(IconButton)),
+        isSemantics(
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+          hasTapAction: true,
+          tooltip: 'Close',
+          label: '',
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a disabled icon button keeps its role and name but loses '
+        'the enabled state and focus', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsIconButton(
+          icon: DsIcons.close,
+          semanticLabel: 'Close',
+          onPressed: null,
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(IconButton)),
+        isSemantics(
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: false,
+          isFocusable: false,
+          tooltip: 'Close',
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a skin can retune the state opacities and focus ring',
+        (tester) async {
+      final skin = DsTokens.light().copyWith(
+        statePressedOpacity: 0.4,
+        stateHoverOpacity: 0.2,
+        stateDisabledIconOpacity: 0.15,
+        focusRingWidth: 5,
+      );
+      await pumpDs(
+        tester,
+        DsIconButton(
+          icon: DsIcons.close,
+          semanticLabel: 'Close',
+          onPressed: () {},
+        ),
+        theme: DsTheme.light(tokens: skin),
+      );
+
+      final style = tester.widget<IconButton>(find.byType(IconButton)).style!;
+      final foreground = skin.colorText;
+      expect(
+        style.backgroundColor!.resolve({WidgetState.pressed}),
+        foreground.withValues(alpha: 0.4),
+      );
+      expect(
+        style.backgroundColor!.resolve({WidgetState.hovered}),
+        foreground.withValues(alpha: 0.2),
+      );
+      expect(
+        style.foregroundColor!.resolve({WidgetState.disabled}),
+        foreground.withValues(alpha: 0.15),
+      );
+      final focused =
+          style.shape!.resolve({WidgetState.focused})! as CircleBorder;
+      expect(focused.side.width, 5);
+    });
+
     testWidgets('does not overflow at a tight size on a 320dp phone',
         (tester) async {
       await pumpDs(

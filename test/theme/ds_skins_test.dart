@@ -15,7 +15,7 @@ void main() {
     });
 
     test('opting into a skin does NOT change the core defaults', () {
-      // The default token set must remain the neutral blue identity — a skin
+      // The default token set must remain the neutral blue identity: a skin
       // is data you pass in, never a mutation of the defaults.
       expect(DsSkins.engenLight().colorPrimary, isNot(const Color(0xFF0074D4)));
       expect(DsTokens.light().colorPrimary, const Color(0xFF0074D4));
@@ -89,6 +89,22 @@ void main() {
       );
       expect(engen.buttonNeutralColorBorder, engen.buttonSecondaryColorBorder);
       expect(engen.buttonNeutralColorText, engen.buttonSecondaryColorText);
+    });
+
+    test('the dark Engen skin keeps the light heading overrides', () {
+      final light = DsSkins.engenLight();
+      final dark = DsSkins.engenDark();
+      expect(dark.headingXl, light.headingXl);
+      expect(dark.headingLg, light.headingLg);
+      expect(dark.headingMd, light.headingMd);
+      expect(dark.headingSm, light.headingSm);
+    });
+
+    test('the Engen skins keep the tertiary label and icon maths in step', () {
+      for (final skin in [DsSkins.engenLight(), DsSkins.engenDark()]) {
+        expect(skin.buttonTertiaryColorText, skin.actionPrimaryColorText);
+        expect(skin.buttonIconSize, skin.buttonLabelFontSize + 2);
+      }
     });
   });
 }

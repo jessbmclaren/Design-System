@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../tokens/ds_spacing.dart';
+import '../../theme/ds_tokens_extension.dart';
 import 'ds_form_field_group.dart';
 import 'ds_select.dart';
 import 'ds_text_field.dart';
@@ -304,6 +304,7 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     final config = widget.config;
     final enabled = widget.enabled && widget.onChanged != null;
     final showCountry = config.showCountry && widget.countries.isNotEmpty;
@@ -372,7 +373,7 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
               ),
           ],
         ),
-        const SizedBox(height: DsSpacing.lg),
+        SizedBox(height: tokens.spacingUnit * 2),
         DsFormFieldGroup(columns: 2, children: pairedFields),
       ],
     );

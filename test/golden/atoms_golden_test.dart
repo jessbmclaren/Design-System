@@ -110,6 +110,29 @@ void main() {
     dsGoldenMatrix(
         'atom', 'icon', () => const DsIcon(icon: Icons.check_circle_outline));
 
+    // Enabled beside disabled, so the disabled fade is pinned alongside the
+    // resting circle.
+    dsGoldenMatrix(
+      'atom',
+      'icon_button',
+      () => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          DsIconButton(
+            icon: DsIcons.close,
+            semanticLabel: 'Close',
+            onPressed: () {},
+          ),
+          const DsIconButton(
+            icon: DsIcons.close,
+            semanticLabel: 'Close',
+            onPressed: null,
+          ),
+        ],
+      ),
+    );
+
     // A row of every tone, where a token-pair regression surfaces.
     dsGoldenMatrix(
       'atom',
@@ -175,6 +198,13 @@ void main() {
         label: 'Email notifications',
         onChanged: (_) {},
       ),
+    );
+
+    // Primary and accent together, so the two-tone weight pairing is pinned.
+    dsGoldenMatrix(
+      'atom',
+      'wordmark',
+      () => const DsWordmark(primary: 'acme', accent: 'id'),
     );
   });
 }

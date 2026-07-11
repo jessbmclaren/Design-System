@@ -21,26 +21,20 @@ class BoxDemo extends StatelessWidget {
           background: tokens.colorBackground,
           borderColor: tokens.colorBorder,
           borderRadius: tokens.borderRadius,
-          shadow: DsElevation.low,
+          shadow: tokens.shadowLow,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Monthly volume',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: tokens.colorSecondaryText,
-                ),
+                style: tokens.labelMd
+                    .copyWith(fontWeight: DsTypography.semiBold)
+                    .toTextStyle(color: tokens.colorSecondaryText),
               ),
               const SizedBox(height: DsSpacing.xs),
               Text(
                 '\$48,290',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: tokens.colorText,
-                ),
+                style: tokens.headingLg.toTextStyle(color: tokens.colorText),
               ),
             ],
           ),
@@ -56,11 +50,7 @@ class BoxDemo extends StatelessWidget {
           child: Text(
             'Every colour and radius here reads from DsTokens, so one theme '
             'change re-skins the surface.',
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: tokens.colorText,
-            ),
+            style: tokens.bodySm.toTextStyle(color: tokens.colorText),
           ),
         ),
         const SizedBox(height: DsSpacing.md),
@@ -73,10 +63,7 @@ class BoxDemo extends StatelessWidget {
           ),
           child: Text(
             'Undecorated · padding only',
-            style: TextStyle(
-              fontSize: 12,
-              color: tokens.colorSecondaryText,
-            ),
+            style: tokens.labelSm.toTextStyle(color: tokens.colorSecondaryText),
           ),
         ),
       ],

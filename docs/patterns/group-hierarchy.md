@@ -6,9 +6,9 @@ The tree is built from plain `DsTreeNode`s (an id, a label and a list of childre
 
 Pair the hierarchy with the rest of the data surfaces: selecting a group scopes the grid, the board or a set of policies to that part of the organisation. A policy attached to a parent is understood to cover its children, which is what makes the hierarchy worth maintaining rather than a flat list of tags.
 
-![Desktop (1280dp)](img/group-hierarchy_desktop.png)
+![Desktop (1120dp)](img/group-hierarchy_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/group-hierarchy_phone.png)
 

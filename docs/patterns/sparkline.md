@@ -4,9 +4,9 @@ A sparkline is a tiny, word-sized line chart that shows the shape of a trend: no
 
 Each sparkline scales independently to its own range, so two side by side are not comparable in absolute terms: a gentle real change and a tiny noisy one can look equally dramatic. Use sparklines to answer "is this going up, down or holding steady?" and reserve axed line charts for when the reader needs to compare series or read values off the plot. Zero- and one-point inputs are handled: an empty list draws nothing, and a single value draws just a centred dot.
 
-![Desktop (1280dp)](img/sparkline_desktop.png)
+![Desktop (1120dp)](img/sparkline_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/sparkline_phone.png)
 

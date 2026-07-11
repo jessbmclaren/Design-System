@@ -4,9 +4,9 @@ Loading feedback tells people that work is under way and reassures them that the
 
 Give `DsSpinner` a `delay` so quick operations resolve without ever flashing an indicator. The spinner only appears if the work outlasts the delay, which avoids a distracting flicker for responses that arrive in a few hundred milliseconds. Load each region independently so a slow table never holds up the header, the navigation or the rest of the page, and keep everything a person can still use interactive while one region catches up.
 
-![Desktop (1280dp)](img/loading_desktop.png)
+![Desktop (1120dp)](img/loading_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/loading_phone.png)
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../util/ds_motion.dart';
 
 // ---------------------------------------------------------------------------
@@ -299,7 +298,7 @@ class DsPasswordStrength extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   for (var i = 0; i < 3; i++) ...<Widget>[
-                    if (i > 0) const SizedBox(width: DsSpacing.xs),
+                    if (i > 0) SizedBox(width: tokens.spacingUnit / 2),
                     Expanded(
                       child: Container(
                         height: 4,
@@ -316,7 +315,7 @@ class DsPasswordStrength extends StatelessWidget {
               ),
             ),
             if (value.isNotEmpty) ...<Widget>[
-              const SizedBox(height: DsSpacing.xs),
+              SizedBox(height: tokens.spacingUnit / 2),
               // A live region so assistive technology announces the tier as
               // it changes under the user's typing.
               Semantics(
@@ -329,7 +328,7 @@ class DsPasswordStrength extends StatelessWidget {
               ),
             ],
             if (showChecklist) ...<Widget>[
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               _Checklist(rules: rules),
             ],
           ],
@@ -353,9 +352,11 @@ class _Checklist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double itemWidth = (constraints.maxWidth - DsSpacing.md) / 2;
+        final double itemWidth =
+            (constraints.maxWidth - tokens.spacingUnit * 1.5) / 2;
         // Two columns only when each is wide enough for a rule label at the
         // ambient text scale; otherwise one column keeps each rule on a line
         // or two instead of wrapping into a tall sliver.
@@ -369,15 +370,15 @@ class _Checklist extends StatelessWidget {
             children: <Widget>[
               for (final rule in rules)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: DsSpacing.xs),
+                  padding: EdgeInsets.only(bottom: tokens.spacingUnit / 2),
                   child: _RuleRow(rule: rule),
                 ),
             ],
           );
         }
         return Wrap(
-          spacing: DsSpacing.md,
-          runSpacing: DsSpacing.xs,
+          spacing: tokens.spacingUnit * 1.5,
+          runSpacing: tokens.spacingUnit / 2,
           children: <Widget>[
             for (final rule in rules)
               SizedBox(
@@ -408,7 +409,7 @@ class _RuleRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           _CheckDot(met: rule.met),
-          const SizedBox(width: DsSpacing.sm),
+          SizedBox(width: tokens.spacingUnit),
           Expanded(
             child: Text(
               rule.label,
@@ -519,7 +520,7 @@ class DsPasswordStrengthHint extends StatelessWidget {
               size: DsIconSize.sm,
               color: tokens.colorDanger,
             ),
-            const SizedBox(width: DsSpacing.xs),
+            SizedBox(width: tokens.spacingUnit / 2),
             Expanded(
               child: Text(
                 message,

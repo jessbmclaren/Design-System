@@ -4,9 +4,9 @@ Every authenticated experience needs an easy, discoverable way to leave it. Sign
 
 Keep the control consistently located across the product so people build muscle memory for it, and always show the account it belongs to so there is no doubt about who is signed in. Signing out should be immediate; only interrupt with a confirmation when there is unsaved work that leaving would discard.
 
-![Desktop (1280dp)](img/sign-out_desktop.png)
+![Desktop (1120dp)](img/sign-out_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/sign-out_phone.png)
 

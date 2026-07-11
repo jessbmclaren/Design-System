@@ -4,9 +4,9 @@ A back link gives people a clear, labelled way to return to the screen they came
 
 Place the back link above the page title, aligned to the left edge of the content. Name the specific destination rather than using a generic "Back". The label doubles as a breadcrumb that reminds people where they are in the hierarchy and where a click will take them.
 
-![Desktop (1280dp)](img/back-link_desktop.png)
+![Desktop (1120dp)](img/back-link_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/back-link_phone.png)
 

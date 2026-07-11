@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_chart_palette.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 
 /// A single named line in a [DsLineChart].
@@ -152,6 +151,7 @@ class DsLineChart extends StatelessWidget {
             gridColor: tokens.colorBorder.withValues(alpha: 0.4),
             axisColor: tokens.colorBorder.withValues(alpha: 0.4),
             markerColor: tokens.colorBackground,
+            spacingUnit: tokens.spacingUnit,
           ),
           child: const SizedBox.expand(),
         );
@@ -162,7 +162,7 @@ class DsLineChart extends StatelessWidget {
           children: [
             if (title != null) ...[
               Text(title!, style: titleStyle),
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
             ],
             if (series.length >= 2) ...[
               _Legend(
@@ -171,7 +171,7 @@ class DsLineChart extends StatelessWidget {
                 labelStyle: DsTypography.bodySm
                     .toTextStyle(color: tokens.colorSecondaryText),
               ),
-              const SizedBox(height: DsSpacing.md),
+              SizedBox(height: tokens.spacingUnit * 1.5),
             ],
             SizedBox(
               height: height,
@@ -226,9 +226,10 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     return Wrap(
-      spacing: DsSpacing.lg,
-      runSpacing: DsSpacing.xs,
+      spacing: tokens.spacingUnit * 2,
+      runSpacing: tokens.spacingUnit / 2,
       children: [
         for (var i = 0; i < series.length; i++)
           Row(
@@ -243,7 +244,7 @@ class _Legend extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(width: DsSpacing.sm),
+              SizedBox(width: tokens.spacingUnit),
               Text(series[i].name, style: labelStyle),
             ],
           ),
@@ -299,6 +300,7 @@ class _LineChartPainter extends CustomPainter {
     required this.gridColor,
     required this.axisColor,
     required this.markerColor,
+    required this.spacingUnit,
   });
 
   final List<DsLineSeries> series;
@@ -311,6 +313,9 @@ class _LineChartPainter extends CustomPainter {
   final Color axisColor;
   final Color markerColor;
 
+  /// The theme's base spacing unit, driving the label gutters and padding.
+  final double spacingUnit;
+
   @override
   void paint(Canvas canvas, Size size) {
     if (pointCount == 0) return;
@@ -320,14 +325,16 @@ class _LineChartPainter extends CustomPainter {
       for (final v in ticks.values) _layout(_formatNumber(v)),
     ];
     final leftPad = yLabelPainters.fold<double>(0, (m, p) => math.max(m, p.width)) +
-        DsSpacing.sm;
+        spacingUnit;
 
     final hasXLabels = xLabels != null && xLabels!.isNotEmpty;
     final bottomPad = hasXLabels
-        ? _layout('X').height + DsSpacing.sm
-        : DsSpacing.xs;
-    const topPad = DsSpacing.sm; // headroom so the top gridline label breathes.
-    const rightPad = DsSpacing.md; // room for the final point's marker/label.
+        ? _layout('X').height + spacingUnit
+        : spacingUnit / 2;
+    // Headroom so the top gridline label breathes.
+    final topPad = spacingUnit;
+    // Room for the final point's marker/label.
+    final rightPad = spacingUnit * 1.5;
 
     final plot = Rect.fromLTRB(
       leftPad,
@@ -346,7 +353,7 @@ class _LineChartPainter extends CustomPainter {
       final tp = yLabelPainters[i];
       tp.paint(
         canvas,
-        Offset(plot.left - DsSpacing.sm - tp.width, y - tp.height / 2),
+        Offset(plot.left - spacingUnit - tp.width, y - tp.height / 2),
       );
     }
 
@@ -433,10 +440,10 @@ class _LineChartPainter extends CustomPainter {
         : plot.width;
     final stride = math.max(
       1,
-      ((maxLabelW + DsSpacing.sm) / math.max(slot, 1)).ceil(),
+      ((maxLabelW + spacingUnit) / math.max(slot, 1)).ceil(),
     );
 
-    final y = plot.bottom + DsSpacing.xs;
+    final y = plot.bottom + spacingUnit / 2;
     for (var i = 0; i < count; i++) {
       // Always keep the first and last; thin the interior on the stride.
       final keep = i % stride == 0 || i == count - 1;
@@ -477,7 +484,8 @@ class _LineChartPainter extends CustomPainter {
         old.axisStyle != axisStyle ||
         old.gridColor != gridColor ||
         old.axisColor != axisColor ||
-        old.markerColor != markerColor;
+        old.markerColor != markerColor ||
+        old.spacingUnit != spacingUnit;
   }
 }
 

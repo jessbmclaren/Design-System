@@ -6,9 +6,9 @@ Grouping is a view over the same rows, applied after the grid's own sort, so it 
 
 Use grouping when the question is "how do these records cluster, and what do the clusters total?": vehicles by depot and status, drivers by team, costs by category. To move records between clusters by hand, use the board view; to slice which records are in scope, use filtering.
 
-![Desktop (1280dp)](img/grouping_desktop.png)
+![Desktop (1120dp)](img/grouping_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/grouping_phone.png)
 

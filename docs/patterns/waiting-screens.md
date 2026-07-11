@@ -6,9 +6,9 @@ Wherever the outcome is delivered asynchronously, let people leave. If the work 
 
 For the brief full-page moments around sign-in and provisioning, `DsWaitingScreen` composes the pieces: a large spinner over a headline with an animated ellipsis, an optional supporting line, an optional header slot for a wordmark and a `DsAuthGradient` backdrop, all entering through a fade-slide. It holds no timers, so the caller swaps it out when the operation completes, and every part settles to a still frame under reduced motion.
 
-![Desktop (1280dp)](img/waiting-screens_desktop.png)
+![Desktop (1120dp)](img/waiting-screens_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/waiting-screens_phone.png)
 

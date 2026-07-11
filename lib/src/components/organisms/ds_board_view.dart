@@ -3,8 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_avatar.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_icon.dart';
@@ -279,12 +277,12 @@ class _DsBoardViewState extends State<DsBoardView> {
   Widget _buildSideBySide(DsTokens tokens, double? maxHeight) {
     final children = <Widget>[];
     for (var i = 0; i < _lanes.length; i++) {
-      if (i > 0) children.add(const SizedBox(width: DsSpacing.md));
+      if (i > 0) children.add(SizedBox(width: tokens.spacingUnit * 1.5));
       children.add(_wideLane(tokens, _lanes[i], maxHeight));
     }
 
     final row = Padding(
-      padding: const EdgeInsets.all(DsSpacing.xs),
+      padding: EdgeInsets.all(tokens.spacingUnit / 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -321,7 +319,7 @@ class _DsBoardViewState extends State<DsBoardView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               header,
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Flexible(child: cards),
             ],
           )
@@ -329,7 +327,7 @@ class _DsBoardViewState extends State<DsBoardView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               header,
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Expanded(
                 child: SingleChildScrollView(child: cards),
               ),
@@ -343,7 +341,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         tokens,
         lane,
         Padding(
-          padding: const EdgeInsets.all(DsSpacing.sm),
+          padding: EdgeInsets.all(tokens.spacingUnit),
           child: body,
         ),
       ),
@@ -356,7 +354,7 @@ class _DsBoardViewState extends State<DsBoardView> {
   Widget _buildStacked(DsTokens tokens, double? maxHeight) {
     final children = <Widget>[];
     for (var i = 0; i < _lanes.length; i++) {
-      if (i > 0) children.add(const SizedBox(height: DsSpacing.md));
+      if (i > 0) children.add(SizedBox(height: tokens.spacingUnit * 1.5));
       children.add(_narrowLane(tokens, _lanes[i]));
     }
 
@@ -367,7 +365,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     );
 
     final padded = Padding(
-      padding: const EdgeInsets.all(DsSpacing.sm),
+      padding: EdgeInsets.all(tokens.spacingUnit),
       child: column,
     );
 
@@ -396,14 +394,14 @@ class _DsBoardViewState extends State<DsBoardView> {
       tokens,
       lane,
       Padding(
-        padding: const EdgeInsets.all(DsSpacing.sm),
+        padding: EdgeInsets.all(tokens.spacingUnit),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _laneHeader(tokens, lane, narrow: true, collapsed: collapsed),
             if (!collapsed) ...[
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               _cardList(tokens, lane),
             ],
           ],
@@ -454,7 +452,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     final row = Row(
       children: [
         Flexible(child: badge),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         count,
         if (narrow) ...[
           const Spacer(),
@@ -465,7 +463,7 @@ class _DsBoardViewState extends State<DsBoardView> {
               onTap: () => _toggleCollapsed(lane.key),
               borderRadius: BorderRadius.circular(999),
               child: Padding(
-                padding: const EdgeInsets.all(DsSpacing.xs),
+                padding: EdgeInsets.all(tokens.spacingUnit / 2),
                 child: DsIcon(
                   icon: collapsed ? DsIcons.expandMore : DsIcons.expandLess,
                   size: DsIconSize.md,
@@ -483,9 +481,9 @@ class _DsBoardViewState extends State<DsBoardView> {
       explicitChildNodes: true,
       label: '${lane.label} lane, ${lane.rows.length} cards',
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DsSpacing.xs,
-          vertical: DsSpacing.xs,
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacingUnit / 2,
+          vertical: tokens.spacingUnit / 2,
         ),
         child: row,
       ),
@@ -509,7 +507,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     }
     final children = <Widget>[];
     for (var i = 0; i < lane.rows.length; i++) {
-      if (i > 0) children.add(const SizedBox(height: DsSpacing.sm));
+      if (i > 0) children.add(SizedBox(height: tokens.spacingUnit));
       children.add(_card(tokens, lane, lane.rows[i]));
     }
     return Column(
@@ -546,10 +544,10 @@ class _DsBoardViewState extends State<DsBoardView> {
       ),
       child: Stack(
         children: [
-          Padding(padding: const EdgeInsets.all(DsSpacing.md), child: body),
+          Padding(padding: EdgeInsets.all(tokens.spacingUnit * 1.5), child: body),
           Positioned(
-            top: DsSpacing.xxs,
-            right: DsSpacing.xxs,
+            top: tokens.spacingUnit / 4,
+            right: tokens.spacingUnit / 4,
             child: _moveMenu(tokens, lane, row, title),
           ),
         ],
@@ -586,7 +584,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     return Material(
       type: MaterialType.transparency,
       child: SizedBox(
-        width: widget.laneWidth - DsSpacing.md,
+        width: widget.laneWidth - tokens.spacingUnit * 1.5,
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(_cardRadius),
@@ -645,19 +643,19 @@ class _DsBoardViewState extends State<DsBoardView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(right: DsSpacing.xxl),
+          padding: EdgeInsets.only(right: tokens.spacingUnit * 4),
           child: Text(
             _primaryText(row),
             style: tokens.bodyMd
                 .toTextStyle(color: tokens.colorText)
-                .copyWith(fontWeight: DsTypography.semiBold),
+                .copyWith(fontWeight: tokens.strongLabelFontWeight),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         for (final field in fields)
           Padding(
-            padding: const EdgeInsets.only(top: DsSpacing.sm),
+            padding: EdgeInsets.only(top: tokens.spacingUnit),
             child: field,
           ),
       ],
@@ -719,8 +717,8 @@ class _DsBoardViewState extends State<DsBoardView> {
         final list = value is List ? value : null;
         if (list == null || list.isEmpty) return null;
         return Wrap(
-          spacing: DsSpacing.xs,
-          runSpacing: DsSpacing.xs,
+          spacing: tokens.spacingUnit / 2,
+          runSpacing: tokens.spacingUnit / 2,
           children: [
             for (final item in list.take(4))
               _selectBadge(tokens, column, item?.toString() ?? ''),
@@ -733,7 +731,7 @@ class _DsBoardViewState extends State<DsBoardView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             DsAvatar(name: s, size: 20),
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             Flexible(child: label(s, color: tokens.colorText)),
           ],
         );
@@ -748,7 +746,7 @@ class _DsBoardViewState extends State<DsBoardView> {
               size: DsIconSize.sm,
               color: b ? tokens.formAccentColor : tokens.colorSecondaryText,
             ),
-            const SizedBox(width: DsSpacing.xs),
+            SizedBox(width: tokens.spacingUnit / 2),
             Flexible(child: label(column.title)),
           ],
         );
@@ -823,7 +821,7 @@ class _DsBoardViewState extends State<DsBoardView> {
             ),
           ),
         ),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Text(
           '$percent%',
           style: tokens.labelSm.toTextStyle(color: tokens.colorSecondaryText),

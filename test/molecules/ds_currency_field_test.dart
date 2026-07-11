@@ -96,4 +96,62 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('border widths and the disabled fade re-style with the skin',
+      (tester) async {
+    await pumpDs(
+      tester,
+      const DsCurrencyField(symbol: r'$', label: 'Amount'),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(
+          inputBorderWidth: 3,
+          inputFocusBorderWidth: 5,
+          stateDisabledOpacity: 0.3,
+        ),
+      ),
+    );
+
+    final TextField field = tester.widget(find.byType(TextField));
+    final decoration = field.decoration!;
+    OutlineInputBorder outline(InputBorder? border) =>
+        border! as OutlineInputBorder;
+
+    expect(outline(decoration.enabledBorder).borderSide.width, 3);
+    expect(outline(decoration.focusedBorder).borderSide.width, 5);
+    final disabled = outline(decoration.disabledBorder).borderSide;
+    expect(disabled.width, 3);
+    expect(disabled.color.a, closeTo(0.3, 0.005));
+  });
+
+  testWidgets('the error border carries the focus emphasis', (tester) async {
+    await pumpDs(
+      tester,
+      const DsCurrencyField(
+        symbol: r'$',
+        label: 'Amount',
+        errorText: 'Amount is required',
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(inputFocusBorderWidth: 5),
+      ),
+    );
+
+    final TextField field = tester.widget(find.byType(TextField));
+    final enabled = field.decoration!.enabledBorder! as OutlineInputBorder;
+    expect(enabled.borderSide.width, 5);
+  });
+
+  testWidgets('the label gap reads the fieldLabelGap token', (tester) async {
+    await pumpDs(
+      tester,
+      const DsCurrencyField(symbol: r'$', label: 'Amount'),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(fieldLabelGap: 14),
+      ),
+    );
+
+    final labelBottom = tester.getBottomLeft(find.text('Amount')).dy;
+    final fieldTop = tester.getTopLeft(find.byType(TextField)).dy;
+    expect(fieldTop - labelBottom, 14);
+  });
 }

@@ -21,7 +21,7 @@ final PatternPage iconographyPage = PatternPage(
       'even, open line work with a consistent stroke. A short family policy '
       'keeps it honest: **outlined line glyphs** are the default for actions, '
       'affordances and status; **bare strokes** carry pure directional marks '
-      '(chevrons, arrows, add, close) that have no shape to outline; and '
+      '(chevrons, arrows, add, remove) that have no shape to outline; and '
       '**filled is reserved for true-state** glyphs where the fill itself is '
       'the meaning. Lucide draws outlines only, so the one true-state glyph '
       '(the selected rating star) keeps its Material solid form while the '
@@ -77,5 +77,5 @@ DsButton(
     Shot(pageId: 'iconography', size: ShotSize.phone),
   ],
   hasLiveDemo: true,
-  related: ['design-tokens', 'motion'],
+  related: ['icon', 'icon-button', 'design-tokens'],
 );

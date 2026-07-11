@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_progress_bar.dart';
 
 /// A single step within a [DsProgressStepper].
@@ -119,10 +118,10 @@ class DsProgressStepper extends StatelessWidget {
           Expanded(
             child: Padding(
               // Align the connector with the vertical centre of the circles.
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 top: _circleSize / 2,
-                left: DsSpacing.xs,
-                right: DsSpacing.xs,
+                left: tokens.spacingUnit / 2,
+                right: tokens.spacingUnit / 2,
               ),
               child: Container(
                 height: 1,
@@ -166,7 +165,7 @@ class DsProgressStepper extends StatelessWidget {
                 color: tokens.colorSecondaryText,
               ),
             ),
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             Expanded(
               child: Text(
                 steps[displayIndex].label,
@@ -179,7 +178,7 @@ class DsProgressStepper extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: DsSpacing.sm),
+        SizedBox(height: tokens.spacingUnit),
         // The shared atom draws the identical bar (same 4dp height, track and
         // fill tokens, fully rounded ends) this stepper used to draw inline.
         DsProgressBar(value: progress),
@@ -258,7 +257,7 @@ class _StepMarker extends StatelessWidget {
           ),
           child: marker,
         ),
-        const SizedBox(height: DsSpacing.xs),
+        SizedBox(height: tokens.spacingUnit / 2),
         Text(
           label,
           textAlign: TextAlign.center,

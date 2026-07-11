@@ -23,14 +23,32 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | `DsMotion.decelerate` | `Curve` | `cubic(0.05, 0.7, 0.1, 1)` | Pure decelerate for elements arriving from off-screen. |
 | `DsMotion.accelerate` | `Curve` | `cubic(0.3, 0, 0.8, 0.15)` | Accelerate for elements leaving the screen entirely. |
 | `DsMotion.settle` | `Curve` | `cubic(0.34, 1.35, 0.64, 1)` | A physical settle with a restrained overshoot: the premium, alive arrival. |
+
+## Physics
+
+For motion driven by a simulation rather than a fixed timeline (a dragged card released, a pull gesture snapping back), two tuned springs replace duration and curve.
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
 | `DsMotion.spring` | `SpringDescription` | `damping 22` | A near-critically-damped spring for physics-driven motion: a dragged card snapping back, only a hint of overshoot. |
 | `DsMotion.bounce` | `SpringDescription` | `damping 10` | An under-damped spring for a tactile, playful bounce: a button releasing. Visibly overshoots and settles. |
 
-One law above all: **respect reduced motion.** When a person has asked their platform for less motion, animation is not softened. It is removed. Resolve every duration and curve through `DsMotion.durationOf` and `DsMotion.curveOf`, which collapse to a still, instant change under the setting, and gate any bespoke animation behind `DsMotion.reduced`. The demo above obeys this: press Replay with reduce-motion on and it stays put.
+## Helpers
 
-![Desktop (1280dp)](img/motion_desktop.png)
+Never read the raw tokens in an animating widget; resolve them through the helpers below so every call site honours reduce-motion by construction.
 
-*Desktop (1280dp)*
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `DsMotion.durationOf(context, full)` | `Duration` | `base → 0ms` | Returns full when motion is allowed and Duration.zero under reduce-motion. |
+| `DsMotion.curveOf(context, full)` | `Curve` | `settle → linear` | Returns full when motion is allowed and Curves.linear under reduce-motion; there is no easing to perceive across a zero-length animation. |
+| `DsMotion.stagger(context, index)` | `Duration` | `40ms × index` | The delay before the item at index begins in a choreographed group, stepped 40ms apart and capped at 240ms. Zero under reduce-motion so the group arrives together. |
+| `DsMotion.reduced(context)` | `bool` | `false` | Whether the platform asks for reduced motion. Gate any bespoke animation behind it. |
+
+One law above all: **respect reduced motion.** When a person has asked their platform for less motion, animation is not softened. It is removed. Resolve every duration and curve through `DsMotion.durationOf` and `DsMotion.curveOf`, which collapse to a still, instant change under the setting, and gate any bespoke animation behind `DsMotion.reduced`. The live demo obeys this: press Replay with reduce-motion on and it stays put.
+
+![Desktop (1120dp)](img/motion_desktop.png)
+
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/motion_phone.png)
 

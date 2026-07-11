@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_avatar.dart';
 import '../atoms/ds_badge.dart';
@@ -195,8 +194,8 @@ class DsRecordPanel extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Wrap(
-                    spacing: DsSpacing.md,
-                    runSpacing: DsSpacing.sm,
+                    spacing: tokens.spacingUnit * 1.5,
+                    runSpacing: tokens.spacingUnit,
                     alignment: WrapAlignment.end,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
@@ -269,7 +268,7 @@ class DsRecordPanel extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < sections.length; i++) ...[
-          if (i > 0) const SizedBox(height: DsSpacing.xl),
+          if (i > 0) SizedBox(height: tokens.spacingUnit * 3),
           sections[i],
         ],
       ],
@@ -455,7 +454,7 @@ class DsRecordPanel extends StatelessWidget {
                   onTap: () => _emit(column.key, star),
                   borderRadius: BorderRadius.circular(tokens.formBorderRadius),
                   child: Padding(
-                    padding: const EdgeInsets.all(DsSpacing.xs),
+                    padding: EdgeInsets.all(tokens.spacingUnit / 2),
                     child: DsIcon(
                       icon: star <= filled ? DsIcons.star : DsIcons.starOutline,
                       size: DsIconSize.lg,
@@ -505,7 +504,7 @@ class DsRecordPanel extends StatelessWidget {
               size: DsIconSize.md,
               color: on ? tokens.colorPrimary : tokens.colorSecondaryText,
             ),
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             text(on ? 'Yes' : 'No'),
           ],
         );
@@ -516,8 +515,8 @@ class DsRecordPanel extends StatelessWidget {
       case DsCellType.multiSelect:
         if (value is! List || value.isEmpty) return emDash;
         return Wrap(
-          spacing: DsSpacing.xs,
-          runSpacing: DsSpacing.xs,
+          spacing: tokens.spacingUnit / 2,
+          runSpacing: tokens.spacingUnit / 2,
           children: [
             for (final item in value) _optionBadge(column, item?.toString() ?? ''),
           ],
@@ -531,7 +530,7 @@ class DsRecordPanel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             DsAvatar(name: value, size: 24),
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             Flexible(
               child: Text(
                 value,
@@ -608,7 +607,7 @@ class _Header extends StatelessWidget {
         children: [
           if (title != null && title.isNotEmpty) ...[
             DsAvatar(name: title, size: 36),
-            const SizedBox(width: DsSpacing.md),
+            SizedBox(width: tokens.spacingUnit * 1.5),
           ],
           Expanded(
             child: Column(
@@ -673,7 +672,7 @@ class _LabeledField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(label, style: _fieldLabelStyle(tokens)),
-        const SizedBox(height: 6),
+        SizedBox(height: tokens.fieldLabelGap),
         child,
       ],
     );

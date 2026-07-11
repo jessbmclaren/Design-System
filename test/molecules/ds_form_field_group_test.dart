@@ -159,6 +159,29 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('announces the legend on the group container, like a fieldset',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          legend: 'Shipping address',
+          children: [
+            DsTextField(label: 'Street'),
+            DsTextField(label: 'City'),
+          ],
+        ),
+      );
+
+      // The group is one labelled container, so assistive technology names
+      // the fields' context on entry. This mirrors an HTML fieldset's legend.
+      expect(
+        tester.getSemantics(find.byType(DsFormFieldGroup)),
+        isSemantics(label: 'Shipping address'),
+      );
+      handle.dispose();
+    });
+
     testWidgets('renders without overflow at 1200 width', (tester) async {
       await pumpDs(
         tester,
@@ -176,6 +199,86 @@ void main() {
       await tester.pump();
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the default gap resolves to twice spacingUnit',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          columns: 1,
+          children: [
+            DsTextField(label: 'First name'),
+            DsTextField(label: 'Last name'),
+          ],
+        ),
+      );
+
+      final firstBottom =
+          tester.getBottomLeft(find.byType(DsTextField).first).dy;
+      final secondTop = tester.getTopLeft(find.byType(DsTextField).last).dy;
+      expect(secondTop - firstBottom, 16);
+    });
+
+    testWidgets('the gap follows a spacingUnit override', (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          columns: 1,
+          children: [
+            DsTextField(label: 'First name'),
+            DsTextField(label: 'Last name'),
+          ],
+        ),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(spacingUnit: 10),
+        ),
+      );
+
+      final firstBottom =
+          tester.getBottomLeft(find.byType(DsTextField).first).dy;
+      final secondTop = tester.getTopLeft(find.byType(DsTextField).last).dy;
+      expect(secondTop - firstBottom, 20);
+    });
+
+    testWidgets('an explicit spacing wins over the token', (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          columns: 1,
+          spacing: 24,
+          children: [
+            DsTextField(label: 'First name'),
+            DsTextField(label: 'Last name'),
+          ],
+        ),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(spacingUnit: 10),
+        ),
+      );
+
+      final firstBottom =
+          tester.getBottomLeft(find.byType(DsTextField).first).dy;
+      final secondTop = tester.getTopLeft(find.byType(DsTextField).last).dy;
+      expect(secondTop - firstBottom, 24);
+    });
+
+    testWidgets('the legend weight follows strongLabelFontWeight',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsFormFieldGroup(
+          legend: 'Shipping address',
+          children: [DsTextField(label: 'Street')],
+        ),
+        theme: DsTheme.light(
+          tokens: DsTokens.light()
+              .copyWith(strongLabelFontWeight: FontWeight.w800),
+        ),
+      );
+
+      final Text legend = tester.widget(find.text('Shipping address'));
+      expect(legend.style!.fontWeight, FontWeight.w800);
     });
   });
 }

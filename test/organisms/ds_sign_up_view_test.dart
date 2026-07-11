@@ -1,4 +1,7 @@
 import 'package:design_system/design_system.dart';
+// The shared auth-card internals are deliberately not exported from the
+// barrel; the dedup regression tests reach them through the src path.
+import 'package:design_system/src/components/organisms/ds_auth_card_parts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,6 +47,55 @@ void main() {
 
       expect(find.byIcon(Icons.workspaces_outline), findsOneWidget);
       expect(find.text('Already have an account?'), findsOneWidget);
+    });
+
+    testWidgets('renders the brand glyph in the shared auth brand mark',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          brandIcon: Icons.workspaces_outline,
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+      );
+
+      // Dedup regression: the mark is the widget shared with DsSignInView.
+      final mark = find.byType(DsAuthBrandMark);
+      expect(mark, findsOneWidget);
+      expect(
+        find.descendant(
+          of: mark,
+          matching: find.byIcon(Icons.workspaces_outline),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('caps the card at its documented 440dp reading width',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Continue',
+          onSubmit: () {},
+        ),
+        surfaceSize: const Size(800, 900),
+      );
+
+      final tokens = DsTokens.of(tester.element(find.byType(DsSignUpView)));
+      final card = find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            w.decoration is BoxDecoration &&
+            (w.decoration! as BoxDecoration).color ==
+                tokens.formBackgroundColor,
+      );
+      expect(tester.getSize(card).width, 440);
     });
 
     testWidgets('fires onSubmit when the primary button is tapped',

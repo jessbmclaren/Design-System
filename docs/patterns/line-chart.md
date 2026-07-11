@@ -2,9 +2,9 @@
 
 A line chart traces one or more metrics as they change over an ordered axis (days, weeks or releases) so trend, momentum and the gap between series are easy to read. Every `DsLineSeries` you pass shares a single y-axis, which keeps the lines directly comparable and rules out the misleading dual-axis pairing. Series take their colour from the validated `DsChartPalette` categorical order by position, so identity stays stable across a product and never collides with a status hue; a legend appears automatically once there are two or more lines. The chart fills its parent's width, renders as a single static frame, thins x-labels rather than overflowing and ships a spoken summary so the trend is available to assistive technology as well as the eye.
 
-![Desktop (1280dp)](img/line-chart_desktop.png)
+![Desktop (1120dp)](img/line-chart_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/line-chart_phone.png)
 

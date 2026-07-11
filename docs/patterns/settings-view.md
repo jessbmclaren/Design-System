@@ -2,9 +2,9 @@
 
 `DsSettingsView` organises a preferences screen into titled `DsSettingsSection`s, each a heading and optional description above a bordered card that stacks its rows behind hairline dividers. It centres the content column, caps it at `maxContentWidth` on wide screens and tightens the horizontal padding on compact phones, so the same page reads cleanly from 320dp to desktop. Rows are ordinary widgets (most often a `DsListItem` carrying a value, a `DsSwitch` or a navigation chevron) and the whole page scrolls as one `ListView`, so a screen can grow to any number of sections without special handling. An optional `header` anchors the page title and a `footer` holds a closing action such as sign-out.
 
-![Desktop (1280dp)](img/settings-view_desktop.png)
+![Desktop (1120dp)](img/settings-view_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/settings-view_phone.png)
 

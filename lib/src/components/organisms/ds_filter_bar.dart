@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_chip.dart';
@@ -713,7 +712,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
           ),
         ),
         if (_open) ...[
-          const SizedBox(height: DsSpacing.sm),
+          SizedBox(height: tokens.spacingUnit),
           _buildPanel(tokens),
         ],
       ],
@@ -736,7 +735,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
             borderRadius: BorderRadius.circular(tokens.formBorderRadius),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(DsSpacing.md),
+            padding: EdgeInsets.all(tokens.spacingUnit * 1.5),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -752,10 +751,10 @@ class _DsFilterBarState extends State<DsFilterBar> {
                   )
                 else
                   for (var i = 0; i < conditions.length; i++) ...[
-                    if (i > 0) const SizedBox(height: DsSpacing.sm),
+                    if (i > 0) SizedBox(height: tokens.spacingUnit),
                     _buildConditionRow(tokens, i, conditions[i], compact),
                   ],
-                const SizedBox(height: DsSpacing.md),
+                SizedBox(height: tokens.spacingUnit * 1.5),
                 _buildFooter(conditions.isNotEmpty),
               ],
             ),
@@ -766,9 +765,10 @@ class _DsFilterBarState extends State<DsFilterBar> {
   }
 
   Widget _buildFooter(bool hasConditions) {
+    final tokens = DsTokens.of(context);
     return Wrap(
-      spacing: DsSpacing.sm,
-      runSpacing: DsSpacing.sm,
+      spacing: tokens.spacingUnit,
+      runSpacing: tokens.spacingUnit,
       children: [
         DsButton(
           label: 'Add condition',
@@ -809,7 +809,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(DsSpacing.sm),
+          padding: EdgeInsets.all(tokens.spacingUnit),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -819,11 +819,11 @@ class _DsFilterBarState extends State<DsFilterBar> {
                   remove,
                 ],
               ),
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               field,
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               operator,
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               value,
             ],
           ),
@@ -835,13 +835,13 @@ class _DsFilterBarState extends State<DsFilterBar> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(width: _prefixWidth, child: prefix),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Expanded(flex: 4, child: field),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Expanded(flex: 4, child: operator),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         Expanded(flex: 5, child: value),
-        const SizedBox(width: DsSpacing.xs),
+        SizedBox(width: tokens.spacingUnit / 2),
         remove,
       ],
     );
@@ -991,7 +991,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: DsSpacing.md),
+        padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit * 1.5),
         child: Text(
           text,
           style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
@@ -1061,7 +1061,7 @@ class _ConjunctionToggle extends StatelessWidget {
           child: Container(
             color: selected ? tokens.formAccentColor : null,
             constraints: const BoxConstraints(minHeight: 40),
-            padding: const EdgeInsets.symmetric(horizontal: DsSpacing.sm),
+            padding: EdgeInsets.symmetric(horizontal: tokens.spacingUnit),
             alignment: Alignment.center,
             child: Text(
               label,
@@ -1093,8 +1093,8 @@ class _OptionChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     return Wrap(
-      spacing: DsSpacing.xs,
-      runSpacing: DsSpacing.xs,
+      spacing: tokens.spacingUnit / 2,
+      runSpacing: tokens.spacingUnit / 2,
       children: [
         for (final option in options)
           _chip(tokens, option, selected.contains(option.value)),

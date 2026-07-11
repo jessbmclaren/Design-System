@@ -6,9 +6,9 @@ Editing is opt-in and controlled. Set `DsDataGrid.editable` and mark the editabl
 
 Because the value type drives everything, keep each cell's runtime type honest: a `num` for number and currency, a `DateTime` for date, a `bool` for checkbox, an `int` 0 to 5 for rating, a `double` 0 to 1 for progress, a `String` option value for select and status, and a `List<String>` for multi-select. A value that does not match its column renders as an em dash rather than throwing, so partial or mid-import data still displays cleanly.
 
-![Desktop (1280dp)](img/cell-types_desktop.png)
+![Desktop (1120dp)](img/cell-types_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/cell-types_phone.png)
 

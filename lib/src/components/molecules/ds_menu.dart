@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_icon.dart';
 
 /// A single selectable row within a [DsMenu].
@@ -187,7 +186,7 @@ class _DsMenuSurface extends StatelessWidget {
         child: ClipRRect(
           borderRadius: radius,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+            padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit / 2),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -220,8 +219,8 @@ class _DsMenuRow extends StatelessWidget {
 
     final ButtonStyle style = ButtonStyle(
       minimumSize: const WidgetStatePropertyAll<Size>(Size(112, 48)),
-      padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-        EdgeInsets.symmetric(horizontal: DsSpacing.md),
+      padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
+        EdgeInsets.symmetric(horizontal: tokens.spacingUnit * 1.5),
       ),
       shape: const WidgetStatePropertyAll<OutlinedBorder>(
         RoundedRectangleBorder(),

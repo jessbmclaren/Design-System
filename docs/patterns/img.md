@@ -4,9 +4,9 @@
 
 Always reserve space. Passing `width` and `height` lets the skeleton occupy the image's final footprint, so text and controls below it do not jump when the pixels arrive. Because `DsImg` starts no timers and no indefinite animation, it is safe to drop straight into screenshots and golden tests. With no source at all it shows the placeholder box.
 
-![Desktop (1280dp)](img/img_desktop.png)
+![Desktop (1120dp)](img/img_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/img_phone.png)
 

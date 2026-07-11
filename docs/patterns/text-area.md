@@ -4,9 +4,9 @@ The text area gives people room to write more than a line: notes, descriptions, 
 
 Because helper and error captions share one row, they never appear at once: set `errorText` and it takes over from `helperText` until the value is valid again. Size the field to the job with `minLines` and `maxLines` (three to six lines suits most notes) and pass a `controller` when you need the character counter to track keystrokes or want to read the value back. Every colour, radius and type ramp is drawn from `DsTokens`, so the field re-skins with the active theme without any per-screen styling.
 
-![Desktop (1280dp)](img/text-area_desktop.png)
+![Desktop (1120dp)](img/text-area_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/text-area_phone.png)
 

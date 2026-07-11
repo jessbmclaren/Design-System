@@ -2,6 +2,14 @@
 
 `DsIconButton` is a flat, circular button for a single icon action, such as closing a dialog or opening an overflow menu. It stays flat until you hover, focus or press it, when a soft themed fill appears, so it sits quietly on a toolbar or inside a card rather than reading as a raised button. The `semanticLabel` is required: it names the button for screen readers and shows as a tooltip on hover. Pass a null `onPressed` to disable the button and drop it from the focus order.
 
+![Desktop (1120dp)](img/icon-button_desktop.png)
+
+*Desktop (1120dp)*
+
+![Small phone (320dp)](img/icon-button_phone.png)
+
+*Small phone (320dp)*
+
 ## Guidelines
 
 **Do**
@@ -47,3 +55,4 @@ Row(
 
 - [Action buttons](action-buttons.md)
 - [Icon](icon.md)
+- [Iconography](iconography.md)

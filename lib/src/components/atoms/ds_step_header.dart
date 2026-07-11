@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 // DsHeadingAlignment is the shared alignment vocabulary already exported from
 // the package barrel; reuse it rather than minting a near-duplicate enum.
-import '../organisms/ds_sign_up_view.dart' show DsHeadingAlignment;
+import 'ds_heading_alignment.dart';
 
 /// The type-ramp size a [DsStepHeader] renders at.
 enum DsStepHeaderSize {

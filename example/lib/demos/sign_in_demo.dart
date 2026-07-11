@@ -120,7 +120,7 @@ class _SignInDemoState extends State<SignInDemo> {
         children: [
           Text(
             'New here? ',
-            style: DsTypography.bodySm.toTextStyle(
+            style: tokens.bodySm.toTextStyle(
               color: tokens.colorSecondaryText,
             ),
           ),

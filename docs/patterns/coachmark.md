@@ -4,9 +4,9 @@ A coachmark is a compact spotlight callout that points a first-time person at ex
 
 Use a coachmark when a feature is genuinely new or easy to miss, and only when a single, well-placed hint will do. Keep each step to one idea and one action; if you find yourself explaining several things at once, the feature likely needs a clearer design rather than a longer tour. Provide `onDismiss` so people can leave at any point, and always let a tour end with a persistent way back to the same information.
 
-![Desktop (1280dp)](img/coachmark_desktop.png)
+![Desktop (1120dp)](img/coachmark_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/coachmark_phone.png)
 

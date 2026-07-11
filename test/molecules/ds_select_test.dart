@@ -270,4 +270,82 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('the focused border matches the field family emphasis',
+      (tester) async {
+    await pumpDs(
+      tester,
+      DsSelect<String>(
+        label: 'Country',
+        value: null,
+        options: options,
+        onChanged: (_) {},
+      ),
+    );
+
+    final InputDecorator decorator =
+        tester.widget(find.byType(InputDecorator));
+    OutlineInputBorder outline(InputBorder? border) =>
+        border! as OutlineInputBorder;
+
+    // Aligned with the rest of the field family: 1.6, not the 2 the select
+    // once drew.
+    expect(outline(decorator.decoration.focusedBorder).borderSide.width, 1.6);
+    expect(
+      outline(decorator.decoration.focusedErrorBorder).borderSide.width,
+      1.6,
+    );
+    expect(outline(decorator.decoration.enabledBorder).borderSide.width, 1);
+  });
+
+  testWidgets('border widths re-style with the skin', (tester) async {
+    await pumpDs(
+      tester,
+      DsSelect<String>(
+        label: 'Country',
+        value: null,
+        options: options,
+        onChanged: (_) {},
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(
+          inputBorderWidth: 3,
+          inputFocusBorderWidth: 5,
+        ),
+      ),
+    );
+
+    final InputDecorator decorator =
+        tester.widget(find.byType(InputDecorator));
+    OutlineInputBorder outline(InputBorder? border) =>
+        border! as OutlineInputBorder;
+
+    expect(outline(decorator.decoration.enabledBorder).borderSide.width, 3);
+    expect(outline(decorator.decoration.focusedBorder).borderSide.width, 5);
+    expect(outline(decorator.decoration.errorBorder).borderSide.width, 3);
+    expect(
+      outline(decorator.decoration.focusedErrorBorder).borderSide.width,
+      5,
+    );
+  });
+
+  testWidgets('the label gap reads the fieldLabelGap token', (tester) async {
+    await pumpDs(
+      tester,
+      DsSelect<String>(
+        label: 'Country',
+        value: null,
+        options: options,
+        onChanged: (_) {},
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(fieldLabelGap: 14),
+      ),
+    );
+
+    final labelBottom = tester.getBottomLeft(find.text('Country')).dy;
+    final fieldTop =
+        tester.getTopLeft(find.byType(DropdownButtonFormField<String>)).dy;
+    expect(fieldTop - labelBottom, 14);
+  });
 }

@@ -29,9 +29,17 @@ abstract final class DsSpacing {
   // Component paddings.
 
   /// The horizontal padding for buttons.
+  ///
+  /// No longer read by the token layer: the button paints the full inset
+  /// held in [DsTokens.buttonPaddingX], so this value is stale.
+  @Deprecated('Set DsTokens.buttonPaddingX instead')
   static const double buttonPaddingX = 4;
 
   /// The vertical padding for buttons.
+  ///
+  /// No longer read by the token layer: the button paints the full inset
+  /// held in [DsTokens.buttonPaddingY], so this value is stale.
+  @Deprecated('Set DsTokens.buttonPaddingY instead')
   static const double buttonPaddingY = 4;
 
   /// The horizontal padding for input fields in forms.

@@ -1,7 +1,7 @@
 // Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
-/// Forms → Form field group.
+/// Inputs → Form field group.
 final PatternPage formFieldGroupPage = PatternPage(
   id: 'form-field-group',
   group: DocGroup.inputs,
@@ -14,9 +14,10 @@ final PatternPage formFieldGroupPage = PatternPage(
       'then lays out its `children` with a consistent `spacing`: it flows fields '
       'two-per-row once the group is wide enough to hold them and stacks to a '
       'single column when it is narrower, so the same markup fits a 320dp phone '
-      'and a desktop pane without overflow. The threshold tracks the group\'s own '
-      'width, so a pair of fields sits side by side inside a card as soon as '
-      'there is room. The whole block is wrapped in a '
+      'and a desktop pane without overflow. The threshold is `minRowWidth` '
+      '(360dp by default), measured against the group\'s own width rather than '
+      'the window, so a pair of fields sits side by side inside a card as soon '
+      'as there is room. The whole block is wrapped in a '
       'semantic container announced by the legend. It gives assistive technology the '
       'same "fieldset and legend" grouping a native form would.',
   hasLiveDemo: true,
@@ -35,13 +36,13 @@ final PatternPage formFieldGroupPage = PatternPage(
         'between separate groups so the sections stay distinct.',
   ],
   donts: const [
-    'Do not wrap a single unrelated field in a group; a lone input reads better '
+    'Don\'t wrap a single unrelated field in a group; a lone input reads better '
         'as a plain labelled field.',
-    'Do not pack unrelated fields under one legend just to shorten the form; '
+    'Don\'t pack unrelated fields under one legend just to shorten the form; '
         'the grouping should reflect real relationships.',
-    'Do not force two columns for inputs that need the full width, such as a '
+    'Don\'t force two columns for inputs that need the full width, such as a '
         'multi-line note; use `columns: 1` instead.',
-    'Do not repeat the legend text inside each child label; the legend already '
+    'Don\'t repeat the legend text inside each child label; the legend already '
         'names the group for both sighted and assistive-tech users.',
   ],
   code: '''

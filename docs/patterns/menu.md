@@ -4,9 +4,9 @@ A `DsMenu` collects the actions that belong to one object (a record, a row, an u
 
 A menu is for actions, not settings. If the choices are mutually exclusive states the user is picking between (a status, a sort order, a saved filter), use a `DsSelect` instead, which shows the current value and reads as a form control. Keep menus short: group related actions, order the most common first and place a `destructive` item such as Delete last, apart from the routine choices above it. Pair any irreversible action with a confirmation step rather than relying on the menu alone.
 
-![Desktop (1280dp)](img/menu_desktop.png)
+![Desktop (1120dp)](img/menu_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/menu_phone.png)
 

@@ -51,4 +51,18 @@ void main() {
     final reduced = await _context(tester, disableAnimations: true);
     expect(DsMotion.stagger(reduced, 3), Duration.zero);
   });
+
+  testWidgets('reduced defaults to false without a MediaQuery ancestor',
+      (tester) async {
+    late BuildContext ctx;
+    await tester.pumpWidget(
+      Builder(builder: (context) {
+        ctx = context;
+        return const SizedBox();
+      }),
+    );
+    expect(DsMotion.reduced(ctx), isFalse);
+    expect(DsMotion.durationOf(ctx, DsMotion.base), DsMotion.base);
+    expect(DsMotion.curveOf(ctx, DsMotion.settle), DsMotion.settle);
+  });
 }

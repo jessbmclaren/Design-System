@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import '../../tokens/ds_spacing.dart';
+import '../../theme/ds_tokens_extension.dart';
 import '../atoms/ds_button.dart';
 
 /// The action cluster that closes a wizard step, an onboarding screen or a
@@ -130,6 +130,7 @@ class DsFooterActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     final leading = this.leading;
     final Widget? back = backLabel == null
         ? null
@@ -154,6 +155,8 @@ class DsFooterActions extends StatelessWidget {
       hasLeading: leading != null,
       hasBack: back != null,
       hasTertiary: tertiary != null,
+      gap: tokens.spacingUnit * 1.5,
+      stackGap: tokens.spacingUnit,
       textDirection: Directionality.of(context),
       children: <Widget>[
         ?leading,
@@ -179,6 +182,8 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
     required this.hasLeading,
     required this.hasBack,
     required this.hasTertiary,
+    required this.gap,
+    required this.stackGap,
     required this.textDirection,
     required super.children,
   });
@@ -187,6 +192,14 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
   final bool hasLeading;
   final bool hasBack;
   final bool hasTertiary;
+
+  /// The gap between the back and primary actions in the row layout, and
+  /// above the tertiary action and the caption.
+  final double gap;
+
+  /// The tighter gap between the stacked primary and back buttons.
+  final double stackGap;
+
   final TextDirection textDirection;
 
   @override
@@ -196,6 +209,8 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
       hasLeading: hasLeading,
       hasBack: hasBack,
       hasTertiary: hasTertiary,
+      gap: gap,
+      stackGap: stackGap,
       textDirection: textDirection,
     );
   }
@@ -210,6 +225,8 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
       ..hasLeading = hasLeading
       ..hasBack = hasBack
       ..hasTertiary = hasTertiary
+      ..gap = gap
+      ..stackGap = stackGap
       ..textDirection = textDirection;
   }
 }
@@ -240,19 +257,33 @@ class _RenderFooterCluster extends RenderBox
     required bool hasLeading,
     required bool hasBack,
     required bool hasTertiary,
+    required double gap,
+    required double stackGap,
     required TextDirection textDirection,
   })  : _minRowWidth = minRowWidth,
         _hasLeading = hasLeading,
         _hasBack = hasBack,
         _hasTertiary = hasTertiary,
+        _gap = gap,
+        _stackGap = stackGap,
         _textDirection = textDirection;
 
   /// The gap between the back and primary actions in the row layout, and
   /// above the tertiary action and the caption.
-  static const double _gap = DsSpacing.md;
+  double _gap;
+  set gap(double value) {
+    if (_gap == value) return;
+    _gap = value;
+    markNeedsLayout();
+  }
 
   /// The tighter gap between the stacked primary and back buttons.
-  static const double _stackGap = DsSpacing.sm;
+  double _stackGap;
+  set stackGap(double value) {
+    if (_stackGap == value) return;
+    _stackGap = value;
+    markNeedsLayout();
+  }
 
   double _minRowWidth;
   set minRowWidth(double value) {

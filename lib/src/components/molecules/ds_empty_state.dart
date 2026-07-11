@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 
 /// A single call-to-action rendered inside a [DsEmptyState].
@@ -60,9 +59,9 @@ class DsEmptyState extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DsSpacing.xl,
-          vertical: DsSpacing.xxl,
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacingUnit * 3,
+          vertical: tokens.spacingUnit * 4,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -74,7 +73,7 @@ class DsEmptyState extends StatelessWidget {
                 size: 48,
                 color: tokens.colorSecondaryText,
               ),
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
             ],
             Text(
               title,
@@ -84,7 +83,7 @@ class DsEmptyState extends StatelessWidget {
               style: tokens.headingSm.toTextStyle(color: tokens.colorText),
             ),
             if (message != null) ...[
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: _messageMaxWidth),
                 child: Text(
@@ -96,7 +95,7 @@ class DsEmptyState extends StatelessWidget {
               ),
             ],
             if (action != null) ...[
-              const SizedBox(height: DsSpacing.xl),
+              SizedBox(height: tokens.spacingUnit * 3),
               DsButton(
                 label: action!.label,
                 onPressed: action!.onPressed,

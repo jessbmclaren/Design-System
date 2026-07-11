@@ -2,9 +2,9 @@
 
 A link is inline, tappable text for navigation and low-emphasis actions: jumping to another view, opening a document or revealing supporting detail without the visual weight of a button. `DsLink` styles its label from the theme's action tokens: `primary` for the main path through a flow, `secondary` for supporting routes that should stay quiet. Set `external: true` to append an "open in new" glyph that signals the destination leaves the current context, or pass a `trailingIcon` such as a chevron for any other affordance. The label ellipsizes rather than wrapping, so a link sits safely inside running text, a `Row` or a `Wrap` from a 320dp phone up to a wide desktop. A null `onPressed` renders the link disabled and drops it from the tap and focus order.
 
-![Desktop (1280dp)](img/link_desktop.png)
+![Desktop (1120dp)](img/link_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/link_phone.png)
 

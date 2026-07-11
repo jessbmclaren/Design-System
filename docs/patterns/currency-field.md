@@ -2,9 +2,9 @@
 
 The currency field collects a single monetary amount without making the user fight the keyboard. `DsCurrencyField` pins the currency `symbol` as a non-editable prefix inside the control, requests a decimal numeric keypad on mobile and filters every keystroke down to digits and a single decimal point, so a value like `1249.5` can never become unparseable. It parses the text to a `num` for you, surfacing it through `onChanged` (or null while the field is empty or holds a lone decimal point), and it renders whole amounts cleanly without a trailing `.0`. Label, hint, helper and error states mirror the text field, and passing `errorText` flips the border and caption to the danger colour and announces the message alongside the label for assistive technology.
 
-![Desktop (1280dp)](img/currency-field_desktop.png)
+![Desktop (1120dp)](img/currency-field_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/currency-field_phone.png)
 

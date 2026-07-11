@@ -104,6 +104,10 @@ abstract final class DsColors {
   /// selected row on a table.
   static const Color offsetBackground = Color(0xFFFFFFFF);
 
+  /// The muted surface tier: the quiet grey behind code wells, table headers
+  /// and other recessed panels.
+  static const Color surfaceMuted = Color(0xFFF6F8FA);
+
   /// The colour used for borders throughout components.
   static const Color border = Color(0xFFD7D7D7);
 

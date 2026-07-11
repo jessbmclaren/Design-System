@@ -4,9 +4,9 @@ Filter controls let people narrow a table or list to the records they care about
 
 The chip is generic over its value type, so it can carry an enum, an id or any domain value without stringly-typed lookups. When more than one filter is active, offer a single "Clear filters" link beside the chips so people can reset the view in one step. If a combination of filters leaves no matching records, replace the table with an empty state that explains why and offers a way back.
 
-![Desktop (1280dp)](img/filter-controls_desktop.png)
+![Desktop (1120dp)](img/filter-controls_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/filter-controls_phone.png)
 

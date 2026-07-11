@@ -4,9 +4,9 @@ An accordion stacks a set of collapsible sections, so a long or dense page colla
 
 Set `initiallyExpanded: true` on the item people most likely need first, so the accordion opens with useful content already visible. In single-open mode only the first such item stays open and the rest start closed. A collapsed body is removed from the tree entirely, so assistive technology never reads hidden content. Each header exposes its expanded state to screen readers.
 
-![Desktop (1280dp)](img/accordion_desktop.png)
+![Desktop (1120dp)](img/accordion_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/accordion_phone.png)
 

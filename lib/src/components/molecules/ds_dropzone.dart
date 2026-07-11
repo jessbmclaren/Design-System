@@ -5,7 +5,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
 
@@ -81,9 +80,9 @@ class DsDropzone extends StatelessWidget {
     final hasFile = selectedFileName != null;
 
     final content = Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DsSpacing.xl,
-        vertical: DsSpacing.xxl,
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacingUnit * 3,
+        vertical: tokens.spacingUnit * 4,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -94,7 +93,7 @@ class DsDropzone extends StatelessWidget {
             size: DsIconSize.xl,
             color: tokens.colorSecondaryText,
           ),
-          const SizedBox(height: DsSpacing.md),
+          SizedBox(height: tokens.spacingUnit * 1.5),
           Text(
             title,
             textAlign: TextAlign.center,
@@ -102,7 +101,7 @@ class DsDropzone extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: tokens.headingSm.toTextStyle(color: tokens.colorText),
           ),
-          const SizedBox(height: DsSpacing.xs),
+          SizedBox(height: tokens.spacingUnit / 2),
           Text(
             acceptHint,
             textAlign: TextAlign.center,
@@ -110,7 +109,7 @@ class DsDropzone extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
           ),
-          const SizedBox(height: DsSpacing.lg),
+          SizedBox(height: tokens.spacingUnit * 2),
           if (hasFile)
             _FileChip(
               tokens: tokens,
@@ -185,11 +184,11 @@ class _FileChip extends StatelessWidget {
         border: Border.all(color: tokens.colorBorder),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-          left: DsSpacing.md,
-          top: DsSpacing.xs,
-          bottom: DsSpacing.xs,
-          right: DsSpacing.xs,
+        padding: EdgeInsets.only(
+          left: tokens.spacingUnit * 1.5,
+          top: tokens.spacingUnit / 2,
+          bottom: tokens.spacingUnit / 2,
+          right: tokens.spacingUnit / 2,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -199,7 +198,7 @@ class _FileChip extends StatelessWidget {
               size: DsIconSize.sm,
               color: tokens.colorSecondaryText,
             ),
-            const SizedBox(width: DsSpacing.sm),
+            SizedBox(width: tokens.spacingUnit),
             Flexible(
               child: Text(
                 name,
@@ -208,7 +207,7 @@ class _FileChip extends StatelessWidget {
                 style: tokens.bodySm.toTextStyle(color: tokens.colorText),
               ),
             ),
-            const SizedBox(width: DsSpacing.xs),
+            SizedBox(width: tokens.spacingUnit / 2),
             Semantics(
               button: true,
               enabled: onClear != null,
@@ -219,9 +218,12 @@ class _FileChip extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: onClear,
-                  child: const Padding(
-                    padding: EdgeInsets.all(DsSpacing.xs),
-                    child: DsIcon(icon: DsIcons.close, size: DsIconSize.sm),
+                  child: Padding(
+                    padding: EdgeInsets.all(tokens.spacingUnit / 2),
+                    child: const DsIcon(
+                      icon: DsIcons.close,
+                      size: DsIconSize.sm,
+                    ),
                   ),
                 ),
               ),

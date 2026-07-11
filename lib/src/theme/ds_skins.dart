@@ -54,6 +54,8 @@ abstract final class DsSkins {
       buttonPrimaryColorBorder: _indigo,
       actionPrimaryColorText: _indigo,
       actionPrimaryTextDecorationColor: _indigo,
+      // The tertiary label follows the brand link colour.
+      buttonTertiaryColorText: _indigo,
       formAccentColor: _indigo,
       formHighlightColorBorder: _indigo,
       // Text & surfaces
@@ -129,6 +131,8 @@ abstract final class DsSkins {
           fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
+      // The glyph keeps its 2dp lead over the 15dp label.
+      buttonIconSize: 17,
       // Elevation: the brand-tinted scale (low / medium / high).
       shadowLow: _shadowLow,
       shadowMedium: _shadowMedium,
@@ -146,6 +150,8 @@ abstract final class DsSkins {
       colorPrimary: const Color(0xFF5A6BE0),
       actionPrimaryColorText: const Color(0xFF9DA8F0),
       actionPrimaryTextDecorationColor: const Color(0xFF9DA8F0),
+      // The tertiary label follows the skin's dark link colour.
+      buttonTertiaryColorText: const Color(0xFF9DA8F0),
       formAccentColor: const Color(0xFF5A6BE0),
       buttonPrimaryColorBackground: const Color(0xFF3B49C4),
       buttonPrimaryColorBorder: const Color(0xFF3B49C4),
@@ -168,12 +174,23 @@ abstract final class DsSkins {
           fontWeight: DsTypography.bold,
           height: 1.2,
           letterSpacing: -0.4),
+      // The same mid-ramp overrides as the light skin, so the brand's
+      // heading voice carries into dark.
+      headingMd: const DsTypeToken(
+          fontSize: 20,
+          fontWeight: DsTypography.bold,
+          height: 1.25,
+          letterSpacing: -0.2),
+      headingSm: const DsTypeToken(
+          fontSize: 16, fontWeight: DsTypography.bold, height: 1.3),
       labelMd: const DsTypeToken(
           fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.4),
       labelSm: const DsTypeToken(
           fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
+      // The glyph keeps its 2dp lead over the 15dp label.
+      buttonIconSize: 17,
       // Deeper drops read on the dark surfaces.
       shadowLow: const <BoxShadow>[
         BoxShadow(

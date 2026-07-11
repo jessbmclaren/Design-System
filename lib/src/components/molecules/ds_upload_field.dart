@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_icon_button.dart';
 import '../atoms/ds_progress_bar.dart';
 
@@ -179,14 +178,14 @@ class DsUploadField extends StatelessWidget {
     final content = ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 48),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DsSpacing.md,
-          vertical: DsSpacing.sm,
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacingUnit * 1.5,
+          vertical: tokens.spacingUnit,
         ),
         child: Row(
           children: <Widget>[
             Icon(icon, size: DsIconSize.lg, color: iconColor),
-            const SizedBox(width: DsSpacing.md),
+            SizedBox(width: tokens.spacingUnit * 1.5),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,13 +205,13 @@ class DsUploadField extends StatelessWidget {
                     ),
                   ),
                   if (uploading) ...<Widget>[
-                    const SizedBox(height: DsSpacing.sm),
+                    SizedBox(height: tokens.spacingUnit),
                     DsProgressBar(
                       value: progress,
                       semanticLabel: 'Upload progress',
                     ),
                   ] else if (caption != null) ...<Widget>[
-                    const SizedBox(height: DsSpacing.xxs),
+                    SizedBox(height: tokens.spacingUnit / 4),
                     Text(
                       caption,
                       maxLines: 2,
@@ -224,7 +223,7 @@ class DsUploadField extends StatelessWidget {
               ),
             ),
             if (success && onRemove != null) ...<Widget>[
-              const SizedBox(width: DsSpacing.sm),
+              SizedBox(width: tokens.spacingUnit),
               DsIconButton(
                 icon: DsIcons.close,
                 semanticLabel: 'Remove file',

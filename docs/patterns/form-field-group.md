@@ -1,10 +1,10 @@
 # Form field group
 
-A form field group gathers related inputs under one legend so a long form reads as a handful of labelled sections rather than an undifferentiated stack of boxes. `DsFormFieldGroup` renders an optional legend and description, then lays out its `children` with a consistent `spacing`: it flows fields two-per-row once the group is wide enough to hold them and stacks to a single column when it is narrower, so the same markup fits a 320dp phone and a desktop pane without overflow. The threshold tracks the group's own width, so a pair of fields sits side by side inside a card as soon as there is room. The whole block is wrapped in a semantic container announced by the legend. It gives assistive technology the same "fieldset and legend" grouping a native form would.
+A form field group gathers related inputs under one legend so a long form reads as a handful of labelled sections rather than an undifferentiated stack of boxes. `DsFormFieldGroup` renders an optional legend and description, then lays out its `children` with a consistent `spacing`: it flows fields two-per-row once the group is wide enough to hold them and stacks to a single column when it is narrower, so the same markup fits a 320dp phone and a desktop pane without overflow. The threshold is `minRowWidth` (360dp by default), measured against the group's own width rather than the window, so a pair of fields sits side by side inside a card as soon as there is room. The whole block is wrapped in a semantic container announced by the legend. It gives assistive technology the same "fieldset and legend" grouping a native form would.
 
-![Desktop (1280dp)](img/form-field-group_desktop.png)
+![Desktop (1120dp)](img/form-field-group_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/form-field-group_phone.png)
 
@@ -23,10 +23,10 @@ A form field group gathers related inputs under one legend so a long form reads 
 
 **Don't**
 
-- Do not wrap a single unrelated field in a group; a lone input reads better as a plain labelled field.
-- Do not pack unrelated fields under one legend just to shorten the form; the grouping should reflect real relationships.
-- Do not force two columns for inputs that need the full width, such as a multi-line note; use `columns: 1` instead.
-- Do not repeat the legend text inside each child label; the legend already names the group for both sighted and assistive-tech users.
+- Don't wrap a single unrelated field in a group; a lone input reads better as a plain labelled field.
+- Don't pack unrelated fields under one legend just to shorten the form; the grouping should reflect real relationships.
+- Don't force two columns for inputs that need the full width, such as a multi-line note; use `columns: 1` instead.
+- Don't repeat the legend text inside each child label; the legend already names the group for both sighted and assistive-tech users.
 
 ## Example
 

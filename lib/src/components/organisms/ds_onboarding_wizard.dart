@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_divider.dart';
 import '../molecules/ds_footer_actions.dart';
@@ -168,7 +167,8 @@ class DsOnboardingWizard extends StatelessWidget {
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
         final compact = width < DsBreakpoints.medium;
-        final horizontalPadding = compact ? DsSpacing.lg : DsSpacing.xl;
+        final horizontalPadding =
+            compact ? tokens.spacingUnit * 2 : tokens.spacingUnit * 3;
         final headerContent = _buildHeader(tokens);
 
         return Column(
@@ -183,9 +183,9 @@ class DsOnboardingWizard extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
                     horizontalPadding,
-                    DsSpacing.xl,
+                    tokens.spacingUnit * 3,
                     horizontalPadding,
-                    DsSpacing.lg,
+                    tokens.spacingUnit * 2,
                   ),
                   child: headerContent,
                 ),
@@ -196,7 +196,7 @@ class DsOnboardingWizard extends StatelessWidget {
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
                     horizontal: horizontalPadding,
-                    vertical: DsSpacing.sm,
+                    vertical: tokens.spacingUnit,
                   ),
                   child: child,
                 ),
@@ -208,7 +208,7 @@ class DsOnboardingWizard extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: horizontalPadding,
-                  vertical: DsSpacing.lg,
+                  vertical: tokens.spacingUnit * 2,
                 ),
                 child: _buildFooter(compact),
               ),
@@ -231,12 +231,12 @@ class DsOnboardingWizard extends StatelessWidget {
       if (header != null) ...[
         header,
         if (stepperVisible || title != null || subtitle != null)
-          const SizedBox(height: DsSpacing.lg),
+          SizedBox(height: tokens.spacingUnit * 2),
       ],
       if (stepperVisible)
         DsProgressStepper(steps: _dsSteps, currentIndex: currentIndex),
       if (title != null) ...[
-        if (stepperVisible) const SizedBox(height: DsSpacing.xl),
+        if (stepperVisible) SizedBox(height: tokens.spacingUnit * 3),
         Semantics(
           header: true,
           child: Text(
@@ -246,7 +246,7 @@ class DsOnboardingWizard extends StatelessWidget {
         ),
       ],
       if (subtitle != null) ...[
-        const SizedBox(height: DsSpacing.xs),
+        SizedBox(height: tokens.spacingUnit / 2),
         Text(
           subtitle,
           style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),

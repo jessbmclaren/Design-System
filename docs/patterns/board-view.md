@@ -6,9 +6,9 @@ Lanes are drawn from the group column's `options`, in their declared order, so t
 
 Use the board when moving records between states is the job. When the job is instead scanning many attributes at once, use the grid; when it is totalling clusters, use grouping. All three read the same `DsGridColumn` / `DsGridRow` model, so a view switch is a change of presentation, not of data.
 
-![Desktop (1280dp)](img/board-view_desktop.png)
+![Desktop (1120dp)](img/board-view_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/board-view_phone.png)
 

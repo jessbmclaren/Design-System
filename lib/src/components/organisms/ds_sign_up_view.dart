@@ -2,42 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_box.dart';
 import '../atoms/ds_button.dart';
-import '../atoms/ds_icon.dart';
+import '../atoms/ds_heading_alignment.dart';
 import '../atoms/ds_icon_button.dart';
-
-/// The extra trailing inset applied to an auth card's heading block while a
-/// corner close button is shown, so heading glyphs never paint beneath it.
-/// The button's 48dp padded tap target ([kMinInteractiveDimension]) sits
-/// [DsSpacing.sm] in from the card edge; the body padding already covers
-/// [DsSpacing.xl] of that span and a further [DsSpacing.sm] keeps a visible
-/// gap between the last glyph and the button.
-const double _headingCloseInset =
-    kMinInteractiveDimension + DsSpacing.sm + DsSpacing.sm - DsSpacing.xl;
-
-/// How an auth card's heading block is aligned.
-///
-/// Applies to the title, the description and any brand header above them.
-/// Start alignment reads as a conventional form; centred alignment suits a
-/// short, focused card such as a one-step sign-up.
-enum DsHeadingAlignment {
-  /// Align the heading block with the leading edge.
-  start,
-
-  /// Centre the heading block.
-  center,
-}
+import 'ds_auth_card_parts.dart';
 
 /// A centred sign-up screen scaffold.
 ///
 /// [DsSignUpView] frames account creation as a focused card: an optional brand
 /// glyph, a [title], a supporting [description], a caller-supplied [form]
 /// (typically a `DsFormFieldGroup` or a column of `DsTextField`s), a full-width
-/// primary [DsButton] built from [primaryActionLabel] / [onSubmit] and an
+/// primary [DsButton] built from [primaryActionLabel] and [onSubmit], plus an
 /// optional [footer] for secondary links (such as an "Already have an account?"
 /// prompt).
 ///
@@ -54,16 +31,17 @@ enum DsHeadingAlignment {
 ///
 /// ## Responsiveness
 ///
-/// When no [aside] is supplied the card is constrained to a comfortable reading
-/// width (~440dp) and centred; it shrinks to fit narrower viewports so it never
-/// overflows on a 320dp phone.
+/// When no [aside] is supplied the card is constrained to a comfortable
+/// reading width ([DsAuthCardLayout.signUpMaxWidth]) and centred; it shrinks
+/// to fit narrower viewports so it never overflows on a 320dp phone.
 ///
-/// When an [aside] (an optional marketing / benefits panel) is supplied, wide
+/// When an [aside] (an optional marketing or benefits panel) is supplied, wide
 /// viewports (at or above the [DsBreakpoints.expanded] breakpoint) lay the form
-/// card and the aside out side by side in a two-column row capped at ~960dp,
-/// with the aside taking roughly 40% of the width inside a tinted [DsBox].
-/// Below that breakpoint the columns stack: the card is shown first, with the
-/// aside beneath it, so nothing is lost on small screens.
+/// card and the aside out side by side in a two-column row capped at
+/// [DsBreakpoints.contentMaxWidth], with the aside taking roughly 40% of the
+/// width inside a tinted [DsBox]. Below that breakpoint the columns stack: the
+/// card is shown first, with the aside beneath it, so nothing is lost on small
+/// screens.
 ///
 /// {@tool snippet}
 ///
@@ -139,15 +117,15 @@ class DsSignUpView extends StatelessWidget {
   /// to validate the [form] and navigate the user onward.
   final VoidCallback? onSubmit;
 
-  /// Whether the primary action is in a pending / in-flight state, which shows
-  /// a spinner and prevents further taps.
+  /// Whether the primary action is in flight, which shows a spinner and
+  /// prevents further taps.
   final bool submitPending;
 
   /// Optional content shown below the primary action, such as a sign-in link.
   /// Rendered centred beneath the button.
   final Widget? footer;
 
-  /// An optional marketing / benefits panel shown beside the form on wide
+  /// An optional marketing or benefits panel shown beside the form on wide
   /// screens and stacked beneath it on compact ones. When omitted the card is
   /// centred on its own.
   final Widget? aside;
@@ -173,10 +151,8 @@ class DsSignUpView extends StatelessWidget {
 
         return Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(DsSpacing.xl),
-            child: showAsideBeside
-                ? _buildWide(context, tokens)
-                : _buildStacked(context, tokens),
+            padding: EdgeInsets.all(tokens.spacingUnit * 3),
+            child: showAsideBeside ? _buildWide(tokens) : _buildStacked(tokens),
           ),
         );
       },
@@ -184,15 +160,18 @@ class DsSignUpView extends StatelessWidget {
   }
 
   /// Side-by-side layout: the form card and the [aside] share a row capped at
-  /// ~960dp. The [ConstrainedBox] resolves a finite width so the [Expanded]
-  /// children below are safe under otherwise-unbounded constraints.
-  Widget _buildWide(BuildContext context, DsTokens tokens) {
+  /// [DsBreakpoints.contentMaxWidth]. The [ConstrainedBox] resolves a finite
+  /// width so the [Expanded] children below are safe under
+  /// otherwise-unbounded constraints.
+  Widget _buildWide(DsTokens tokens) {
     // Top-align the two columns (do NOT use IntrinsicHeight + stretch): the
     // form contains text fields, which cannot report an intrinsic height, so a
     // stretch/intrinsic layout would throw. Each column takes its natural
     // height instead.
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 960),
+      constraints: const BoxConstraints(
+        maxWidth: DsBreakpoints.contentMaxWidth,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -215,7 +194,7 @@ class DsSignUpView extends StatelessWidget {
               showBorder: showBorder,
             ),
           ),
-          const SizedBox(width: DsSpacing.xl),
+          SizedBox(width: tokens.spacingUnit * 3),
           Expanded(
             flex: 4,
             child: _AsidePanel(child: aside!),
@@ -228,9 +207,11 @@ class DsSignUpView extends StatelessWidget {
   /// Stacked layout: the card is constrained to a comfortable reading width and
   /// centred. When an [aside] is present it is shown beneath the card so no
   /// content is dropped on compact screens.
-  Widget _buildStacked(BuildContext context, DsTokens tokens) {
+  Widget _buildStacked(DsTokens tokens) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 440),
+      constraints: const BoxConstraints(
+        maxWidth: DsAuthCardLayout.signUpMaxWidth,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -252,7 +233,7 @@ class DsSignUpView extends StatelessWidget {
             showBorder: showBorder,
           ),
           if (aside != null) ...[
-            const SizedBox(height: DsSpacing.lg),
+            SizedBox(height: tokens.spacingUnit * 2),
             _AsidePanel(child: aside!),
           ],
         ],
@@ -316,7 +297,7 @@ class _FormCard extends StatelessWidget {
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(DsSpacing.xl),
+            padding: EdgeInsets.all(tokens.spacingUnit * 3),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -326,7 +307,9 @@ class _FormCard extends StatelessWidget {
                 // glyphs never paint beneath the icon.
                 Padding(
                   padding: EdgeInsets.only(
-                    right: onClose != null ? _headingCloseInset : 0,
+                    right: onClose != null
+                        ? DsAuthCardLayout.headingCloseInset(tokens)
+                        : 0,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -334,15 +317,15 @@ class _FormCard extends StatelessWidget {
                     children: [
                       if (header != null) ...[
                         Align(alignment: headerAlignment, child: header),
-                        const SizedBox(height: DsSpacing.lg),
+                        SizedBox(height: tokens.spacingUnit * 2),
                       ] else if (brandIcon != null) ...[
-                        _BrandMark(
+                        DsAuthBrandMark(
                           icon: brandIcon!,
                           color: brandColor ??
                               tokens.buttonPrimaryColorBackground,
                           alignment: headerAlignment,
                         ),
-                        const SizedBox(height: DsSpacing.lg),
+                        SizedBox(height: tokens.spacingUnit * 2),
                       ],
                       Semantics(
                         header: true,
@@ -354,7 +337,7 @@ class _FormCard extends StatelessWidget {
                         ),
                       ),
                       if (description != null) ...[
-                        const SizedBox(height: DsSpacing.sm),
+                        SizedBox(height: tokens.spacingUnit),
                         Text(
                           description!,
                           textAlign: textAlign,
@@ -367,12 +350,12 @@ class _FormCard extends StatelessWidget {
                   ),
                 ),
                 if (aboveForm != null) ...[
-                  const SizedBox(height: DsSpacing.sm),
+                  SizedBox(height: tokens.spacingUnit),
                   aboveForm!,
                 ],
-                const SizedBox(height: DsSpacing.xl),
+                SizedBox(height: tokens.spacingUnit * 3),
                 form,
-                const SizedBox(height: DsSpacing.xl),
+                SizedBox(height: tokens.spacingUnit * 3),
                 DsButton(
                   label: primaryActionLabel,
                   onPressed: onSubmit,
@@ -380,7 +363,7 @@ class _FormCard extends StatelessWidget {
                   fullWidth: true,
                 ),
                 if (footer != null) ...[
-                  const SizedBox(height: DsSpacing.lg),
+                  SizedBox(height: tokens.spacingUnit * 2),
                   Align(alignment: Alignment.center, child: footer),
                 ],
               ],
@@ -388,8 +371,8 @@ class _FormCard extends StatelessWidget {
           ),
           if (onClose != null)
             Positioned(
-              top: DsSpacing.sm,
-              right: DsSpacing.sm,
+              top: tokens.spacingUnit,
+              right: tokens.spacingUnit,
               child: DsIconButton(
                 icon: DsIcons.close,
                 semanticLabel: 'Close',
@@ -402,7 +385,7 @@ class _FormCard extends StatelessWidget {
   }
 }
 
-/// The tinted panel that hosts an optional marketing / benefits [aside].
+/// The tinted panel that hosts an optional marketing or benefits [aside].
 class _AsidePanel extends StatelessWidget {
   const _AsidePanel({required this.child});
 
@@ -414,46 +397,12 @@ class _AsidePanel extends StatelessWidget {
 
     return DsBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(DsSpacing.xl),
+      padding: EdgeInsets.all(tokens.spacingUnit * 3),
       background: tokens.offsetBackgroundColor,
       borderColor: tokens.colorBorder,
       borderRadius: tokens.overlayBorderRadius,
       alignment: Alignment.centerLeft,
       child: child,
-    );
-  }
-}
-
-/// The tinted rounded square that frames a brand glyph.
-class _BrandMark extends StatelessWidget {
-  const _BrandMark({
-    required this.icon,
-    required this.color,
-    required this.alignment,
-  });
-
-  final IconData icon;
-  final Color color;
-  final Alignment alignment;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    return Align(
-      alignment: alignment,
-      child: Container(
-        padding: const EdgeInsets.all(DsSpacing.md),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          boxShadow: tokens.shadowMedium,
-        ),
-        child: DsIcon(
-          icon: icon,
-          size: DsIconSize.xl,
-          color: tokens.buttonPrimaryColorText,
-        ),
-      ),
     );
   }
 }

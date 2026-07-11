@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
 import '../molecules/ds_select.dart';
@@ -126,7 +125,7 @@ class DsSortBuilder extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.formBorderRadius),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(DsSpacing.md),
+            padding: EdgeInsets.all(tokens.spacingUnit * 1.5),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -142,10 +141,10 @@ class DsSortBuilder extends StatelessWidget {
                   )
                 else
                   for (var i = 0; i < value.length; i++) ...[
-                    if (i > 0) const SizedBox(height: DsSpacing.sm),
+                    if (i > 0) SizedBox(height: tokens.spacingUnit),
                     _buildSortRow(tokens, i, value[i], compact),
                   ],
-                const SizedBox(height: DsSpacing.md),
+                SizedBox(height: tokens.spacingUnit * 1.5),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: DsButton(
@@ -223,15 +222,15 @@ class DsSortBuilder extends StatelessWidget {
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(DsSpacing.sm),
+          padding: EdgeInsets.all(tokens.spacingUnit),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               field,
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Wrap(
-                spacing: DsSpacing.sm,
-                runSpacing: DsSpacing.sm,
+                spacing: tokens.spacingUnit,
+                runSpacing: tokens.spacingUnit,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [direction, controls],
               ),
@@ -245,9 +244,9 @@ class DsSortBuilder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(flex: 5, child: field),
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         direction,
-        const SizedBox(width: DsSpacing.sm),
+        SizedBox(width: tokens.spacingUnit),
         controls,
       ],
     );
@@ -318,13 +317,13 @@ class _DirectionToggle extends StatelessWidget {
           child: Container(
             color: selected ? tokens.formAccentColor : null,
             constraints: const BoxConstraints(minHeight: 40),
-            padding: const EdgeInsets.symmetric(horizontal: DsSpacing.sm),
+            padding: EdgeInsets.symmetric(horizontal: tokens.spacingUnit),
             alignment: Alignment.center,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DsIcon(icon: icon, size: DsIconSize.xs, color: foreground),
-                const SizedBox(width: DsSpacing.xs),
+                SizedBox(width: tokens.spacingUnit / 2),
                 Text(
                   label,
                   style: tokens.labelMd.toTextStyle(color: foreground),

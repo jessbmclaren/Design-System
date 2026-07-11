@@ -4,9 +4,9 @@ Tell people the result of an action or a condition they need to address, and mat
 
 A toast is fire-and-forget: it acknowledges success and disappears, so never put anything the person must read or act on inside it. A banner is anchored to the surface it describes. Place it directly under the page header or at the top of the affected section, give it a single clear action and let the person dismiss it only once the underlying condition is gone.
 
-![Desktop (1280dp)](img/communicating-state_desktop.png)
+![Desktop (1120dp)](img/communicating-state_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/communicating-state_phone.png)
 

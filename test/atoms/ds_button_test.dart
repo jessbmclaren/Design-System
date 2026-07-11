@@ -217,6 +217,60 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('stays still and runs no press animation under reduced '
+        'motion', (tester) async {
+      await pumpDs(
+        tester,
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: DsButton(label: 'Save', onPressed: () {}),
+        ),
+      );
+
+      double scale() => tester
+          .widget<ScaleTransition>(
+            find.descendant(
+              of: find.byType(DsButton),
+              matching: find.byType(ScaleTransition),
+            ),
+          )
+          .scale
+          .value;
+
+      final gesture =
+          await tester.startGesture(tester.getCenter(find.byType(DsButton)));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      // Mid-press the button has not scaled down.
+      expect(scale(), 1);
+
+      await gesture.up();
+      await tester.pump();
+      expect(scale(), 1);
+
+      // Flush the ink highlight fade (a fixed, non-repeating Material
+      // effect), after which nothing may still be animating: the press
+      // spring must never have started.
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(scale(), 1);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('a pending button stays keyboard focusable', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsButton(label: 'Saving', pending: true, onPressed: () {}),
+      );
+      await tester.pump();
+
+      expect(
+        tester.getSemantics(find.byType(DsButton)),
+        isSemantics(isFocusable: true),
+      );
+      handle.dispose();
+    });
+
     testWidgets('every variant renders', (tester) async {
       for (final variant in DsButtonVariant.values) {
         await pumpDs(
@@ -305,6 +359,67 @@ void main() {
       expect(focused.color, tokens.buttonPrimaryColorText);
       expect(focused.width, 2);
       expect(focused, isNot(equals(resting)));
+    });
+
+    testWidgets('a skin can retune the button metrics and state tokens',
+        (tester) async {
+      final skin = DsTokens.light().copyWith(
+        buttonMinHeight: 56,
+        buttonIconSize: 30,
+        buttonRestBorderWidth: 3,
+        focusRingWidth: 4,
+        stateDisabledOpacity: 0.25,
+        stateDisabledTextOpacity: 0.7,
+      );
+      await pumpDs(
+        tester,
+        const DsButton(
+          label: 'Save',
+          icon: Icons.check,
+          variant: DsButtonVariant.secondary,
+        ),
+        theme: DsTheme.light(tokens: skin),
+      );
+
+      final style =
+          tester.widget<FilledButton>(find.byType(FilledButton)).style!;
+      expect(style.minimumSize!.resolve({})!.height, 56);
+      expect(tester.widget<Icon>(find.byIcon(Icons.check)).size, 30);
+      expect(style.side!.resolve({})!.width, 3);
+      expect(style.side!.resolve({WidgetState.focused})!.width, 4);
+      // The non-primary disabled fade follows the state opacity tokens.
+      expect(
+        style.backgroundColor!.resolve({WidgetState.disabled}),
+        skin.buttonSecondaryColorBackground.withValues(alpha: 0.25),
+      );
+      expect(
+        style.foregroundColor!.resolve({WidgetState.disabled}),
+        skin.buttonSecondaryColorText.withValues(alpha: 0.7),
+      );
+    });
+
+    testWidgets('a skin can restyle the tertiary variant through its tokens',
+        (tester) async {
+      final skin = DsTokens.light().copyWith(
+        buttonTertiaryColorBackground: const Color(0xFFEEF2FF),
+        buttonTertiaryColorBorder: const Color(0xFF6366F1),
+        buttonTertiaryColorText: const Color(0xFF312E81),
+      );
+      await pumpDs(
+        tester,
+        DsButton(
+          label: 'Back',
+          variant: DsButtonVariant.tertiary,
+          onPressed: () {},
+        ),
+        theme: DsTheme.light(tokens: skin),
+      );
+
+      final style =
+          tester.widget<FilledButton>(find.byType(FilledButton)).style!;
+      expect(style.backgroundColor!.resolve({}), const Color(0xFFEEF2FF));
+      expect(style.side!.resolve({})!.color, const Color(0xFF6366F1));
+      expect(style.foregroundColor!.resolve({}), const Color(0xFF312E81));
     });
 
     testWidgets('does not overflow at 320dp with fullWidth', (tester) async {

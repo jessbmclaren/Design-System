@@ -2,9 +2,9 @@
 
 `DsInline` styles a single run of text (bold, italic, monospace `code` or strikethrough) so a sentence can carry emphasis without leaving the flow of copy. It deliberately never sets its own font size or colour: it inherits both from the surrounding `DefaultTextStyle`, so the same treatment reads correctly inside a heading, a body paragraph or a caption without adjustment. Drop it in as a widget for a standalone run, or use the `DsInline.span` helper to combine several treatments in one `Text.rich` paragraph. Because it renders a plain `Text` with no state, timers or network work, it stays predictable everywhere it appears.
 
-![Desktop (1280dp)](img/inline_desktop.png)
+![Desktop (1120dp)](img/inline_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/inline_phone.png)
 

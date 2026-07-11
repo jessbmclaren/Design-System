@@ -6,9 +6,9 @@ Each field renders the editor its `DsCellType` calls for (a text field, a curren
 
 Group related fields with `DsRecordFieldGroup` (identity, status, assignment) and the panel lays them out as titled sections that stack to one column on a phone and flow to two where there is room. A long form is easier to complete when it is chunked into the few things a person actually reasons about together.
 
-![Desktop (1280dp)](img/record-panel_desktop.png)
+![Desktop (1120dp)](img/record-panel_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/record-panel_phone.png)
 

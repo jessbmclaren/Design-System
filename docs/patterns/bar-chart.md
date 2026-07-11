@@ -2,9 +2,9 @@
 
 A `DsBarChart` compares a single series of categories as vertical, baseline-anchored bars. It is the clearest way to answer "which is biggest?" across a handful of named values. Because it shows one series it carries no legend: the `title` names what is measured and every bar shares one hue from the data-visualisation palette, so the eye reads length, not colour. Each `DsBarDatum` pairs a `label` with a `value` anchored to zero; the chart rounds up to a tidy axis maximum, draws recessive gridlines and prints a compact value above each bar. It is responsive by construction: it fills its parent's width, thins and ellipsizes x-axis labels on narrow viewports and drops any value label that no longer fits rather than overflow, down to a 320dp phone. It renders a still frame with no timers or animation and exposes the full series to screen readers as a summary of every label and value.
 
-![Desktop (1280dp)](img/bar-chart_desktop.png)
+![Desktop (1120dp)](img/bar-chart_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/bar-chart_phone.png)
 

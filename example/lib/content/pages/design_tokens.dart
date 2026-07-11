@@ -25,7 +25,10 @@ final PatternPage designTokensPage = PatternPage(
       'at once. Sizes are expressed in logical pixels (`double`); text '
       'transforms default to `none` and accept `uppercase`, `lowercase` or '
       '`capitalize`. Each heading / body / label ramp row is a property of that '
-      'level\'s `DsTypeToken` (`headingXl`, `bodyMd`, …); re-scale a level with '
+      'level\'s `DsTypeToken` (`headingXl`, `bodyMd`, …); every level also '
+      'carries a line `height` multiplier, an optional `letterSpacing` and a '
+      '`textTransform`, including `bodyMd` and `bodySm`, whose transforms stay '
+      'at `none` and are omitted from the table. Re-scale a level with '
       '`copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: '
       'DsTypography.bold))`. The button- and badge-label rows are instead flat '
       'tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden '
@@ -66,6 +69,9 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'buttonNeutralColorBackground', type: 'Color', example: '#EBEEF1', description: 'The colour used as a background for neutral buttons, which carry third-party or utility actions such as federated sign-in. Defaults to the secondary button background.'),
         VariableRow(name: 'buttonNeutralColorBorder', type: 'Color', example: '#EBEEF1', description: 'The border colour used for neutral buttons. Defaults to the secondary button border.'),
         VariableRow(name: 'buttonNeutralColorText', type: 'Color', example: '#393B3E', description: 'The text colour used for neutral buttons. Defaults to the secondary button text colour.'),
+        VariableRow(name: 'buttonTertiaryColorBackground', type: 'Color', example: 'transparent', description: 'The background colour for tertiary (text) buttons. Transparent by default, so the label alone carries the action.'),
+        VariableRow(name: 'buttonTertiaryColorBorder', type: 'Color', example: 'transparent', description: 'The border colour for tertiary (text) buttons. Transparent by default.'),
+        VariableRow(name: 'buttonTertiaryColorText', type: 'Color', example: '#0074D4', description: 'The text colour for tertiary (text) buttons. Defaults to the primary action colour.'),
       ],
     ),
     VariablesBlock(
@@ -76,6 +82,7 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'colorBorderSubtle', type: 'Color', example: '#D7D7D7', description: 'The hairline tier beneath colorBorder: the quietest rule the system draws, used by dividers and decorative hairlines. Defaults to the border colour.'),
         VariableRow(name: 'formBackgroundColor', type: 'Color', example: '#FFFFFF', description: 'The background colour used for form items.'),
         VariableRow(name: 'offsetBackgroundColor', type: 'Color', example: '#FFFFFF', description: 'The background colour used when highlighting information, like the selected row on a table.'),
+        VariableRow(name: 'colorSurfaceMuted', type: 'Color', example: '#F6F8FA', description: 'The muted surface tier: the quiet grey behind code wells, table headers and other recessed panels. Exposed to the Material scheme as surfaceContainerHighest.'),
         VariableRow(name: 'formHighlightColorBorder', type: 'Color', example: '#D7D7D7', description: 'The colour used to highlight form items when focused.'),
         VariableRow(name: 'formAccentColor', type: 'Color', example: '#0074D4', description: 'The colour used to fill form items such as tickboxes, radio buttons and switches.'),
         VariableRow(name: 'formPlaceholderTextColor', type: 'Color', example: '#AAAAAA', description: 'The colour for placeholder text in form items.'),
@@ -115,9 +122,21 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'badgeLabelFontSize', type: 'double', example: '14', description: 'The font size for badge label typography.'),
         VariableRow(name: 'badgeLabelFontWeight', type: 'FontWeight', example: '400', description: 'The font weight for badge label typography.'),
         VariableRow(name: 'badgeLabelTextTransform', type: 'DsTextTransform', example: 'none', description: 'The text transform for badge label typography.'),
+        VariableRow(name: 'strongLabelFontWeight', type: 'FontWeight', example: '600', description: 'The font weight for strong labels: group legends, table headers and other short emphasised runs.'),
       ],
     ),
     SubheadingBlock('Less commonly used variables'),
+    VariablesBlock(
+      title: 'Interaction states',
+      rows: [
+        VariableRow(name: 'stateHoverOpacity', type: 'double', example: '0.06', description: 'The state-layer alpha painted over a flat control on hover and keyboard focus.'),
+        VariableRow(name: 'statePressedOpacity', type: 'double', example: '0.1', description: 'The state-layer alpha painted over a flat control while pressed.'),
+        VariableRow(name: 'stateDisabledOpacity', type: 'double', example: '0.5', description: 'The fade shared by the disabled treatments that dim a whole surface: a disabled button\'s fill, a disabled tertiary button\'s label and a disabled input\'s border.'),
+        VariableRow(name: 'stateDisabledTextOpacity', type: 'double', example: '0.9', description: 'The fade for a disabled filled button\'s label. Gentler than stateDisabledOpacity, so the label stays readable on the dimmed fill.'),
+        VariableRow(name: 'stateDisabledIconOpacity', type: 'double', example: '0.38', description: 'The fade for a disabled icon-only control\'s glyph.'),
+        VariableRow(name: 'focusRingWidth', type: 'double', example: '2', description: 'The stroke width of the keyboard focus ring on buttons and icon buttons.'),
+      ],
+    ),
     VariablesBlock(
       title: 'Action text decoration',
       rows: [
@@ -158,9 +177,16 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'badgeBorderRadius', type: 'double', example: '4', description: 'The border radius used for badges.'),
         VariableRow(name: 'buttonPaddingX', type: 'double', example: '16', description: 'The horizontal padding for buttons, the full inset the button paints.'),
         VariableRow(name: 'buttonPaddingY', type: 'double', example: '10', description: 'The vertical padding for buttons, the full inset the button paints.'),
+        VariableRow(name: 'buttonMinHeight', type: 'double', example: '40', description: 'The minimum height for buttons.'),
+        VariableRow(name: 'buttonIconSize', type: 'double', example: '18', description: 'The size of a glyph inside a button. Defaults to buttonLabelFontSize plus 2; keep the pair in step when a skin re-sizes the label.'),
+        VariableRow(name: 'buttonRestBorderWidth', type: 'double', example: '1', description: 'The border stroke width for buttons at rest.'),
         VariableRow(name: 'inputFieldPaddingX', type: 'double', example: '8', description: 'The horizontal padding for input fields in forms.'),
         VariableRow(name: 'inputFieldPaddingY', type: 'double', example: '4', description: 'The vertical padding for input fields in forms.'),
         VariableRow(name: 'textFieldPaddingY', type: 'double', example: '16', description: 'The full vertical padding a bordered text input paints, so a skin can retune the text field without moving every other form control.'),
+        VariableRow(name: 'inputBorderWidth', type: 'double', example: '1', description: 'The border stroke width for input fields at rest.'),
+        VariableRow(name: 'inputFocusBorderWidth', type: 'double', example: '1.6', description: 'The border stroke width for a focused input field. The error border carries the same emphasis.'),
+        VariableRow(name: 'fieldLabelGap', type: 'double', example: '6', description: 'The gap between a field\'s label and its input.'),
+        VariableRow(name: 'boxBorderWidth', type: 'double', example: '1', description: 'The border stroke width a DsBox draws when given a border colour without an explicit width.'),
         VariableRow(name: 'badgePaddingX', type: 'double', example: '6', description: 'The horizontal padding for badges.'),
         VariableRow(name: 'badgePaddingY', type: 'double', example: '2', description: 'The vertical padding for badges.'),
         VariableRow(name: 'tableRowPaddingY', type: 'double', example: '8', description: 'The vertical padding for table rows.'),
@@ -168,19 +194,22 @@ final PatternPage designTokensPage = PatternPage(
     ),
     SubheadingBlock('Elevation, icons and weights'),
     ProseBlock(
-      'Beyond the appearance variables, the system ships a small set of shared '
-      'primitives that components use directly: an elevation scale, an '
-      'icon-size scale and a font-weight ramp. The bundled Inter provides all '
+      'Elevation is themable: components cast shadows through the three '
+      '`shadow` tokens, which default to the matching `DsElevation` '
+      'primitives, so a skin can retint every raised surface at once (usually '
+      'by deriving a set with `DsElevation.tinted`). Beyond that, the system '
+      'ships two shared primitives that components use directly: an icon-size '
+      'scale and a font-weight ramp. The bundled Inter provides all '
       'four weights (400 / 500 / 600 / 700), so hierarchy is not limited to '
       'regular and bold.',
     ),
     VariablesBlock(
-      title: 'Elevation (DsElevation)',
+      title: 'Elevation',
       rows: [
-        VariableRow(name: 'DsElevation.low', type: 'List<BoxShadow>', example: 'resting', description: 'Resting raised surfaces: chips, hovers and list cards.'),
-        VariableRow(name: 'DsElevation.medium', type: 'List<BoxShadow>', example: 'floating', description: 'Floating surfaces: menus, popovers and toasts.'),
-        VariableRow(name: 'DsElevation.high', type: 'List<BoxShadow>', example: 'modal', description: 'Modal surfaces: dialogs, drawers and takeovers.'),
-        VariableRow(name: 'DsElevation.tinted', type: 'Color → shadows', example: 'brand', description: 'A brand-tinted scale derived from a colour, so a skin can lift surfaces with its own hue.'),
+        VariableRow(name: 'shadowLow', type: 'List<BoxShadow>', example: 'DsElevation.low', description: 'The resting drop shadow for lightly raised surfaces: chips, hover cards and list cards.'),
+        VariableRow(name: 'shadowMedium', type: 'List<BoxShadow>', example: 'DsElevation.medium', description: 'The drop shadow for floating surfaces: cards, menus, popovers and toasts.'),
+        VariableRow(name: 'shadowHigh', type: 'List<BoxShadow>', example: 'DsElevation.high', description: 'The drop shadow for modal surfaces: dialogs, drawers and takeovers.'),
+        VariableRow(name: 'DsElevation.tinted', type: 'Color → shadows', example: 'brand', description: 'A brand-tinted scale derived from a colour, ready to feed the three shadow tokens above.'),
       ],
     ),
     VariablesBlock(
@@ -214,6 +243,22 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'overlays', type: 'DsOverlayStyle', example: 'dialog', description: 'The type of overlay used. Valid values are dialog (default) and drawer.'),
         VariableRow(name: 'overlayBorderRadius', type: 'double', example: '8', description: 'The border radius used for overlays.'),
         VariableRow(name: 'overlayBackdropColor', type: 'Color', example: '#661A1B25', description: 'The backdrop colour shown behind an open overlay: a translucent scrim (ARGB) over the page.'),
+      ],
+    ),
+    SubheadingBlock('Auth chrome and wordmark'),
+    ProseBlock(
+      'The auth surfaces (sign-in, sign-up, waiting screens) paint their '
+      'backdrop from two tokens, and the wordmark\'s type metrics are tokens '
+      'too, so a brand can retune the whole first impression without forking '
+      'a component.',
+    ),
+    VariablesBlock(
+      rows: [
+        VariableRow(name: 'authWashGradient', type: 'List<Color>', example: '#FFFFFF → #EBEEF1', description: 'The colour stops of the auth wash, painted top to bottom by DsAuthGradient behind sign-in, sign-up and waiting screens. Give it at least two colours.'),
+        VariableRow(name: 'bloomColor', type: 'Color', example: '#DCE2E9', description: 'The peak colour of the soft radial brand glow painted by DsBrandBloom. Neutral by default, so the glow is present without carrying a hue.'),
+        VariableRow(name: 'wordmarkFontSize', type: 'double', example: '22', description: 'The default wordmark size, in logical pixels.'),
+        VariableRow(name: 'wordmarkLetterSpacing', type: 'double', example: '-0.2', description: 'The wordmark\'s letter spacing. Slightly negative by default, so the mark sets a little tighter than body text.'),
+        VariableRow(name: 'wordmarkHeight', type: 'double', example: '1', description: 'The wordmark\'s line height multiplier. 1 by default, so the mark occupies exactly its glyph height in chrome and headers.'),
       ],
     ),
   ],

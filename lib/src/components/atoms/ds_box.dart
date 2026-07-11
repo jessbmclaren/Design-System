@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/ds_tokens_extension.dart';
+
 /// A lightweight, tokened layout wrapper around [Container].
 ///
 /// [DsBox] is the design system's primitive for applying spacing, a
@@ -14,13 +16,18 @@ import 'package:flutter/material.dart';
 /// ```dart
 /// final tokens = DsTokens.of(context);
 /// DsBox(
-///   padding: const EdgeInsets.all(DsSpacing.md),
+///   padding: EdgeInsets.all(tokens.spacingUnit * 1.5),
 ///   background: tokens.colorBackground,
 ///   borderColor: tokens.colorBorder,
 ///   borderRadius: tokens.borderRadius,
+///   shadow: tokens.shadowLow,
 ///   child: const Text('Hello'),
 /// );
 /// ```
+///
+/// Reading the shadow from [DsTokens.shadowLow] (or its medium and high
+/// siblings) rather than a raw elevation primitive keeps the box on skins
+/// that re-tint their shadows.
 ///
 /// The widget is purely declarative: it starts no timers or animations and is
 /// therefore safe to render in screenshots and golden tests. With no explicit
@@ -62,7 +69,8 @@ class DsBox extends StatelessWidget {
 
   /// The border colour. When `null` no border is drawn.
   ///
-  /// When set, the border uses [borderWidth] (or `1` if that is also `null`).
+  /// When set, the border uses [borderWidth] (or the theme's
+  /// [DsTokens.boxBorderWidth] if that is also `null`).
   final Color? borderColor;
 
   /// The corner radius applied to all four corners, in logical pixels.
@@ -72,7 +80,8 @@ class DsBox extends StatelessWidget {
 
   /// The border stroke width. Only used when [borderColor] is non-null.
   ///
-  /// Defaults to `1` when a [borderColor] is provided.
+  /// Defaults to the theme's [DsTokens.boxBorderWidth] when a [borderColor]
+  /// is provided.
   final double? borderWidth;
 
   /// An explicit width for the box. When `null` the box sizes to its child.
@@ -90,7 +99,8 @@ class DsBox extends StatelessWidget {
 
   /// Elevation shadows cast beneath the box.
   ///
-  /// Pass a design system elevation such as `DsElevation.low`.
+  /// Pass a themed shadow such as `DsTokens.of(context).shadowLow`, so a
+  /// skin that re-tints its shadows restyles the box too.
   final List<BoxShadow>? shadow;
 
   @override
@@ -110,7 +120,9 @@ class DsBox extends StatelessWidget {
             border: hasBorder
                 ? Border.all(
                     color: borderColor!,
-                    width: borderWidth ?? 1,
+                    // The tokens are only read when a border is actually
+                    // drawn, so a plain layout box stays theme-independent.
+                    width: borderWidth ?? DsTokens.of(context).boxBorderWidth,
                   )
                 : null,
             boxShadow: shadow,

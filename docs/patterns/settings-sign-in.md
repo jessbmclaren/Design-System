@@ -4,9 +4,9 @@ Some settings surfaces manage a connection to an external service, and those con
 
 Keep the signed-out state minimal: a short title, one line of context and a single primary action are enough to start the connection. Reserve the settings controls (toggles, credentials, disconnect) for the authenticated state so nothing appears actionable before it can be acted on. When the sign-in genuinely needs more explanation, move it into the view's additional-context reveal rather than crowding the card.
 
-![Desktop (1280dp)](img/settings-sign-in_desktop.png)
+![Desktop (1120dp)](img/settings-sign-in_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/settings-sign-in_phone.png)
 

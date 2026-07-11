@@ -3,20 +3,12 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
+import '../atoms/ds_divider.dart';
+import '../atoms/ds_heading_alignment.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_icon_button.dart';
-import 'ds_sign_up_view.dart' show DsHeadingAlignment;
-
-/// The extra trailing inset applied to the heading block while a corner close
-/// button is shown, so heading glyphs never paint beneath it. The button's
-/// 48dp padded tap target ([kMinInteractiveDimension]) sits [DsSpacing.sm] in
-/// from the card edge; the body padding already covers [DsSpacing.xl] of that
-/// span and a further [DsSpacing.sm] keeps a visible gap between the last
-/// glyph and the button. Mirrors the sign-up card.
-const double _headingCloseInset =
-    kMinInteractiveDimension + DsSpacing.sm + DsSpacing.sm - DsSpacing.xl;
+import 'ds_auth_card_parts.dart';
 
 /// The primary call to action shown in a [DsSignInView].
 ///
@@ -26,16 +18,25 @@ const double _headingCloseInset =
 /// itself never collects credentials.
 class DsSignInAction {
   /// Creates a description of a [DsSignInView] primary action.
-  const DsSignInAction({required this.label, required this.onPressed});
+  const DsSignInAction({
+    required this.label,
+    required this.onPressed,
+    this.pending = false,
+  });
 
   /// The label rendered on the primary button.
   final String label;
 
-  /// Called when the primary button is tapped.
-  final VoidCallback onPressed;
+  /// Called when the primary button is tapped. Pass `null` to disable the
+  /// button (for example while the caller's form is invalid).
+  final VoidCallback? onPressed;
+
+  /// Whether the action is in flight, which shows a spinner on the button and
+  /// prevents further taps. Mirrors `DsSignUpView.submitPending`.
+  final bool pending;
 }
 
-/// A centred sign-in / onboarding view.
+/// A centred sign-in and onboarding view.
 ///
 /// [DsSignInView] presents a focused welcome card: an optional brand icon, a
 /// [title], an optional supporting [description] and a single full-width primary
@@ -55,10 +56,11 @@ class DsSignInAction {
 /// corner close button with [onClose]. Set [showBorder] to false for a
 /// shadow-only card.
 ///
-/// The card is constrained to a comfortable reading width (~420dp) and shrinks
-/// to fit narrower viewports, so it never overflows on small phones.
+/// The card is constrained to a comfortable reading width
+/// ([DsAuthCardLayout.signInMaxWidth]) and shrinks to fit narrower viewports,
+/// so it never overflows on small phones.
 class DsSignInView extends StatefulWidget {
-  /// Creates a centred sign-in / onboarding view.
+  /// Creates a centred sign-in and onboarding view.
   const DsSignInView({
     super.key,
     required this.title,
@@ -87,8 +89,8 @@ class DsSignInView extends StatefulWidget {
 
   /// An optional form body, typically a column of `DsTextField`s (username,
   /// password), rendered between the description and the primary action. When
-  /// omitted the view reads as a redirect / SSO card; when provided it reads as
-  /// a credential sign-in. The view lays it out but owns none of its state.
+  /// omitted the view reads as a redirect or SSO card; when provided it reads
+  /// as a credential sign-in. The view lays it out but owns none of its state.
   final Widget? form;
 
   /// An optional brand glyph shown in a tinted rounded square above the title.
@@ -139,9 +141,11 @@ class _DsSignInViewState extends State<DsSignInView> {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(DsSpacing.xl),
+        padding: EdgeInsets.all(tokens.spacingUnit * 3),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
+          constraints: const BoxConstraints(
+            maxWidth: DsAuthCardLayout.signInMaxWidth,
+          ),
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -160,8 +164,8 @@ class _DsSignInViewState extends State<DsSignInView> {
                 _buildCard(tokens),
                 if (widget.onClose != null)
                   Positioned(
-                    top: DsSpacing.sm,
-                    right: DsSpacing.sm,
+                    top: tokens.spacingUnit,
+                    right: tokens.spacingUnit,
                     child: DsIconButton(
                       icon: DsIcons.close,
                       semanticLabel: 'Close',
@@ -180,7 +184,7 @@ class _DsSignInViewState extends State<DsSignInView> {
   /// [DsSignInView.footerBand] clipped to the card's corner radius.
   Widget _buildCard(DsTokens tokens) {
     final body = Padding(
-      padding: const EdgeInsets.all(DsSpacing.xl),
+      padding: EdgeInsets.all(tokens.spacingUnit * 3),
       child: _buildBody(tokens),
     );
     if (widget.footerBand == null) return body;
@@ -195,9 +199,9 @@ class _DsSignInViewState extends State<DsSignInView> {
         children: [
           body,
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DsSpacing.xl,
-              vertical: DsSpacing.lg,
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacingUnit * 3,
+              vertical: tokens.spacingUnit * 2,
             ),
             decoration: BoxDecoration(
               color: tokens.offsetBackgroundColor,
@@ -230,20 +234,22 @@ class _DsSignInViewState extends State<DsSignInView> {
         // paint beneath the icon.
         Padding(
           padding: EdgeInsets.only(
-            right: widget.onClose != null ? _headingCloseInset : 0,
+            right: widget.onClose != null
+                ? DsAuthCardLayout.headingCloseInset(tokens)
+                : 0,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (widget.brandIcon != null) ...[
-                _BrandMark(
+                DsAuthBrandMark(
                   icon: widget.brandIcon!,
                   color: widget.brandColor ??
                       tokens.buttonPrimaryColorBackground,
                   alignment: centred ? Alignment.center : Alignment.centerLeft,
                 ),
-                const SizedBox(height: DsSpacing.lg),
+                SizedBox(height: tokens.spacingUnit * 2),
               ],
               Semantics(
                 header: true,
@@ -256,7 +262,7 @@ class _DsSignInViewState extends State<DsSignInView> {
                 ),
               ),
               if (widget.description != null) ...[
-                const SizedBox(height: DsSpacing.sm),
+                SizedBox(height: tokens.spacingUnit),
                 Text(
                   widget.description!,
                   textAlign: textAlign,
@@ -268,71 +274,38 @@ class _DsSignInViewState extends State<DsSignInView> {
             ],
           ),
         ),
-        const SizedBox(height: DsSpacing.xl),
+        SizedBox(height: tokens.spacingUnit * 3),
         if (widget.form != null) ...[
           widget.form!,
-          const SizedBox(height: DsSpacing.lg),
+          SizedBox(height: tokens.spacingUnit * 2),
         ],
         DsButton(
           label: widget.primaryAction.label,
           onPressed: widget.primaryAction.onPressed,
+          pending: widget.primaryAction.pending,
           fullWidth: true,
         ),
         if (widget.footer != null) ...[
-          const SizedBox(height: DsSpacing.lg),
+          SizedBox(height: tokens.spacingUnit * 2),
           Align(
             alignment: Alignment.center,
             child: widget.footer,
           ),
         ],
         if (hasReveal) ...[
-          const SizedBox(height: DsSpacing.md),
-          Divider(height: 1, color: tokens.colorBorderSubtle),
+          SizedBox(height: tokens.spacingUnit * 1.5),
+          const DsDivider(),
           _RevealControl(
             label: widget.additionalContextLabel!,
             expanded: _expanded,
             onToggle: () => setState(() => _expanded = !_expanded),
           ),
           if (_expanded && widget.additionalContext != null) ...[
-            const SizedBox(height: DsSpacing.sm),
+            SizedBox(height: tokens.spacingUnit),
             widget.additionalContext!,
           ],
         ],
       ],
-    );
-  }
-}
-
-/// The tinted rounded square that frames a brand glyph.
-class _BrandMark extends StatelessWidget {
-  const _BrandMark({
-    required this.icon,
-    required this.color,
-    required this.alignment,
-  });
-
-  final IconData icon;
-  final Color color;
-  final Alignment alignment;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    return Align(
-      alignment: alignment,
-      child: Container(
-        padding: const EdgeInsets.all(DsSpacing.md),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          boxShadow: tokens.shadowMedium,
-        ),
-        child: DsIcon(
-          icon: icon,
-          size: DsIconSize.xl,
-          color: tokens.buttonPrimaryColorText,
-        ),
-      ),
     );
   }
 }
@@ -357,31 +330,37 @@ class _RevealControl extends StatelessWidget {
     return Semantics(
       button: true,
       expanded: expanded,
-      child: InkWell(
-        onTap: onToggle,
-        borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: DsSpacing.md),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: tokens.labelMd.toTextStyle(
-                    color: tokens.actionSecondaryColorText,
+      // The transparent Material hosts the ink splash above the card's opaque
+      // background; without it the ink would paint on the Scaffold's material
+      // beneath the card and never show.
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit * 1.5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: tokens.labelMd.toTextStyle(
+                      color: tokens.actionSecondaryColorText,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: DsSpacing.xs),
-              DsIcon(
-                icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
-                size: DsIconSize.lg,
-                color: tokens.actionSecondaryColorText,
-              ),
-            ],
+                SizedBox(width: tokens.spacingUnit / 2),
+                DsIcon(
+                  icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
+                  size: DsIconSize.lg,
+                  color: tokens.actionSecondaryColorText,
+                ),
+              ],
+            ),
           ),
         ),
       ),

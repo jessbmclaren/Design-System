@@ -4,9 +4,9 @@ A divider is a hairline rule that separates content without adding the visual we
 
 Use a divider only when whitespace alone is not enough to signal a grouping. A horizontal divider fills its parent's width, so place it in a column that is already constrained; a vertical divider fills its parent's height, so give it a bounded height (for example an IntrinsicHeight row or a fixed-height container), otherwise it has no extent to fill.
 
-![Desktop (1280dp)](img/divider_desktop.png)
+![Desktop (1120dp)](img/divider_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/divider_phone.png)
 

@@ -1,7 +1,7 @@
 // Pure Dart, no Flutter imports.
 import '../pattern_page_content.dart';
 
-/// Forms → Text fields.
+/// Inputs → Text fields.
 final PatternPage textFieldsPage = PatternPage(
   id: 'text-fields',
   group: DocGroup.inputs,
@@ -82,5 +82,5 @@ Column(
     Shot(pageId: 'text-fields', size: ShotSize.desktop),
     Shot(pageId: 'text-fields', size: ShotSize.phone),
   ],
-  related: ['selection-controls', 'select', 'sign-in'],
+  related: ['text-area', 'field-label', 'selection-controls', 'select', 'sign-in'],
 );

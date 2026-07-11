@@ -4,9 +4,9 @@
 
 Assistive technology announces the bar as a percentage. Give it a `semanticLabel` naming what is progressing when the bar stands alone, or set `excludeSemantics: true` when neighbouring text already states the progress (a "3 of 6" count, say) so it is not read out twice.
 
-![Desktop (1280dp)](img/progress-bar_desktop.png)
+![Desktop (1120dp)](img/progress-bar_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/progress-bar_phone.png)
 

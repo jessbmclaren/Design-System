@@ -140,7 +140,7 @@ class DsDateField extends StatelessWidget {
         ? tokens.colorDanger
         : (isEnabled
             ? tokens.colorBorder
-            : tokens.colorBorder.withValues(alpha: 0.5));
+            : tokens.colorBorder.withValues(alpha: tokens.stateDisabledOpacity));
 
     final String displayText =
         hasValue ? _format(value!) : (hintText ?? '');
@@ -172,9 +172,13 @@ class DsDateField extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: radius,
+                  // The error border carries the focus emphasis, as
+                  // documented on [DsTokens.inputFocusBorderWidth].
                   border: Border.all(
                     color: borderColor,
-                    width: hasError ? 1.6 : 1,
+                    width: hasError
+                        ? tokens.inputFocusBorderWidth
+                        : tokens.inputBorderWidth,
                   ),
                 ),
                 child: Padding(
@@ -192,7 +196,7 @@ class DsDateField extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: tokens.spacingUnit),
                       DsIcon(
                         icon: DsIcons.calendar,
                         size: DsIconSize.sm,
@@ -220,11 +224,11 @@ class DsDateField extends StatelessWidget {
                   .toTextStyle(color: tokens.colorText)
                   .copyWith(fontWeight: DsTypography.medium),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: tokens.fieldLabelGap),
           ],
           field,
           if (caption != null) ...<Widget>[
-            const SizedBox(height: 6),
+            SizedBox(height: tokens.fieldLabelGap),
             Text(
               caption,
               style: tokens.bodySm.toTextStyle(color: captionColor),

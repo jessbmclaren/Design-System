@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 
 /// A labelled numeric input for collecting monetary amounts.
@@ -104,11 +103,12 @@ class DsCurrencyField extends StatelessWidget {
     final tokens = DsTokens.of(context);
     final bool hasError = errorText != null;
 
-    // A slightly roomier vertical padding than the raw token reads best on a
-    // bordered input, while horizontal padding stays on the token.
+    // The horizontal inset stays on the shared input token; the vertical
+    // inset reads the same full-padding token as [DsTextField], so the two
+    // fields stay in step when a skin retunes their height.
     final EdgeInsets contentPadding = EdgeInsets.symmetric(
       horizontal: tokens.inputFieldPaddingX,
-      vertical: tokens.inputFieldPaddingY + 12,
+      vertical: tokens.textFieldPaddingY,
     );
 
     final BorderRadius radius = BorderRadius.circular(tokens.formBorderRadius);
@@ -129,7 +129,7 @@ class DsCurrencyField extends StatelessWidget {
     final Widget prefix = Padding(
       padding: EdgeInsets.only(
         left: tokens.inputFieldPaddingX,
-        right: DsSpacing.xs,
+        right: tokens.spacingUnit / 2,
       ),
       child: Text(
         symbol,
@@ -148,7 +148,7 @@ class DsCurrencyField extends StatelessWidget {
                   fontWeight: DsTypography.medium,
                 ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: tokens.fieldLabelGap),
         ],
         Semantics(
           label: label,
@@ -184,26 +184,31 @@ class DsCurrencyField extends StatelessWidget {
               // The caption (helper or error) is rendered by this widget below,
               // so the field's built-in helper/error text is suppressed to
               // avoid duplication. The border still reflects the error state.
-              border: borderWith(tokens.colorBorder, 1),
+              border: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+              // The error border carries the focus emphasis, as documented on
+              // [DsTokens.inputFocusBorderWidth].
               enabledBorder: borderWith(
                 hasError ? tokens.colorDanger : tokens.colorBorder,
-                hasError ? 1.6 : 1,
+                hasError
+                    ? tokens.inputFocusBorderWidth
+                    : tokens.inputBorderWidth,
               ),
               focusedBorder: borderWith(
                 hasError
                     ? tokens.colorDanger
                     : tokens.formHighlightColorBorder,
-                1.6,
+                tokens.inputFocusBorderWidth,
               ),
               disabledBorder: borderWith(
-                tokens.colorBorder.withValues(alpha: 0.5),
-                1,
+                tokens.colorBorder
+                    .withValues(alpha: tokens.stateDisabledOpacity),
+                tokens.inputBorderWidth,
               ),
             ),
           ),
         ),
         if (caption != null) ...<Widget>[
-          const SizedBox(height: 6),
+          SizedBox(height: tokens.fieldLabelGap),
           Text(
             caption,
             style: tokens.bodySm.toTextStyle(color: captionColor),

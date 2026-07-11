@@ -20,7 +20,9 @@ import '../atoms/ds_field_label.dart';
 /// controls when that happens. Exactly one caption shows at a time: a failing
 /// [validator]'s message wins over [errorText], and either error suppresses
 /// [helperText]. Set [optional] to mark the field with a subdued Optional
-/// label rather than decorating the required majority.
+/// label rather than decorating the required majority; the marker is folded
+/// into the label assistive technology announces, so the control reads as
+/// "Company, optional" in one pass.
 ///
 /// All colours, spacing, radii and typography are read from [DsTokens] so the
 /// field re-skins automatically with the active theme:
@@ -207,11 +209,18 @@ class DsTextField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (label != null) ...<Widget>[
-          DsFieldLabel(label: label!, optional: optional),
-          const SizedBox(height: 6),
+          // The visible label is presentational here: the control below
+          // carries the label (with the optional marker folded in), so the
+          // text is excluded to keep it from being announced twice.
+          ExcludeSemantics(
+            child: DsFieldLabel(label: label!, optional: optional),
+          ),
+          SizedBox(height: tokens.fieldLabelGap),
         ],
         Semantics(
-          label: label,
+          label: label == null
+              ? null
+              : (optional ? '$label, optional' : label),
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
@@ -260,14 +269,27 @@ class DsTextField extends StatelessWidget {
               errorText: errorText,
               errorStyle: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
               errorMaxLines: 3,
-              border: borderWith(tokens.colorBorder, 1),
-              enabledBorder: borderWith(tokens.colorBorder, 1),
-              focusedBorder: borderWith(tokens.formHighlightColorBorder, 1.6),
-              errorBorder: borderWith(tokens.colorDanger, 1.6),
-              focusedErrorBorder: borderWith(tokens.colorDanger, 1.6),
+              border: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+              enabledBorder:
+                  borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+              focusedBorder: borderWith(
+                tokens.formHighlightColorBorder,
+                tokens.inputFocusBorderWidth,
+              ),
+              // Error borders carry the focus emphasis, as documented on
+              // [DsTokens.inputFocusBorderWidth].
+              errorBorder: borderWith(
+                tokens.colorDanger,
+                tokens.inputFocusBorderWidth,
+              ),
+              focusedErrorBorder: borderWith(
+                tokens.colorDanger,
+                tokens.inputFocusBorderWidth,
+              ),
               disabledBorder: borderWith(
-                tokens.colorBorder.withValues(alpha: 0.5),
-                1,
+                tokens.colorBorder
+                    .withValues(alpha: tokens.stateDisabledOpacity),
+                tokens.inputBorderWidth,
               ),
             ),
           ),

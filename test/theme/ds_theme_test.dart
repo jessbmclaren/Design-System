@@ -48,6 +48,38 @@ void main() {
       final shape = theme.cardTheme.shape! as RoundedRectangleBorder;
       expect(shape.borderRadius, BorderRadius.circular(20));
     });
+
+    test('the muted surface tier feeds the colour scheme', () {
+      const probe = Color(0xFF123456);
+      final theme = DsTheme.light(
+        tokens: DsTokens.light().copyWith(colorSurfaceMuted: probe),
+      );
+      expect(theme.colorScheme.surfaceContainerHighest, probe);
+
+      // The defaults reproduce the values the scheme used to hardcode.
+      expect(
+        DsTheme.light().colorScheme.surfaceContainerHighest,
+        const Color(0xFFF6F8FA),
+      );
+      expect(
+        DsTheme.dark().colorScheme.surfaceContainerHighest,
+        const Color(0xFF1E2025),
+      );
+    });
+
+    test('the divider theme reads the hairline tier', () {
+      const probe = Color(0xFF123456);
+      final theme = DsTheme.light(
+        tokens: DsTokens.light().copyWith(colorBorderSubtle: probe),
+      );
+      expect(theme.dividerTheme.color, probe);
+      // At the defaults the hairline equals colorBorder, so plain Dividers
+      // render exactly as before.
+      expect(
+        DsTheme.light().dividerTheme.color,
+        DsTokens.light().colorBorder,
+      );
+    });
   });
 
   group('DsTokens value semantics', () {
@@ -120,6 +152,54 @@ void main() {
       }
     });
 
+    test('the state vocabulary defaults equal the old hardcoded values', () {
+      for (final tokens in [DsTokens.light(), DsTokens.dark()]) {
+        expect(tokens.stateHoverOpacity, 0.06);
+        expect(tokens.statePressedOpacity, 0.10);
+        expect(tokens.stateDisabledOpacity, 0.5);
+        expect(tokens.stateDisabledTextOpacity, 0.9);
+        expect(tokens.stateDisabledIconOpacity, 0.38);
+        expect(tokens.focusRingWidth, 2);
+        expect(tokens.buttonRestBorderWidth, 1);
+        expect(tokens.inputBorderWidth, 1);
+        expect(tokens.inputFocusBorderWidth, 1.6);
+        expect(tokens.boxBorderWidth, 1);
+        expect(tokens.fieldLabelGap, 6);
+      }
+    });
+
+    test('the button metric defaults equal the old hardcoded values', () {
+      for (final tokens in [DsTokens.light(), DsTokens.dark()]) {
+        expect(tokens.buttonMinHeight, 40);
+        // The glyph rides 2 above the label, the maths the button used at
+        // build time.
+        expect(tokens.buttonIconSize, tokens.buttonLabelFontSize + 2);
+        expect(tokens.buttonTertiaryColorBackground, Colors.transparent);
+        expect(tokens.buttonTertiaryColorBorder, Colors.transparent);
+        // The tertiary label reads the same colour the button used to take
+        // from the primary action.
+        expect(tokens.buttonTertiaryColorText, tokens.actionPrimaryColorText);
+      }
+    });
+
+    test('the muted surface tier matches the old scheme hardcodes', () {
+      expect(DsTokens.light().colorSurfaceMuted, const Color(0xFFF6F8FA));
+      expect(DsTokens.dark().colorSurfaceMuted, const Color(0xFF1E2025));
+    });
+
+    test('the wordmark defaults equal the old hardcoded style', () {
+      final tokens = DsTokens.light();
+      expect(tokens.wordmarkFontSize, 22);
+      expect(tokens.wordmarkLetterSpacing, -0.2);
+      expect(tokens.wordmarkHeight, 1.0);
+    });
+
+    test('the strong label weight defaults to semi-bold', () {
+      for (final tokens in [DsTokens.light(), DsTokens.dark()]) {
+        expect(tokens.strongLabelFontWeight, FontWeight.w600);
+      }
+    });
+
     test('the overlay backdrop is a translucent scrim in both modes', () {
       expect(DsTokens.light().overlayBackdropColor.a, lessThan(1));
       expect(DsTokens.dark().overlayBackdropColor.a, lessThan(1));
@@ -155,6 +235,108 @@ void main() {
       expect(base.lerp(copied, 0).colorSuccess, base.colorSuccess);
       expect(base.lerp(copied, 1).colorSuccess, probe);
       expect(base.lerp(copied, 1).textFieldPaddingY, 10);
+    });
+
+    test(
+        'the state, metric and wordmark tokens thread through copyWith, '
+        'lerp and equality', () {
+      const probe = Color(0xFF123456);
+      final base = DsTokens.light();
+
+      final copied = base.copyWith(
+        strongLabelFontWeight: FontWeight.w900,
+        stateHoverOpacity: 0.2,
+        statePressedOpacity: 0.3,
+        stateDisabledOpacity: 0.4,
+        stateDisabledTextOpacity: 0.6,
+        stateDisabledIconOpacity: 0.7,
+        focusRingWidth: 3,
+        buttonTertiaryColorBackground: probe,
+        buttonTertiaryColorBorder: probe,
+        buttonTertiaryColorText: probe,
+        buttonMinHeight: 44,
+        buttonIconSize: 20,
+        buttonRestBorderWidth: 2,
+        colorSurfaceMuted: probe,
+        inputBorderWidth: 2,
+        inputFocusBorderWidth: 3,
+        fieldLabelGap: 8,
+        boxBorderWidth: 2,
+        wordmarkFontSize: 30,
+        wordmarkLetterSpacing: 0.5,
+        wordmarkHeight: 1.2,
+      );
+      expect(copied.strongLabelFontWeight, FontWeight.w900);
+      expect(copied.stateHoverOpacity, 0.2);
+      expect(copied.statePressedOpacity, 0.3);
+      expect(copied.stateDisabledOpacity, 0.4);
+      expect(copied.stateDisabledTextOpacity, 0.6);
+      expect(copied.stateDisabledIconOpacity, 0.7);
+      expect(copied.focusRingWidth, 3);
+      expect(copied.buttonTertiaryColorBackground, probe);
+      expect(copied.buttonTertiaryColorBorder, probe);
+      expect(copied.buttonTertiaryColorText, probe);
+      expect(copied.buttonMinHeight, 44);
+      expect(copied.buttonIconSize, 20);
+      expect(copied.buttonRestBorderWidth, 2);
+      expect(copied.colorSurfaceMuted, probe);
+      expect(copied.inputBorderWidth, 2);
+      expect(copied.inputFocusBorderWidth, 3);
+      expect(copied.fieldLabelGap, 8);
+      expect(copied.boxBorderWidth, 2);
+      expect(copied.wordmarkFontSize, 30);
+      expect(copied.wordmarkLetterSpacing, 0.5);
+      expect(copied.wordmarkHeight, 1.2);
+      expect(copied, isNot(equals(base)));
+
+      // Endpoints of a lerp resolve to each side; doubles and colours
+      // interpolate through the midpoint.
+      expect(base.lerp(copied, 0).fieldLabelGap, 6);
+      expect(base.lerp(copied, 1).fieldLabelGap, 8);
+      expect(base.lerp(copied, 0.5).fieldLabelGap, closeTo(7, 0.001));
+      expect(
+        base.lerp(copied, 0.5).colorSurfaceMuted,
+        Color.lerp(base.colorSurfaceMuted, probe, 0.5),
+      );
+      expect(base.lerp(copied, 1).strongLabelFontWeight, FontWeight.w900);
+      expect(base.lerp(copied, 1).buttonMinHeight, 44);
+      expect(base.lerp(copied, 1).wordmarkFontSize, 30);
+
+      // Equality is structural: an unchanged copy restores it.
+      final same = copied.copyWith();
+      expect(same, copied);
+      expect(same.hashCode, copied.hashCode);
+    });
+
+    test('each new token breaks equality on its own', () {
+      const probe = Color(0xFF123456);
+      final base = DsTokens.light();
+      final variants = <DsTokens>[
+        base.copyWith(strongLabelFontWeight: FontWeight.w900),
+        base.copyWith(stateHoverOpacity: 0.2),
+        base.copyWith(statePressedOpacity: 0.3),
+        base.copyWith(stateDisabledOpacity: 0.4),
+        base.copyWith(stateDisabledTextOpacity: 0.6),
+        base.copyWith(stateDisabledIconOpacity: 0.7),
+        base.copyWith(focusRingWidth: 3),
+        base.copyWith(buttonTertiaryColorBackground: probe),
+        base.copyWith(buttonTertiaryColorBorder: probe),
+        base.copyWith(buttonTertiaryColorText: probe),
+        base.copyWith(buttonMinHeight: 44),
+        base.copyWith(buttonIconSize: 20),
+        base.copyWith(buttonRestBorderWidth: 2),
+        base.copyWith(colorSurfaceMuted: probe),
+        base.copyWith(inputBorderWidth: 2),
+        base.copyWith(inputFocusBorderWidth: 3),
+        base.copyWith(fieldLabelGap: 8),
+        base.copyWith(boxBorderWidth: 2),
+        base.copyWith(wordmarkFontSize: 30),
+        base.copyWith(wordmarkLetterSpacing: 0.5),
+        base.copyWith(wordmarkHeight: 1.2),
+      ];
+      for (final variant in variants) {
+        expect(variant, isNot(equals(base)));
+      }
     });
 
     test('the auth chrome tokens thread through copyWith, lerp and equality',

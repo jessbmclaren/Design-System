@@ -4,11 +4,13 @@ Anchor a record's main actions in its `DsPageHeader` so they stay reachable whil
 
 Emphasis comes from the `variant`, not the position. Reserve the `danger` variant for destructive, hard-to-undo actions such as deleting a record or voiding a document, and pair it with a confirmation step. Ordinary actions (even important ones like saving) should never borrow the danger style, or the colour stops signalling real risk.
 
+Two more states round out the set. While a submission is in flight, set `pending`: a spinner covers the label, which stays mounted at zero opacity so the button keeps its width, presses are ignored and assistive technology announces the label as busy. The fill keeps its enabled colour because the button is busy, not disabled. For federated sign-in and other third-party actions, the `DsButton.social` preset renders a full-width `neutral` button with a leading provider icon; the glyph inherits the button's text colour, so pass a monochrome provider mark.
+
 Feedback is felt, not flashy. On press a `DsButton` gives a subtle, physical response: it scales down a touch and springs back through the `DsMotion.spring` token, settling with a single small overshoot and no bounce, with the ink ripple removed so the motion itself is the acknowledgement. It is deliberately restrained: the same calm press on every button reads as considered, where an exaggerated bounce would read as a toy. Under reduced motion it holds perfectly still. Because it lives in the atom, every button in the product feels identical; you never add your own scale or bounce on top.
 
-![Desktop (1280dp)](img/action-buttons_desktop.png)
+![Desktop (1120dp)](img/action-buttons_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/action-buttons_phone.png)
 

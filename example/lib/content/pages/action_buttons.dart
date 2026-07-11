@@ -28,6 +28,17 @@ final PatternPage actionButtonsPage = PatternPage(
       'the danger style, or the colour stops signalling real risk.',
     ),
     ProseBlock(
+      'Two more states round out the set. While a submission is in flight, '
+      'set `pending`: a spinner covers the label, which stays mounted at zero '
+      'opacity so the button keeps its width, presses are ignored and '
+      'assistive technology announces the label as busy. The fill keeps its '
+      'enabled colour because the button is busy, not disabled. For federated '
+      'sign-in and other third-party actions, the `DsButton.social` preset '
+      'renders a full-width `neutral` button with a leading provider icon; '
+      'the glyph inherits the button\'s text colour, so pass a monochrome '
+      'provider mark.',
+    ),
+    ProseBlock(
       'Feedback is felt, not flashy. On press a `DsButton` gives a subtle, '
       'physical response: it scales down a touch and springs back through the '
       '`DsMotion.spring` token, settling with a single small overshoot and no '

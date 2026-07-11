@@ -11,6 +11,8 @@ final Map<String, PlaygroundSpec> _playgrounds = {
       SelectKnob('variant', 'Variant', value: DsButtonVariant.primary, options: [
         (label: 'Primary', value: DsButtonVariant.primary),
         (label: 'Secondary', value: DsButtonVariant.secondary),
+        (label: 'Tertiary', value: DsButtonVariant.tertiary),
+        (label: 'Neutral', value: DsButtonVariant.neutral),
         (label: 'Danger', value: DsButtonVariant.danger),
       ]),
       ToggleKnob('icon', 'Leading icon'),

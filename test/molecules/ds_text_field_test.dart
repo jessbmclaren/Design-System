@@ -304,5 +304,98 @@ void main() {
       final EditableText editable = tester.widget(find.byType(EditableText));
       expect(editable.readOnly, isTrue);
     });
+
+    testWidgets('the label is announced with the control', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsTextField(label: 'Email'));
+
+      // The semantics wrapper carries the label on the node that holds the
+      // text field, so assistive technology names the control.
+      expect(
+        tester.getSemantics(find.byType(TextFormField)),
+        isSemantics(label: 'Email'),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('the error is announced as a live region', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsTextField(label: 'Email', errorText: 'Enter a valid email'),
+      );
+
+      // The decorator marks the error caption as a live region, so screen
+      // readers announce it as soon as it appears.
+      expect(
+        tester.getSemantics(find.text('Enter a valid email')),
+        isSemantics(label: 'Enter a valid email', isLiveRegion: true),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('announces the label exactly once', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsTextField(label: 'Email'));
+
+      // The visible label text is excluded from semantics; only the control
+      // itself carries the label.
+      expect(find.bySemanticsLabel('Email'), findsOneWidget);
+      handle.dispose();
+    });
+
+    testWidgets('folds the optional marker into the field label',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(tester, const DsTextField(label: 'Company', optional: true));
+
+      final node = tester.getSemantics(find.byType(TextFormField));
+      expect(node.label, contains('Company'));
+      expect(node.label.toLowerCase(), contains('optional'));
+      handle.dispose();
+    });
+
+    testWidgets('border widths and the disabled fade re-style with the skin',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsTextField(label: 'Email'),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(
+            inputBorderWidth: 3,
+            inputFocusBorderWidth: 5,
+            stateDisabledOpacity: 0.3,
+          ),
+        ),
+      );
+
+      final TextField field = tester.widget(find.byType(TextField));
+      final decoration = field.decoration!;
+      OutlineInputBorder outline(InputBorder? border) =>
+          border! as OutlineInputBorder;
+
+      expect(outline(decoration.enabledBorder).borderSide.width, 3);
+      expect(outline(decoration.focusedBorder).borderSide.width, 5);
+      // Error borders share the focus emphasis.
+      expect(outline(decoration.errorBorder).borderSide.width, 5);
+      expect(outline(decoration.focusedErrorBorder).borderSide.width, 5);
+      final disabled = outline(decoration.disabledBorder).borderSide;
+      expect(disabled.width, 3);
+      expect(disabled.color.a, closeTo(0.3, 0.005));
+    });
+
+    testWidgets('the label gap reads the fieldLabelGap token', (tester) async {
+      await pumpDs(
+        tester,
+        const DsTextField(label: 'Email'),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(fieldLabelGap: 14),
+        ),
+      );
+
+      final labelBottom = tester.getBottomLeft(find.text('Email')).dy;
+      final fieldTop = tester.getTopLeft(find.byType(TextField)).dy;
+      expect(fieldTop - labelBottom, 14);
+    });
   });
 }

@@ -6,9 +6,9 @@ The operators offered adapt to each column's `DsCellType`: text supports contain
 
 Because `DsFilter` is a plain, serialisable model with a predicate, it is the same shape a saved view or an access policy is built from. The filter you assemble here is exactly what a policy rule evaluates later. Keep the conditions few and legible; a filter that needs a paragraph to explain is usually two saved views.
 
-![Desktop (1280dp)](img/filtering-sorting_desktop.png)
+![Desktop (1120dp)](img/filtering-sorting_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/filtering-sorting_phone.png)
 

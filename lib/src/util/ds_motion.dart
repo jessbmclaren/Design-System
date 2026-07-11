@@ -74,11 +74,11 @@ abstract final class DsMotion {
     damping: 22,
   );
 
-  /// A springier, under-damped spring for a tactile, playful *bounce* — a
+  /// A springier, under-damped spring for a tactile, playful *bounce*: a
   /// button releasing, a chip toggling. It visibly overshoots and settles with
   /// a couple of diminishing rebounds (damping ratio ≈ 0.37), where [spring] is
-  /// nearly critically damped. Reach for this when the motion should feel
-  /// satisfying, not merely correct.
+  /// nearly critically damped. Use it where the motion should feel satisfying,
+  /// not merely correct.
   static const SpringDescription bounce = SpringDescription(
     mass: 1,
     stiffness: 180,
@@ -106,9 +106,12 @@ abstract final class DsMotion {
 
   /// Whether the user has requested reduced motion (or platform animations are
   /// disabled). Motion is a law: honour this everywhere.
+  ///
+  /// Registers a dependency on the `disableAnimations` aspect alone, so a
+  /// caller rebuilds when that setting changes and not on every media query
+  /// change (keyboard insets, window resizes and so on).
   static bool reduced(BuildContext context) {
-    final media = MediaQuery.maybeOf(context);
-    return media?.disableAnimations ?? false;
+    return MediaQuery.maybeDisableAnimationsOf(context) ?? false;
   }
 
   /// [full] when motion is allowed, otherwise [Duration.zero].

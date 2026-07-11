@@ -25,7 +25,7 @@ Row(
   children: const [
     // Two-tone: a lighter primary and a heavier accent.
     DsWordmark(primary: 'acme', accent: 'id'),
-    SizedBox(width: 32),
+    SizedBox(width: DsSpacing.xxl),
     // Single tone, larger, for a marketing header.
     DsWordmark(primary: 'acme', fontSize: 28),
   ],

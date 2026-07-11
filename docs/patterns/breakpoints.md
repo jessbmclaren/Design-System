@@ -24,9 +24,9 @@ Resolve the class for the window with `DsBreakpoints.of(context)`, or for any me
 
 The system is tested the way it is used: every component holds from a 320dp phone to a 1920dp desktop without overflow, and the docs sweep each live demo across eleven widths between those ends. Treat the boundaries as ranges, not targets; a layout must flex all the way through a class, not just at its edges. Honour the user's text scale too: text wraps or ellipsizes, it never clips.
 
-![Desktop (1280dp)](img/breakpoints_desktop.png)
+![Desktop (1120dp)](img/breakpoints_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/breakpoints_phone.png)
 

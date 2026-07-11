@@ -10,9 +10,9 @@ When setup needs real answers, run it as steps. `DsOnboardingWizard` owns the ch
 
 Onboarding does not end at the last wizard step. `DsSetupGuide` carries the remaining tasks into the product as a collapsible checklist that reads out progress and always points at the next actionable item. `DsTourCard` gives the short illustrated walkthrough after sign-up; it steps through a few ideas on its own card and points at nothing. Both are controlled components, so you decide when they appear and what progress they show.
 
-![Desktop (1280dp)](img/onboarding_desktop.png)
+![Desktop (1120dp)](img/onboarding_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/onboarding_phone.png)
 

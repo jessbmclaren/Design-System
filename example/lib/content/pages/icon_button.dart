@@ -15,7 +15,7 @@ final PatternPage iconButtonPage = PatternPage(
       'button. The `semanticLabel` is required: it names the button for screen '
       'readers and shows as a tooltip on hover. Pass a null `onPressed` to '
       'disable the button and drop it from the focus order.',
-  hasLiveDemo: false,
+  hasLiveDemo: true,
   dos: const [
     'Give every icon button a `semanticLabel` that names the action, for example "Close" or "Add row".',
     'Pick an icon whose meaning is well known, so the button reads without a visible caption.',
@@ -50,5 +50,9 @@ Row(
   ],
 );
 ''',
-  related: const ['action-buttons', 'icon'],
+  shots: const [
+    Shot(pageId: 'icon-button', size: ShotSize.desktop),
+    Shot(pageId: 'icon-button', size: ShotSize.phone),
+  ],
+  related: const ['action-buttons', 'icon', 'iconography'],
 );

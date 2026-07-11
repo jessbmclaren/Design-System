@@ -94,9 +94,12 @@ class DsTextArea extends StatelessWidget {
     final tokens = DsTokens.of(context);
     final bool hasError = errorText != null;
 
+    // The horizontal inset stays on the shared input token; the vertical
+    // inset reads the same full-padding token as [DsTextField], so the two
+    // fields stay in step when a skin retunes their height.
     final EdgeInsets contentPadding = EdgeInsets.symmetric(
       horizontal: tokens.inputFieldPaddingX,
-      vertical: tokens.inputFieldPaddingY + 12,
+      vertical: tokens.textFieldPaddingY,
     );
 
     final BorderRadius radius = BorderRadius.circular(tokens.formBorderRadius);
@@ -123,7 +126,7 @@ class DsTextArea extends StatelessWidget {
                   fontWeight: DsTypography.medium,
                 ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: tokens.fieldLabelGap),
         ],
         Semantics(
           label: label,
@@ -155,24 +158,29 @@ class DsTextArea extends StatelessWidget {
               // helper/error/counter text is suppressed to avoid duplication.
               // The border still reflects the error state.
               counterText: '',
-              border: borderWith(tokens.colorBorder, 1),
+              border: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+              // The error border carries the focus emphasis, as documented on
+              // [DsTokens.inputFocusBorderWidth].
               enabledBorder: borderWith(
                 hasError ? tokens.colorDanger : tokens.colorBorder,
-                hasError ? 1.6 : 1,
+                hasError
+                    ? tokens.inputFocusBorderWidth
+                    : tokens.inputBorderWidth,
               ),
               focusedBorder: borderWith(
                 hasError ? tokens.colorDanger : tokens.formHighlightColorBorder,
-                1.6,
+                tokens.inputFocusBorderWidth,
               ),
               disabledBorder: borderWith(
-                tokens.colorBorder.withValues(alpha: 0.5),
-                1,
+                tokens.colorBorder
+                    .withValues(alpha: tokens.stateDisabledOpacity),
+                tokens.inputBorderWidth,
               ),
             ),
           ),
         ),
         if (caption != null || maxLength != null) ...<Widget>[
-          const SizedBox(height: 6),
+          SizedBox(height: tokens.fieldLabelGap),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -186,7 +194,7 @@ class DsTextArea extends StatelessWidget {
               else
                 const Spacer(),
               if (maxLength != null) ...<Widget>[
-                const SizedBox(width: 8),
+                SizedBox(width: tokens.spacingUnit),
                 _CharacterCounter(
                   controller: controller,
                   maxLength: maxLength!,

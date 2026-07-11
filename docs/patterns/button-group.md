@@ -2,9 +2,9 @@
 
 `DsButtonGroup` is the toolbar primitive for a set of related actions. Hand it a list of `children` (usually `DsButton`s in priority order) and it keeps them on a single line, measuring the width the parent gives it and collapsing whatever will not fit into a trailing "More" menu. The leading actions stay inline the longest and trailing ones are the first to move into the menu, so the same group shows every action on a wide desktop and just one or two plus a menu on a 320dp phone, with no breakpoint configuration. Because each collapsed `DsButton` carries its own label, icon and `onPressed` into the menu entry, an action behaves identically whether it is shown inline or overflowed, and the row is guaranteed never to clip or wrap.
 
-![Desktop (1280dp)](img/button-group_desktop.png)
+![Desktop (1120dp)](img/button-group_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/button-group_phone.png)
 

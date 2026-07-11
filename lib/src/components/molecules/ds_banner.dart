@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 
 /// The severity and tone of a [DsBanner].
 ///
@@ -127,7 +126,7 @@ class DsBanner extends StatelessWidget {
           style: tokens.headingSm.toTextStyle(color: foreground),
         ),
         if (message != null && message!.isNotEmpty) ...[
-          const SizedBox(height: DsSpacing.xs),
+          SizedBox(height: tokens.spacingUnit / 2),
           Text(
             message!,
             style: tokens.bodySm.toTextStyle(
@@ -152,7 +151,7 @@ class DsBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(DsSpacing.md),
+          padding: EdgeInsets.all(tokens.spacingUnit * 1.5),
           child: LayoutBuilder(
             builder: (context, constraints) {
               final stackAction =
@@ -162,7 +161,7 @@ class DsBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(icon, size: 20, color: foreground),
-                  const SizedBox(width: DsSpacing.sm),
+                  SizedBox(width: tokens.spacingUnit),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +169,7 @@ class DsBanner extends StatelessWidget {
                       children: [
                         textColumn,
                         if (stackAction) ...[
-                          const SizedBox(height: DsSpacing.sm),
+                          SizedBox(height: tokens.spacingUnit),
                           Align(
                             alignment: Alignment.centerLeft,
                             child: actionButton,
@@ -180,11 +179,11 @@ class DsBanner extends StatelessWidget {
                     ),
                   ),
                   if (!stackAction && actionButton != null) ...[
-                    const SizedBox(width: DsSpacing.sm),
+                    SizedBox(width: tokens.spacingUnit),
                     actionButton,
                   ],
                   if (closeButton != null) ...[
-                    const SizedBox(width: DsSpacing.xs),
+                    SizedBox(width: tokens.spacingUnit / 2),
                     closeButton,
                   ],
                 ],
@@ -201,9 +200,9 @@ class DsBanner extends StatelessWidget {
       onPressed: action!.onPressed,
       style: TextButton.styleFrom(
         foregroundColor: foreground,
-        padding: const EdgeInsets.symmetric(
-          horizontal: DsSpacing.sm,
-          vertical: DsSpacing.xs,
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacingUnit,
+          vertical: tokens.spacingUnit / 2,
         ),
         minimumSize: const Size(0, 32),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

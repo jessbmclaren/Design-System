@@ -24,10 +24,10 @@ final PatternPage iconPage = PatternPage(
     'Leave semanticLabel null for purely decorative icons that sit beside visible text, so screen readers do not announce the same thing twice.',
   ],
   donts: const [
-    'Do not hard-code an ad-hoc size like 17 or 22; choose the nearest DsIconSize step so the glyph stays on the scale.',
-    'Do not hard-code a raw hex colour for tint; resolve it from DsTokens so it adapts to the active theme.',
-    'Do not rely on DsIcon for interactivity; wrap it in a button or IconButton to get a tap target and tooltip.',
-    'Do not label decorative icons, and do not leave an icon-only action unlabelled.',
+    'Don\'t hard-code an ad-hoc size like 17 or 22; choose the nearest DsIconSize step so the glyph stays on the scale.',
+    'Don\'t hard-code a raw hex colour for tint; resolve it from DsTokens so it adapts to the active theme.',
+    'Don\'t rely on DsIcon for interactivity; wrap it in a button or DsIconButton to get a tap target and tooltip.',
+    'Don\'t label decorative icons, and don\'t leave an icon-only action unlabelled.',
   ],
   code: '''
 // Decorative glyph: inherits the theme text colour, no label needed.
@@ -46,5 +46,5 @@ DsIcon(
     Shot(pageId: 'icon', size: ShotSize.phone),
   ],
   hasLiveDemo: true,
-  related: const ['inline', 'link'],
+  related: const ['iconography', 'icon-button', 'inline', 'link'],
 );

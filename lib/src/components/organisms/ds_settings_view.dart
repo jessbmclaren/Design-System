@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_spacing.dart';
 
 /// A titled group of related settings rows within a [DsSettingsView].
 ///
@@ -87,20 +86,21 @@ class DsSettingsView extends StatelessWidget {
     final windowSize = DsBreakpoints.of(context);
 
     // Horizontal padding tightens on small phones so 320dp never feels cramped.
-    final double horizontalPadding =
-        windowSize == DsWindowSize.compact ? DsSpacing.lg : DsSpacing.xl;
+    final double horizontalPadding = windowSize == DsWindowSize.compact
+        ? tokens.spacingUnit * 2
+        : tokens.spacingUnit * 3;
 
     final children = <Widget>[
       if (header != null) ...<Widget>[
         header!,
-        const SizedBox(height: DsSpacing.xl),
+        SizedBox(height: tokens.spacingUnit * 3),
       ],
       for (var i = 0; i < sections.length; i++) ...<Widget>[
-        if (i > 0) const SizedBox(height: DsSpacing.xxl),
+        if (i > 0) SizedBox(height: tokens.spacingUnit * 4),
         _DsSettingsSectionView(section: sections[i], tokens: tokens),
       ],
       if (footer != null) ...<Widget>[
-        const SizedBox(height: DsSpacing.xxl),
+        SizedBox(height: tokens.spacingUnit * 4),
         footer!,
       ],
     ];
@@ -108,7 +108,7 @@ class DsSettingsView extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
-        vertical: DsSpacing.xl,
+        vertical: tokens.spacingUnit * 3,
       ),
       children: <Widget>[
         Center(
@@ -167,14 +167,14 @@ class _DsSettingsSectionView extends StatelessWidget {
           ),
         ),
         if (section.description != null) ...<Widget>[
-          const SizedBox(height: DsSpacing.xs),
+          SizedBox(height: tokens.spacingUnit / 2),
           Text(
             section.description!,
             style:
                 tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
           ),
         ],
-        const SizedBox(height: DsSpacing.md),
+        SizedBox(height: tokens.spacingUnit * 1.5),
         DecoratedBox(
           decoration: BoxDecoration(
             color: tokens.formBackgroundColor,

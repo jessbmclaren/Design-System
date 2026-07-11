@@ -4,9 +4,11 @@ The sign-in view is the front door to your product: a single, centred card that 
 
 Keep it to the two things people came to do: enter their details and get in. Lead with a short, left-aligned heading, keep the primary button the obvious next step and put recovery (forgot password) on the password label row where people look for it. Alternative providers belong below the primary action behind an "Or sign in with" divider, so the password path stays the default and the alternatives read as equals among themselves. The `footerBand` keeps the new-user path visible without competing with the form: its tint and hairline mark it as a separate room. Surface a failed attempt with a `DsBanner` above the form or an `errorText` on the offending field rather than a bare sentence.
 
-![Desktop (1280dp)](img/sign-in_desktop.png)
+The composition flexes through a handful of optional parameters. Dropping the `form` and adding a `brandIcon` turns it into a redirect or SSO card: the glyph sits in a tinted rounded square above the title (filled with `brandColor`, or the primary button background when omitted) and a supporting `description` renders beneath. `onClose` adds a corner close button and insets the heading so the title never paints beneath it. `showBorder: false` lets the card rest on its shadow alone. `additionalContextLabel` with `additionalContext` tucks supplementary detail, such as terms or enterprise sign-in options, behind a lightweight reveal below the footer.
 
-*Desktop (1280dp)*
+![Desktop (1120dp)](img/sign-in_desktop.png)
+
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/sign-in_phone.png)
 
@@ -80,8 +82,8 @@ DsSignInView(
   footerBand: Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      Text('New here? ', style: DsTypography.bodySm.toTextStyle(
-        color: DsTokens.of(context).colorSecondaryText,
+      Text('New here? ', style: tokens.bodySm.toTextStyle(
+        color: tokens.colorSecondaryText,
       )),
       DsLink(label: 'Create an account', onPressed: _goToSignUp),
     ],

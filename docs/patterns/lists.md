@@ -4,9 +4,9 @@ A list presents a collection of records as stacked rows. Use `DsList` with `DsLi
 
 Give `DsListItem` an `onTap` to make the whole row a target. When no trailing widget is supplied, a chevron appears automatically to signal that the row navigates. Set `bordered: true` on `DsList` to group the rows into a rounded card, and keep `showDividers` on so adjacent rows stay visually separate.
 
-![Desktop (1280dp)](img/lists_desktop.png)
+![Desktop (1120dp)](img/lists_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/lists_phone.png)
 

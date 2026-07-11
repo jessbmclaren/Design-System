@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../util/ds_motion.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_progress_bar.dart';
@@ -211,7 +210,7 @@ class DsTourCard extends StatelessWidget {
               onSkip: onSkip,
             ),
           Padding(
-            padding: const EdgeInsets.all(DsSpacing.xl),
+            padding: EdgeInsets.all(tokens.spacingUnit * 3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -236,7 +235,7 @@ class DsTourCard extends StatelessWidget {
                         style: tokens.headingMd
                             .toTextStyle(color: tokens.colorText),
                       ),
-                      const SizedBox(height: DsSpacing.sm),
+                      SizedBox(height: tokens.spacingUnit),
                       Text(
                         step.body,
                         style: tokens.bodyMd
@@ -245,7 +244,7 @@ class DsTourCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: DsSpacing.xl),
+                SizedBox(height: tokens.spacingUnit * 3),
                 _Footer(
                   stepIndex: _index,
                   stepCount: steps.length,
@@ -357,11 +356,11 @@ class _Frame extends StatelessWidget {
 
     return Container(
       color: tokens.offsetBackgroundColor,
-      padding: const EdgeInsets.fromLTRB(
-        DsSpacing.lg,
-        DsSpacing.sm,
-        DsSpacing.lg,
-        DsSpacing.lg,
+      padding: EdgeInsets.fromLTRB(
+        tokens.spacingUnit * 2,
+        tokens.spacingUnit,
+        tokens.spacingUnit * 2,
+        tokens.spacingUnit * 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -461,6 +460,7 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     // The bar is decorative to a screen reader; the wrapping label announces
     // the position on every change instead, so it is never read twice.
     final progress = Semantics(
@@ -499,10 +499,10 @@ class _Footer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               progress,
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
               nextButton(fullWidth: true),
               if (stepIndex > 0) ...[
-                const SizedBox(height: DsSpacing.xs),
+                SizedBox(height: tokens.spacingUnit / 2),
                 backButton(fullWidth: true),
               ],
             ],
@@ -516,14 +516,14 @@ class _Footer extends StatelessWidget {
         return Row(
           children: [
             Expanded(child: progress),
-            const SizedBox(width: DsSpacing.lg),
+            SizedBox(width: tokens.spacingUnit * 2),
             if (stepIndex > 0) ...[
               ConstrainedBox(
                 key: const ValueKey('DsTourCard.back'),
                 constraints: BoxConstraints(maxWidth: width * 0.25),
                 child: backButton(fullWidth: false),
               ),
-              const SizedBox(width: DsSpacing.sm),
+              SizedBox(width: tokens.spacingUnit),
             ],
             ConstrainedBox(
               key: const ValueKey('DsTourCard.next'),

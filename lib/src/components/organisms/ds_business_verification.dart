@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_checkbox.dart';
@@ -409,6 +408,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
   // Step 1: Business details --------------------------------------------
 
   Widget _buildBusinessDetailsStep() {
+    final tokens = DsTokens.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -431,7 +431,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
             ),
           ],
         ),
-        const SizedBox(height: DsSpacing.lg),
+        SizedBox(height: tokens.spacingUnit * 2),
         DsAddressFieldGroup(
           legend: 'Registered address',
           value: _address,
@@ -446,6 +446,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
   // Step 2: Verify identity ---------------------------------------------
 
   Widget _buildIdentityStep() {
+    final tokens = DsTokens.of(context);
     final uploadState = widget.uploadState;
 
     return DsFormFieldGroup(
@@ -470,7 +471,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const DsFieldLabel(label: 'Identity document'),
-              const SizedBox(height: 6),
+              SizedBox(height: tokens.fieldLabelGap),
               DsUploadField(
                 state: uploadState,
                 progress: widget.uploadProgress,
@@ -525,15 +526,15 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
         Text(
           'Review your details',
           style: tokens.labelMd
-              .copyWith(fontWeight: DsTypography.semiBold)
+              .copyWith(fontWeight: tokens.strongLabelFontWeight)
               .toTextStyle(color: tokens.colorText),
         ),
-        const SizedBox(height: DsSpacing.md),
+        SizedBox(height: tokens.spacingUnit * 1.5),
         for (var i = 0; i < rows.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: DsSpacing.sm),
+          if (i > 0) SizedBox(height: tokens.spacingUnit),
           _SummaryRow(tokens: tokens, entry: rows[i]),
         ],
-        const SizedBox(height: DsSpacing.lg),
+        SizedBox(height: tokens.spacingUnit * 2),
         Text(
           'Submitting sends these details for verification. We\'ll let you know '
           'once the review is complete.',
@@ -567,9 +568,9 @@ class _TakeoverHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DsSpacing.md,
-        vertical: DsSpacing.xs,
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacingUnit * 1.5,
+        vertical: tokens.spacingUnit / 2,
       ),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: tokens.colorBorderSubtle)),
@@ -581,9 +582,9 @@ class _TakeoverHeader extends StatelessWidget {
             semanticLabel: 'Close',
             onPressed: onClose,
           ),
-          const SizedBox(width: DsSpacing.md),
+          SizedBox(width: tokens.spacingUnit * 1.5),
           const DsDivider(axis: DsDividerAxis.vertical, length: 24),
-          const SizedBox(width: DsSpacing.lg),
+          SizedBox(width: tokens.spacingUnit * 2),
           Expanded(
             child: Semantics(
               header: true,
@@ -636,7 +637,7 @@ class _SummaryRow extends StatelessWidget {
             style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
           ),
         ),
-        const SizedBox(width: DsSpacing.md),
+        SizedBox(width: tokens.spacingUnit * 1.5),
         Expanded(
           flex: 3,
           child: Text(
@@ -667,7 +668,7 @@ class _SuccessState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(DsSpacing.xl),
+        padding: EdgeInsets.all(tokens.spacingUnit * 3),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
@@ -689,7 +690,7 @@ class _SuccessState extends StatelessWidget {
                   semanticLabel: 'Success',
                 ),
               ),
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
               Semantics(
                 header: true,
                 child: Text(
@@ -698,7 +699,7 @@ class _SuccessState extends StatelessWidget {
                   style: tokens.headingMd.toTextStyle(color: tokens.colorText),
                 ),
               ),
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Text(
                 "Thanks. We've received your business details and will review "
                 'them shortly. You can safely close this window.',
@@ -732,7 +733,7 @@ class _ReceiptState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(DsSpacing.xl),
+        padding: EdgeInsets.all(tokens.spacingUnit * 3),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
@@ -744,7 +745,7 @@ class _ReceiptState extends StatelessWidget {
                 size: 64,
                 semanticLabel: 'Submitted',
               ),
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
               // A live region so the arrival of the receipt is announced.
               Semantics(
                 header: true,
@@ -755,7 +756,7 @@ class _ReceiptState extends StatelessWidget {
                   style: tokens.headingMd.toTextStyle(color: tokens.colorText),
                 ),
               ),
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Text(
                 "We've received your business details and started the checks. "
                 "They usually finish quickly, and we'll let you know the "
@@ -764,10 +765,10 @@ class _ReceiptState extends StatelessWidget {
                 style: tokens.bodyMd
                     .toTextStyle(color: tokens.colorSecondaryText),
               ),
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(DsSpacing.lg),
+                padding: EdgeInsets.all(tokens.spacingUnit * 2),
                 decoration: BoxDecoration(
                   color: tokens.offsetBackgroundColor,
                   borderRadius: BorderRadius.circular(tokens.formBorderRadius),
@@ -780,7 +781,7 @@ class _ReceiptState extends StatelessWidget {
                       .toTextStyle(color: tokens.colorSecondaryText),
                 ),
               ),
-              const SizedBox(height: DsSpacing.xl),
+              SizedBox(height: tokens.spacingUnit * 3),
               DsButton(
                 label: continueLabel,
                 onPressed: onContinue,

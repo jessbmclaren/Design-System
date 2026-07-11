@@ -2,9 +2,9 @@
 
 `DsFocusView` opens a dedicated, distraction-free surface for a single task (confirming a change, filling a short form or stepping through a sequence) without navigating away from the current screen. It is a titled panel with a scrollable body and an optional footer for the one or two actions that finish the task. The static `DsFocusView.show` presents it over the current route, honouring the `overlays` token so it appears as a centred dialog or an edge drawer; the widget itself renders a stable panel you can also embed inline.
 
-![Desktop (1280dp)](img/focus-view_desktop.png)
+![Desktop (1120dp)](img/focus-view_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/focus-view_phone.png)
 

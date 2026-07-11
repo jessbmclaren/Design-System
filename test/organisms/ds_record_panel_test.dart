@@ -282,5 +282,35 @@ void main() {
         expect(tester.takeException(), isNull, reason: 'overflow at $width');
       }
     });
+
+    testWidgets('labelled blocks read the fieldLabelGap token',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 800,
+          height: 600,
+          child: DsRecordPanel(
+            columns: const <DsGridColumn>[
+              DsGridColumn(
+                key: 'insured',
+                title: 'Insured',
+                type: DsCellType.checkbox,
+              ),
+            ],
+            values: const {'insured': true},
+            onChanged: (_) {},
+          ),
+        ),
+        surfaceSize: const Size(800, 600),
+        theme: DsTheme.light(
+          tokens: DsTokens.light().copyWith(fieldLabelGap: 12),
+        ),
+      );
+
+      final labelBottom = tester.getBottomLeft(find.text('Insured')).dy;
+      final switchTop = tester.getTopLeft(find.byType(DsSwitch)).dy;
+      expect(switchTop - labelBottom, 12);
+    });
   });
 }

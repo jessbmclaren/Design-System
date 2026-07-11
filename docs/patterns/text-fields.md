@@ -6,9 +6,9 @@ Keep the label visible at all times and let the `hintText` show an example of a 
 
 Inside a `Form`, drive validation through the field rather than by hand: pass a `validator` and set `autovalidateMode: AutovalidateMode.onUserInteraction`, so the message appears only once someone has edited the field. A failing validator takes precedence over `errorText`, and either one hides `helperText`. Mark a genuinely optional field with `optional: true`, which appends a subdued Optional marker to its label, rather than annotating the required majority.
 
-![Desktop (1280dp)](img/text-fields_desktop.png)
+![Desktop (1120dp)](img/text-fields_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/text-fields_phone.png)
 
@@ -64,6 +64,8 @@ Column(
 
 ## See also
 
+- [Text area](text-area.md)
+- [Field label](field-label.md)
 - [Selection controls](selection-controls.md)
 - [Select](select.md)
 - [Sign in](sign-in.md)

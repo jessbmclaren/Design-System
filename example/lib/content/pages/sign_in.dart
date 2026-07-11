@@ -37,6 +37,18 @@ final PatternPage signInPage = PatternPage(
       'the form or an `errorText` on the offending field rather than a bare '
       'sentence.',
     ),
+    ProseBlock(
+      'The composition flexes through a handful of optional parameters. '
+      'Dropping the `form` and adding a `brandIcon` turns it into a redirect '
+      'or SSO card: the glyph sits in a tinted rounded square above the title '
+      '(filled with `brandColor`, or the primary button background when '
+      'omitted) and a supporting `description` renders beneath. `onClose` '
+      'adds a corner close button and insets the heading so the title never '
+      'paints beneath it. `showBorder: false` lets the card rest on its '
+      'shadow alone. `additionalContextLabel` with `additionalContext` tucks '
+      'supplementary detail, such as terms or enterprise sign-in options, '
+      'behind a lightweight reveal below the footer.',
+    ),
   ],
   dos: const [
     'Give people the two obvious paths: signing in (the primary action) and '
@@ -111,8 +123,8 @@ DsSignInView(
   footerBand: Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      Text('New here? ', style: DsTypography.bodySm.toTextStyle(
-        color: DsTokens.of(context).colorSecondaryText,
+      Text('New here? ', style: tokens.bodySm.toTextStyle(
+        color: tokens.colorSecondaryText,
       )),
       DsLink(label: 'Create an account', onPressed: _goToSignUp),
     ],

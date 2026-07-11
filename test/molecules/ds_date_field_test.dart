@@ -134,4 +134,75 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('the rest border follows inputBorderWidth', (
+    WidgetTester tester,
+  ) async {
+    await pumpDs(
+      tester,
+      DsDateField(
+        label: 'Start date',
+        value: DateTime(2026, 7, 9),
+        onChanged: (_) {},
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(inputBorderWidth: 3),
+      ),
+    );
+
+    expect(_fieldBorder(tester).top.width, 3);
+  });
+
+  testWidgets('the error border carries the focus emphasis', (
+    WidgetTester tester,
+  ) async {
+    await pumpDs(
+      tester,
+      DsDateField(
+        label: 'Start date',
+        value: DateTime(2026, 7, 9),
+        errorText: 'Pick a weekday',
+        onChanged: (_) {},
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(inputFocusBorderWidth: 5),
+      ),
+    );
+
+    expect(_fieldBorder(tester).top.width, 5);
+  });
+
+  testWidgets('the disabled border fade reads stateDisabledOpacity', (
+    WidgetTester tester,
+  ) async {
+    await pumpDs(
+      tester,
+      DsDateField(
+        label: 'Start date',
+        value: DateTime(2026, 7, 9),
+        enabled: false,
+        onChanged: (_) {},
+      ),
+      theme: DsTheme.light(
+        tokens: DsTokens.light().copyWith(stateDisabledOpacity: 0.3),
+      ),
+    );
+
+    expect(_fieldBorder(tester).top.color.a, closeTo(0.3, 0.005));
+  });
+}
+
+/// The [Border] the date field's outlined control paints.
+Border _fieldBorder(WidgetTester tester) {
+  final boxes = tester.widgetList<DecoratedBox>(
+    find.descendant(
+      of: find.byType(DsDateField),
+      matching: find.byType(DecoratedBox),
+    ),
+  );
+  final decoration = boxes
+      .map((box) => box.decoration)
+      .whereType<BoxDecoration>()
+      .firstWhere((candidate) => candidate.border != null);
+  return decoration.border! as Border;
 }

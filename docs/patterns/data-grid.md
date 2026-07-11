@@ -6,9 +6,9 @@ The grid is deliberately unopinionated about where its data comes from or how it
 
 Use the data grid when the job is scanning and comparing many records across many attributes. When a person needs to see one record in full, pair it with a record panel; when they need to slice the set, layer a filter bar and grouping above it. The grid is the surface those patterns build on.
 
-![Desktop (1280dp)](img/data-grid_desktop.png)
+![Desktop (1120dp)](img/data-grid_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/data-grid_phone.png)
 

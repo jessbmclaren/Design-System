@@ -4,9 +4,9 @@ An empty state fills the space where records would be when a view has nothing to
 
 Match the copy to the reason the view is empty. When a record type has never been created, say so with a hopeful "yet" and offer the action that creates the first one. When an active filter or search returns no matches, swap the message to explain that nothing meets the current criteria and drop the create action. The fix is to adjust the filter, not to add data. Keep empty distinct from loading (use `DsSpinner`) and from error (use `DsBanner`), so people always know which situation they are in.
 
-![Desktop (1280dp)](img/empty-state_desktop.png)
+![Desktop (1120dp)](img/empty-state_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/empty-state_phone.png)
 

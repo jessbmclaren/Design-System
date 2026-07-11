@@ -6,9 +6,9 @@ Create and apply are two steps. You build the policy here (its condition and rul
 
 The builder is controlled: it holds no copy of the policy and emits a new immutable `DsPolicy` on every edit, so a policy is as serialisable and auditable as any other record. Keep a policy to one clear intent with a handful of rules; when it needs a paragraph of conditions, it is usually two policies.
 
-![Desktop (1280dp)](img/policies_desktop.png)
+![Desktop (1120dp)](img/policies_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/policies_phone.png)
 

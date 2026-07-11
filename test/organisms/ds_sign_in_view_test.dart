@@ -1,4 +1,7 @@
 import 'package:design_system/design_system.dart';
+// The shared auth-card internals are deliberately not exported from the
+// barrel; the dedup regression tests reach them through the src path.
+import 'package:design_system/src/components/organisms/ds_auth_card_parts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -41,6 +44,51 @@ void main() {
       await tester.pump();
 
       expect(taps, 1);
+    });
+
+    testWidgets('disables the primary button when the action has no callback',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        const DsSignInView(
+          title: 'Welcome back',
+          primaryAction: DsSignInAction(label: 'Continue', onPressed: null),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(DsButton)),
+        isSemantics(isButton: true, isEnabled: false),
+      );
+      await tester.tap(find.byType(DsButton), warnIfMissed: false);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      handle.dispose();
+    });
+
+    testWidgets('does not fire onPressed while the action is pending',
+        (tester) async {
+      var taps = 0;
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Welcome back',
+          primaryAction: DsSignInAction(
+            label: 'Continue',
+            onPressed: () => taps++,
+            pending: true,
+          ),
+        ),
+      );
+
+      // While pending the label is replaced by a spinner, so tap the button
+      // itself. It ignores taps and must fire nothing.
+      expect(find.byType(DsSpinner), findsOneWidget);
+      await tester.tap(find.byType(DsButton), warnIfMissed: false);
+      await tester.pump();
+
+      expect(taps, 0);
     });
 
     testWidgets('renders footer when provided', (tester) async {
@@ -196,8 +244,18 @@ void main() {
           .decoration! as BoxDecoration;
       expect((decoration.border! as Border).top.color, tokens.colorBorder);
 
-      final divider = tester.widget<Divider>(find.byType(Divider));
-      expect(divider.color, tokens.colorBorderSubtle);
+      // The reveal rule is a DsDivider, which paints the subtle hairline tier
+      // by default.
+      final rule = tester.widget<DecoratedBox>(
+        find.descendant(
+          of: find.byType(DsDivider),
+          matching: find.byType(DecoratedBox),
+        ),
+      );
+      expect(
+        (rule.decoration as BoxDecoration).color,
+        tokens.colorBorderSubtle,
+      );
     });
 
     testWidgets('renders the footer band edge to edge in a tinted strip',
@@ -306,6 +364,122 @@ void main() {
         ),
       );
       expect(cardDecoration().border, isNull);
+    });
+
+    testWidgets('the reveal control announces its expanded state through a '
+        'full expand and collapse cycle', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+          additionalContextLabel: 'More options',
+          additionalContext: const Text('Enterprise SSO.'),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.text('More options')),
+        isSemantics(
+          isButton: true,
+          hasTapAction: true,
+          hasExpandedState: true,
+          isExpanded: false,
+        ),
+      );
+      expect(find.text('Enterprise SSO.'), findsNothing);
+
+      await tester.tap(find.text('More options'));
+      await tester.pump();
+      expect(
+        tester.getSemantics(find.text('More options')),
+        isSemantics(hasExpandedState: true, isExpanded: true),
+      );
+      expect(find.text('Enterprise SSO.'), findsOneWidget);
+
+      await tester.tap(find.text('More options'));
+      await tester.pump();
+      expect(
+        tester.getSemantics(find.text('More options')),
+        isSemantics(hasExpandedState: true, isExpanded: false),
+      );
+      expect(find.text('Enterprise SSO.'), findsNothing);
+      handle.dispose();
+    });
+
+    testWidgets('hosts the reveal ink on a transparent Material inside the '
+        'card', (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+          additionalContextLabel: 'More options',
+          additionalContext: const Text('Enterprise SSO.'),
+        ),
+      );
+
+      // The nearest Material above the reveal control must be the transparent
+      // one inside the card; without it the ink would paint on the Scaffold's
+      // material beneath the card's opaque background and never show.
+      final material = tester.widget<Material>(
+        find
+            .ancestor(
+              of: find.text('More options'),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(material.type, MaterialType.transparency);
+
+      // The splash actually renders: pump a frame mid-ripple without error.
+      await tester.tap(find.text('More options'));
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(tester.takeException(), isNull);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('renders the brand glyph in the shared auth brand mark',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Welcome back',
+          brandIcon: Icons.lock_outline,
+          primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+        ),
+      );
+
+      // Dedup regression: the mark is the widget shared with DsSignUpView.
+      final mark = find.byType(DsAuthBrandMark);
+      expect(mark, findsOneWidget);
+      expect(
+        find.descendant(of: mark, matching: find.byIcon(Icons.lock_outline)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('caps the card at its documented 420dp reading width',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Welcome back',
+          primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+        ),
+        surfaceSize: const Size(800, 900),
+      );
+
+      final tokens = DsTokens.of(tester.element(find.byType(DsSignInView)));
+      final card = find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            w.decoration is BoxDecoration &&
+            (w.decoration! as BoxDecoration).color ==
+                tokens.formBackgroundColor,
+      );
+      expect(tester.getSize(card).width, 420);
     });
 
     testWidgets('lays out the new slots without overflow at 320dp',

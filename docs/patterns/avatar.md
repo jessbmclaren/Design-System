@@ -2,9 +2,9 @@
 
 `DsAvatar` is a circular badge for a person or entity that is guaranteed to render something legible on the first frame. It resolves its content by priority: a network `imageUrl` when one loads, then up to two upper-cased initials derived from `name`, then a caller-supplied `icon` and finally a default person glyph. Because the image sits above that chain, an avatar shown while the picture is still loading (or when it fails, or when there is no network at all) falls straight back to initials instead of a broken-image icon, so lists and headers never flicker. The circle is `size` logical pixels across; the fill and foreground default to the active theme and adopt your white-label palette automatically, while `backgroundColor` and `foregroundColor` override them when you need a per-person accent. The whole widget is exposed to assistive technology as an image labelled by `name`, so screen readers announce who it represents.
 
-![Desktop (1280dp)](img/avatar_desktop.png)
+![Desktop (1120dp)](img/avatar_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/avatar_phone.png)
 

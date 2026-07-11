@@ -3,8 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
-import '../../tokens/ds_typography.dart';
 import '../../util/ds_motion.dart';
 
 /// A single collapsible section within a [DsAccordion].
@@ -197,7 +195,7 @@ class _DsAccordionSection extends StatelessWidget {
     final curve = DsMotion.curveOf(context, Curves.easeInOut);
 
     final titleStyle = tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
-          fontWeight: DsTypography.semiBold,
+          fontWeight: tokens.strongLabelFontWeight,
         );
 
     final header = Semantics(
@@ -209,9 +207,9 @@ class _DsAccordionSection extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DsSpacing.lg,
-              vertical: DsSpacing.md,
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacingUnit * 2,
+              vertical: tokens.spacingUnit * 1.5,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -224,7 +222,7 @@ class _DsAccordionSection extends StatelessWidget {
                     ),
                     child: item.leading!,
                   ),
-                  const SizedBox(width: DsSpacing.md),
+                  SizedBox(width: tokens.spacingUnit * 1.5),
                 ],
                 Expanded(
                   child: Text(
@@ -234,7 +232,7 @@ class _DsAccordionSection extends StatelessWidget {
                     style: titleStyle,
                   ),
                 ),
-                const SizedBox(width: DsSpacing.md),
+                SizedBox(width: tokens.spacingUnit * 1.5),
                 ExcludeSemantics(
                   child: AnimatedRotation(
                     turns: expanded ? 0.5 : 0,
@@ -263,11 +261,11 @@ class _DsAccordionSection extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: expanded
           ? Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DsSpacing.lg,
+              padding: EdgeInsets.fromLTRB(
+                tokens.spacingUnit * 2,
                 0,
-                DsSpacing.lg,
-                DsSpacing.lg,
+                tokens.spacingUnit * 2,
+                tokens.spacingUnit * 2,
               ),
               child: DefaultTextStyle.merge(
                 style:

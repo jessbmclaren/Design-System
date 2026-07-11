@@ -4,9 +4,9 @@ A `DsSelect` lets someone choose one value from a longer list without spending t
 
 Order the options in a way people can predict (alphabetical, by frequency or in a natural sequence) so the list is quick to skim rather than something to read end to end. When a submitted value fails validation, surface the reason through `errorText` directly beneath the field; the control shifts to its error styling and the message stays visible until the choice is corrected. Guidance that applies before any error lives in `helperText`, a subdued line beneath the field that an `errorText` temporarily replaces. Inside a `Form`, pass a `validator` instead and the field reports its own message when the form validates; `autovalidateMode` controls when that happens and `onSaved` receives the chosen value when the form is saved.
 
-![Desktop (1280dp)](img/select_desktop.png)
+![Desktop (1120dp)](img/select_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/select_phone.png)
 

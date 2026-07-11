@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 
 /// A column definition for a [DsDataTable].
@@ -105,7 +104,7 @@ class DsDataTable extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < rows.length; i++) ...[
-          if (i > 0) const SizedBox(height: DsSpacing.sm),
+          if (i > 0) SizedBox(height: tokens.spacingUnit),
           _CompactCard(columns: columns, row: rows[i], tokens: tokens),
         ],
       ],
@@ -139,8 +138,8 @@ class DsDataTable extends StatelessWidget {
                   for (final column in columns)
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: DsSpacing.md,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: tokens.spacingUnit * 1.5,
                         ),
                         child: Text(
                           DsTextTransform.uppercase.apply(column.label),
@@ -200,7 +199,9 @@ class _WideRow extends StatelessWidget {
             for (var i = 0; i < columns.length; i++)
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: DsSpacing.md),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: tokens.spacingUnit * 1.5,
+                  ),
                   child: Text(
                     row.cells[i],
                     textAlign:
@@ -249,15 +250,15 @@ class _CompactCard extends StatelessWidget {
         borderRadius: radius,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DsSpacing.md,
-          vertical: DsSpacing.sm,
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacingUnit * 1.5,
+          vertical: tokens.spacingUnit,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < columns.length; i++) ...[
-              if (i > 0) const SizedBox(height: DsSpacing.xs),
+              if (i > 0) SizedBox(height: tokens.spacingUnit / 2),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -270,7 +271,7 @@ class _CompactCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: DsSpacing.sm),
+                  SizedBox(width: tokens.spacingUnit),
                   Expanded(
                     child: Text(
                       row.cells[i],

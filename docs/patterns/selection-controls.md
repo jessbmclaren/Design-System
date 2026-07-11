@@ -4,9 +4,9 @@ Selection controls capture a choice without a text entry, and each one answers a
 
 All three controls are driven entirely by the value you pass and report changes back through a single callback, so the widget owns no state of its own. You keep the truth in your model and rebuild. Write labels as the outcome the person is choosing, not the mechanism, and make the whole label a tap target so no one has to aim for the box or thumb. When a radio group has an expected default, select it up front so the form is never in a blank, invalid state.
 
-![Desktop (1280dp)](img/selection-controls_desktop.png)
+![Desktop (1120dp)](img/selection-controls_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/selection-controls_phone.png)
 

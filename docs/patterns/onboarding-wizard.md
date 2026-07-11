@@ -4,9 +4,9 @@ The onboarding wizard frames a multi-step setup flow in a single, predictable co
 
 The wizard is a controlled component: it holds no step state of its own. Keep `currentIndex` and the collected values in your own model, advance on `onNext`, retreat on `onBack` and swap the `child` for the active step. Gate progress with `nextEnabled` while a step is incomplete, and set `nextPending` to show a spinner and block double-submits while a step is saving. Hide Back on the first step by leaving `onBack` null, and rename the final action with `nextLabel` (for example "Finish"). The body lives inside an `Expanded` scroll view, so give the wizard a bounded height (a page body or an `Expanded`) and it fills the space and scrolls long steps. The chrome bends where a flow needs it to: `header` slots custom content (a wordmark, an illustration) above the progress stepper and `showStepper` drops the stepper, which also hides itself when there is only one step. The footer is built on `DsFooterActions`, the shared footer cluster, so its ordering and stacking match every other onboarding surface.
 
-![Desktop (1280dp)](img/onboarding-wizard_desktop.png)
+![Desktop (1120dp)](img/onboarding-wizard_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/onboarding-wizard_phone.png)
 

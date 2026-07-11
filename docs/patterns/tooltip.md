@@ -2,9 +2,9 @@
 
 A tooltip surfaces a short, on-demand hint for the element it wraps: shown on hover for pointer devices and on long-press for touch. Wrap any widget in `DsTooltip` and give it a `message`; after a brief delay a dark, inverted bubble floats above the neighbouring content and takes its colours, radius and shadow straight from the active theme so it matches both light and dark skins. It is best for naming an icon-only control or clarifying a terse label: supplementary help that a fully-labelled interface would never need. The bubble prefers to sit below its child, flips to the opposite side when space runs short and caps its width so longer copy wraps rather than overflowing down to a 320dp phone.
 
-![Desktop (1280dp)](img/tooltip_desktop.png)
+![Desktop (1120dp)](img/tooltip_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/tooltip_phone.png)
 

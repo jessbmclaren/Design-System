@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_divider.dart';
 
 /// A horizontal rule with a centred label.
@@ -25,7 +24,7 @@ class DsLabeledDivider extends StatelessWidget {
         const Expanded(child: DsDivider()),
         Flexible(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: DsSpacing.sm),
+            padding: EdgeInsets.symmetric(horizontal: tokens.spacingUnit),
             child: Text(
               label,
               style:

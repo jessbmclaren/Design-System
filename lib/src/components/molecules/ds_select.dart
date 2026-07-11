@@ -44,6 +44,10 @@ class DsSelectOption<T> {
 /// All colours, spacing, radii and typography are read from [DsTokens], so the
 /// control re-brands with the active theme and never hardcodes appearance.
 ///
+/// The focused border reads [DsTokens.inputFocusBorderWidth], the same
+/// emphasis as the rest of the field family. Earlier releases drew it at 2dp;
+/// it now matches the family default of 1.6dp.
+///
 /// ```dart
 /// DsSelect<String>(
 ///   label: 'Country',
@@ -174,12 +178,20 @@ class DsSelect<T> extends StatelessWidget {
         horizontal: tokens.inputFieldPaddingX,
         vertical: tokens.inputFieldPaddingY,
       ),
-      enabledBorder: borderWith(tokens.colorBorder, 1),
-      border: borderWith(tokens.colorBorder, 1),
-      focusedBorder: borderWith(tokens.formHighlightColorBorder, 2),
-      disabledBorder: borderWith(tokens.colorBorder, 1),
-      errorBorder: borderWith(tokens.colorDanger, 1),
-      focusedErrorBorder: borderWith(tokens.colorDanger, 2),
+      enabledBorder: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+      border: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+      // Focused borders share the family's emphasis token; see the class doc
+      // for the 2dp to 1.6dp alignment.
+      focusedBorder: borderWith(
+        tokens.formHighlightColorBorder,
+        tokens.inputFocusBorderWidth,
+      ),
+      disabledBorder: borderWith(tokens.colorBorder, tokens.inputBorderWidth),
+      errorBorder: borderWith(tokens.colorDanger, tokens.inputBorderWidth),
+      focusedErrorBorder: borderWith(
+        tokens.colorDanger,
+        tokens.inputFocusBorderWidth,
+      ),
       // A manual [errorText] is rendered below by this widget, so only the
       // border should react here and the in-decoration error line is
       // suppressed. Messages from [validator] have no other outlet, so they
@@ -253,11 +265,11 @@ class DsSelect<T> extends StatelessWidget {
                   .toTextStyle(color: tokens.colorText)
                   .copyWith(fontWeight: DsTypography.medium),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: tokens.fieldLabelGap),
           ],
           field,
           if (caption != null) ...[
-            const SizedBox(height: 6),
+            SizedBox(height: tokens.fieldLabelGap),
             Text(
               caption,
               style: tokens.bodySm.toTextStyle(color: captionColor),

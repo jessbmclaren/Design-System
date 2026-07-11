@@ -2,9 +2,9 @@
 
 `DsPasswordField` is a `DsTextField` set up to obscure what the user types, with an eye toggle in the suffix that shows or hides the value. It keeps its own show and hide state, so you wire up only the field props a password needs. It forwards `controller`, `hintText`, `errorText`, `onChanged`, `onSubmitted`, `textInputAction`, `enabled`, `autofocus` and `focusNode` straight to the underlying field. Use it anywhere someone enters a password: sign-in, sign-up and change-password forms.
 
-![Desktop (1280dp)](img/password-field_desktop.png)
+![Desktop (1120dp)](img/password-field_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/password-field_phone.png)
 

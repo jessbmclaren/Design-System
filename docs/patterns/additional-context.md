@@ -4,9 +4,9 @@ Some sign-in screens carry more than a single action: a note about what happens 
 
 The reveal stays collapsed by default, so the first thing anyone sees is the title, a short description and the primary action. Expanding it surfaces supporting lines without navigating away or resetting the form. Keep the hidden content to a few short sentences or bullet rows; if the explanation grows into paragraphs or requires acknowledgement, move it to a separate screen instead.
 
-![Desktop (1280dp)](img/additional-context_desktop.png)
+![Desktop (1120dp)](img/additional-context_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/additional-context_phone.png)
 

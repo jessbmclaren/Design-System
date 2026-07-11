@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_button.dart';
 
 /// An onboarding coachmark: a small spotlight callout that points a first-time
@@ -120,7 +119,9 @@ class DsCoachmark extends StatelessWidget {
         Expanded(
           child: Padding(
             // Keep the title clear of the close control's touch target.
-            padding: EdgeInsets.only(top: onDismiss != null ? DsSpacing.sm : 0),
+            padding: EdgeInsets.only(
+              top: onDismiss != null ? tokens.spacingUnit : 0,
+            ),
             child: Text(
               title,
               style: tokens.headingSm.toTextStyle(color: tokens.colorText),
@@ -129,7 +130,7 @@ class DsCoachmark extends StatelessWidget {
         ),
         if (onDismiss != null)
           Padding(
-            padding: const EdgeInsets.only(left: DsSpacing.sm),
+            padding: EdgeInsets.only(left: tokens.spacingUnit),
             child: _CloseButton(
               onPressed: onDismiss!,
               color: tokens.colorSecondaryText,
@@ -160,14 +161,14 @@ class DsCoachmark extends StatelessWidget {
         boxShadow: tokens.shadowHigh,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(DsSpacing.lg),
+        padding: EdgeInsets.all(tokens.spacingUnit * 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             header,
             if (body != null) ...[
-              const SizedBox(height: DsSpacing.sm),
+              SizedBox(height: tokens.spacingUnit),
               Text(
                 body!,
                 style: tokens.bodySm
@@ -175,7 +176,7 @@ class DsCoachmark extends StatelessWidget {
               ),
             ],
             if (_showDots || hasActions) ...[
-              const SizedBox(height: DsSpacing.lg),
+              SizedBox(height: tokens.spacingUnit * 2),
               footer,
             ],
           ],
@@ -228,6 +229,7 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     final dots = showDots
         ? _StepDots(
             index: stepIndex,
@@ -239,8 +241,8 @@ class _Footer extends StatelessWidget {
 
     final actions = (hasPrimary || hasSecondary)
         ? Wrap(
-            spacing: DsSpacing.sm,
-            runSpacing: DsSpacing.sm,
+            spacing: tokens.spacingUnit,
+            runSpacing: tokens.spacingUnit,
             alignment: WrapAlignment.end,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
@@ -283,7 +285,7 @@ class _Footer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Align(alignment: Alignment.centerLeft, child: dots),
-              const SizedBox(height: DsSpacing.md),
+              SizedBox(height: tokens.spacingUnit * 1.5),
               actions,
             ],
           );
@@ -292,7 +294,7 @@ class _Footer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             dots,
-            const SizedBox(width: DsSpacing.md),
+            SizedBox(width: tokens.spacingUnit * 1.5),
             Expanded(child: actions),
           ],
         );
@@ -317,13 +319,16 @@ class _StepDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     const dotSize = 8.0;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < count; i++)
           Padding(
-            padding: EdgeInsets.only(right: i == count - 1 ? 0 : DsSpacing.xs),
+            padding: EdgeInsets.only(
+              right: i == count - 1 ? 0 : tokens.spacingUnit / 2,
+            ),
             child: Container(
               width: dotSize,
               height: dotSize,

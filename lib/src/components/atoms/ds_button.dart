@@ -35,9 +35,10 @@ enum DsButtonVariant {
 /// Set [pending] while an action is in flight: the label stays mounted at
 /// zero opacity beneath a spinner, so the button keeps its width, presses are
 /// ignored and assistive technology announces the label as busy. A pending
-/// button keeps its enabled fill (busy, not disabled), so the spinner holds a
-/// clear contrast against it. Set [fullWidth] on compact layouts where a
-/// button should span the available width.
+/// button keeps its enabled fill and its place in the keyboard focus order
+/// (busy, not disabled), so the spinner holds a clear contrast against it and
+/// focus does not drop off the control mid-flight. Set [fullWidth] on compact
+/// layouts where a button should span the available width.
 ///
 /// Keyboard focus draws a ring in the variant's text colour, so it reads
 /// distinctly from the hover wash. Pressing the button gives a physical,
@@ -97,9 +98,10 @@ class DsButton extends StatefulWidget {
   final IconData? trailingIcon;
 
   /// Whether an action is in flight. Shows a spinner over the label (kept
-  /// mounted at zero opacity so the width holds) and blocks presses. The
-  /// fill stays the enabled colour: the button is busy, not disabled, and
-  /// the spinner needs the contrast of the full fill.
+  /// mounted at zero opacity so the width holds) and swallows presses while
+  /// keeping the button in the keyboard focus order. The fill stays the
+  /// enabled colour: the button is busy, not disabled, and the spinner needs
+  /// the contrast of the full fill.
   final bool pending;
 
   /// Whether the button expands to fill the available width.
@@ -154,8 +156,14 @@ class _DsButtonState extends State<DsButton>
     super.dispose();
   }
 
+  /// Swallows a press while [DsButton.pending] is set: the button stays in
+  /// the focus order, but the action must not fire twice.
+  static void _ignorePress() {}
+
   void _onStatesChanged() {
-    final pressed = _states.value.contains(WidgetState.pressed);
+    // A busy button swallows presses, so it gives no press feedback either.
+    final pressed =
+        !widget.pending && _states.value.contains(WidgetState.pressed);
     if (pressed == _wasPressed) return;
     _wasPressed = pressed;
     if (_reduceMotion) {
@@ -193,9 +201,9 @@ class _DsButtonState extends State<DsButton>
           tokens.buttonSecondaryColorText,
         ),
       DsButtonVariant.tertiary => (
-          Colors.transparent,
-          Colors.transparent,
-          tokens.actionPrimaryColorText,
+          tokens.buttonTertiaryColorBackground,
+          tokens.buttonTertiaryColorBorder,
+          tokens.buttonTertiaryColorText,
         ),
       DsButtonVariant.neutral => (
           tokens.buttonNeutralColorBackground,
@@ -211,24 +219,24 @@ class _DsButtonState extends State<DsButton>
 
     // The primary variant reads its disabled treatment from real tokens so a
     // skin can supply a solid tint; the other variants fade their own fill
-    // and label. A text button has no fill to fade, so its label carries the
-    // whole state.
+    // and label through the state opacity tokens. A text button has no fill
+    // to fade, so its label carries the whole state.
     final (disabledBackground, disabledForeground) = switch (widget.variant) {
       DsButtonVariant.primary => (
           tokens.buttonPrimaryDisabledColorBackground,
           tokens.buttonPrimaryDisabledColorText,
         ),
       DsButtonVariant.tertiary => (
-          Colors.transparent,
-          foreground.withValues(alpha: 0.5),
+          background,
+          foreground.withValues(alpha: tokens.stateDisabledOpacity),
         ),
       _ => (
-          background.withValues(alpha: 0.5),
-          foreground.withValues(alpha: 0.9),
+          background.withValues(alpha: tokens.stateDisabledOpacity),
+          foreground.withValues(alpha: tokens.stateDisabledTextOpacity),
         ),
     };
 
-    final enabled = widget.onPressed != null && !widget.pending;
+    final hasAction = widget.onPressed != null;
     final label = tokens.buttonLabelTextTransform.apply(widget.label);
 
     final Widget content = Row(
@@ -236,7 +244,7 @@ class _DsButtonState extends State<DsButton>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.icon != null) ...[
-          Icon(widget.icon, size: tokens.buttonLabelFontSize + 2),
+          Icon(widget.icon, size: tokens.buttonIconSize),
           SizedBox(width: tokens.spacingUnit),
         ],
         Flexible(
@@ -251,39 +259,56 @@ class _DsButtonState extends State<DsButton>
         ),
         if (widget.trailingIcon != null) ...[
           SizedBox(width: tokens.spacingUnit),
-          Icon(widget.trailingIcon, size: tokens.buttonLabelFontSize + 2),
+          Icon(widget.trailingIcon, size: tokens.buttonIconSize),
         ],
       ],
     );
 
     // While pending the label is hidden, not removed, so the button keeps its
     // width and the spinner centres over it. Opacity zero also drops the
-    // label from the semantics tree; the outer node announces the state.
+    // label from the semantics tree; the busy name is set explicitly on the
+    // button's own node, so the focusable, tappable node keeps its name. The
+    // wrapper node at the bottom of build carries the same name.
     final child = widget.pending
-        ? Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(opacity: 0, child: content),
-              ExcludeSemantics(
-                child: DsSpinner(
-                  size: DsSpinnerSize.small,
-                  color: foreground,
+        ? Semantics(
+            label: '$label, busy',
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Opacity(opacity: 0, child: content),
+                ExcludeSemantics(
+                  child: DsSpinner(
+                    size: DsSpinnerSize.small,
+                    color: foreground,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         : content;
 
     return Semantics(
       button: true,
-      enabled: enabled,
+      // Busy is not disabled: a pending button with an action stays enabled
+      // (and focusable), it merely swallows presses until the flight lands.
+      enabled: hasAction,
+      // The focus itself lives on the inner button, which stays enabled
+      // while busy; this node surfaces the focusability it really has.
+      focusable: widget.pending && hasAction ? true : null,
       label: widget.pending ? '$label, busy' : null,
       child: SizedBox(
         width: widget.fullWidth ? double.infinity : null,
         child: ScaleTransition(
           scale: _scale,
           child: FilledButton(
-            onPressed: enabled ? widget.onPressed : null,
+            // A pending button keeps a live (no-op) callback, so it stays in
+            // the keyboard focus order while the action is in flight; only a
+            // null [DsButton.onPressed] truly disables it.
+            onPressed: !hasAction
+                ? null
+                : widget.pending
+                    ? _ignorePress
+                    : widget.onPressed,
             statesController: _states,
             style: FilledButton.styleFrom(
               backgroundColor: background,
@@ -298,7 +323,7 @@ class _DsButtonState extends State<DsButton>
               elevation: 0,
               // The scale is the press feedback; drop the ink splash.
               splashFactory: NoSplash.splashFactory,
-              minimumSize: const Size(0, 40),
+              minimumSize: Size(0, tokens.buttonMinHeight),
               padding: EdgeInsets.symmetric(
                 horizontal: tokens.buttonPaddingX,
                 vertical: tokens.buttonPaddingY,
@@ -312,10 +337,22 @@ class _DsButtonState extends State<DsButton>
               // distinctly from the hover wash.
               side: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.focused)) {
-                  return BorderSide(color: foreground, width: 2);
+                  return BorderSide(
+                    color: foreground,
+                    width: tokens.focusRingWidth,
+                  );
                 }
-                return BorderSide(color: border);
+                return BorderSide(
+                  color: border,
+                  width: tokens.buttonRestBorderWidth,
+                );
               }),
+              // While busy the button swallows presses, so the hover and
+              // press washes would promise an interaction that cannot
+              // happen; the focus ring above still marks keyboard focus.
+              overlayColor: widget.pending
+                  ? const WidgetStatePropertyAll(Colors.transparent)
+                  : null,
             ),
             child: child,
           ),

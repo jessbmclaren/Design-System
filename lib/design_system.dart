@@ -40,6 +40,7 @@ export 'src/components/atoms/ds_chip.dart';
 export 'src/components/atoms/ds_divider.dart';
 export 'src/components/atoms/ds_fade_slide_in.dart';
 export 'src/components/atoms/ds_field_label.dart';
+export 'src/components/atoms/ds_heading_alignment.dart';
 export 'src/components/atoms/ds_icon.dart';
 export 'src/components/atoms/ds_icon_badge.dart';
 export 'src/components/atoms/ds_icon_button.dart';

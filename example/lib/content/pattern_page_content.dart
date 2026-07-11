@@ -37,7 +37,7 @@ enum DocGroup {
 enum ShotSize {
   phone('phone', 'Small phone (320dp)'),
   tablet('tablet', 'Tablet (768dp)'),
-  desktop('desktop', 'Desktop (1280dp)');
+  desktop('desktop', 'Desktop (1120dp)');
 
   const ShotSize(this.slug, this.label);
 

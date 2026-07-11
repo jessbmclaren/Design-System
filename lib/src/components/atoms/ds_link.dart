@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 
 /// The visual emphasis of a [DsLink].
 enum DsLinkVariant {
@@ -165,11 +164,11 @@ class _DsLinkState extends State<DsLink> {
           ),
         ),
         if (widget.trailingIcon != null) ...[
-          const SizedBox(width: DsSpacing.xs),
+          SizedBox(width: tokens.spacingUnit / 2),
           Icon(widget.trailingIcon, size: DsIconSize.xs, color: resolvedColor),
         ],
         if (widget.external) ...[
-          const SizedBox(width: DsSpacing.xs),
+          SizedBox(width: tokens.spacingUnit / 2),
           Icon(DsIcons.externalLink, size: DsIconSize.xs, color: resolvedColor),
         ],
       ],
@@ -178,9 +177,9 @@ class _DsLinkState extends State<DsLink> {
     // A comfortable tap area without forcing a full 48dp block: inline links
     // live within running text.
     Widget target = Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DsSpacing.xs,
-        vertical: DsSpacing.xs,
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacingUnit / 2,
+        vertical: tokens.spacingUnit / 2,
       ),
       child: content,
     );

@@ -8,8 +8,10 @@ import '../../tokens/ds_typography.dart';
 /// [DsWordmark] sets a product name as text, with an optional [accent] suffix
 /// in a heavier weight so the mark reads with a subtle two-tone emphasis (for
 /// example "acme" followed by "id"). The family and colour come from the
-/// active theme, so the mark re-skins with the rest of the system; the two
-/// weights are fixed.
+/// active theme and the type metrics from the wordmark tokens
+/// ([DsTokens.wordmarkFontSize], [DsTokens.wordmarkLetterSpacing] and
+/// [DsTokens.wordmarkHeight]), so the mark re-skins with the rest of the
+/// system; the two weights are fixed.
 ///
 /// The name itself is content rather than a token, so the caller passes it in.
 /// A brand that keeps its name in its own theme can build the wordmark there
@@ -20,7 +22,7 @@ class DsWordmark extends StatelessWidget {
     super.key,
     required this.primary,
     this.accent,
-    this.fontSize = 22,
+    this.fontSize,
     this.color,
   });
 
@@ -30,8 +32,9 @@ class DsWordmark extends StatelessWidget {
   /// An optional suffix shown in the heavier weight for a two-tone emphasis.
   final String? accent;
 
-  /// The wordmark size, in logical pixels.
-  final double fontSize;
+  /// The wordmark size, in logical pixels. Defaults to
+  /// [DsTokens.wordmarkFontSize].
+  final double? fontSize;
 
   /// The wordmark colour. Defaults to [DsTokens.colorText].
   final Color? color;
@@ -43,11 +46,13 @@ class DsWordmark extends StatelessWidget {
     // which already maps the default token onto the bundled package-prefixed
     // font and carries any brand override. Naming the raw token here would
     // bypass that mapping and miss the bundled font entirely.
+    // The tight tracking and glyph-height line come from the wordmark
+    // tokens, so a skin can retune the mark's set without a new widget.
     final base = TextStyle(
-      fontSize: fontSize,
+      fontSize: fontSize ?? tokens.wordmarkFontSize,
       color: color ?? tokens.colorText,
-      height: 1,
-      letterSpacing: -0.2,
+      height: tokens.wordmarkHeight,
+      letterSpacing: tokens.wordmarkLetterSpacing,
     );
     return Text.rich(
       TextSpan(

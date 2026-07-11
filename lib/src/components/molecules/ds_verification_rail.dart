@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_icon_badge.dart';
 
@@ -147,7 +146,7 @@ class DsVerificationRail extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (var i = 0; i < sections.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: DsSpacing.sm),
+          if (i > 0) SizedBox(height: tokens.spacingUnit),
           _SectionRow(
             tokens: tokens,
             section: sections[i],
@@ -199,7 +198,7 @@ class DsVerificationRail extends StatelessWidget {
                 state: DsVerificationSectionState.active,
                 number: activeIndex + 1,
               ),
-              const SizedBox(width: DsSpacing.md),
+              SizedBox(width: tokens.spacingUnit * 1.5),
             ],
             Expanded(
               child: Column(
@@ -212,7 +211,7 @@ class DsVerificationRail extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: tokens.bodyMd
-                          .copyWith(fontWeight: DsTypography.semiBold)
+                          .copyWith(fontWeight: tokens.strongLabelFontWeight)
                           .toTextStyle(color: tokens.colorText),
                     ),
                   Text(
@@ -278,7 +277,8 @@ class _SectionRow extends StatelessWidget {
       section.label,
       style: tokens.bodyMd
           .copyWith(
-            fontWeight: active ? DsTypography.semiBold : DsTypography.medium,
+            fontWeight:
+                active ? tokens.strongLabelFontWeight : DsTypography.medium,
           )
           .toTextStyle(
             color: upcoming ? tokens.colorSecondaryText : tokens.colorText,
@@ -292,7 +292,7 @@ class _SectionRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           _Marker(tokens: tokens, state: section.state, number: index + 1),
-          const SizedBox(width: DsSpacing.md),
+          SizedBox(width: tokens.spacingUnit * 1.5),
           Expanded(child: label),
         ],
       ),
@@ -374,7 +374,7 @@ class _Marker extends StatelessWidget {
       child: Text(
         '$number',
         style: tokens.labelSm
-            .copyWith(fontWeight: DsTypography.semiBold)
+            .copyWith(fontWeight: tokens.strongLabelFontWeight)
             .toTextStyle(color: foreground)
             .copyWith(height: 1),
       ),
@@ -404,7 +404,7 @@ class _SubSteps extends StatelessWidget {
     const indent = DsVerificationRail._markerSize / 2 - _dotColumn / 2;
 
     return Padding(
-      padding: const EdgeInsets.only(left: indent, bottom: DsSpacing.xs),
+      padding: EdgeInsets.only(left: indent, bottom: tokens.spacingUnit / 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -415,7 +415,7 @@ class _SubSteps extends StatelessWidget {
                 padding: const EdgeInsets.only(left: _dotColumn / 2 - 0.5),
                 child: Container(
                   width: 1,
-                  height: DsSpacing.md,
+                  height: tokens.spacingUnit * 1.5,
                   color: tokens.colorBorderSubtle,
                 ),
               ),
@@ -467,7 +467,7 @@ class _SubStepRow extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: DsSpacing.md),
+        SizedBox(width: tokens.spacingUnit * 1.5),
         Expanded(
           child: Text(
             label,

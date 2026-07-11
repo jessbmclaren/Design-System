@@ -35,11 +35,29 @@ void main() {
     expect(tester.widget<Icon>(find.byType(Icon)).color, const Color(0xFF00FF00));
   });
 
-  testWidgets('falls back to a themed colour when none is given',
-      (WidgetTester tester) async {
+  testWidgets('falls back to exactly the themed text colour when none is '
+      'given', (WidgetTester tester) async {
     await pumpDs(tester, const DsIcon(icon: Icons.info_outline));
 
-    expect(tester.widget<Icon>(find.byType(Icon)).color, isNotNull);
+    final tokens = DsTokens.of(tester.element(find.byType(DsIcon)));
+    expect(tester.widget<Icon>(find.byType(Icon)).color, tokens.colorText);
+  });
+
+  testWidgets('a decorative icon is skipped by assistive technology',
+      (WidgetTester tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpDs(tester, const DsIcon(icon: Icons.check_circle_outline));
+
+    // No semanticLabel: the glyph excludes itself, so nothing is announced.
+    expect(
+      find.descendant(
+        of: find.byType(DsIcon),
+        matching: find.byType(ExcludeSemantics),
+      ),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel(RegExp('.+')), findsNothing);
+    handle.dispose();
   });
 
   testWidgets('exposes the semantic label to assistive technology',

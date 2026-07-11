@@ -6,9 +6,9 @@ Keep the handoff and the return symmetrical. Send the user to the provider in th
 
 Set expectations before and after the redirect. Tell people what they are about to do ("sign in with your identity provider") and reassure them on the way back that their place is preserved. Match the panel to the rest of the product so the return never feels like a different application.
 
-![Desktop (1280dp)](img/redirects_desktop.png)
+![Desktop (1120dp)](img/redirects_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/redirects_phone.png)
 

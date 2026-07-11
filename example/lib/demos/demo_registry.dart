@@ -7,6 +7,7 @@ import 'breakpoints_demo.dart';
 import 'accordion_demo.dart';
 import 'avatar_demo.dart';
 import 'divider_demo.dart';
+import 'icon_button_demo.dart';
 import 'icon_demo.dart';
 import 'img_demo.dart';
 import 'inline_demo.dart';
@@ -74,6 +75,7 @@ final Map<String, Widget Function()> _demos = {
   'avatar': () => const AvatarDemo(),
   'divider': () => const DividerDemo(),
   'icon': () => const IconDemo(),
+  'icon-button': () => const IconButtonDemo(),
   'img': () => const ImgDemo(),
   'inline': () => const InlineDemo(),
   'link': () => const LinkDemo(),

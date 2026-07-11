@@ -4,9 +4,9 @@ Business verification collects the facts you need to confirm an organisation and
 
 The flow extends without forking. `onClose` adds a takeover-style header above the wizard (a corner close affordance, a hairline divider and the flow title, the same pattern as the auth cards). `stepBodyBuilder` appends fields or validators to any step, or replaces a step body entirely. The identity step gains a `DsUploadField` document slot when `uploadState` is set, driven wholly by the caller. The registered address is structured through `DsAddressFieldGroup`, tuned per market with `addressCountries` and `addressConfig`. Finally, `showReceipt` swaps the immediate success confirmation for a receipt with a primary continue action, and `onSubmitted` then waits for that action (closing from the receipt also completes, since the submission has already happened).
 
-![Desktop (1280dp)](img/business-verification_desktop.png)
+![Desktop (1120dp)](img/business-verification_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/business-verification_phone.png)
 

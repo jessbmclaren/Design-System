@@ -22,7 +22,7 @@ enum DsOverlayStyle {
 ///
 /// Field names mirror the published Design System appearance variables one-to-one
 /// (`buttonPrimaryColorBackground`, `badgeSuccessColorText`,
-/// `headingXlFontSize`, …) so that a value in the documentation always has
+/// `spacingUnit`, …) so that a value in the documentation always has
 /// an identically named counterpart in code.
 ///
 /// Read the tokens for the active theme with:
@@ -53,6 +53,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.bodySm,
     required this.labelMd,
     required this.labelSm,
+    required this.strongLabelFontWeight,
     // Text
     required this.colorText,
     required this.colorSecondaryText,
@@ -71,6 +72,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.actionSecondaryTextDecorationStyle,
     required this.actionSecondaryTextDecorationThickness,
     required this.actionSecondaryTextTransform,
+    // Interaction states
+    required this.stateHoverOpacity,
+    required this.statePressedOpacity,
+    required this.stateDisabledOpacity,
+    required this.stateDisabledTextOpacity,
+    required this.stateDisabledIconOpacity,
+    required this.focusRingWidth,
     // Buttons
     required this.buttonPrimaryColorBackground,
     required this.buttonPrimaryColorBorder,
@@ -86,9 +94,15 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.buttonNeutralColorBackground,
     required this.buttonNeutralColorBorder,
     required this.buttonNeutralColorText,
+    required this.buttonTertiaryColorBackground,
+    required this.buttonTertiaryColorBorder,
+    required this.buttonTertiaryColorText,
     required this.buttonPaddingX,
     required this.buttonPaddingY,
     required this.buttonBorderRadius,
+    required this.buttonMinHeight,
+    required this.buttonIconSize,
+    required this.buttonRestBorderWidth,
     required this.buttonLabelFontSize,
     required this.buttonLabelFontWeight,
     required this.buttonLabelTextTransform,
@@ -113,6 +127,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.badgeLabelTextTransform,
     // Forms & surfaces
     required this.offsetBackgroundColor,
+    required this.colorSurfaceMuted,
     required this.formBackgroundColor,
     required this.formHighlightColorBorder,
     required this.formAccentColor,
@@ -121,6 +136,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.inputFieldPaddingX,
     required this.inputFieldPaddingY,
     required this.textFieldPaddingY,
+    required this.inputBorderWidth,
+    required this.inputFocusBorderWidth,
+    required this.fieldLabelGap,
+    required this.boxBorderWidth,
     // Table
     required this.tableRowPaddingY,
     // Overlays
@@ -133,6 +152,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     // Chrome
     required this.authWashGradient,
     required this.bloomColor,
+    // Wordmark
+    required this.wordmarkFontSize,
+    required this.wordmarkLetterSpacing,
+    required this.wordmarkHeight,
   });
 
   /// The default Design System light appearance.
@@ -159,6 +182,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: DsTypography.bodySm,
       labelMd: DsTypography.labelMd,
       labelSm: DsTypography.labelSm,
+      strongLabelFontWeight: DsTypography.semiBold,
       colorText: DsColors.textPrimary,
       colorSecondaryText: DsColors.textSecondary,
       colorBorder: DsColors.border,
@@ -175,6 +199,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
       actionSecondaryTextDecorationStyle: TextDecorationStyle.solid,
       actionSecondaryTextDecorationThickness: 1,
       actionSecondaryTextTransform: DsTextTransform.none,
+      stateHoverOpacity: 0.06,
+      statePressedOpacity: 0.10,
+      stateDisabledOpacity: 0.5,
+      stateDisabledTextOpacity: 0.9,
+      stateDisabledIconOpacity: 0.38,
+      focusRingWidth: 2,
       buttonPrimaryColorBackground: DsColors.buttonPrimaryBackground,
       buttonPrimaryColorBorder: DsColors.buttonPrimaryBorder,
       buttonPrimaryColorText: DsColors.buttonPrimaryText,
@@ -190,12 +220,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
       buttonNeutralColorBackground: DsColors.buttonNeutralBackground,
       buttonNeutralColorBorder: DsColors.buttonNeutralBorder,
       buttonNeutralColorText: DsColors.buttonNeutralText,
-      // The full padding the button paints: the raw DsSpacing values plus the
-      // 12 and 6 the button used to add at build time, so the rendered
-      // control is unchanged and a skin can set its metrics directly.
-      buttonPaddingX: DsSpacing.buttonPaddingX + 12,
-      buttonPaddingY: DsSpacing.buttonPaddingY + 6,
+      buttonTertiaryColorBackground: Colors.transparent,
+      buttonTertiaryColorBorder: Colors.transparent,
+      buttonTertiaryColorText: DsColors.actionPrimary,
+      // The full insets the button paints, so a skin sets its metrics
+      // directly.
+      buttonPaddingX: 16,
+      buttonPaddingY: 10,
       buttonBorderRadius: DsRadii.button,
+      buttonMinHeight: 40,
+      // The glyph rides 2 above the 16dp label, the maths the button used at
+      // build time; keep the pair in step when re-sizing the label.
+      buttonIconSize: 18,
+      buttonRestBorderWidth: 1,
       buttonLabelFontSize: 16,
       buttonLabelFontWeight: FontWeight.w400,
       buttonLabelTextTransform: DsTextTransform.none,
@@ -218,6 +255,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       badgeLabelFontWeight: FontWeight.w400,
       badgeLabelTextTransform: DsTextTransform.none,
       offsetBackgroundColor: DsColors.offsetBackground,
+      colorSurfaceMuted: DsColors.surfaceMuted,
       formBackgroundColor: DsColors.formBackground,
       formHighlightColorBorder: DsColors.formHighlightBorder,
       formAccentColor: DsColors.formAccent,
@@ -228,6 +266,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // The full vertical padding the text field paints: the raw DsSpacing
       // value plus the 12 the field used to add at build time.
       textFieldPaddingY: DsSpacing.inputFieldPaddingY + 12,
+      inputBorderWidth: 1,
+      inputFocusBorderWidth: 1.6,
+      fieldLabelGap: 6,
+      boxBorderWidth: 1,
       tableRowPaddingY: DsSpacing.tableRowPaddingY,
       overlayBorderRadius: DsRadii.overlay,
       overlayBackdropColor: DsColors.overlayBackdrop,
@@ -237,6 +279,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowHigh: DsElevation.high,
       authWashGradient: DsColors.authWash,
       bloomColor: DsColors.bloom,
+      wordmarkFontSize: 22,
+      wordmarkLetterSpacing: -0.2,
+      wordmarkHeight: 1,
     );
   }
 
@@ -255,6 +300,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       actionPrimaryTextDecorationColor: const Color(0xFF58A6F0),
       actionSecondaryColorText: const Color(0xFFC9CDD3),
       actionSecondaryTextDecorationColor: const Color(0xFF58A6F0),
+      // The tertiary label follows the dark link colour, the value the
+      // button used to read from actionPrimaryColorText.
+      buttonTertiaryColorText: const Color(0xFF58A6F0),
       // AA-safe with white label text (contrast ~5:1); the lighter #2388DB
       // is kept for scheme accents/links only.
       buttonPrimaryColorBackground: const Color(0xFF0B6BC7),
@@ -284,6 +332,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       badgeDangerColorText: const Color(0xFFF06A9B),
       badgeDangerColorBorder: const Color(0xFF5C1A37),
       offsetBackgroundColor: const Color(0xFF1E2025),
+      // The muted tier shares the offset surface on dark; both sit one step
+      // above the page.
+      colorSurfaceMuted: const Color(0xFF1E2025),
       formBackgroundColor: const Color(0xFF17181C),
       formHighlightColorBorder: const Color(0xFF4B4E56),
       formAccentColor: const Color(0xFF2388DB),
@@ -379,6 +430,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// Small label typography.
   final DsTypeToken labelSm;
 
+  /// The font weight for strong labels: group legends, table headers and
+  /// other short emphasised runs. Defaults to [DsTypography.semiBold].
+  final FontWeight strongLabelFontWeight;
+
   // Text ----------------------------------------------------------------
 
   /// The colour used for primary text.
@@ -433,6 +488,36 @@ class DsTokens extends ThemeExtension<DsTokens> {
 
   /// The text transform for secondary actions and links.
   final DsTextTransform actionSecondaryTextTransform;
+
+  // Interaction states ----------------------------------------------------
+  //
+  // The alpha and stroke vocabulary for hover, press, focus and disabled
+  // treatments. Each default equals the value components used to hardcode,
+  // so nothing shifts until a skin retunes it.
+
+  /// The state-layer alpha painted over a flat control on hover and
+  /// keyboard focus.
+  final double stateHoverOpacity;
+
+  /// The state-layer alpha painted over a flat control while pressed.
+  final double statePressedOpacity;
+
+  /// The fade shared by the disabled treatments that dim a whole surface: a
+  /// disabled button's fill, a disabled tertiary button's label and a
+  /// disabled input's border.
+  final double stateDisabledOpacity;
+
+  /// The fade for a disabled filled button's label. Gentler than
+  /// [stateDisabledOpacity], so the label stays readable on the dimmed
+  /// fill.
+  final double stateDisabledTextOpacity;
+
+  /// The fade for a disabled icon-only control's glyph.
+  final double stateDisabledIconOpacity;
+
+  /// The stroke width of the keyboard focus ring on buttons and icon
+  /// buttons.
+  final double focusRingWidth;
 
   // Buttons -------------------------------------------------------------
 
@@ -491,6 +576,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The text colour used for neutral buttons.
   final Color buttonNeutralColorText;
 
+  /// The background colour for tertiary (text) buttons. Transparent by
+  /// default, so the label alone carries the action.
+  final Color buttonTertiaryColorBackground;
+
+  /// The border colour for tertiary (text) buttons. Transparent by default.
+  final Color buttonTertiaryColorBorder;
+
+  /// The text colour for tertiary (text) buttons. Defaults to the primary
+  /// action colour, the value the button used to read from
+  /// [actionPrimaryColorText].
+  final Color buttonTertiaryColorText;
+
   /// The horizontal padding for buttons. This is the full inset the button
   /// paints, so a skin can set its metrics directly.
   final double buttonPaddingX;
@@ -501,6 +598,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
 
   /// The border radius used for buttons.
   final double buttonBorderRadius;
+
+  /// The minimum height for buttons, in logical pixels.
+  final double buttonMinHeight;
+
+  /// The size of a glyph inside a button, in logical pixels. Defaults to
+  /// [buttonLabelFontSize] plus 2, the derivation the button used at build
+  /// time; keep the pair in step when a skin re-sizes the label.
+  final double buttonIconSize;
+
+  /// The border stroke width for buttons at rest.
+  final double buttonRestBorderWidth;
 
   /// The font size for button label typography.
   final double buttonLabelFontSize;
@@ -581,6 +689,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// selected row on a table.
   final Color offsetBackgroundColor;
 
+  /// The muted surface tier: the quiet grey behind code wells, table
+  /// headers and other recessed panels. Exposed to the Material scheme as
+  /// `surfaceContainerHighest`.
+  final Color colorSurfaceMuted;
+
   /// The background colour used for form items.
   final Color formBackgroundColor;
 
@@ -608,6 +721,20 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// used to add at build time, so the rendered field is unchanged; a skin
   /// can lower it directly for denser inputs.
   final double textFieldPaddingY;
+
+  /// The border stroke width for input fields at rest.
+  final double inputBorderWidth;
+
+  /// The border stroke width for a focused input field. The error border
+  /// carries the same emphasis.
+  final double inputFocusBorderWidth;
+
+  /// The gap between a field's label and its input.
+  final double fieldLabelGap;
+
+  /// The border stroke width a [DsBox] draws when given a border colour
+  /// without an explicit width.
+  final double boxBorderWidth;
 
   // Table ---------------------------------------------------------------
 
@@ -651,6 +778,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// present without carrying a hue; a skin supplies its brand tint.
   final Color bloomColor;
 
+  // Wordmark ---------------------------------------------------------------
+
+  /// The default wordmark size, in logical pixels.
+  final double wordmarkFontSize;
+
+  /// The wordmark's letter spacing. Slightly negative by default, so the
+  /// mark sets a little tighter than body text.
+  final double wordmarkLetterSpacing;
+
+  /// The wordmark's line height multiplier. 1 by default, so the mark
+  /// occupies exactly its glyph height in chrome and headers.
+  final double wordmarkHeight;
+
   @override
   DsTokens copyWith({
     String? fontFamily,
@@ -671,6 +811,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     DsTypeToken? bodySm,
     DsTypeToken? labelMd,
     DsTypeToken? labelSm,
+    FontWeight? strongLabelFontWeight,
     Color? colorText,
     Color? colorSecondaryText,
     Color? colorBorder,
@@ -687,6 +828,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
     TextDecorationStyle? actionSecondaryTextDecorationStyle,
     double? actionSecondaryTextDecorationThickness,
     DsTextTransform? actionSecondaryTextTransform,
+    double? stateHoverOpacity,
+    double? statePressedOpacity,
+    double? stateDisabledOpacity,
+    double? stateDisabledTextOpacity,
+    double? stateDisabledIconOpacity,
+    double? focusRingWidth,
     Color? buttonPrimaryColorBackground,
     Color? buttonPrimaryColorBorder,
     Color? buttonPrimaryColorText,
@@ -701,9 +848,15 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? buttonNeutralColorBackground,
     Color? buttonNeutralColorBorder,
     Color? buttonNeutralColorText,
+    Color? buttonTertiaryColorBackground,
+    Color? buttonTertiaryColorBorder,
+    Color? buttonTertiaryColorText,
     double? buttonPaddingX,
     double? buttonPaddingY,
     double? buttonBorderRadius,
+    double? buttonMinHeight,
+    double? buttonIconSize,
+    double? buttonRestBorderWidth,
     double? buttonLabelFontSize,
     FontWeight? buttonLabelFontWeight,
     DsTextTransform? buttonLabelTextTransform,
@@ -726,6 +879,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     FontWeight? badgeLabelFontWeight,
     DsTextTransform? badgeLabelTextTransform,
     Color? offsetBackgroundColor,
+    Color? colorSurfaceMuted,
     Color? formBackgroundColor,
     Color? formHighlightColorBorder,
     Color? formAccentColor,
@@ -734,6 +888,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? inputFieldPaddingX,
     double? inputFieldPaddingY,
     double? textFieldPaddingY,
+    double? inputBorderWidth,
+    double? inputFocusBorderWidth,
+    double? fieldLabelGap,
+    double? boxBorderWidth,
     double? tableRowPaddingY,
     double? overlayBorderRadius,
     Color? overlayBackdropColor,
@@ -743,6 +901,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
     List<BoxShadow>? shadowHigh,
     List<Color>? authWashGradient,
     Color? bloomColor,
+    double? wordmarkFontSize,
+    double? wordmarkLetterSpacing,
+    double? wordmarkHeight,
   }) {
     return DsTokens(
       fontFamily: fontFamily ?? this.fontFamily,
@@ -763,6 +924,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: bodySm ?? this.bodySm,
       labelMd: labelMd ?? this.labelMd,
       labelSm: labelSm ?? this.labelSm,
+      strongLabelFontWeight:
+          strongLabelFontWeight ?? this.strongLabelFontWeight,
       colorText: colorText ?? this.colorText,
       colorSecondaryText: colorSecondaryText ?? this.colorSecondaryText,
       colorBorder: colorBorder ?? this.colorBorder,
@@ -793,6 +956,14 @@ class DsTokens extends ThemeExtension<DsTokens> {
               this.actionSecondaryTextDecorationThickness,
       actionSecondaryTextTransform:
           actionSecondaryTextTransform ?? this.actionSecondaryTextTransform,
+      stateHoverOpacity: stateHoverOpacity ?? this.stateHoverOpacity,
+      statePressedOpacity: statePressedOpacity ?? this.statePressedOpacity,
+      stateDisabledOpacity: stateDisabledOpacity ?? this.stateDisabledOpacity,
+      stateDisabledTextOpacity:
+          stateDisabledTextOpacity ?? this.stateDisabledTextOpacity,
+      stateDisabledIconOpacity:
+          stateDisabledIconOpacity ?? this.stateDisabledIconOpacity,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
       buttonPrimaryColorBackground:
           buttonPrimaryColorBackground ?? this.buttonPrimaryColorBackground,
       buttonPrimaryColorBorder:
@@ -822,9 +993,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonNeutralColorBorder ?? this.buttonNeutralColorBorder,
       buttonNeutralColorText:
           buttonNeutralColorText ?? this.buttonNeutralColorText,
+      buttonTertiaryColorBackground:
+          buttonTertiaryColorBackground ?? this.buttonTertiaryColorBackground,
+      buttonTertiaryColorBorder:
+          buttonTertiaryColorBorder ?? this.buttonTertiaryColorBorder,
+      buttonTertiaryColorText:
+          buttonTertiaryColorText ?? this.buttonTertiaryColorText,
       buttonPaddingX: buttonPaddingX ?? this.buttonPaddingX,
       buttonPaddingY: buttonPaddingY ?? this.buttonPaddingY,
       buttonBorderRadius: buttonBorderRadius ?? this.buttonBorderRadius,
+      buttonMinHeight: buttonMinHeight ?? this.buttonMinHeight,
+      buttonIconSize: buttonIconSize ?? this.buttonIconSize,
+      buttonRestBorderWidth:
+          buttonRestBorderWidth ?? this.buttonRestBorderWidth,
       buttonLabelFontSize: buttonLabelFontSize ?? this.buttonLabelFontSize,
       buttonLabelFontWeight:
           buttonLabelFontWeight ?? this.buttonLabelFontWeight,
@@ -862,6 +1043,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           badgeLabelTextTransform ?? this.badgeLabelTextTransform,
       offsetBackgroundColor:
           offsetBackgroundColor ?? this.offsetBackgroundColor,
+      colorSurfaceMuted: colorSurfaceMuted ?? this.colorSurfaceMuted,
       formBackgroundColor: formBackgroundColor ?? this.formBackgroundColor,
       formHighlightColorBorder:
           formHighlightColorBorder ?? this.formHighlightColorBorder,
@@ -872,6 +1054,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
       inputFieldPaddingX: inputFieldPaddingX ?? this.inputFieldPaddingX,
       inputFieldPaddingY: inputFieldPaddingY ?? this.inputFieldPaddingY,
       textFieldPaddingY: textFieldPaddingY ?? this.textFieldPaddingY,
+      inputBorderWidth: inputBorderWidth ?? this.inputBorderWidth,
+      inputFocusBorderWidth:
+          inputFocusBorderWidth ?? this.inputFocusBorderWidth,
+      fieldLabelGap: fieldLabelGap ?? this.fieldLabelGap,
+      boxBorderWidth: boxBorderWidth ?? this.boxBorderWidth,
       tableRowPaddingY: tableRowPaddingY ?? this.tableRowPaddingY,
       overlayBorderRadius: overlayBorderRadius ?? this.overlayBorderRadius,
       overlayBackdropColor: overlayBackdropColor ?? this.overlayBackdropColor,
@@ -881,6 +1068,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowHigh: shadowHigh ?? this.shadowHigh,
       authWashGradient: authWashGradient ?? this.authWashGradient,
       bloomColor: bloomColor ?? this.bloomColor,
+      wordmarkFontSize: wordmarkFontSize ?? this.wordmarkFontSize,
+      wordmarkLetterSpacing:
+          wordmarkLetterSpacing ?? this.wordmarkLetterSpacing,
+      wordmarkHeight: wordmarkHeight ?? this.wordmarkHeight,
     );
   }
 
@@ -913,6 +1104,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: t < 0.5 ? bodySm : other.bodySm,
       labelMd: t < 0.5 ? labelMd : other.labelMd,
       labelSm: t < 0.5 ? labelSm : other.labelSm,
+      strongLabelFontWeight: FontWeight.lerp(
+          strongLabelFontWeight, other.strongLabelFontWeight, t)!,
       colorText: c(colorText, other.colorText),
       colorSecondaryText: c(colorSecondaryText, other.colorSecondaryText),
       colorBorder: c(colorBorder, other.colorBorder),
@@ -949,6 +1142,15 @@ class DsTokens extends ThemeExtension<DsTokens> {
       actionSecondaryTextTransform: t < 0.5
           ? actionSecondaryTextTransform
           : other.actionSecondaryTextTransform,
+      stateHoverOpacity: d(stateHoverOpacity, other.stateHoverOpacity),
+      statePressedOpacity: d(statePressedOpacity, other.statePressedOpacity),
+      stateDisabledOpacity:
+          d(stateDisabledOpacity, other.stateDisabledOpacity),
+      stateDisabledTextOpacity:
+          d(stateDisabledTextOpacity, other.stateDisabledTextOpacity),
+      stateDisabledIconOpacity:
+          d(stateDisabledIconOpacity, other.stateDisabledIconOpacity),
+      focusRingWidth: d(focusRingWidth, other.focusRingWidth),
       buttonPrimaryColorBackground:
           c(buttonPrimaryColorBackground, other.buttonPrimaryColorBackground),
       buttonPrimaryColorBorder:
@@ -978,9 +1180,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
           c(buttonNeutralColorBorder, other.buttonNeutralColorBorder),
       buttonNeutralColorText:
           c(buttonNeutralColorText, other.buttonNeutralColorText),
+      buttonTertiaryColorBackground: c(
+          buttonTertiaryColorBackground, other.buttonTertiaryColorBackground),
+      buttonTertiaryColorBorder:
+          c(buttonTertiaryColorBorder, other.buttonTertiaryColorBorder),
+      buttonTertiaryColorText:
+          c(buttonTertiaryColorText, other.buttonTertiaryColorText),
       buttonPaddingX: d(buttonPaddingX, other.buttonPaddingX),
       buttonPaddingY: d(buttonPaddingY, other.buttonPaddingY),
       buttonBorderRadius: d(buttonBorderRadius, other.buttonBorderRadius),
+      buttonMinHeight: d(buttonMinHeight, other.buttonMinHeight),
+      buttonIconSize: d(buttonIconSize, other.buttonIconSize),
+      buttonRestBorderWidth:
+          d(buttonRestBorderWidth, other.buttonRestBorderWidth),
       buttonLabelFontSize: d(buttonLabelFontSize, other.buttonLabelFontSize),
       buttonLabelFontWeight:
           FontWeight.lerp(buttonLabelFontWeight, other.buttonLabelFontWeight, t)!,
@@ -1020,6 +1232,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           t < 0.5 ? badgeLabelTextTransform : other.badgeLabelTextTransform,
       offsetBackgroundColor:
           c(offsetBackgroundColor, other.offsetBackgroundColor),
+      colorSurfaceMuted: c(colorSurfaceMuted, other.colorSurfaceMuted),
       formBackgroundColor: c(formBackgroundColor, other.formBackgroundColor),
       formHighlightColorBorder:
           c(formHighlightColorBorder, other.formHighlightColorBorder),
@@ -1030,6 +1243,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
       inputFieldPaddingX: d(inputFieldPaddingX, other.inputFieldPaddingX),
       inputFieldPaddingY: d(inputFieldPaddingY, other.inputFieldPaddingY),
       textFieldPaddingY: d(textFieldPaddingY, other.textFieldPaddingY),
+      inputBorderWidth: d(inputBorderWidth, other.inputBorderWidth),
+      inputFocusBorderWidth:
+          d(inputFocusBorderWidth, other.inputFocusBorderWidth),
+      fieldLabelGap: d(fieldLabelGap, other.fieldLabelGap),
+      boxBorderWidth: d(boxBorderWidth, other.boxBorderWidth),
       tableRowPaddingY: d(tableRowPaddingY, other.tableRowPaddingY),
       overlayBorderRadius: d(overlayBorderRadius, other.overlayBorderRadius),
       overlayBackdropColor: c(overlayBackdropColor, other.overlayBackdropColor),
@@ -1042,6 +1260,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           BoxShadow.lerpList(shadowHigh, other.shadowHigh, t) ?? shadowHigh,
       authWashGradient: cs(authWashGradient, other.authWashGradient),
       bloomColor: c(bloomColor, other.bloomColor),
+      wordmarkFontSize: d(wordmarkFontSize, other.wordmarkFontSize),
+      wordmarkLetterSpacing:
+          d(wordmarkLetterSpacing, other.wordmarkLetterSpacing),
+      wordmarkHeight: d(wordmarkHeight, other.wordmarkHeight),
     );
   }
 
@@ -1068,6 +1290,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           bodySm == other.bodySm &&
           labelMd == other.labelMd &&
           labelSm == other.labelSm &&
+          strongLabelFontWeight == other.strongLabelFontWeight &&
           colorText == other.colorText &&
           colorSecondaryText == other.colorSecondaryText &&
           colorBorder == other.colorBorder &&
@@ -1084,6 +1307,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           actionSecondaryTextDecorationStyle == other.actionSecondaryTextDecorationStyle &&
           actionSecondaryTextDecorationThickness == other.actionSecondaryTextDecorationThickness &&
           actionSecondaryTextTransform == other.actionSecondaryTextTransform &&
+          stateHoverOpacity == other.stateHoverOpacity &&
+          statePressedOpacity == other.statePressedOpacity &&
+          stateDisabledOpacity == other.stateDisabledOpacity &&
+          stateDisabledTextOpacity == other.stateDisabledTextOpacity &&
+          stateDisabledIconOpacity == other.stateDisabledIconOpacity &&
+          focusRingWidth == other.focusRingWidth &&
           buttonPrimaryColorBackground == other.buttonPrimaryColorBackground &&
           buttonPrimaryColorBorder == other.buttonPrimaryColorBorder &&
           buttonPrimaryColorText == other.buttonPrimaryColorText &&
@@ -1100,9 +1329,16 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonNeutralColorBackground == other.buttonNeutralColorBackground &&
           buttonNeutralColorBorder == other.buttonNeutralColorBorder &&
           buttonNeutralColorText == other.buttonNeutralColorText &&
+          buttonTertiaryColorBackground ==
+              other.buttonTertiaryColorBackground &&
+          buttonTertiaryColorBorder == other.buttonTertiaryColorBorder &&
+          buttonTertiaryColorText == other.buttonTertiaryColorText &&
           buttonPaddingX == other.buttonPaddingX &&
           buttonPaddingY == other.buttonPaddingY &&
           buttonBorderRadius == other.buttonBorderRadius &&
+          buttonMinHeight == other.buttonMinHeight &&
+          buttonIconSize == other.buttonIconSize &&
+          buttonRestBorderWidth == other.buttonRestBorderWidth &&
           buttonLabelFontSize == other.buttonLabelFontSize &&
           buttonLabelFontWeight == other.buttonLabelFontWeight &&
           buttonLabelTextTransform == other.buttonLabelTextTransform &&
@@ -1125,6 +1361,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           badgeLabelFontWeight == other.badgeLabelFontWeight &&
           badgeLabelTextTransform == other.badgeLabelTextTransform &&
           offsetBackgroundColor == other.offsetBackgroundColor &&
+          colorSurfaceMuted == other.colorSurfaceMuted &&
           formBackgroundColor == other.formBackgroundColor &&
           formHighlightColorBorder == other.formHighlightColorBorder &&
           formAccentColor == other.formAccentColor &&
@@ -1133,6 +1370,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           inputFieldPaddingX == other.inputFieldPaddingX &&
           inputFieldPaddingY == other.inputFieldPaddingY &&
           textFieldPaddingY == other.textFieldPaddingY &&
+          inputBorderWidth == other.inputBorderWidth &&
+          inputFocusBorderWidth == other.inputFocusBorderWidth &&
+          fieldLabelGap == other.fieldLabelGap &&
+          boxBorderWidth == other.boxBorderWidth &&
           tableRowPaddingY == other.tableRowPaddingY &&
           overlayBorderRadius == other.overlayBorderRadius &&
           overlayBackdropColor == other.overlayBackdropColor &&
@@ -1141,7 +1382,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           listEquals(shadowMedium, other.shadowMedium) &&
           listEquals(shadowHigh, other.shadowHigh) &&
           listEquals(authWashGradient, other.authWashGradient) &&
-          bloomColor == other.bloomColor;
+          bloomColor == other.bloomColor &&
+          wordmarkFontSize == other.wordmarkFontSize &&
+          wordmarkLetterSpacing == other.wordmarkLetterSpacing &&
+          wordmarkHeight == other.wordmarkHeight;
   }
 
   @override
@@ -1165,6 +1409,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         bodySm,
         labelMd,
         labelSm,
+        strongLabelFontWeight,
         colorText,
         colorSecondaryText,
         colorBorder,
@@ -1181,6 +1426,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
         actionSecondaryTextDecorationStyle,
         actionSecondaryTextDecorationThickness,
         actionSecondaryTextTransform,
+        stateHoverOpacity,
+        statePressedOpacity,
+        stateDisabledOpacity,
+        stateDisabledTextOpacity,
+        stateDisabledIconOpacity,
+        focusRingWidth,
         buttonPrimaryColorBackground,
         buttonPrimaryColorBorder,
         buttonPrimaryColorText,
@@ -1195,9 +1446,15 @@ class DsTokens extends ThemeExtension<DsTokens> {
         buttonNeutralColorBackground,
         buttonNeutralColorBorder,
         buttonNeutralColorText,
+        buttonTertiaryColorBackground,
+        buttonTertiaryColorBorder,
+        buttonTertiaryColorText,
         buttonPaddingX,
         buttonPaddingY,
         buttonBorderRadius,
+        buttonMinHeight,
+        buttonIconSize,
+        buttonRestBorderWidth,
         buttonLabelFontSize,
         buttonLabelFontWeight,
         buttonLabelTextTransform,
@@ -1220,6 +1477,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         badgeLabelFontWeight,
         badgeLabelTextTransform,
         offsetBackgroundColor,
+        colorSurfaceMuted,
         formBackgroundColor,
         formHighlightColorBorder,
         formAccentColor,
@@ -1228,6 +1486,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
         inputFieldPaddingX,
         inputFieldPaddingY,
         textFieldPaddingY,
+        inputBorderWidth,
+        inputFocusBorderWidth,
+        fieldLabelGap,
+        boxBorderWidth,
         tableRowPaddingY,
         overlayBorderRadius,
         overlayBackdropColor,
@@ -1237,5 +1499,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
         Object.hashAll(shadowHigh),
         Object.hashAll(authWashGradient),
         bloomColor,
+        wordmarkFontSize,
+        wordmarkLetterSpacing,
+        wordmarkHeight,
       ]);
 }

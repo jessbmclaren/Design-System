@@ -4,9 +4,9 @@ A full page opens with a `DsPageHeader`: a clear title, a short subtitle for con
 
 Lead with the information most people need on arrival and move supporting detail into later tabs. Give each section a stable, deep-linkable route so a tab can be bookmarked, shared and reopened in place. Switching tabs should never reset the reader's scroll position or their earlier selections.
 
-![Desktop (1280dp)](img/full-page-layouts_desktop.png)
+![Desktop (1120dp)](img/full-page-layouts_desktop.png)
 
-*Desktop (1280dp)*
+*Desktop (1120dp)*
 
 ![Small phone (320dp)](img/full-page-layouts_phone.png)
 
