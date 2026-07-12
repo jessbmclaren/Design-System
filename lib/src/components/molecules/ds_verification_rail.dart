@@ -125,6 +125,12 @@ class DsVerificationRail extends StatelessWidget {
   /// The marker diameter shared by both layouts.
   static const double _markerSize = 28;
 
+  /// The narrowest active-section label the all-markers compact strip keeps.
+  /// When a marker per section plus this would overflow the rail's width, the
+  /// compact summary falls back to the single-marker form rather than squash
+  /// the label to nothing or overflow the row.
+  static const double _minCompactLabelWidth = 48;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -136,14 +142,17 @@ class DsVerificationRail extends StatelessWidget {
         final width = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        return SizedBox(
-          width: width,
-          child: width < compactBreakpoint
-              ? (compactShowsAllMarkers
-                  ? _buildCompactAllMarkers(tokens)
-                  : _buildCompact(tokens))
-              : _buildVertical(tokens),
-        );
+        final Widget child;
+        if (width >= compactBreakpoint) {
+          child = _buildVertical(tokens);
+        } else if (compactShowsAllMarkers && _allMarkersFit(width, tokens)) {
+          child = _buildCompactAllMarkers(tokens);
+        } else {
+          // The all-markers strip cannot fit a marker per section here, so fall
+          // back to the single-marker summary, which always fits.
+          child = _buildCompact(tokens);
+        }
+        return SizedBox(width: width, child: child);
       },
     );
   }
@@ -238,6 +247,16 @@ class DsVerificationRail extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Whether a marker per section, the gaps between them and a readable slice
+  /// of the active label fit [width]. Below this the all-markers strip would
+  /// overflow, so the compact summary falls back to the single marker.
+  bool _allMarkersFit(double width, DsTokens tokens) {
+    final n = sections.length;
+    if (n == 0) return true;
+    final markers = n * _markerSize + (n - 1) * tokens.spacingUnit;
+    return markers + tokens.spacingUnit * 1.5 + _minCompactLabelWidth <= width;
   }
 
   /// The compact all-markers summary: a marker for every section (a check when

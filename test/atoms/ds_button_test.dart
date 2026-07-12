@@ -26,6 +26,13 @@ double _contrast(Color a, Color b) {
 
 void main() {
   group('DsButton', () {
+    testWidgets('pins a padded tap target so it is 48dp on every platform',
+        (tester) async {
+      await pumpDs(tester, DsButton(label: 'Continue', onPressed: () {}));
+      final style = tester.widget<FilledButton>(find.byType(FilledButton)).style;
+      expect(style?.tapTargetSize, MaterialTapTargetSize.padded);
+    });
+
     testWidgets('renders its label', (tester) async {
       await pumpDs(tester, const DsButton(label: 'Continue'));
 

@@ -87,8 +87,6 @@ class DsLink extends StatefulWidget {
   /// standing alone rather than one inline with running text.
   final bool padded;
 
-  /// The minimum accessible tap target, applied when [padded] is set.
-  static const double _minTapTarget = 48;
 
   @override
   State<DsLink> createState() => _DsLinkState();
@@ -191,7 +189,7 @@ class _DsLinkState extends State<DsLink> {
       // the label under loose constraints, so the link does not claim taps
       // across the whole row unless the parent stretches it.
       target = ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: DsLink._minTapTarget),
+        constraints: BoxConstraints(minHeight: tokens.minTapTarget),
         child: Align(
           alignment: Alignment.centerLeft,
           widthFactor: 1,

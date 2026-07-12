@@ -324,6 +324,10 @@ class _DsButtonState extends State<DsButton>
               // The scale is the press feedback; drop the ink splash.
               splashFactory: NoSplash.splashFactory,
               minimumSize: Size(0, tokens.buttonMinHeight),
+              // Guarantee the 48dp touch target on every platform, not just the
+              // touch defaults: padded only adds an invisible hit area, so the
+              // visual fill and mouse density are unchanged.
+              tapTargetSize: MaterialTapTargetSize.padded,
               padding: EdgeInsets.symmetric(
                 horizontal: tokens.buttonPaddingX,
                 vertical: tokens.buttonPaddingY,

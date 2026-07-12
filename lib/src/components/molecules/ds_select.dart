@@ -213,8 +213,8 @@ class DsSelect<T> extends StatelessWidget {
         : null;
 
     final field = ConstrainedBox(
-      // Guarantee an accessible >=48dp touch target regardless of density.
-      constraints: const BoxConstraints(minHeight: 48),
+      // Guarantee an accessible touch target regardless of density.
+      constraints: BoxConstraints(minHeight: tokens.minTapTarget),
       child: DropdownButtonFormField<T>(
         initialValue: value,
         // Expand so long labels ellipsize within the field instead of

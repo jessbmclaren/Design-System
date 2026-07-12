@@ -329,7 +329,11 @@ class _NextLine extends StatelessWidget {
       children: [
         Text('Next:', style: muted),
         SizedBox(width: tokens.spacingUnit / 2),
-        Flexible(child: DsLink(label: task.label, onPressed: task.onTap)),
+        // Padded so the collapsed bar's only action is a full 48dp touch
+        // target, matching the expanded task rows and the header bar.
+        Flexible(
+          child: DsLink(label: task.label, onPressed: task.onTap, padded: true),
+        ),
       ],
     );
   }

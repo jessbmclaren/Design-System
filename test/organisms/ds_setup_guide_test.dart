@@ -61,6 +61,25 @@ void main() {
       expect(row.height, greaterThanOrEqualTo(48));
     });
 
+    testWidgets('the collapsed Next link meets the 48dp touch minimum',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSetupGuide(
+          title: 'Setup guide',
+          initiallyCollapsed: true,
+          tasks: [DsSetupTask(label: 'Add your vehicles', onTap: () {})],
+        ),
+      );
+
+      // Collapsed, the only action is the Next link, so it must be a full
+      // touch target like the expanded task rows.
+      final link = tester.getSize(
+        find.widgetWithText(DsLink, 'Add your vehicles'),
+      );
+      expect(link.height, greaterThanOrEqualTo(48));
+    });
+
     testWidgets('done and pending tasks are not tappable', (tester) async {
       var tapped = 0;
       await pumpDs(

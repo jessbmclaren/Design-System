@@ -78,7 +78,6 @@ class DsCheckbox extends StatefulWidget {
   final bool isError;
 
   static const double _boxSize = 18;
-  static const double _minTapTarget = 48;
   static const double _labelGap = 8;
 
   /// Focus ring geometry: an accent ring of this width, held off the box by a
@@ -182,8 +181,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
     final control = Opacity(
       opacity: enabled ? 1 : 0.5,
       child: ConstrainedBox(
-        constraints:
-            const BoxConstraints(minHeight: DsCheckbox._minTapTarget),
+        constraints: BoxConstraints(minHeight: tokens.minTapTarget),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Padding(

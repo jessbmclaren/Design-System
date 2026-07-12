@@ -79,6 +79,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.stateDisabledTextOpacity,
     required this.stateDisabledIconOpacity,
     required this.focusRingWidth,
+    required this.minTapTarget,
     // Buttons
     required this.buttonPrimaryColorBackground,
     required this.buttonPrimaryColorBorder,
@@ -207,6 +208,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledTextOpacity: 0.9,
       stateDisabledIconOpacity: 0.38,
       focusRingWidth: 2,
+      minTapTarget: kMinInteractiveDimension,
       buttonPrimaryColorBackground: DsColors.buttonPrimaryBackground,
       buttonPrimaryColorBorder: DsColors.buttonPrimaryBorder,
       buttonPrimaryColorText: DsColors.buttonPrimaryText,
@@ -529,6 +531,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The stroke width of the keyboard focus ring on buttons and icon
   /// buttons.
   final double focusRingWidth;
+
+  /// The minimum size of an interactive control's tap target, in logical
+  /// pixels. Defaults to `kMinInteractiveDimension` (48), the accessible floor;
+  /// a brand that wants a denser or roomier touch surface retunes it here, and
+  /// every control reads it rather than hardcoding the value.
+  final double minTapTarget;
 
   // Buttons -------------------------------------------------------------
 
@@ -859,6 +867,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? stateDisabledTextOpacity,
     double? stateDisabledIconOpacity,
     double? focusRingWidth,
+    double? minTapTarget,
     Color? buttonPrimaryColorBackground,
     Color? buttonPrimaryColorBorder,
     Color? buttonPrimaryColorText,
@@ -991,6 +1000,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledIconOpacity:
           stateDisabledIconOpacity ?? this.stateDisabledIconOpacity,
       focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      minTapTarget: minTapTarget ?? this.minTapTarget,
       buttonPrimaryColorBackground:
           buttonPrimaryColorBackground ?? this.buttonPrimaryColorBackground,
       buttonPrimaryColorBorder:
@@ -1180,6 +1190,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledIconOpacity:
           d(stateDisabledIconOpacity, other.stateDisabledIconOpacity),
       focusRingWidth: d(focusRingWidth, other.focusRingWidth),
+      minTapTarget: d(minTapTarget, other.minTapTarget),
       buttonPrimaryColorBackground:
           c(buttonPrimaryColorBackground, other.buttonPrimaryColorBackground),
       buttonPrimaryColorBorder:
@@ -1344,6 +1355,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           stateDisabledTextOpacity == other.stateDisabledTextOpacity &&
           stateDisabledIconOpacity == other.stateDisabledIconOpacity &&
           focusRingWidth == other.focusRingWidth &&
+          minTapTarget == other.minTapTarget &&
           buttonPrimaryColorBackground == other.buttonPrimaryColorBackground &&
           buttonPrimaryColorBorder == other.buttonPrimaryColorBorder &&
           buttonPrimaryColorText == other.buttonPrimaryColorText &&
@@ -1465,6 +1477,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         stateDisabledTextOpacity,
         stateDisabledIconOpacity,
         focusRingWidth,
+        minTapTarget,
         buttonPrimaryColorBackground,
         buttonPrimaryColorBorder,
         buttonPrimaryColorText,

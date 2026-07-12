@@ -245,8 +245,8 @@ class _DsSignInViewState extends State<DsSignInView> {
               if (widget.brandIcon != null) ...[
                 DsAuthBrandMark(
                   icon: widget.brandIcon!,
-                  color: widget.brandColor ??
-                      tokens.buttonPrimaryColorBackground,
+                  color:
+                      widget.brandColor ?? tokens.buttonPrimaryColorBackground,
                   alignment: centred ? Alignment.center : Alignment.centerLeft,
                 ),
                 SizedBox(height: tokens.spacingUnit * 2),
@@ -256,9 +256,7 @@ class _DsSignInViewState extends State<DsSignInView> {
                 child: Text(
                   widget.title,
                   textAlign: textAlign,
-                  style: tokens.headingLg.toTextStyle(
-                    color: tokens.colorText,
-                  ),
+                  style: tokens.headingLg.toTextStyle(color: tokens.colorText),
                 ),
               ),
               if (widget.description != null) ...[
@@ -287,10 +285,7 @@ class _DsSignInViewState extends State<DsSignInView> {
         ),
         if (widget.footer != null) ...[
           SizedBox(height: tokens.spacingUnit * 2),
-          Align(
-            alignment: Alignment.center,
-            child: widget.footer,
-          ),
+          Align(alignment: Alignment.center, child: widget.footer),
         ],
         if (hasReveal) ...[
           SizedBox(height: tokens.spacingUnit * 1.5),
@@ -338,28 +333,32 @@ class _RevealControl extends StatelessWidget {
         child: InkWell(
           onTap: onToggle,
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit * 1.5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: tokens.labelMd.toTextStyle(
-                      color: tokens.actionSecondaryColorText,
+          child: ConstrainedBox(
+            // Keep the reveal a full touch target, like the buttons beside it.
+            constraints: BoxConstraints(minHeight: tokens.minTapTarget),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: tokens.spacingUnit * 1.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: tokens.labelMd.toTextStyle(
+                        color: tokens.actionSecondaryColorText,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: tokens.spacingUnit / 2),
-                DsIcon(
-                  icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
-                  size: DsIconSize.lg,
-                  color: tokens.actionSecondaryColorText,
-                ),
-              ],
+                  SizedBox(width: tokens.spacingUnit / 2),
+                  DsIcon(
+                    icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
+                    size: DsIconSize.lg,
+                    color: tokens.actionSecondaryColorText,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

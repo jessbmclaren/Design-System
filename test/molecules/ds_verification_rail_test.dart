@@ -191,6 +191,37 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets(
+        'the all-markers compact form falls back when the markers cannot fit',
+        (tester) async {
+      final many = <DsVerificationSection>[
+        for (var i = 0; i < 6; i++)
+          DsVerificationSection(
+            label: 'Section ${i + 1}',
+            state: i < 2
+                ? DsVerificationSectionState.done
+                : i == 2
+                    ? DsVerificationSectionState.active
+                    : DsVerificationSectionState.upcoming,
+          ),
+      ];
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 180,
+          child: DsVerificationRail(
+            sections: many,
+            compactShowsAllMarkers: true,
+          ),
+        ),
+      );
+
+      // Six 28dp markers cannot fit a 180dp rail, so it falls back to the
+      // single-marker summary with its caption rather than overflowing.
+      expect(tester.takeException(), isNull);
+      expect(find.text('Step 3 of 6'), findsOneWidget);
+    });
+
     testWidgets('the compact form survives many sections without overflow',
         (tester) async {
       final manySections = <DsVerificationSection>[

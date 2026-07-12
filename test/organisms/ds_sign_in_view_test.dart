@@ -366,6 +366,24 @@ void main() {
       expect(cardDecoration().border, isNull);
     });
 
+    testWidgets('the reveal control meets the 48dp touch minimum',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignInView(
+          title: 'Sign in to your account',
+          primaryAction: DsSignInAction(label: 'Sign in', onPressed: () {}),
+          additionalContextLabel: 'More options',
+          additionalContext: const Text('Enterprise SSO.'),
+        ),
+      );
+
+      final reveal = tester.getSize(
+        find.widgetWithText(InkWell, 'More options'),
+      );
+      expect(reveal.height, greaterThanOrEqualTo(48));
+    });
+
     testWidgets('the reveal control announces its expanded state through a '
         'full expand and collapse cycle', (tester) async {
       final handle = tester.ensureSemantics();

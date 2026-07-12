@@ -66,7 +66,6 @@ class DsRadio<T> extends StatelessWidget {
   static const double _dotSize = 8;
 
   /// The minimum interactive dimension required for an accessible tap target.
-  static const double _minTapTarget = 48;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +140,7 @@ class DsRadio<T> extends StatelessWidget {
       child: Opacity(
         opacity: opacity,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: _minTapTarget),
+          constraints: BoxConstraints(minHeight: tokens.minTapTarget),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: tokens.inputFieldPaddingY),
             child: Align(

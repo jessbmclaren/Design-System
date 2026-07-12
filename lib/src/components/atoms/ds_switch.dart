@@ -182,7 +182,7 @@ class _DsSwitchState extends State<DsSwitch> {
             onFocusChange: (focused) => setState(() => _focused = focused),
             borderRadius: BorderRadius.circular(tokens.formBorderRadius),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 48),
+              constraints: BoxConstraints(minHeight: tokens.minTapTarget),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: tokens.inputFieldPaddingY,
