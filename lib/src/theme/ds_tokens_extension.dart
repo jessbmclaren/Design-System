@@ -285,9 +285,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // to a soft spread of [bloomColor], so white-label output is unchanged
       // until a skin supplies its stops.
       bloomStops: const <Color>[],
-      // The soft brand-tinted surface. Neutral on the base (the offset
-      // surface), so nothing carries a hue until a skin tints it.
-      brandTintColor: DsColors.offsetBackground,
+      // A soft wash of the primary, so a brand-soft mark is legible on the
+      // base; a skin supplies its own tint.
+      brandTintColor: const Color(0xFFE7F1FB),
       wordmarkFontSize: 22,
       wordmarkLetterSpacing: -0.2,
       wordmarkHeight: 1,
@@ -354,9 +354,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // fill as the bloom peak.
       authWashGradient: const [Color(0xFF121317), Color(0xFF1E2025)],
       bloomColor: const Color(0xFF2A2C33),
-      // The dark brand tint shares the offset surface, one step above the
-      // page, mirroring the light default.
-      brandTintColor: const Color(0xFF1E2025),
+      // A dark wash toward the primary, one step above the page.
+      brandTintColor: const Color(0xFF16273A),
     );
   }
 
@@ -799,8 +798,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
 
   /// A soft brand-tinted surface: the quiet wash behind a brand-soft badge or
   /// a selected brand row, distinct from the neutral [offsetBackgroundColor].
-  /// Defaults to the offset surface, so it carries no hue until a skin tints
-  /// it; pair it with [actionPrimaryColorText] as the ink on top.
+  /// Defaults to a soft wash of the primary, so a brand-soft mark stays legible
+  /// on the base; a skin supplies its own tint. Pair it with
+  /// [actionPrimaryColorText] as the ink on top.
   final Color brandTintColor;
 
   // Wordmark ---------------------------------------------------------------

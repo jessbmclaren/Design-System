@@ -94,6 +94,7 @@ class DsVerificationRail extends StatelessWidget {
     this.activeSubStep = 0,
     this.onSectionSelected,
     this.compactBreakpoint = 200,
+    this.compactShowsAllMarkers = false,
   });
 
   /// The flow's sections, in order. The caller keeps each section's state up
@@ -114,6 +115,13 @@ class DsVerificationRail extends StatelessWidget {
   /// for the compact horizontal summary. Defaults to 200.
   final double compactBreakpoint;
 
+  /// Whether the compact summary shows a marker for every section (a check
+  /// when done, otherwise the section number) beside the active section's
+  /// title, rather than only the single active marker with a "Step n of N"
+  /// caption. Defaults to false. The all-markers row reads the whole journey
+  /// at a glance, but needs the width for one marker per section.
+  final bool compactShowsAllMarkers;
+
   /// The marker diameter shared by both layouts.
   static const double _markerSize = 28;
 
@@ -131,7 +139,9 @@ class DsVerificationRail extends StatelessWidget {
         return SizedBox(
           width: width,
           child: width < compactBreakpoint
-              ? _buildCompact(tokens)
+              ? (compactShowsAllMarkers
+                  ? _buildCompactAllMarkers(tokens)
+                  : _buildCompact(tokens))
               : _buildVertical(tokens),
         );
       },
@@ -224,6 +234,48 @@ class DsVerificationRail extends StatelessWidget {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The compact all-markers summary: a marker for every section (a check when
+  /// done, otherwise its number) with the active section's title alongside, so
+  /// the whole journey reads at a glance on a narrow rail.
+  Widget _buildCompactAllMarkers(DsTokens tokens) {
+    int? activeIndex;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].state == DsVerificationSectionState.active) {
+        activeIndex = i;
+        break;
+      }
+    }
+    final activeLabel = activeIndex == null ? null : sections[activeIndex].label;
+
+    return Semantics(
+      container: true,
+      label: _compactSemanticLabel(activeLabel),
+      child: ExcludeSemantics(
+        child: Row(
+          children: <Widget>[
+            for (var i = 0; i < sections.length; i++) ...<Widget>[
+              if (i > 0) SizedBox(width: tokens.spacingUnit),
+              _Marker(tokens: tokens, state: sections[i].state, number: i + 1),
+            ],
+            if (activeLabel != null) ...<Widget>[
+              SizedBox(width: tokens.spacingUnit * 1.5),
+              Expanded(
+                child: Text(
+                  activeLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: tokens.bodyMd
+                      .copyWith(fontWeight: DsTypography.semiBold)
+                      .toTextStyle(color: tokens.colorText),
+                ),
+              ),
+            ],
           ],
         ),
       ),

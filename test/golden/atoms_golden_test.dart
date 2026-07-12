@@ -71,6 +71,31 @@ void main() {
       ),
     );
 
+    // The multi-pool sweep: a single quiet hue on the neutral base, the brand
+    // stops under the skin.
+    dsGoldenMatrix(
+      'atom',
+      'brand_bloom_pools',
+      () => const SizedBox(
+        height: 160,
+        child: DsAuthGradient(child: DsBrandBloom.pools()),
+      ),
+    );
+
+    // The pool sweep on the dark skin, so the dark bloom stops are pinned
+    // alongside the light ones the matrix already captures.
+    testWidgets('atom · brand_bloom_pools · skin-engen-dark', (tester) async {
+      await expectDsGolden(
+        tester,
+        const SizedBox(
+          height: 160,
+          child: DsAuthGradient(child: DsBrandBloom.pools()),
+        ),
+        name: 'atom__brand_bloom_pools__skin-engen-dark',
+        theme: DsTheme.dark(tokens: DsSkins.engenDark()),
+      );
+    });
+
     // A row of every button variant.
     dsGoldenMatrix(
       'atom',
@@ -142,6 +167,7 @@ void main() {
         runSpacing: 8,
         children: [
           DsIconBadge(icon: DsIcons.check),
+          DsIconBadge(icon: DsIcons.check, tone: DsIconBadgeTone.brandSoft),
           DsIconBadge(icon: DsIcons.check, tone: DsIconBadgeTone.success),
           DsIconBadge(icon: DsIcons.warning, tone: DsIconBadgeTone.warning),
           DsIconBadge(icon: DsIcons.close, tone: DsIconBadgeTone.danger),

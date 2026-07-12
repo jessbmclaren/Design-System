@@ -186,10 +186,15 @@ class _DsSpotlightState extends State<DsSpotlight> {
         LayoutBuilder(
           builder: (context, viewport) {
             // Lift the message clear of the bottom edge, but never so far on a
-            // short viewport that the heading is pushed off-screen.
-            final bottomInset = widget.messageBottomInset
-                .clamp(0.0, viewport.maxHeight * 0.18)
-                .clamp(unit * 2, widget.messageBottomInset);
+            // short viewport that the heading is pushed off-screen. The floor
+            // is two units, unless the caller asked for a smaller inset, so the
+            // clamp range never inverts for a tiny custom value.
+            final base = widget.messageBottomInset;
+            final cap = viewport.maxHeight.isFinite
+                ? viewport.maxHeight * 0.18
+                : base;
+            final floor = unit * 2 < base ? unit * 2 : base;
+            final bottomInset = base.clamp(0.0, cap).clamp(floor, base);
             final maxHeight = (viewport.maxHeight - bottomInset - unit * 2)
                 .clamp(unit * 12, double.infinity);
 

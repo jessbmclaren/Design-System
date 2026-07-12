@@ -370,4 +370,201 @@ void main() {
       expect(closed, 0);
     });
   });
+
+  group('DsBusinessVerification market depth', () {
+    const types = <DsSelectOption<String>>[
+      DsSelectOption<String>(value: 'Company', label: 'Company'),
+      DsSelectOption<String>(value: 'Sole trader', label: 'Sole trader'),
+    ];
+    const registered = DsBusinessFieldCopy(
+      nameLabel: 'Registered company name',
+      identifierLabel: 'Company registration number',
+    );
+    const unregistered = DsBusinessFieldCopy(
+      nameLabel: 'Business name',
+      identifierLabel: 'ID number',
+    );
+
+    Future<void> pumpFlow(WidgetTester tester) => pumpDs(
+          tester,
+          const DsBusinessVerification(
+            businessTypeOptions: types,
+            unregisteredValues: {'Sole trader'},
+            registeredCopy: registered,
+            unregisteredCopy: unregistered,
+          ),
+          surfaceSize: const Size(900, 1200),
+        );
+
+    Future<void> selectType(WidgetTester tester, String label) async {
+      await tester.tap(find.byType(DsSelect<String>).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label).last);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('reframes the details step for a registered type',
+        (tester) async {
+      await pumpFlow(tester);
+      await selectType(tester, 'Company');
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Registered company name'), findsOneWidget);
+      expect(find.text('Company registration number'), findsOneWidget);
+    });
+
+    testWidgets('reframes and clears the identifier across the divide',
+        (tester) async {
+      await pumpFlow(tester);
+      await selectType(tester, 'Company');
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // Enter a company registration number (the identifier is the second
+      // field on the details step).
+      await tester.enterText(find.byType(TextFormField).at(1), '2019/123456/07');
+      await tester.pump();
+
+      // Back to the type step and switch to an unregistered type.
+      await tester.tap(find.text('Back'));
+      await tester.pumpAndSettle();
+      await selectType(tester, 'Sole trader');
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // The unregistered copy applies and the identifier was cleared.
+      expect(find.text('Business name'), findsOneWidget);
+      expect(find.text('ID number'), findsOneWidget);
+      expect(find.text('2019/123456/07'), findsNothing);
+    });
+
+    testWidgets('pre-fills the legal name from initialLegalName',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsBusinessVerification(initialLegalName: 'Acme Logistics'),
+        surfaceSize: const Size(900, 1200),
+      );
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('Acme Logistics'), findsOneWidget);
+    });
+
+    testWidgets('shows a role select on the identity step when given options',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsBusinessVerification(
+          roleOptions: <DsSelectOption<String>>[
+            DsSelectOption<String>(value: 'Director', label: 'Director'),
+          ],
+          roleLabel: 'Your role in the business',
+        ),
+        surfaceSize: const Size(900, 1200),
+      );
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('Your role in the business'), findsOneWidget);
+    });
+
+    testWidgets('a legal-name validator blocks Continue and shows the error',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsBusinessVerification(
+          legalNameValidator: (v) =>
+              (v == null || v.isEmpty) ? 'Enter your business name' : null,
+        ),
+        surfaceSize: const Size(900, 1200),
+      );
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // On the details step with an empty name: Continue validates and holds.
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('Enter your business name'), findsOneWidget);
+      expect(find.text('Verify identity'), findsNothing);
+    });
+
+    Future<void> walkToReceipt(WidgetTester tester) async {
+      // Walk to the end: type, details, identity (tick consent), review, submit.
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text("I confirm I'm authorised to act for this business"),
+      );
+      await tester.pump();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the receipt badge defaults to the success tone',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsBusinessVerification(showReceipt: true),
+        surfaceSize: const Size(900, 1200),
+      );
+      await walkToReceipt(tester);
+      final badge = tester.widget<DsIconBadge>(find.byType(DsIconBadge));
+      expect(badge.tone, DsIconBadgeTone.success);
+    });
+
+    testWidgets('the receipt badge honours a brand-soft override',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const DsBusinessVerification(
+          showReceipt: true,
+          receiptBadgeTone: DsIconBadgeTone.brandSoft,
+        ),
+        surfaceSize: const Size(900, 1200),
+      );
+      await walkToReceipt(tester);
+      final badge = tester.widget<DsIconBadge>(find.byType(DsIconBadge));
+      expect(badge.tone, DsIconBadgeTone.brandSoft);
+    });
+
+    testWidgets('handleSystemBack steps back through the flow', (tester) async {
+      await pumpDs(
+        tester,
+        const DsBusinessVerification(handleSystemBack: true),
+        surfaceSize: const Size(900, 1200),
+      );
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('Legal name'), findsWidgets);
+
+      // A system back gesture steps to the previous step, not out of the flow.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Legal name'), findsNothing);
+      expect(find.text('Continue'), findsOneWidget);
+    });
+
+    testWidgets('handleSystemBack backs out of the first step via onCancel',
+        (tester) async {
+      var cancelled = 0;
+      await pumpDs(
+        tester,
+        DsBusinessVerification(
+          handleSystemBack: true,
+          onCancel: () => cancelled++,
+        ),
+        surfaceSize: const Size(900, 1200),
+      );
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(cancelled, 1);
+    });
+  });
 }

@@ -132,6 +132,25 @@ void main() {
       expect(centredX, lessThan(dockedX));
     });
 
+    testWidgets('a tiny messageBottomInset does not invert the clamp', (
+      tester,
+    ) async {
+      // A custom inset below two spacing units must not throw when the inset
+      // range is resolved.
+      await pumpDs(
+        tester,
+        const DsSpotlight(
+          title: 'Verify your business to go live',
+          actionLabel: 'Verify business',
+          messageBottomInset: 4,
+          child: SizedBox.expand(),
+        ),
+        surfaceSize: const Size(600, 800),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('Verify your business to go live'), findsOneWidget);
+    });
+
     testWidgets('renders without overflow at 320dp and a short viewport', (
       tester,
     ) async {

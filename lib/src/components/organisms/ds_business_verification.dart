@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
@@ -28,6 +29,76 @@ typedef DsVerificationStepBuilder = Widget Function(
   int stepIndex,
   Widget body,
 );
+
+/// The stock business types offered when a caller supplies none.
+const List<DsSelectOption<String>> _kDefaultBusinessTypes =
+    <DsSelectOption<String>>[
+  DsSelectOption<String>(value: 'Sole trader', label: 'Sole trader'),
+  DsSelectOption<String>(value: 'Company', label: 'Company'),
+  DsSelectOption<String>(value: 'Partnership', label: 'Partnership'),
+  DsSelectOption<String>(value: 'Non-profit', label: 'Non-profit'),
+];
+
+/// Per-classification copy for the business-details step.
+///
+/// The identifier a business verifies on, and the words for its name and
+/// address, differ across the registered / unregistered split (a company
+/// matched on a registration number versus a sole trader matched on a personal
+/// identifier). [DsBusinessVerification] picks the copy for the selected type,
+/// so a market reframes the name and identifier fields without forking the
+/// flow. Every field defaults to the neutral stock wording, so the default
+/// flow is unchanged.
+@immutable
+class DsBusinessFieldCopy {
+  /// Creates a business-details copy set.
+  const DsBusinessFieldCopy({
+    this.nameLabel = 'Legal name',
+    this.nameHint = 'Registered business name',
+    this.nameHelper,
+    this.nameValidator,
+    this.identifierLabel = 'Registration number',
+    this.identifierHint = 'e.g. 12345678',
+    this.identifierHelper,
+    this.identifierKeyboardType,
+    this.identifierInputFormatters,
+    this.identifierValidator,
+    this.addressLegend = 'Registered address',
+  });
+
+  /// The label of the business name field.
+  final String nameLabel;
+
+  /// Placeholder text for the business name field.
+  final String? nameHint;
+
+  /// Helper text beneath the business name field.
+  final String? nameHelper;
+
+  /// Optional validator for the business name field.
+  final FormFieldValidator<String>? nameValidator;
+
+  /// The label of the registration identifier field.
+  final String identifierLabel;
+
+  /// Placeholder text for the identifier field.
+  final String? identifierHint;
+
+  /// Helper text beneath the identifier field.
+  final String? identifierHelper;
+
+  /// The keyboard type for the identifier field.
+  final TextInputType? identifierKeyboardType;
+
+  /// Input formatters for the identifier field, so a market can mask or bound
+  /// the entry.
+  final List<TextInputFormatter>? identifierInputFormatters;
+
+  /// Optional validator for the identifier field.
+  final FormFieldValidator<String>? identifierValidator;
+
+  /// The legend of the registered address block.
+  final String addressLegend;
+}
 
 /// A guided, multi-step flow for verifying a business's identity and details.
 ///
@@ -114,8 +185,21 @@ class DsBusinessVerification extends StatefulWidget {
     this.onUploadRemove,
     this.addressCountries = const <DsSelectOption<String>>[],
     this.addressConfig = const DsAddressFieldConfig(),
+    this.addressRegionOptions = const <DsSelectOption<String>>[],
+    this.addressCountryReadback,
     this.showReceipt = false,
     this.receiptContinueLabel = 'Continue',
+    this.receiptBadgeTone = DsIconBadgeTone.success,
+    this.businessTypeOptions = _kDefaultBusinessTypes,
+    this.unregisteredValues = const <String>{},
+    this.registeredCopy = const DsBusinessFieldCopy(),
+    this.unregisteredCopy,
+    this.roleOptions = const <DsSelectOption<String>>[],
+    this.roleLabel = 'Your role',
+    this.roleHelperText,
+    this.initialLegalName,
+    this.legalNameValidator,
+    this.handleSystemBack = false,
   });
 
   /// Called once the flow completes.
@@ -214,6 +298,68 @@ class DsBusinessVerification extends StatefulWidget {
   /// `'Continue'`. Only used with [showReceipt].
   final String receiptContinueLabel;
 
+  /// The region choices for the registered address. When non-empty the address
+  /// region renders as a province or state picker; empty leaves it free text.
+  final List<DsSelectOption<String>> addressRegionOptions;
+
+  /// A fixed country stated as a read-back line on the address block rather
+  /// than asked, for a flow that serves a single market.
+  final String? addressCountryReadback;
+
+  /// The badge tone of the post-submit receipt. Defaults to
+  /// [DsIconBadgeTone.success], the finished green tick. Where verification
+  /// runs on and the receipt is a holding state rather than an approval, pass
+  /// [DsIconBadgeTone.brandSoft] so it reads as the brand's own "we're
+  /// checking" rather than a completed success.
+  final DsIconBadgeTone receiptBadgeTone;
+
+  /// The business types offered on the first step. The value doubles as the
+  /// display label and the review read-back. Defaults to a neutral set of four.
+  final List<DsSelectOption<String>> businessTypeOptions;
+
+  /// The business type values that are not registered entities, so they verify
+  /// on a personal identifier rather than a registration number. A type in
+  /// this set uses [unregisteredCopy] for the details step, and switching a
+  /// selection across this divide clears the identifier field. Empty by
+  /// default, so every type is treated as registered.
+  final Set<String> unregisteredValues;
+
+  /// The details-step copy for a registered business type. Defaults to the
+  /// neutral stock wording.
+  final DsBusinessFieldCopy registeredCopy;
+
+  /// The details-step copy for an unregistered business type (one in
+  /// [unregisteredValues]). When null (the default) an unregistered type falls
+  /// back to [registeredCopy].
+  final DsBusinessFieldCopy? unregisteredCopy;
+
+  /// The role choices for the identity step. When non-empty a role select is
+  /// shown, so the representative can state how they relate to the business.
+  /// Empty by default, so no role field is shown.
+  final List<DsSelectOption<String>> roleOptions;
+
+  /// The label of the role select. Defaults to `'Your role'`.
+  final String roleLabel;
+
+  /// Helper text beneath the role select.
+  final String? roleHelperText;
+
+  /// The legal name captured earlier in the flow, pre-filling the name field
+  /// so verification confirms rather than re-asks. Stays editable.
+  final String? initialLegalName;
+
+  /// Optional validator for the business name field, run on Continue.
+  final FormFieldValidator<String>? legalNameValidator;
+
+  /// Whether the flow owns the system back gesture (hardware or browser back).
+  ///
+  /// When true it steps backwards through the flow instead of popping the
+  /// route: back moves to the previous step, backs out of the first step (via
+  /// [onCancel], then [onClose]), and completes rather than cancels once the
+  /// flow has been submitted, so a back gesture never throws away a submission
+  /// that already happened. Defaults to false, leaving back to the host.
+  final bool handleSystemBack;
+
   @override
   State<DsBusinessVerification> createState() => _DsBusinessVerificationState();
 }
@@ -233,17 +379,12 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     DsWizardStep(label: 'Review & submit'),
   ];
 
-  /// The available business types. The value doubles as the display label so
-  /// the review step can read it back directly.
-  static const List<DsSelectOption<String>> _businessTypeOptions =
-      <DsSelectOption<String>>[
-    DsSelectOption<String>(value: 'Sole trader', label: 'Sole trader'),
-    DsSelectOption<String>(value: 'Company', label: 'Company'),
-    DsSelectOption<String>(value: 'Partnership', label: 'Partnership'),
-    DsSelectOption<String>(value: 'Non-profit', label: 'Non-profit'),
-  ];
+  /// Validates the visible step's fields before it may advance. A step with no
+  /// validators passes.
+  final GlobalKey<FormState> _stepFormKey = GlobalKey<FormState>();
 
-  final TextEditingController _legalName = TextEditingController();
+  late final TextEditingController _legalName =
+      TextEditingController(text: widget.initialLegalName ?? '');
   final TextEditingController _registrationNumber = TextEditingController();
   final TextEditingController _representativeName = TextEditingController();
   final TextEditingController _idNumber = TextEditingController();
@@ -253,6 +394,9 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
 
   /// The selected business type, or `null` while nothing is chosen.
   String? _businessType;
+
+  /// The representative's stated role, or `null` while nothing is chosen.
+  String? _role;
 
   /// The structured registered address.
   DsAddressValue _address = const DsAddressValue();
@@ -264,6 +408,32 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
   bool _submitted = false;
 
   int get _lastStep => _steps.length - 1;
+
+  /// Whether the selected type is a registered entity, and so verifies on a
+  /// registration number rather than a personal identifier. A null selection
+  /// reads as registered, keeping the stock framing until a type is chosen.
+  bool get _isRegistered => !widget.unregisteredValues.contains(_businessType);
+
+  /// The details-step copy for the current classification: the unregistered
+  /// set when one is given and the type is unregistered, otherwise the
+  /// registered set.
+  DsBusinessFieldCopy get _activeCopy =>
+      (!_isRegistered && widget.unregisteredCopy != null)
+          ? widget.unregisteredCopy!
+          : widget.registeredCopy;
+
+  /// Applies a business-type change, clearing the identifier when the choice
+  /// crosses the registered / unregistered divide, since the number means
+  /// different things on each side.
+  void _onBusinessTypeChanged(String? value) {
+    if (value == null || value == _businessType) return;
+    final wasRegistered = _isRegistered;
+    final nowRegistered = !widget.unregisteredValues.contains(value);
+    setState(() {
+      _businessType = value;
+      if (nowRegistered != wasRegistered) _registrationNumber.clear();
+    });
+  }
 
   /// Whether the current step permits advancing.
   ///
@@ -297,6 +467,9 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
   }
 
   void _handleNext() {
+    // Validate the visible step before advancing; a step with no validators
+    // passes. The identity consent stays a separate gate via nextEnabled.
+    if (!(_stepFormKey.currentState?.validate() ?? true)) return;
     if (_step < _lastStep) {
       setState(() => _step += 1);
       return;
@@ -319,6 +492,21 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
     return widget.onClose;
   }
 
+  /// Steps the flow backwards for a system back gesture: to the previous step,
+  /// out of the first step (cancel, then close), or to completion once
+  /// submitted, since the submission must not be forgotten.
+  void _onSystemBack() {
+    if (_submitted) {
+      _headerClose?.call();
+      return;
+    }
+    if (_step > 0) {
+      setState(() => _step -= 1);
+      return;
+    }
+    (widget.onCancel ?? widget.onClose)?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -329,6 +517,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
       content = widget.showReceipt
           ? _ReceiptState(
               tokens: tokens,
+              badgeTone: widget.receiptBadgeTone,
               continueLabel: widget.receiptContinueLabel,
               onContinue: () => widget.onSubmitted?.call(),
             )
@@ -357,18 +546,31 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
         onNext: _handleNext,
         nextLabel: _step == _lastStep ? 'Submit' : 'Continue',
         nextEnabled: _canAdvance(identityBodyIsStock: identityBodyIsStock),
-        child: body,
+        child: Form(key: _stepFormKey, child: body),
       );
     }
 
-    if (!hasHeader) return content;
+    final Widget result = hasHeader
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _TakeoverHeader(
+                tokens: tokens,
+                title: _title,
+                onClose: _headerClose,
+              ),
+              Expanded(child: content),
+            ],
+          )
+        : content;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _TakeoverHeader(tokens: tokens, title: _title, onClose: _headerClose),
-        Expanded(child: content),
-      ],
+    if (!widget.handleSystemBack) return result;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _onSystemBack();
+      },
+      child: result,
     );
   }
 
@@ -398,8 +600,8 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
           label: 'Business type',
           value: _businessType,
           hintText: 'Select a business type',
-          options: _businessTypeOptions,
-          onChanged: (value) => setState(() => _businessType = value),
+          options: widget.businessTypeOptions,
+          onChanged: _onBusinessTypeChanged,
         ),
       ],
     );
@@ -409,6 +611,8 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
 
   Widget _buildBusinessDetailsStep() {
     final tokens = DsTokens.of(context);
+    final copy = _activeCopy;
+    final nameValidator = widget.legalNameValidator ?? copy.nameValidator;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -420,28 +624,42 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
           columns: 1,
           children: <Widget>[
             DsTextField(
-              label: 'Legal name',
-              hintText: 'Registered business name',
+              label: copy.nameLabel,
+              hintText: copy.nameHint,
+              helperText: copy.nameHelper,
               controller: _legalName,
+              validator: nameValidator,
+              autovalidateMode: _avm(nameValidator),
             ),
             DsTextField(
-              label: 'Registration number',
-              hintText: 'e.g. 12345678',
+              label: copy.identifierLabel,
+              hintText: copy.identifierHint,
+              helperText: copy.identifierHelper,
               controller: _registrationNumber,
+              keyboardType: copy.identifierKeyboardType,
+              inputFormatters: copy.identifierInputFormatters,
+              validator: copy.identifierValidator,
+              autovalidateMode: _avm(copy.identifierValidator),
             ),
           ],
         ),
         SizedBox(height: tokens.spacingUnit * 2),
         DsAddressFieldGroup(
-          legend: 'Registered address',
+          legend: copy.addressLegend,
           value: _address,
           countries: widget.addressCountries,
+          regionOptions: widget.addressRegionOptions,
+          countryReadback: widget.addressCountryReadback,
           config: widget.addressConfig,
           onChanged: (value) => setState(() => _address = value),
         ),
       ],
     );
   }
+
+  /// Autovalidate on interaction only where a validator is set.
+  AutovalidateMode? _avm(FormFieldValidator<String>? validator) =>
+      validator == null ? null : AutovalidateMode.onUserInteraction;
 
   // Step 2: Verify identity ---------------------------------------------
 
@@ -465,6 +683,15 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
           hintText: 'Passport, licence or reference number',
           controller: _idNumber,
         ),
+        if (widget.roleOptions.isNotEmpty)
+          DsSelect<String>(
+            label: widget.roleLabel,
+            value: _role,
+            hintText: 'Select your role',
+            helperText: widget.roleHelperText,
+            options: widget.roleOptions,
+            onChanged: (value) => setState(() => _role = value),
+          ),
         if (uploadState != null)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,6 +736,7 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
       ),
       _SummaryEntry('Representative', _valueOrNull(_representativeName.text)),
       _SummaryEntry('ID or reference', _valueOrNull(_idNumber.text)),
+      if (widget.roleOptions.isNotEmpty) _SummaryEntry(widget.roleLabel, _role),
       if (widget.uploadState != null)
         _SummaryEntry(
           'Identity document',
@@ -721,11 +949,13 @@ class _SuccessState extends StatelessWidget {
 class _ReceiptState extends StatelessWidget {
   const _ReceiptState({
     required this.tokens,
+    required this.badgeTone,
     required this.continueLabel,
     required this.onContinue,
   });
 
   final DsTokens tokens;
+  final DsIconBadgeTone badgeTone;
   final String continueLabel;
   final VoidCallback onContinue;
 
@@ -739,9 +969,9 @@ class _ReceiptState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const DsIconBadge(
+              DsIconBadge(
                 icon: DsIcons.check,
-                tone: DsIconBadgeTone.success,
+                tone: badgeTone,
                 size: 64,
                 semanticLabel: 'Submitted',
               ),

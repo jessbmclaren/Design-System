@@ -167,6 +167,30 @@ void main() {
       expect(find.text('Step 2 of 3'), findsOneWidget);
     });
 
+    testWidgets('the all-markers compact form shows every section marker',
+        (tester) async {
+      await pumpDs(
+        tester,
+        const SizedBox(
+          width: 180,
+          child: DsVerificationRail(
+            sections: sections,
+            compactShowsAllMarkers: true,
+          ),
+        ),
+      );
+
+      // The active section's title still shows, but every section now has a
+      // marker: a check for the done one, standalone numbers for the rest, and
+      // no "Step n of N" caption.
+      expect(find.text('Identity'), findsOneWidget);
+      expect(find.byIcon(DsIcons.check), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+      expect(find.text('Step 2 of 3'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('the compact form survives many sections without overflow',
         (tester) async {
       final manySections = <DsVerificationSection>[

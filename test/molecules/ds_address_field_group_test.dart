@@ -233,5 +233,141 @@ void main() {
       expect(const DsAddressValue().isEmpty, isTrue);
       expect(const DsAddressValue(city: 'Ghent').isEmpty, isFalse);
     });
+
+    test('suburb rides through the value contract', () {
+      const value = DsAddressValue(street: '1 Main Road', suburb: 'Claremont');
+      expect(value.isEmpty, isFalse);
+      expect(value.format(), '1 Main Road, Claremont');
+      expect(value.copyWith(suburb: 'Rondebosch').suburb, 'Rondebosch');
+      expect(value, const DsAddressValue(street: '1 Main Road', suburb: 'Claremont'));
+      expect(value, isNot(const DsAddressValue(street: '1 Main Road')));
+    });
+  });
+
+  group('DsAddressFieldGroup market shape', () {
+    const provinces = <DsSelectOption<String>>[
+      DsSelectOption(value: 'Gauteng', label: 'Gauteng'),
+      DsSelectOption(value: 'Western Cape', label: 'Western Cape'),
+    ];
+
+    testWidgets('shows the suburb field only when configured', (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: DsAddressFieldGroup(
+            config: const DsAddressFieldConfig(showSuburb: true),
+            onChanged: (_) {},
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+      expect(find.text('Suburb'), findsOneWidget);
+    });
+
+    testWidgets('reports a suburb edit through onChanged', (tester) async {
+      DsAddressValue? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: DsAddressFieldGroup(
+            config: const DsAddressFieldConfig(showSuburb: true),
+            onChanged: (v) => value = v,
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      // Target the suburb field by the DsTextField that carries its label.
+      final suburbField = find.descendant(
+        of: find.ancestor(
+          of: find.text('Suburb'),
+          matching: find.byType(DsTextField),
+        ),
+        matching: find.byType(TextFormField),
+      );
+      await tester.enterText(suburbField, 'Claremont');
+      await tester.pump();
+      expect(value?.suburb, 'Claremont');
+    });
+
+    testWidgets('renders the region as a select when given options',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: DsAddressFieldGroup(
+            config: const DsAddressFieldConfig(regionLabel: 'Province'),
+            regionOptions: provinces,
+            onChanged: (_) {},
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      // The Province label sits inside a DsSelect, not a free-text field.
+      expect(
+        find.ancestor(
+          of: find.text('Province'),
+          matching: find.byType(DsSelect<String>),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('Province'),
+          matching: find.byType(DsTextField),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('states the country as a read-back and hides the select',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: DsAddressFieldGroup(
+            countries: countries,
+            countryReadback: 'South Africa',
+            onChanged: (_) {},
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      expect(find.text('South Africa'), findsOneWidget);
+      // The editable country select is suppressed: no placeholder to pick from.
+      expect(find.text('Select a country'), findsNothing);
+    });
+
+    testWidgets('a field validator surfaces an inline error on validate',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: Form(
+            key: formKey,
+            child: DsAddressFieldGroup(
+              config: DsAddressFieldConfig(
+                streetValidator: (v) =>
+                    (v == null || v.isEmpty) ? 'Enter a street' : null,
+              ),
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pump();
+      expect(find.text('Enter a street'), findsOneWidget);
+    });
   });
 }
