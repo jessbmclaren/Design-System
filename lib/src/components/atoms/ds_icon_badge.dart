@@ -9,13 +9,17 @@ import '../../theme/ds_tokens_extension.dart';
 ///
 /// * [primary]: the solid primary action pair, for the flow's own marks such
 ///   as a completed step tick.
+/// * [brandSoft]: the soft brand-tinted pair (a brand wash with brand ink),
+///   for a receipt or holding state that must read as the brand's own without
+///   implying a finished, positive outcome the way [success] does — such as a
+///   "we're verifying" confirmation.
 /// * [success]: the tinted success badge pair, for a positive outcome.
 /// * [warning]: the tinted warning badge pair, for something needing
 ///   attention.
 /// * [danger]: the tinted danger badge pair, for a failure.
 /// * [neutral]: the tinted neutral badge pair, for a mark with no strong
 ///   connotation.
-enum DsIconBadgeTone { primary, success, warning, danger, neutral }
+enum DsIconBadgeTone { primary, brandSoft, success, warning, danger, neutral }
 
 /// A circular mark holding a single icon on a token-tinted background.
 ///
@@ -90,6 +94,10 @@ class DsIconBadge extends StatelessWidget {
       DsIconBadgeTone.primary => (
           tokens.buttonPrimaryColorBackground,
           tokens.buttonPrimaryColorText,
+        ),
+      DsIconBadgeTone.brandSoft => (
+          tokens.brandTintColor,
+          tokens.actionPrimaryColorText,
         ),
       DsIconBadgeTone.success => (
           tokens.badgeSuccessColorBackground,

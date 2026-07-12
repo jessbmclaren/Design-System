@@ -67,7 +67,7 @@ Components are organised into atomic design layers under
 | --- | --- |
 | **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom` |
 | **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordStrength`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner` |
-| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsTourCard`, `DsSignInView`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences` |
+| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences` |
 | **Templates** | `DsPageScaffold`, `DsAuthShell` |
 | **Pages** | the documentation demos in [`example/`](example/) |
 

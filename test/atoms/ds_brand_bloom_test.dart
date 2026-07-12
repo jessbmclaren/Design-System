@@ -111,5 +111,73 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    group('pools', () {
+      CustomPaint paintOf(WidgetTester tester) => tester.widget<CustomPaint>(
+            find.descendant(
+              of: find.byType(DsBrandBloom),
+              matching: find.byType(CustomPaint),
+            ),
+          );
+
+      testWidgets('paints a custom multi-pool sweep, wrapped for repaint',
+          (tester) async {
+        await pumpDs(
+          tester,
+          const SizedBox(width: 300, height: 200, child: DsBrandBloom.pools()),
+        );
+
+        expect(paintOf(tester).painter, isNotNull);
+        expect(
+          find.descendant(
+            of: find.byType(DsBrandBloom),
+            matching: find.byType(RepaintBoundary),
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('is decorative: it exposes no semantics', (tester) async {
+        final handle = tester.ensureSemantics();
+        await pumpDs(
+          tester,
+          const SizedBox(width: 300, height: 200, child: DsBrandBloom.pools()),
+        );
+
+        expect(
+          find.descendant(
+            of: find.byType(DsBrandBloom),
+            matching: find.byType(ExcludeSemantics),
+          ),
+          findsOneWidget,
+        );
+        handle.dispose();
+      });
+
+      testWidgets('paints on the neutral base and under a skin without overflow',
+          (tester) async {
+        // Neutral base: no bloomStops, so it falls back to a soft spread of
+        // the single bloom colour.
+        expect(DsTokens.light().bloomStops, isEmpty);
+        await pumpDs(
+          tester,
+          const SizedBox.expand(child: DsBrandBloom.pools()),
+          surfaceSize: const Size(320, 640),
+        );
+        expect(tester.takeException(), isNull);
+        expect(paintOf(tester).painter, isNotNull);
+
+        // Skinned: the Engen sweep supplies its own ordered stops.
+        final skin = DsSkins.engenLight();
+        expect(skin.bloomStops, hasLength(5));
+        await pumpDs(
+          tester,
+          const SizedBox.expand(child: DsBrandBloom.pools()),
+          theme: DsTheme.light(tokens: skin),
+          surfaceSize: const Size(1440, 800),
+        );
+        expect(tester.takeException(), isNull);
+      });
+    });
   });
 }

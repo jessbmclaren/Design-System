@@ -42,6 +42,10 @@ void main() {
           tokens.buttonPrimaryColorBackground,
           tokens.buttonPrimaryColorText,
         ),
+        DsIconBadgeTone.brandSoft: (
+          tokens.brandTintColor,
+          tokens.actionPrimaryColorText,
+        ),
         DsIconBadgeTone.success: (
           tokens.badgeSuccessColorBackground,
           tokens.badgeSuccessColorText,

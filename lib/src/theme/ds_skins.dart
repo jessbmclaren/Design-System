@@ -141,6 +141,19 @@ abstract final class DsSkins {
       // blue bloom, sampled from the brand's marketing surfaces.
       authWashGradient: const [Color(0xFFFFFFFF), Color(0xFFEAF2FA)],
       bloomColor: const Color(0xFF5AA8E0),
+      // The five-pool spotlight bloom, read left to right along the bottom
+      // edge: a coral lift, warm red, sky and light blue, into the deep navy
+      // corner anchor.
+      bloomStops: const [
+        Color(0xFFF48A8A),
+        Color(0xFFE85A62),
+        Color(0xFF7DC3EB),
+        Color(0xFF5AA8E0),
+        Color(0xFF004D7A),
+      ],
+      // A pale indigo tint for brand-soft badges and washes (the "verifying"
+      // receipt check), with the indigo action colour as the ink on top.
+      brandTintColor: const Color(0xFFEEF1F8),
     );
   }
 
@@ -208,6 +221,18 @@ abstract final class DsSkins {
       // dimmed to hold the same soft glow on dark surfaces.
       authWashGradient: const [Color(0xFF121317), Color(0xFF101B2E)],
       bloomColor: const Color(0xFF2B5E8F),
+      // The same five-pool sweep, dimmed to a low-saturation navy-forward set
+      // so the glow reads on the dark page without turning garish.
+      bloomStops: const [
+        Color(0xFF3E2C57),
+        Color(0xFF4A2733),
+        Color(0xFF1F4E6E),
+        Color(0xFF2B5E8F),
+        Color(0xFF0C2A46),
+      ],
+      // A dark indigo tint for brand-soft badges, with the dark link colour as
+      // the ink on top.
+      brandTintColor: const Color(0xFF20264D),
     );
   }
 }

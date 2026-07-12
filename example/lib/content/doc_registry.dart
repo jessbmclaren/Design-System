@@ -86,6 +86,8 @@ import 'pages/auth_shell.dart';
 import 'pages/cookie_banner.dart';
 import 'pages/cookie_preferences.dart';
 import 'pages/tour_card.dart';
+import 'pages/verify_email.dart';
+import 'pages/spotlight.dart';
 
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
@@ -176,7 +178,9 @@ final List<PatternPage> allPages = [
   signOutPage,
   settingsSignInPage,
   businessVerificationPage,
+  verifyEmailPage,
   setupGuidePage,
+  spotlightPage,
   tourCardPage,
   additionalContextPage,
   redirectsPage,

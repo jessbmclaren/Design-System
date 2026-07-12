@@ -152,6 +152,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     // Chrome
     required this.authWashGradient,
     required this.bloomColor,
+    required this.bloomStops,
+    required this.brandTintColor,
     // Wordmark
     required this.wordmarkFontSize,
     required this.wordmarkLetterSpacing,
@@ -279,6 +281,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowHigh: DsElevation.high,
       authWashGradient: DsColors.authWash,
       bloomColor: DsColors.bloom,
+      // No branded pools on the neutral base: the multi-pool bloom falls back
+      // to a soft spread of [bloomColor], so white-label output is unchanged
+      // until a skin supplies its stops.
+      bloomStops: const <Color>[],
+      // The soft brand-tinted surface. Neutral on the base (the offset
+      // surface), so nothing carries a hue until a skin tints it.
+      brandTintColor: DsColors.offsetBackground,
       wordmarkFontSize: 22,
       wordmarkLetterSpacing: -0.2,
       wordmarkHeight: 1,
@@ -345,6 +354,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // fill as the bloom peak.
       authWashGradient: const [Color(0xFF121317), Color(0xFF1E2025)],
       bloomColor: const Color(0xFF2A2C33),
+      // The dark brand tint shares the offset surface, one step above the
+      // page, mirroring the light default.
+      brandTintColor: const Color(0xFF1E2025),
     );
   }
 
@@ -778,6 +790,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// present without carrying a hue; a skin supplies its brand tint.
   final Color bloomColor;
 
+  /// The colour pools of the multi-pool brand bloom painted by
+  /// [DsBrandBloom.pools], read bottom edge outward. Empty by default, so the
+  /// multi-pool bloom falls back to a soft spread of [bloomColor] and the
+  /// white-label glow stays neutral; a skin supplies its own ordered stops
+  /// (for example a corner-to-corner sweep of brand hues).
+  final List<Color> bloomStops;
+
+  /// A soft brand-tinted surface: the quiet wash behind a brand-soft badge or
+  /// a selected brand row, distinct from the neutral [offsetBackgroundColor].
+  /// Defaults to the offset surface, so it carries no hue until a skin tints
+  /// it; pair it with [actionPrimaryColorText] as the ink on top.
+  final Color brandTintColor;
+
   // Wordmark ---------------------------------------------------------------
 
   /// The default wordmark size, in logical pixels.
@@ -901,6 +926,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     List<BoxShadow>? shadowHigh,
     List<Color>? authWashGradient,
     Color? bloomColor,
+    List<Color>? bloomStops,
+    Color? brandTintColor,
     double? wordmarkFontSize,
     double? wordmarkLetterSpacing,
     double? wordmarkHeight,
@@ -1068,6 +1095,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       shadowHigh: shadowHigh ?? this.shadowHigh,
       authWashGradient: authWashGradient ?? this.authWashGradient,
       bloomColor: bloomColor ?? this.bloomColor,
+      bloomStops: bloomStops ?? this.bloomStops,
+      brandTintColor: brandTintColor ?? this.brandTintColor,
       wordmarkFontSize: wordmarkFontSize ?? this.wordmarkFontSize,
       wordmarkLetterSpacing:
           wordmarkLetterSpacing ?? this.wordmarkLetterSpacing,
@@ -1260,6 +1289,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
           BoxShadow.lerpList(shadowHigh, other.shadowHigh, t) ?? shadowHigh,
       authWashGradient: cs(authWashGradient, other.authWashGradient),
       bloomColor: c(bloomColor, other.bloomColor),
+      bloomStops: cs(bloomStops, other.bloomStops),
+      brandTintColor: c(brandTintColor, other.brandTintColor),
       wordmarkFontSize: d(wordmarkFontSize, other.wordmarkFontSize),
       wordmarkLetterSpacing:
           d(wordmarkLetterSpacing, other.wordmarkLetterSpacing),
@@ -1383,6 +1414,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
           listEquals(shadowHigh, other.shadowHigh) &&
           listEquals(authWashGradient, other.authWashGradient) &&
           bloomColor == other.bloomColor &&
+          listEquals(bloomStops, other.bloomStops) &&
+          brandTintColor == other.brandTintColor &&
           wordmarkFontSize == other.wordmarkFontSize &&
           wordmarkLetterSpacing == other.wordmarkLetterSpacing &&
           wordmarkHeight == other.wordmarkHeight;
@@ -1499,6 +1532,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
         Object.hashAll(shadowHigh),
         Object.hashAll(authWashGradient),
         bloomColor,
+        Object.hashAll(bloomStops),
+        brandTintColor,
         wordmarkFontSize,
         wordmarkLetterSpacing,
         wordmarkHeight,

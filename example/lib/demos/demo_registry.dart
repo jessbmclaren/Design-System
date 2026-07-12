@@ -63,6 +63,8 @@ import 'loading_demo.dart';
 import 'progress_bar_demo.dart';
 import 'progress_stepping_demo.dart';
 import 'waiting_screens_demo.dart';
+import 'verify_email_demo.dart';
+import 'spotlight_demo.dart';
 
 /// Maps a page id to its live demo widget. Used by the docs app and the
 /// screenshot harness. Reconciled deterministically with the content registry.
@@ -121,7 +123,9 @@ final Map<String, Widget Function()> _demos = {
   'coachmark': () => const CoachmarkDemo(),
   'onboarding-wizard': () => const OnboardingWizardDemo(),
   'business-verification': () => const BusinessVerificationDemo(),
+  'verify-email': () => const VerifyEmailDemo(),
   'setup-guide': () => const SetupGuideDemo(),
+  'spotlight': () => const SpotlightDemo(),
   'back-link': () => const BackLinkDemo(),
   'action-buttons': () => const ActionButtonsDemo(),
   'communicating-state': () => const CommunicatingStateDemo(),

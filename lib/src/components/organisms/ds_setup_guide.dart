@@ -223,8 +223,11 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
                   turns: _collapsed ? 0 : 0.5,
                   duration: DsMotion.durationOf(context, DsMotion.fast),
                   curve: DsMotion.curveOf(context, DsMotion.standard),
+                  // Docked at the bottom the panel opens upward, so the chevron
+                  // points up while collapsed ("expand up", like a bottom-sheet
+                  // grabber); floating, it points down to open downward.
                   child: Icon(
-                    DsIcons.expandMore,
+                    widget.fullWidth ? DsIcons.expandLess : DsIcons.expandMore,
                     size: DsIconSize.sm,
                     color: tokens.colorSecondaryText,
                   ),
@@ -249,8 +252,7 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
     );
 
     // Collapsed, the card summarises what to tackle next; expanded, it shows
-    // the full list, which scrolls when a maxHeight budget is tighter than
-    // the list.
+    // the full list.
     final body = _collapsed
         ? _NextLine(next: _nextTask, summary: widget.collapsedSummary)
         : taskList;
