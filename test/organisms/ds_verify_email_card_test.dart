@@ -1,8 +1,17 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers.dart';
+
+/// Finds the body text carrying [address], tolerant of the zero-width break
+/// opportunities the card inserts so an ordinary email wraps at narrow widths.
+Finder findAddress(String address) => find.byWidgetPredicate(
+      (w) =>
+          w is RichText &&
+          w.text.toPlainText().replaceAll('​', '').contains(address),
+    );
 
 void main() {
   group('DsVerifyEmailCard', () {
@@ -15,7 +24,7 @@ void main() {
       );
 
       expect(find.text('Verify your email'), findsOneWidget);
-      expect(find.textContaining('sam@example.com'), findsOneWidget);
+      expect(findAddress('sam@example.com'), findsOneWidget);
       expect(find.widgetWithText(DsButton, 'Resend email'), findsOneWidget);
       // No continue action while unverified.
       expect(find.widgetWithText(DsButton, 'Continue'), findsNothing);
@@ -122,6 +131,48 @@ void main() {
       await pumpDs(tester, const DsVerifyEmailCard(email: '   '));
       // The fallback address lands in the body sentence.
       expect(find.textContaining('Check your email'), findsOneWidget);
+    });
+
+    testWidgets('a blank email reads back cleanly when verified, no stutter', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsVerifyEmailCard(email: '   ', verified: true),
+      );
+
+      final bodies = tester
+          .widgetList<RichText>(find.byType(RichText))
+          .map((r) => r.text.toPlainText())
+          .toList();
+      expect(bodies, contains('Your email has been verified.'));
+      expect(
+        bodies.any((t) => t.contains('your email your email')),
+        isFalse,
+        reason: 'the fallback noun must not be stitched into the sentence',
+      );
+    });
+
+    testWidgets('a long hyphen-free email wraps rather than clips at 320dp', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsVerifyEmailCard(email: 'jonathan.smith@examplecompany.com'),
+        surfaceSize: const Size(320, 640),
+      );
+      expect(tester.takeException(), isNull);
+
+      // An unbreakable address would report a min intrinsic width wider than
+      // the card's content box and paint past its edge; the inserted break
+      // opportunities must bring it within the laid-out width.
+      final para = tester.renderObject<RenderParagraph>(
+        findAddress('jonathan.smith@examplecompany.com'),
+      );
+      expect(
+        para.getMinIntrinsicWidth(double.infinity),
+        lessThanOrEqualTo(para.size.width),
+      );
     });
 
     testWidgets('the verified heading is announced as a live region', (

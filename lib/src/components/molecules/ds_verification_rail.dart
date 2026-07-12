@@ -391,6 +391,10 @@ class _SectionRow extends StatelessWidget {
       button: true,
       enabled: true,
       label: semanticLabel,
+      // Expose the tap action on the announced node so an assistive-technology
+      // activate gesture jumps back, matching the pointer and keyboard paths.
+      // onSelected is non-null here: the inert case returned above.
+      onTap: onSelected,
       child: ExcludeSemantics(
         child: Material(
           color: Colors.transparent,

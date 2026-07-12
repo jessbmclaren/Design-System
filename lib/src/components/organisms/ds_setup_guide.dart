@@ -173,11 +173,15 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
   int get _doneCount => widget.tasks.where((task) => task.done).length;
 
   /// The first task the user can act on right now, surfaced by the collapsed
-  /// card's "Next" line. Skips done, pending and locked tasks so "Next"
-  /// always names something actionable; null once nothing is.
+  /// card's "Next" line. Skips done, pending and locked tasks, and any task
+  /// with no `onTap`, so "Next" always names something the user can actually
+  /// follow rather than a dead link or a task hidden behind one; null once
+  /// nothing is actionable.
   DsSetupTask? get _nextTask {
     for (final task in widget.tasks) {
-      if (!task.done && !task.pending && !task.locked) return task;
+      if (!task.done && !task.pending && !task.locked && task.onTap != null) {
+        return task;
+      }
     }
     return null;
   }

@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers.dart';
@@ -88,6 +89,29 @@ void main() {
       await tester.tap(find.text('Business'));
       await tester.pump();
       expect(selected, 0);
+    });
+
+    testWidgets('a done section exposes a tap action to assistive tech',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 280,
+          child: DsVerificationRail(
+            sections: sections,
+            onSectionSelected: (_) {},
+          ),
+        ),
+      );
+
+      // The announced button carries a tap action, so a screen-reader activate
+      // gesture can jump back, not just a pointer tap.
+      final node = tester.getSemantics(
+        find.bySemanticsLabel('Business, section 1 of 3, complete'),
+      );
+      expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+      handle.dispose();
     });
 
     testWidgets('active and upcoming sections are not selectable',

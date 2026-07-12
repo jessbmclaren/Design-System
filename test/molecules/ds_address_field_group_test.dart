@@ -344,6 +344,54 @@ void main() {
       expect(find.text('Select a country'), findsNothing);
     });
 
+    testWidgets('the read-back country enters the collected value',
+        (tester) async {
+      DsAddressValue? value;
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: DsAddressFieldGroup(
+            countryReadback: 'South Africa',
+            onChanged: (v) => value = v,
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      await tester.enterText(find.byType(TextFormField).first, '1 Main Road');
+      await tester.pump();
+      // The stated country is not display-only: it rides in the value.
+      expect(value?.country, 'South Africa');
+    });
+
+    testWidgets('a country validator can make the country required',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 500,
+          child: Form(
+            key: formKey,
+            child: DsAddressFieldGroup(
+              countries: countries,
+              config: DsAddressFieldConfig(
+                countryValidator: (v) =>
+                    (v == null || v.isEmpty) ? 'Country is required' : null,
+              ),
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+        surfaceSize: const Size(600, 1000),
+      );
+
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pump();
+      expect(find.text('Country is required'), findsOneWidget);
+    });
+
     testWidgets('a field validator surfaces an inline error on validate',
         (tester) async {
       final formKey = GlobalKey<FormState>();

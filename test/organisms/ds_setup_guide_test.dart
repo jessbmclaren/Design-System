@@ -156,9 +156,9 @@ void main() {
         tester,
         DsSetupGuide(
           title: 'Setup guide',
-          tasks: const [
-            DsSetupTask(label: 'Add your vehicles'),
-            DsSetupTask(label: 'Invite users'),
+          tasks: [
+            DsSetupTask(label: 'Add your vehicles', onTap: () {}),
+            DsSetupTask(label: 'Invite users', onTap: () {}),
           ],
         ),
       );
@@ -189,12 +189,33 @@ void main() {
         DsSetupGuide(
           title: 'Setup guide',
           initiallyCollapsed: true,
-          tasks: const [DsSetupTask(label: 'Add your vehicles')],
+          tasks: [DsSetupTask(label: 'Add your vehicles', onTap: () {})],
         ),
       );
 
       expect(find.text('Next:'), findsOneWidget);
       expect(find.widgetWithText(DsLink, 'Add your vehicles'), findsOneWidget);
+    });
+
+    testWidgets('the collapsed Next line skips a task with no action', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsSetupGuide(
+          title: 'Setup guide',
+          initiallyCollapsed: true,
+          collapsedSummary: 'Nothing to do',
+          tasks: [
+            // No onTap: not actionable, so Next must skip it for the wired one.
+            const DsSetupTask(label: 'Read the guide'),
+            DsSetupTask(label: 'Add your vehicles', onTap: () {}),
+          ],
+        ),
+      );
+
+      expect(find.text('Add your vehicles'), findsOneWidget);
+      expect(find.text('Read the guide'), findsNothing);
     });
 
     testWidgets('the collapsed Next line skips done and pending tasks', (

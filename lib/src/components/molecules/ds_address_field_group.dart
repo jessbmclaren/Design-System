@@ -146,6 +146,7 @@ class DsAddressFieldConfig {
     this.postalCodeInputFormatters,
     this.countryLabel = 'Country',
     this.countryHint = 'Select a country',
+    this.countryValidator,
     this.showUnit = true,
     this.showSuburb = false,
     this.showRegion = true,
@@ -220,6 +221,10 @@ class DsAddressFieldConfig {
 
   /// Placeholder text for the country select while nothing is chosen.
   final String? countryHint;
+
+  /// Optional validator for the country select, so a market can make the
+  /// country required like the other fields.
+  final FormFieldValidator<String>? countryValidator;
 
   /// Whether the unit field is rendered. Defaults to true.
   final bool showUnit;
@@ -381,7 +386,9 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
         city: _city.text,
         region: _regionIsSelect ? widget.value.region : _region.text,
         postalCode: _postalCode.text,
-        country: widget.value.country,
+        // A stated read-back country is part of the collected address, so it
+        // rides in the value rather than being display-only.
+        country: widget.countryReadback ?? widget.value.country,
       );
 
   void _notify() => widget.onChanged?.call(_current);
@@ -470,6 +477,8 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
           hintText: config.countryHint,
           options: widget.countries,
           enabled: enabled,
+          validator: config.countryValidator,
+          autovalidateMode: _avm(config.countryValidator),
           onChanged: _handleCountry,
         ),
     ];
@@ -532,17 +541,28 @@ class _CountryReadback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        DsFieldLabel(label: label),
-        SizedBox(height: tokens.fieldLabelGap),
-        Text(
-          value,
-          style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+    // Fold the label and value into one read-only field node ("Country:
+    // South Africa"), the way a text field folds its label into the control,
+    // rather than announcing two loose text nodes.
+    return Semantics(
+      container: true,
+      label: label,
+      value: value,
+      readOnly: true,
+      child: ExcludeSemantics(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DsFieldLabel(label: label),
+            SizedBox(height: tokens.fieldLabelGap),
+            Text(
+              value,
+              style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

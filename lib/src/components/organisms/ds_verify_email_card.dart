@@ -176,17 +176,23 @@ class DsVerifyEmailCard extends StatelessWidget {
 
   /// The body copy with [address] emphasised in the primary text colour: an
   /// inbox instruction while unverified, a read-back confirmation once
-  /// verified.
+  /// verified. A blank address reads back without stitching the fallback noun
+  /// into the sentence.
   TextSpan _bodySpan(DsTokens tokens, String address) {
     final emphasis = TextStyle(
       color: tokens.colorText,
       fontWeight: tokens.strongLabelFontWeight,
     );
+    final blank = email.trim().isEmpty;
     if (verified) {
+      // "Your email <addr> has been verified." collapses to a natural
+      // "Your email has been verified." when there is no address to name,
+      // rather than "Your email your email has been verified.".
+      if (blank) return const TextSpan(text: 'Your email has been verified.');
       return TextSpan(
         children: <InlineSpan>[
           const TextSpan(text: 'Your email '),
-          TextSpan(text: address, style: emphasis),
+          TextSpan(text: _breakable(address), style: emphasis),
           const TextSpan(text: ' has been verified.'),
         ],
       );
@@ -194,9 +200,23 @@ class DsVerifyEmailCard extends StatelessWidget {
     return TextSpan(
       children: <InlineSpan>[
         const TextSpan(text: 'Check '),
-        TextSpan(text: address, style: emphasis),
+        TextSpan(text: _breakable(address), style: emphasis),
         const TextSpan(text: ' for a link to verify your email.'),
       ],
     );
+  }
+
+  /// Inserts zero-width break opportunities after an address's segment
+  /// delimiters, so an ordinary email (which carries no whitespace or hyphens)
+  /// wraps to the next line at a narrow width instead of painting past the
+  /// card edge. The visible glyphs are unchanged.
+  static String _breakable(String s) {
+    const breakAfter = <int>{0x40, 0x2E, 0x2D, 0x5F, 0x2B, 0x2F}; // @ . - _ + /
+    final buffer = StringBuffer();
+    for (final rune in s.runes) {
+      buffer.writeCharCode(rune);
+      if (breakAfter.contains(rune)) buffer.write('​');
+    }
+    return buffer.toString();
   }
 }
