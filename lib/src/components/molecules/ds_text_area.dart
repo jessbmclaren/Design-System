@@ -123,7 +123,7 @@ class DsTextArea extends StatelessWidget {
           Text(
             label!,
             style: tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
-                  fontWeight: DsTypography.medium,
+                  fontWeight: tokens.mediumLabelFontWeight,
                 ),
           ),
           SizedBox(height: tokens.fieldLabelGap),

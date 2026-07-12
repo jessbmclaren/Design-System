@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_typography.dart';
 
 /// A form field label.
 ///
@@ -31,7 +30,7 @@ class DsFieldLabel extends StatelessWidget {
     final Widget text = Text(
       label,
       style: tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
-            fontWeight: DsTypography.medium,
+            fontWeight: tokens.mediumLabelFontWeight,
           ),
     );
     if (!optional) return text;

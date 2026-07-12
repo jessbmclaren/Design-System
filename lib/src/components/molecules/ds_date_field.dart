@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_icon.dart';
 
 /// A labelled, read-only date input that opens a calendar picker on tap.
@@ -222,7 +221,7 @@ class DsDateField extends StatelessWidget {
               label!,
               style: tokens.labelMd
                   .toTextStyle(color: tokens.colorText)
-                  .copyWith(fontWeight: DsTypography.medium),
+                  .copyWith(fontWeight: tokens.mediumLabelFontWeight),
             ),
             SizedBox(height: tokens.fieldLabelGap),
           ],

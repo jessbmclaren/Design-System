@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_icon_badge.dart';
 
 /// The progress state of one [DsVerificationSection].
@@ -290,7 +289,7 @@ class DsVerificationRail extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: tokens.bodyMd
-                      .copyWith(fontWeight: DsTypography.semiBold)
+                      .copyWith(fontWeight: tokens.strongLabelFontWeight)
                       .toTextStyle(color: tokens.colorText),
                 ),
               ),
@@ -349,7 +348,7 @@ class _SectionRow extends StatelessWidget {
       style: tokens.bodyMd
           .copyWith(
             fontWeight:
-                active ? tokens.strongLabelFontWeight : DsTypography.medium,
+                active ? tokens.strongLabelFontWeight : tokens.mediumLabelFontWeight,
           )
           .toTextStyle(
             color: upcoming ? tokens.colorSecondaryText : tokens.colorText,
@@ -549,7 +548,7 @@ class _SubStepRow extends StatelessWidget {
             style: tokens.bodySm
                 .copyWith(
                   fontWeight:
-                      active ? DsTypography.medium : DsTypography.regular,
+                      active ? tokens.mediumLabelFontWeight : null,
                 )
                 .toTextStyle(
                   color: active ? tokens.colorText : tokens.colorSecondaryText,

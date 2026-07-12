@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 
 /// A single choice within a [DsSelect].
 ///
@@ -263,7 +262,7 @@ class DsSelect<T> extends StatelessWidget {
               label!,
               style: tokens.labelMd
                   .toTextStyle(color: tokens.colorText)
-                  .copyWith(fontWeight: DsTypography.medium),
+                  .copyWith(fontWeight: tokens.mediumLabelFontWeight),
             ),
             SizedBox(height: tokens.fieldLabelGap),
           ],

@@ -4,7 +4,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_divider.dart';
@@ -821,7 +820,7 @@ class _TakeoverHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: tokens.labelMd
-                    .copyWith(fontWeight: DsTypography.medium)
+                    .copyWith(fontWeight: tokens.mediumLabelFontWeight)
                     .toTextStyle(color: tokens.colorText),
               ),
             ),

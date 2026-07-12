@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_avatar.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_button.dart';
@@ -810,7 +809,7 @@ bool _numEquals(num? a, num? b) {
 
 TextStyle _fieldLabelStyle(DsTokens tokens) => tokens.labelMd
     .toTextStyle(color: tokens.colorText)
-    .copyWith(fontWeight: DsTypography.medium);
+    .copyWith(fontWeight: tokens.mediumLabelFontWeight);
 
 /// A no-op used to render a read-only [DsLink] as an active-looking link.
 void _noop() {}

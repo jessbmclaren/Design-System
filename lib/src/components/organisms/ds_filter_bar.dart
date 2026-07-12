@@ -3,7 +3,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_chip.dart';
 import '../atoms/ds_icon.dart';
@@ -869,7 +868,7 @@ class _DsFilterBarState extends State<DsFilterBar> {
     return Text(
       _filter.conjunction == DsFilterConjunction.and ? 'And' : 'Or',
       style: tokens.bodyMd.toTextStyle(color: tokens.colorText).copyWith(
-            fontWeight: DsTypography.medium,
+            fontWeight: tokens.mediumLabelFontWeight,
           ),
     );
   }

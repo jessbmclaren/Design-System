@@ -54,6 +54,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.labelMd,
     required this.labelSm,
     required this.strongLabelFontWeight,
+    required this.mediumLabelFontWeight,
     // Text
     required this.colorText,
     required this.colorSecondaryText,
@@ -159,6 +160,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.wordmarkFontSize,
     required this.wordmarkLetterSpacing,
     required this.wordmarkHeight,
+    required this.wordmarkPrimaryFontWeight,
+    required this.wordmarkAccentFontWeight,
   });
 
   /// The default Design System light appearance.
@@ -186,6 +189,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       labelMd: DsTypography.labelMd,
       labelSm: DsTypography.labelSm,
       strongLabelFontWeight: DsTypography.semiBold,
+      mediumLabelFontWeight: DsTypography.medium,
       colorText: DsColors.textPrimary,
       colorSecondaryText: DsColors.textSecondary,
       colorBorder: DsColors.border,
@@ -293,6 +297,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       wordmarkFontSize: 22,
       wordmarkLetterSpacing: -0.2,
       wordmarkHeight: 1,
+      wordmarkPrimaryFontWeight: DsTypography.semiBold,
+      wordmarkAccentFontWeight: DsTypography.bold,
     );
   }
 
@@ -446,6 +452,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The font weight for strong labels: group legends, table headers and
   /// other short emphasised runs. Defaults to [DsTypography.semiBold].
   final FontWeight strongLabelFontWeight;
+
+  /// The font weight for medium-emphasis text: a field label, a picker value,
+  /// a selected row. One step below [strongLabelFontWeight]. Defaults to
+  /// [DsTypography.medium].
+  final FontWeight mediumLabelFontWeight;
 
   // Text ----------------------------------------------------------------
 
@@ -824,6 +835,14 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// occupies exactly its glyph height in chrome and headers.
   final double wordmarkHeight;
 
+  /// The font weight of the wordmark's primary part. Defaults to
+  /// [DsTypography.semiBold]; a skin retunes the mark's weight here.
+  final FontWeight wordmarkPrimaryFontWeight;
+
+  /// The font weight of the wordmark's optional accent part. Defaults to
+  /// [DsTypography.bold], one step heavier than the primary.
+  final FontWeight wordmarkAccentFontWeight;
+
   @override
   DsTokens copyWith({
     String? fontFamily,
@@ -845,6 +864,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     DsTypeToken? labelMd,
     DsTypeToken? labelSm,
     FontWeight? strongLabelFontWeight,
+    FontWeight? mediumLabelFontWeight,
     Color? colorText,
     Color? colorSecondaryText,
     Color? colorBorder,
@@ -940,6 +960,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? wordmarkFontSize,
     double? wordmarkLetterSpacing,
     double? wordmarkHeight,
+    FontWeight? wordmarkPrimaryFontWeight,
+    FontWeight? wordmarkAccentFontWeight,
   }) {
     return DsTokens(
       fontFamily: fontFamily ?? this.fontFamily,
@@ -962,6 +984,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       labelSm: labelSm ?? this.labelSm,
       strongLabelFontWeight:
           strongLabelFontWeight ?? this.strongLabelFontWeight,
+      mediumLabelFontWeight:
+          mediumLabelFontWeight ?? this.mediumLabelFontWeight,
       colorText: colorText ?? this.colorText,
       colorSecondaryText: colorSecondaryText ?? this.colorSecondaryText,
       colorBorder: colorBorder ?? this.colorBorder,
@@ -1111,6 +1135,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       wordmarkLetterSpacing:
           wordmarkLetterSpacing ?? this.wordmarkLetterSpacing,
       wordmarkHeight: wordmarkHeight ?? this.wordmarkHeight,
+      wordmarkPrimaryFontWeight:
+          wordmarkPrimaryFontWeight ?? this.wordmarkPrimaryFontWeight,
+      wordmarkAccentFontWeight:
+          wordmarkAccentFontWeight ?? this.wordmarkAccentFontWeight,
     );
   }
 
@@ -1145,6 +1173,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       labelSm: t < 0.5 ? labelSm : other.labelSm,
       strongLabelFontWeight: FontWeight.lerp(
           strongLabelFontWeight, other.strongLabelFontWeight, t)!,
+      mediumLabelFontWeight: FontWeight.lerp(
+          mediumLabelFontWeight, other.mediumLabelFontWeight, t)!,
       colorText: c(colorText, other.colorText),
       colorSecondaryText: c(colorSecondaryText, other.colorSecondaryText),
       colorBorder: c(colorBorder, other.colorBorder),
@@ -1306,6 +1336,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       wordmarkLetterSpacing:
           d(wordmarkLetterSpacing, other.wordmarkLetterSpacing),
       wordmarkHeight: d(wordmarkHeight, other.wordmarkHeight),
+      wordmarkPrimaryFontWeight: FontWeight.lerp(
+          wordmarkPrimaryFontWeight, other.wordmarkPrimaryFontWeight, t)!,
+      wordmarkAccentFontWeight: FontWeight.lerp(
+          wordmarkAccentFontWeight, other.wordmarkAccentFontWeight, t)!,
     );
   }
 
@@ -1333,6 +1367,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           labelMd == other.labelMd &&
           labelSm == other.labelSm &&
           strongLabelFontWeight == other.strongLabelFontWeight &&
+          mediumLabelFontWeight == other.mediumLabelFontWeight &&
           colorText == other.colorText &&
           colorSecondaryText == other.colorSecondaryText &&
           colorBorder == other.colorBorder &&
@@ -1430,7 +1465,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
           brandTintColor == other.brandTintColor &&
           wordmarkFontSize == other.wordmarkFontSize &&
           wordmarkLetterSpacing == other.wordmarkLetterSpacing &&
-          wordmarkHeight == other.wordmarkHeight;
+          wordmarkHeight == other.wordmarkHeight &&
+          wordmarkPrimaryFontWeight == other.wordmarkPrimaryFontWeight &&
+          wordmarkAccentFontWeight == other.wordmarkAccentFontWeight;
   }
 
   @override
@@ -1455,6 +1492,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         labelMd,
         labelSm,
         strongLabelFontWeight,
+        mediumLabelFontWeight,
         colorText,
         colorSecondaryText,
         colorBorder,
@@ -1550,5 +1588,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         wordmarkFontSize,
         wordmarkLetterSpacing,
         wordmarkHeight,
+        wordmarkPrimaryFontWeight,
+        wordmarkAccentFontWeight,
       ]);
 }

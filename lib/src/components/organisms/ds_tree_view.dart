@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
-import '../../tokens/ds_typography.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_icon.dart';
 
@@ -591,7 +590,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: tokens.bodySm.toTextStyle(color: tokens.colorText).copyWith(
-                fontWeight: widget.selected ? DsTypography.medium : null,
+                fontWeight: widget.selected ? tokens.mediumLabelFontWeight : null,
               ),
         ),
         if (node.subtitle != null) ...[

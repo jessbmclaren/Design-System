@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_typography.dart';
 
 /// A two-tone product wordmark.
 ///
@@ -59,12 +58,12 @@ class DsWordmark extends StatelessWidget {
         children: <TextSpan>[
           TextSpan(
             text: primary,
-            style: base.copyWith(fontWeight: DsTypography.semiBold),
+            style: base.copyWith(fontWeight: tokens.wordmarkPrimaryFontWeight),
           ),
           if (accent != null)
             TextSpan(
               text: accent,
-              style: base.copyWith(fontWeight: DsTypography.bold),
+              style: base.copyWith(fontWeight: tokens.wordmarkAccentFontWeight),
             ),
         ],
       ),
