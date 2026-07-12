@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_field_label.dart';
 import 'ds_form_field_group.dart';
 import 'ds_select.dart';
@@ -410,6 +409,7 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     final config = widget.config;
     final enabled = widget.enabled && widget.onChanged != null;
     final showCountrySelect = widget.countryReadback == null &&
@@ -517,13 +517,13 @@ class _DsAddressFieldGroupState extends State<DsAddressFieldGroup> {
         // A single-market flow states the country once as a read-back line
         // rather than asking for it.
         if (widget.countryReadback != null) ...<Widget>[
-          const SizedBox(height: DsSpacing.lg),
+          SizedBox(height: tokens.spacingUnit * 2),
           _CountryReadback(
             label: config.countryLabel,
             value: widget.countryReadback!,
           ),
         ],
-        const SizedBox(height: DsSpacing.lg),
+        SizedBox(height: tokens.spacingUnit * 2),
         DsFormFieldGroup(columns: 2, children: pairedFields),
       ],
     );

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_chart_palette.dart';
-import '../../tokens/ds_typography.dart';
 
 /// A single named line in a [DsLineChart].
 ///
@@ -130,7 +129,7 @@ class DsLineChart extends StatelessWidget {
     // The painter uses TextPainter, which does not inherit the theme font;
     // stamp the resolved family onto the axis label style.
     final themed = Theme.of(context).textTheme.bodyMedium;
-    final axisStyle = DsTypography.bodySm
+    final axisStyle = tokens.bodySm
         .toTextStyle(color: tokens.colorSecondaryText)
         .copyWith(
           fontFamily: themed?.fontFamily,
@@ -168,7 +167,7 @@ class DsLineChart extends StatelessWidget {
               _Legend(
                 series: series,
                 colors: colors,
-                labelStyle: DsTypography.bodySm
+                labelStyle: tokens.bodySm
                     .toTextStyle(color: tokens.colorSecondaryText),
               ),
               SizedBox(height: tokens.spacingUnit * 1.5),
