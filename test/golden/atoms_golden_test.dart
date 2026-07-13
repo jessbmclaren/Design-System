@@ -205,6 +205,21 @@ void main() {
     dsGoldenMatrix(
         'atom', 'sparkline', () => const DsSparkline(values: [3, 5, 2, 8, 6, 9, 7]));
 
+    dsGoldenMatrix(
+      'atom',
+      'segmented_control',
+      () => Center(
+        child: DsSegmentedControl<bool>(
+          value: true,
+          onChanged: (_) {},
+          segments: const <DsSegment<bool>>[
+            DsSegment(value: true, label: 'Asc', icon: DsIcons.arrowUp),
+            DsSegment(value: false, label: 'Desc', icon: DsIcons.arrowDown),
+          ],
+        ),
+      ),
+    );
+
     dsGoldenMatrix('atom', 'spinner', () => const DsSpinner());
 
     dsGoldenMatrix(
