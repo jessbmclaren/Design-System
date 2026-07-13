@@ -169,6 +169,15 @@ void main() {
           },
         );
 
+    // The stage's own scroll view, scoped to the DemoStageCard so it ignores
+    // the vertical scroll view the harness wraps everything in. The stage frames
+    // the demo in a horizontal scroller, so a demo wider than the stage scrolls
+    // rather than overflowing.
+    Finder stageScroller() => find.descendant(
+          of: find.byType(DemoStageCard),
+          matching: find.byType(SingleChildScrollView),
+        );
+
     testWidgets('desktop fills a roomy stage', (tester) async {
       late double childWidth;
       await _pump(
@@ -189,8 +198,11 @@ void main() {
       );
       // Laid out at the floor, not squeezed to 194.
       expect(childWidth, moreOrLessEquals(320, epsilon: 0.5));
-      // And made scrollable rather than overflowing.
-      expect(find.byType(SingleChildScrollView), findsWidgets);
+      // Framed in the stage's own horizontal scroller (scoped to the stage, not
+      // the harness's outer scroll view), so a wider demo scrolls not overflows.
+      expect(stageScroller(), findsOneWidget);
+      expect(tester.widget<SingleChildScrollView>(stageScroller()).scrollDirection,
+          Axis.horizontal);
       expect(tester.takeException(), isNull);
     });
 
@@ -226,7 +238,9 @@ void main() {
         width: 500, // inner 444 < 768 tablet
       );
       expect(childWidth, moreOrLessEquals(768, epsilon: 0.5));
-      expect(find.byType(SingleChildScrollView), findsWidgets);
+      expect(stageScroller(), findsOneWidget);
+      expect(tester.widget<SingleChildScrollView>(stageScroller()).scrollDirection,
+          Axis.horizontal);
       expect(tester.takeException(), isNull);
     });
 
@@ -366,7 +380,7 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Reset restores knobs but keeps the chosen viewport', (tester) async {
+    testWidgets('Reset restores the knobs but keeps the chosen viewport', (tester) async {
       final handle = tester.ensureSemantics();
       await _pump(tester, panel(), width: 900);
 
@@ -374,17 +388,54 @@ void main() {
       await tester.tap(find.byTooltip('Phone'));
       await tester.pump();
 
-      // Change a knob (the Label text field is the first DsTextField in Controls).
-      final labelField = find.widgetWithText(DsTextField, 'Email');
-      await tester.enterText(labelField.first, 'Work email');
+      // Turn the Label knob (its own field, labelled 'Label' — not the live
+      // preview, whose label happens to read 'Email'). The live component
+      // re-renders with the new label, so the edit is observable.
+      await tester.enterText(find.widgetWithText(DsTextField, 'Label'), 'Work email');
       await tester.pump();
+      expect(find.text('Work email'), findsWidgets, reason: 'the knob edit should take');
 
       await tester.tap(find.widgetWithText(DsButton, 'Reset'));
       await tester.pump();
 
-      // Viewport survives the reset...
+      // The knob is restored to its seeded value...
+      expect(find.text('Work email'), findsNothing,
+          reason: 'Reset should restore the knob to its initial value');
+      // ...but the chosen viewport survives the reset.
       expect(tester.getSemantics(find.bySemanticsLabel('Phone preview')),
           isSemantics(isSelected: true));
+      expect(tester.takeException(), isNull);
+      handle.dispose();
+    });
+
+    testWidgets('a real button keeps its natural width at every viewport (reported bug)', (tester) async {
+      // The exact reported case: the live DsButton must not stretch to the
+      // 768dp tablet width and clip its label. At a 760dp panel the side-by-side
+      // stage is ~374dp, narrower than the tablet viewport, so this drives the
+      // scroll path that previously ballooned the button.
+      final handle = tester.ensureSemantics();
+      await _pump(tester, PlaygroundPanel(spec: playgroundFor('action-buttons')!), width: 760);
+      final button = find.widgetWithText(DsButton, 'Save changes');
+      double buttonWidth() => tester.getSize(button).width;
+      final desktopWidth = buttonWidth();
+
+      await tester.tap(find.byTooltip('Tablet'));
+      await tester.pumpAndSettle();
+      // Guard against a vacuous pass: prove the viewport actually switched, so
+      // the width check below is genuinely exercising the tablet path.
+      expect(tester.getSemantics(find.bySemanticsLabel('Tablet preview')),
+          isSemantics(isSelected: true));
+      expect(buttonWidth(), lessThan(320),
+          reason: 'button stretched to ${buttonWidth()} at tablet');
+      // A label-sized button is the same width whichever viewport is chosen.
+      expect(buttonWidth(), moreOrLessEquals(desktopWidth, epsilon: 1));
+
+      await tester.tap(find.byTooltip('Phone'));
+      await tester.pumpAndSettle();
+      expect(tester.getSemantics(find.bySemanticsLabel('Phone preview')),
+          isSemantics(isSelected: true));
+      expect(buttonWidth(), lessThan(320),
+          reason: 'button stretched to ${buttonWidth()} at phone');
       expect(tester.takeException(), isNull);
       handle.dispose();
     });
