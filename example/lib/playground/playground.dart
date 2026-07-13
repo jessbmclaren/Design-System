@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 import '../ui/code_block.dart';
+import '../ui/demo_stage.dart';
 import '../ui/docs_style.dart';
 
 /// A single interactive control in a component [PlaygroundSpec].
@@ -81,6 +82,7 @@ class PlaygroundPanel extends StatefulWidget {
 class _PlaygroundPanelState extends State<PlaygroundPanel> {
   late Map<String, Object?> _values;
   final Map<String, TextEditingController> _controllers = {};
+  DemoViewport _viewport = DemoViewport.desktop;
 
   @override
   void initState() {
@@ -146,29 +148,22 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
     final docs = DocsColors.of(context);
     final spec = widget.spec;
 
-    final stage = Container(
-      decoration: BoxDecoration(
-        color: docs.surface,
-        border: Border.all(color: docs.separator),
-        borderRadius: BorderRadius.circular(DocsRadii.lg),
-        boxShadow: DocsShadows.card,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: Builder(builder: (context) => spec.builder(context, _values)),
-        ),
-      ),
+    // The live component, framed in the shared stage so the playground and the
+    // static demos wear the same viewport switch and the same surface.
+    final stage = DemoStageCard(
+      viewport: _viewport,
+      minHeight: 180,
+      child: Builder(builder: (context) => spec.builder(context, _values)),
     );
 
-    final knobs = Column(
+    final controls = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
             Expanded(
-              child: Text('Playground', style: DocsType.headline(docs.textPrimary)),
+              child: Text('Controls', style: DocsType.headline(docs.textPrimary)),
             ),
             DsButton(
               label: 'Reset',
@@ -177,10 +172,10 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 18),
         for (final knob in spec.knobs) ...[
           _control(knob),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
         ],
       ],
     );
@@ -188,30 +183,44 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // One header spanning the whole panel: the "Playground" title on the
+        // left and the viewport switch on the right, so the stage and the
+        // controls read as one unit rather than two stacked headings.
+        DemoSectionHeader(
+          title: 'Playground',
+          trailingBuilder: (compact) => DemoViewportControl(
+            value: _viewport,
+            onChanged: (v) => setState(() => _viewport = v),
+            compact: compact,
+          ),
+        ),
+        const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth >= 720) {
+              // Stage grows to fill the row; the controls hold a steady column
+              // on the right. Top-aligned so both start on the same line.
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: SizedBox(height: 260, child: stage)),
-                  const SizedBox(width: 24),
-                  SizedBox(width: 300, child: knobs),
+                  Expanded(child: stage),
+                  const SizedBox(width: 28),
+                  SizedBox(width: 300, child: controls),
                 ],
               );
             }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 220, child: stage),
-                const SizedBox(height: 16),
-                knobs,
+                stage,
+                const SizedBox(height: 24),
+                controls,
               ],
             );
           },
         ),
         if (spec.code != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           CodeBlock(code: spec.code!(_values)),
         ],
       ],

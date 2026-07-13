@@ -198,6 +198,13 @@ abstract final class DocsMetrics {
   static const double pagePaddingX = 44;
   static const double pagePaddingY = 52;
 
+  /// Vertical rhythm for a pattern page: a single gap between major sections
+  /// and a single title-to-body gap, so the page reads on a regular beat
+  /// rather than an ad-hoc mix of spacings.
+  static const double sectionGap = 44;
+  static const double sectionHeaderGap = 18;
+  static const double proseGap = 22;
+
   /// Uniform icon-catalogue cell so the grid is a perfect matrix.
   static const double iconCellWidth = 120;
   static const double iconCellHeight = 104;

@@ -72,7 +72,7 @@ class _PatternPageViewState extends State<PatternPageView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Eyebrow(label: page.group.label),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   // Scales the tight display title down on very narrow columns
                   // (a long single word at 320dp) rather than wrapping or clipping.
                   FittedBox(
@@ -94,38 +94,41 @@ class _PatternPageViewState extends State<PatternPageView> {
                   const SizedBox(height: 32),
                   for (final block in page.blocks) ...[
                     _block(block),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: DocsMetrics.proseGap),
                   ],
                   if (playground != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     PlaygroundPanel(
                       key: ValueKey('pg-${page.id}'),
                       spec: playground,
                     ),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: DocsMetrics.sectionGap),
                   ] else if (page.hasLiveDemo && demo != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     DeviceFrame(child: demo),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: DocsMetrics.sectionGap),
                   ],
                   if (page.dos.isNotEmpty || page.donts.isNotEmpty) ...[
                     Text('Guidelines', style: DocsType.title2(docs.textPrimary)),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: DocsMetrics.sectionHeaderGap),
                     DoDont(dos: page.dos, donts: page.donts),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: DocsMetrics.sectionGap),
                   ],
                   if (page.code != null) ...[
                     Text('Example', style: DocsType.title2(docs.textPrimary)),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: DocsMetrics.sectionHeaderGap),
                     CodeBlock(code: page.code!.trim()),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: DocsMetrics.sectionGap),
                   ],
                   if (page.related.isNotEmpty) ...[
-                    const SizedBox(height: 44),
+                    // This footer follows a major section (a live demo,
+                    // Guidelines or Example), whose trailing sectionGap supplies
+                    // the space above the divider, so it adds no leading gap of
+                    // its own and avoids a doubled gap.
                     Divider(color: docs.separator, height: 1),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     Text('See also', style: DocsType.title3(docs.textPrimary)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: DocsMetrics.sectionHeaderGap),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         // Cards keep their comfortable width on wide layouts and
