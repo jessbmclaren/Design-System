@@ -45,9 +45,10 @@ final PatternPage filterControlsPage = PatternPage(
         'data is invisible.',
   ],
   code: '''
-// Keep the selected filters in state and narrow the rows in Dart
-// before building the table, so counts stay correct.
-DsStatus? status = DsStatus.active;
+// Status is your own domain enum, not a design-system type: DsFilterChip is
+// generic over whatever value you filter by. Keep the selected filter in state
+// and narrow the rows in Dart before building the table, so counts stay correct.
+Status? status = Status.active;
 
 final visible = people
     .where((p) => status == null || p.status == status)
@@ -59,14 +60,14 @@ Column(
     Wrap(
       spacing: 8,
       children: [
-        DsFilterChip<DsStatus>(
+        DsFilterChip<Status>(
           label: 'Status',
           value: status,
           onChanged: (v) => setState(() => status = v),
           options: const [
-            DsFilterOption(value: DsStatus.active, label: 'Active'),
-            DsFilterOption(value: DsStatus.invited, label: 'Invited'),
-            DsFilterOption(value: DsStatus.paused, label: 'Paused'),
+            DsFilterOption(value: Status.active, label: 'Active'),
+            DsFilterOption(value: Status.invited, label: 'Invited'),
+            DsFilterOption(value: Status.paused, label: 'Paused'),
           ],
         ),
         if (status != null)
