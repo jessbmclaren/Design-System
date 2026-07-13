@@ -35,7 +35,13 @@ are generated, so never hand-edit them. From `example/`:
 ```sh
 dart run tool/generate_markdown.dart          # rewrite docs/patterns/*.md
 dart run tool/generate_markdown.dart --check  # must pass; fails if any twin is stale
+dart run tool/check_snippets.dart             # must pass; every copyable snippet still compiles
 ```
+
+The last step guards the copyable code: it resolves every page's `code:`
+snippet against the live API, so a renamed parameter or dropped enum value
+fails here instead of shipping as broken copy-paste. Run it after regenerating,
+since it reads the twins.
 
 **Run the docs app.**
 

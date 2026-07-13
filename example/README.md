@@ -17,6 +17,9 @@ flutter run -d chrome     # or: -d macos
 dart run tool/generate_markdown.dart
 dart run tool/generate_markdown.dart --check   # fail if any twin is stale
 
+# Prove every copyable snippet still compiles against the live API
+dart run tool/check_snippets.dart              # fail if a snippet no longer resolves
+
 # Regenerate the screenshots embedded in the markdown twins
 flutter test test/screenshots/screenshots.dart --update-goldens
 ```

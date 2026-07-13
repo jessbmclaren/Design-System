@@ -84,7 +84,7 @@ Every component is built to be usable by everyone, across screen sizes and text 
 - `flutter analyze` clean and `flutter test` green, including the 320dp and semantics checks.
 - Exported from the barrel in its layer group.
 - A `///` doc comment on the component and its public members.
-- A content-model page at `example/lib/content/pages/<id>.dart`, then `dart run tool/generate_markdown.dart` from `example/` with `--check` passing.
+- A content-model page at `example/lib/content/pages/<id>.dart`, then `dart run tool/generate_markdown.dart` from `example/` with `--check` passing, and `dart run tool/check_snippets.dart` passing so the page's copyable `code:` snippet still compiles against the live API.
 - Renders correctly in light and dark, and under a skin such as `DsSkins.engenLight()`.
 - Listed in the README component table.
 
@@ -95,4 +95,7 @@ All user-facing pattern copy lives in the content model at `example/lib/content/
 ```sh
 dart run tool/generate_markdown.dart          # rewrite docs/patterns/*.md
 dart run tool/generate_markdown.dart --check   # must pass; fails if any twin is stale
+dart run tool/check_snippets.dart              # must pass; every copyable snippet still compiles
 ```
+
+`check_snippets.dart` reads the generated twins, so run it after regenerating. It wraps each page's `code:` snippet and resolves it against the real components, turning a renamed parameter or dropped enum value into a build failure instead of broken copy-paste.
