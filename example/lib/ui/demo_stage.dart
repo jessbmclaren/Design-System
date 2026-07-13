@@ -48,15 +48,18 @@ class DemoSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final docs = DocsColors.of(context);
-    // Announced as a section heading (so screen-reader users can jump between
-    // demos), and ellipsised rather than clipped when the row is tight.
-    final label = Semantics(
-      header: true,
-      child: Text(
-        title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: DocsType.headline(docs.textPrimary),
+    // Announced as a single section-heading node (so screen-reader users can
+    // jump between demos), and ellipsised rather than clipped when the row is
+    // tight.
+    final label = MergeSemantics(
+      child: Semantics(
+        header: true,
+        child: Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: DocsType.headline(docs.textPrimary),
+        ),
       ),
     );
     if (trailingBuilder == null) return label;
