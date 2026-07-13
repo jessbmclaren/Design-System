@@ -131,22 +131,32 @@ class DemoStageCard extends StatelessWidget {
           // 320 and scroll rather than squeeze the demo until it overflows.
           if (w == null) {
             if (available >= _minStageWidth) return Center(child: child);
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: _ConstrainedViewport(width: _minStageWidth, child: child),
-            );
+            return _centredScroll(available, _minStageWidth);
           }
 
-          // A fixed phone/tablet width: centre it when it fits, else scroll the
-          // fixed-width box horizontally rather than overflowing. `content` is a
-          // bounded box (never Center) so the scroll view has a bounded child.
-          final content = _ConstrainedViewport(width: w, child: child);
-          if (w <= available) return Center(child: content);
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: content,
-          );
+          // A fixed phone/tablet viewport: cap the demo at that width, centre it
+          // in the stage, and scroll only when the demo itself is wider than the
+          // stage. So a button stays button-sized and fully visible, while a
+          // full-width form reflows to the viewport and scrolls.
+          return _centredScroll(available, w);
         },
+      ),
+    );
+  }
+
+  /// Frames the demo at [viewportWidth], centred in the stage, and scrolls
+  /// horizontally only when the laid-out demo is wider than the [available]
+  /// stage. The `minWidth: available` on the inner box means a narrow demo
+  /// centres and stays fully visible, while a demo that fills the viewport
+  /// grows past the stage and scrolls instead of overflowing.
+  Widget _centredScroll(double available, double viewportWidth) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: available),
+        child: Center(
+          child: _ConstrainedViewport(width: viewportWidth, child: child),
+        ),
       ),
     );
   }
@@ -155,19 +165,20 @@ class DemoStageCard extends StatelessWidget {
 class _ConstrainedViewport extends StatelessWidget {
   const _ConstrainedViewport({required this.width, required this.child});
 
-  final double? width;
+  final double width;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (width == null) return child;
     final media = MediaQuery.of(context);
-    // Constrain the width AND report that width to MediaQuery so components
-    // that read the window size resolve their breakpoints against the frame.
-    return SizedBox(
-      width: width,
-      child: MediaQuery(
-        data: media.copyWith(size: Size(width!, media.size.height)),
+    // Cap the demo at the viewport width and report that width to MediaQuery so
+    // width-responsive demos resolve their breakpoints against the frame. A cap
+    // (not a fixed size) keeps a fixed-width control at its natural size while a
+    // width-filling demo still expands to the viewport.
+    return MediaQuery(
+      data: media.copyWith(size: Size(width, media.size.height)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: width),
         child: child,
       ),
     );

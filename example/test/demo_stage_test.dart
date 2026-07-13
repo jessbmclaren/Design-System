@@ -230,6 +230,38 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('a fixed-width demo keeps its natural size, not stretched to the viewport', (tester) async {
+      // Regression: a button-sized control must not balloon to the 768dp tablet
+      // viewport width (which clipped its label).
+      await _pump(
+        tester,
+        DemoStageCard(
+          viewport: DemoViewport.tablet,
+          child: const SizedBox(key: ValueKey('natural'), width: 120, height: 40),
+        ),
+        width: 500,
+      );
+      expect(tester.getSize(find.byKey(const ValueKey('natural'))).width,
+          moreOrLessEquals(120, epsilon: 0.5));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a width-filling demo still expands to the viewport', (tester) async {
+      // The natural-size treatment must not stop a form-style demo from filling
+      // the viewport width.
+      await _pump(
+        tester,
+        DemoStageCard(
+          viewport: DemoViewport.tablet,
+          child: const SizedBox(key: ValueKey('fill'), width: double.infinity, height: 40),
+        ),
+        width: 500,
+      );
+      expect(tester.getSize(find.byKey(const ValueKey('fill'))).width,
+          moreOrLessEquals(768, epsilon: 0.5));
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('honours minHeight so a small demo does not float in a thin band', (tester) async {
       await _pump(
         tester,
