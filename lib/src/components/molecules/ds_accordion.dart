@@ -3,6 +3,7 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
+import '../atoms/ds_icon.dart';
 import '../../util/ds_motion.dart';
 
 /// A single collapsible section within a [DsAccordion].
@@ -238,8 +239,8 @@ class _DsAccordionSection extends StatelessWidget {
                     turns: expanded ? 0.5 : 0,
                     duration: motion,
                     curve: curve,
-                    child: Icon(
-                      DsIcons.expandMore,
+                    child: DsIcon(
+                      icon: DsIcons.expandMore,
                       size: DsIconSize.md,
                       color: tokens.colorSecondaryText,
                     ),

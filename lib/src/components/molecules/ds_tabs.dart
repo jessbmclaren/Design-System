@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../atoms/ds_icon.dart';
 
 /// A single entry in a [DsTabs] bar.
 ///
@@ -123,7 +124,7 @@ class _DsTabItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (tab.icon != null) ...[
-                Icon(tab.icon, size: 18, color: color),
+                DsIcon(icon: tab.icon!, color: color),
                 const SizedBox(width: 8),
               ],
               Text(
