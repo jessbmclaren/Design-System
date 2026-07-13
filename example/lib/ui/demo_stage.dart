@@ -87,11 +87,14 @@ class DemoSectionHeader extends StatelessWidget {
   }
 }
 
-/// The framed stage a live demo renders inside: a white surface card that
-/// constrains its [child] to the chosen [viewport] width, centres it when it
-/// fits and scrolls it horizontally when the demoed width is wider than the
-/// stage rather than overflowing. A [minHeight] gives the stage presence so a
-/// small component does not float in a shallow band.
+/// The framed stage a live demo renders inside: a surface card sized to the
+/// chosen [viewport] and centred on the page, so switching Phone / Tablet /
+/// Desktop visibly resizes the preview — a phone renders in a narrow card, a
+/// desktop fills the stage. The demo keeps its natural size inside the card (a
+/// fixed-width control stays centred; a width-filling demo expands to the
+/// card), and the card scrolls horizontally when the device is wider than the
+/// available stage rather than overflowing. A [minHeight] gives the card
+/// presence so a small demo does not float in a shallow band.
 class DemoStageCard extends StatelessWidget {
   const DemoStageCard({
     super.key,
@@ -103,84 +106,63 @@ class DemoStageCard extends StatelessWidget {
   final DemoViewport viewport;
   final Widget child;
 
-  /// A floor for the stage height so short demos still read as a deliberate
+  /// A floor for the card height so short demos still read as a deliberate
   /// stage rather than a thin strip.
   final double minHeight;
 
   @override
   Widget build(BuildContext context) {
     final docs = DocsColors.of(context);
-    return Container(
-      width: double.infinity,
-      constraints: BoxConstraints(minHeight: minHeight),
-      decoration: BoxDecoration(
-        color: docs.surface,
-        borderRadius: BorderRadius.circular(DocsRadii.lg),
-        border: Border.all(color: docs.separator),
-        boxShadow: DocsShadows.card,
-      ),
-      padding: const EdgeInsets.all(28),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final available = constraints.maxWidth;
-          final w = viewport.width;
-
-          // Desktop fills the stage — but never lays a demo out below the
-          // 320dp small-phone width every component is built for. On a stage
-          // narrower than that floor (a phone-width reading column), render at
-          // 320 and scroll rather than squeeze the demo until it overflows.
-          if (w == null) {
-            if (available >= _minStageWidth) return Center(child: child);
-            return _centredScroll(available, _minStageWidth);
-          }
-
-          // A fixed phone/tablet viewport: cap the demo at that width, centre it
-          // in the stage, and scroll only when the demo itself is wider than the
-          // stage. So a button stays button-sized and fully visible, while a
-          // full-width form reflows to the viewport and scrolls.
-          return _centredScroll(available, w);
-        },
-      ),
-    );
-  }
-
-  /// Frames the demo at [viewportWidth], centred in the stage, and scrolls
-  /// horizontally only when the laid-out demo is wider than the [available]
-  /// stage. The `minWidth: available` on the inner box means a narrow demo
-  /// centres and stays fully visible, while a demo that fills the viewport
-  /// grows past the stage and scrolls instead of overflowing.
-  Widget _centredScroll(double available, double viewportWidth) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: available),
-        child: Center(
-          child: _ConstrainedViewport(width: viewportWidth, child: child),
-        ),
-      ),
-    );
-  }
-}
-
-class _ConstrainedViewport extends StatelessWidget {
-  const _ConstrainedViewport({required this.width, required this.child});
-
-  final double width;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    // Cap the demo at the viewport width and report that width to MediaQuery so
-    // width-responsive demos resolve their breakpoints against the frame. A cap
-    // (not a fixed size) keeps a fixed-width control at its natural size while a
-    // width-filling demo still expands to the viewport.
-    return MediaQuery(
-      data: media.copyWith(size: Size(width, media.size.height)),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: width),
-        child: child,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final available = constraints.maxWidth;
+        final w = viewport.width;
+
+        // The card wraps a device-width "screen" plus its padding matte, so the
+        // demo's usable width IS the device width (a demo built for 320dp gets a
+        // full 320, not 320 minus padding). Desktop fills the stage down to the
+        // 320dp floor; Phone and Tablet size the screen to the device and report
+        // that width to MediaQuery so responsive demos resolve against it.
+        const chrome = 58.0; // padding (28 × 2) + hairline border (1 × 2)
+        final double cardWidth;
+        Widget content = child;
+        if (w == null) {
+          cardWidth =
+              available - chrome >= _minStageWidth ? available : _minStageWidth + chrome;
+        } else {
+          cardWidth = w + chrome;
+          content = MediaQuery(
+            data: media.copyWith(size: Size(w, media.size.height)),
+            child: child,
+          );
+        }
+
+        final card = Container(
+          width: cardWidth,
+          constraints: BoxConstraints(minHeight: minHeight),
+          decoration: BoxDecoration(
+            color: docs.surface,
+            borderRadius: BorderRadius.circular(DocsRadii.lg),
+            border: Border.all(color: docs.separator),
+            boxShadow: DocsShadows.card,
+          ),
+          padding: const EdgeInsets.all(28),
+          // Natural size inside the card: a width-filling demo expands to it, a
+          // fixed-width control stays centred rather than stretching.
+          child: Center(child: content),
+        );
+
+        // Centre the device-width card on the stage; scroll it when the device
+        // is wider than the available width rather than overflowing.
+        if (cardWidth <= available) {
+          return Align(alignment: Alignment.topCenter, child: card);
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: card,
+        );
+      },
     );
   }
 }
