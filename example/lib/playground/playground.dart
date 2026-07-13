@@ -90,6 +90,20 @@ class _PlaygroundPanelState extends State<PlaygroundPanel> {
     _seed();
   }
 
+  @override
+  void didUpdateWidget(PlaygroundPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the panel is reused for a different component, re-seed from the new
+    // spec and dispose the old text controllers so they do not leak.
+    if (widget.spec != oldWidget.spec) {
+      for (final controller in _controllers.values) {
+        controller.dispose();
+      }
+      _controllers.clear();
+      _seed();
+    }
+  }
+
   void _seed() {
     _values = {for (final knob in widget.spec.knobs) knob.id: knob.initial};
     for (final knob in widget.spec.knobs) {
