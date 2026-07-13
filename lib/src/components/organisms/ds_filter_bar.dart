@@ -6,6 +6,7 @@ import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_chip.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_segmented_control.dart';
 import '../atoms/ds_switch.dart';
 import '../molecules/ds_date_field.dart';
 import '../molecules/ds_select.dart';
@@ -859,9 +860,21 @@ class _DsFilterBarState extends State<DsFilterBar> {
     if (index == 1) {
       return Align(
         alignment: Alignment.centerLeft,
-        child: _ConjunctionToggle(
+        child: DsSegmentedControl<DsFilterConjunction>(
           value: _filter.conjunction,
           onChanged: _setConjunction,
+          segments: const <DsSegment<DsFilterConjunction>>[
+            DsSegment(
+              value: DsFilterConjunction.and,
+              label: 'And',
+              semanticLabel: 'Match all conditions',
+            ),
+            DsSegment(
+              value: DsFilterConjunction.or,
+              label: 'Or',
+              semanticLabel: 'Match any condition',
+            ),
+          ],
         ),
       );
     }
@@ -994,81 +1007,6 @@ class _DsFilterBarState extends State<DsFilterBar> {
         child: Text(
           text,
           style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
-        ),
-      ),
-    );
-  }
-}
-
-/// A compact two-segment And/Or control driving a [DsFilter]'s conjunction.
-class _ConjunctionToggle extends StatelessWidget {
-  const _ConjunctionToggle({required this.value, required this.onChanged});
-
-  final DsFilterConjunction value;
-  final ValueChanged<DsFilterConjunction> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final radius = BorderRadius.circular(tokens.formBorderRadius);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: tokens.colorBorder),
-        borderRadius: radius,
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _segment(
-              tokens,
-              label: 'And',
-              semanticsLabel: 'Match all conditions',
-              selected: value == DsFilterConjunction.and,
-              onTap: () => onChanged(DsFilterConjunction.and),
-            ),
-            _segment(
-              tokens,
-              label: 'Or',
-              semanticsLabel: 'Match any condition',
-              selected: value == DsFilterConjunction.or,
-              onTap: () => onChanged(DsFilterConjunction.or),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _segment(
-    DsTokens tokens, {
-    required String label,
-    required String semanticsLabel,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: semanticsLabel,
-      excludeSemantics: true,
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            color: selected ? tokens.formAccentColor : null,
-            constraints: const BoxConstraints(minHeight: 40),
-            padding: EdgeInsets.symmetric(horizontal: tokens.spacingUnit),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: tokens.labelMd.toTextStyle(
-                color: selected ? Colors.white : tokens.colorSecondaryText,
-              ),
-            ),
-          ),
         ),
       ),
     );

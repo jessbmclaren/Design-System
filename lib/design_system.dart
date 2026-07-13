@@ -49,6 +49,7 @@ export 'src/components/atoms/ds_inline.dart';
 export 'src/components/atoms/ds_link.dart';
 export 'src/components/atoms/ds_progress_bar.dart';
 export 'src/components/atoms/ds_radio.dart';
+export 'src/components/atoms/ds_segmented_control.dart';
 export 'src/components/atoms/ds_spinner.dart';
 export 'src/components/atoms/ds_sparkline.dart';
 export 'src/components/atoms/ds_step_header.dart';

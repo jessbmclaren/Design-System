@@ -5,6 +5,7 @@ import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_segmented_control.dart';
 import '../molecules/ds_select.dart';
 import 'ds_data_grid.dart';
 
@@ -189,9 +190,23 @@ class DsSortBuilder extends StatelessWidget {
       },
     );
 
-    final direction = _DirectionToggle(
-      ascending: sort.ascending,
+    final direction = DsSegmentedControl<bool>(
+      value: sort.ascending,
       onChanged: (ascending) => _setAscending(index, ascending),
+      segments: const <DsSegment<bool>>[
+        DsSegment(
+          value: true,
+          label: 'Asc',
+          icon: DsIcons.arrowUp,
+          semanticLabel: 'Sort ascending',
+        ),
+        DsSegment(
+          value: false,
+          label: 'Desc',
+          icon: DsIcons.arrowDown,
+          semanticLabel: 'Sort descending',
+        ),
+      ],
     );
 
     final controls = Row(
@@ -249,90 +264,6 @@ class DsSortBuilder extends StatelessWidget {
         SizedBox(width: tokens.spacingUnit),
         controls,
       ],
-    );
-  }
-}
-
-/// A compact two-segment ascending/descending control for a single sort.
-class _DirectionToggle extends StatelessWidget {
-  const _DirectionToggle({required this.ascending, required this.onChanged});
-
-  final bool ascending;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    final radius = BorderRadius.circular(tokens.formBorderRadius);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: tokens.colorBorder),
-        borderRadius: radius,
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _segment(
-              tokens,
-              label: 'Asc',
-              icon: DsIcons.arrowUp,
-              semanticsLabel: 'Sort ascending',
-              selected: ascending,
-              onTap: () => onChanged(true),
-            ),
-            _segment(
-              tokens,
-              label: 'Desc',
-              icon: DsIcons.arrowDown,
-              semanticsLabel: 'Sort descending',
-              selected: !ascending,
-              onTap: () => onChanged(false),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _segment(
-    DsTokens tokens, {
-    required String label,
-    required IconData icon,
-    required String semanticsLabel,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    final foreground = selected ? Colors.white : tokens.colorSecondaryText;
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: semanticsLabel,
-      excludeSemantics: true,
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            color: selected ? tokens.formAccentColor : null,
-            constraints: const BoxConstraints(minHeight: 40),
-            padding: EdgeInsets.symmetric(horizontal: tokens.spacingUnit),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DsIcon(icon: icon, size: DsIconSize.xs, color: foreground),
-                SizedBox(width: tokens.spacingUnit / 2),
-                Text(
-                  label,
-                  style: tokens.labelMd.toTextStyle(color: foreground),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
