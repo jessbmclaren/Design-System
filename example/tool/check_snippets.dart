@@ -170,11 +170,24 @@ ${p.code}
 }
 
 /// A resolution failure that survived absorption: a real design-system break.
+///
+/// Value equality (not identity) so the report's `.toSet()` collapses the same
+/// break reported twice — e.g. a dropped enum value used twice in one snippet.
 class _Failure {
   _Failure(this.pageId, this.code, this.message);
   final String pageId;
   final String code;
   final String message;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _Failure &&
+      other.pageId == pageId &&
+      other.code == code &&
+      other.message == message;
+
+  @override
+  int get hashCode => Object.hash(pageId, code, message);
 }
 
 /// Run the analyzer, absorbing reader-supplied symbols, until only genuine
