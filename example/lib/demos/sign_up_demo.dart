@@ -64,28 +64,44 @@ class _SignUpDemoState extends State<SignUpDemo> {
   bool _emailTouched = false;
   bool _passwordTouched = false;
 
+  // Whether the user has actually typed into each required-only field. Blur
+  // reveals a required error only for a field they engaged with, so tabbing
+  // forward past an untouched field does not scold them mid-flow. The email and
+  // password validate live once typed, so their edit-signal is their own
+  // touched flag.
+  bool _nameEdited = false;
+  bool _surnameEdited = false;
+  bool _companyEdited = false;
+
   @override
   void initState() {
     super.initState();
-    _touchOnBlur(_nameFocus, () => _nameTouched, () => _nameTouched = true);
-    _touchOnBlur(
-        _surnameFocus, () => _surnameTouched, () => _surnameTouched = true);
-    _touchOnBlur(
-        _companyFocus, () => _companyTouched, () => _companyTouched = true);
-    _touchOnBlur(_emailFocus, () => _emailTouched, () => _emailTouched = true);
-    _touchOnBlur(_passwordFocus, () => _passwordTouched,
+    _touchOnBlur(_nameFocus, () => _nameEdited, () => _nameTouched,
+        () => _nameTouched = true);
+    _touchOnBlur(_surnameFocus, () => _surnameEdited, () => _surnameTouched,
+        () => _surnameTouched = true);
+    _touchOnBlur(_companyFocus, () => _companyEdited, () => _companyTouched,
+        () => _companyTouched = true);
+    _touchOnBlur(_emailFocus, () => _emailTouched, () => _emailTouched,
+        () => _emailTouched = true);
+    _touchOnBlur(_passwordFocus, () => _passwordTouched, () => _passwordTouched,
         () => _passwordTouched = true);
   }
 
   /// Flips a field to "touched" the first time focus leaves it, so a required
-  /// error shows on blur rather than while the user is still typing.
+  /// error shows on blur rather than while the user is still typing. Only a
+  /// field the user has actually engaged with ([isEdited]) reveals on blur, so
+  /// tabbing forward past an untouched field does not scold them.
   void _touchOnBlur(
     FocusNode node,
+    bool Function() isEdited,
     bool Function() isTouched,
     VoidCallback markTouched,
   ) {
     node.addListener(() {
-      if (!node.hasFocus && !isTouched()) setState(markTouched);
+      if (!node.hasFocus && isEdited() && !isTouched()) {
+        setState(markTouched);
+      }
     });
   }
 
@@ -185,7 +201,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
                 focusNode: _nameFocus,
                 hintText: 'Name',
                 textInputAction: TextInputAction.next,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) => setState(() => _nameEdited = true),
                 errorText: _nameTouched
                     ? _requiredError(_name.text, 'Enter your name')
                     : null,
@@ -195,7 +211,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
                 focusNode: _surnameFocus,
                 hintText: 'Surname',
                 textInputAction: TextInputAction.next,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) => setState(() => _surnameEdited = true),
                 errorText: _surnameTouched
                     ? _requiredError(_surname.text, 'Enter your surname')
                     : null,
@@ -208,7 +224,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
             focusNode: _companyFocus,
             hintText: 'Company name',
             textInputAction: TextInputAction.next,
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _companyEdited = true),
             errorText: _companyTouched
                 ? _requiredError(_company.text, 'Enter your company name')
                 : null,
