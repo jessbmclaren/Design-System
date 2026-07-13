@@ -39,6 +39,7 @@ class DsIconButton extends StatelessWidget {
     required this.semanticLabel,
     this.size = 40,
     this.iconSize = DsIconSize.md,
+    this.color,
   });
 
   /// The glyph shown in the centre of the button.
@@ -59,10 +60,15 @@ class DsIconButton extends StatelessWidget {
   /// The glyph size, in logical pixels.
   final double iconSize;
 
+  /// Overrides the glyph and interaction-tint colour. Defaults to
+  /// [DsTokens.colorText]; set it when the button sits on a tinted surface
+  /// (a status banner, a toast) and must match that surface's foreground.
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final Color foreground = tokens.colorText;
+    final Color foreground = color ?? tokens.colorText;
 
     // A flat control with a soft fill that only appears on interaction, tinted
     // from the text colour so it reads on any surface in light or dark.

@@ -8,6 +8,7 @@ import '../atoms/ds_badge.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_icon_button.dart';
 import '../atoms/ds_link.dart';
 import '../atoms/ds_switch.dart';
 import '../molecules/ds_currency_field.dart';
@@ -639,14 +640,12 @@ class _Header extends StatelessWidget {
           ),
           if (onClose != null) ...[
             const SizedBox(width: 4),
-            IconButton(
+            DsIconButton(
+              icon: DsIcons.close,
               onPressed: onClose,
-              icon: const Icon(DsIcons.close),
-              iconSize: 20,
+              semanticLabel: 'Close',
+              iconSize: DsIconSize.lg,
               color: tokens.colorSecondaryText,
-              tooltip: 'Close',
-              // Keep a >=48dp touch target for accessibility.
-              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             ),
           ],
         ],

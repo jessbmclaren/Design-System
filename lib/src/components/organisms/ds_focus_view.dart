@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_icon_size.dart';
+import '../atoms/ds_icon_button.dart';
 
 /// A focused overlay surface for additional context or multi-step flows.
 ///
@@ -75,13 +77,12 @@ class DsFocusView extends StatelessWidget {
               ),
               if (onClose != null) ...[
                 const SizedBox(width: 8),
-                IconButton(
+                DsIconButton(
+                  icon: DsIcons.close,
                   onPressed: onClose,
-                  icon: const Icon(DsIcons.close),
-                  iconSize: 20,
+                  semanticLabel: 'Close',
+                  iconSize: DsIconSize.lg,
                   color: tokens.colorSecondaryText,
-                  tooltip: 'Close',
-                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ],
