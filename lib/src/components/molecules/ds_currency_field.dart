@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../atoms/ds_field_label.dart';
 
 /// A labelled numeric input for collecting monetary amounts.
 ///
@@ -141,12 +142,7 @@ class DsCurrencyField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (label != null) ...<Widget>[
-          Text(
-            label!,
-            style: tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
-                  fontWeight: tokens.mediumLabelFontWeight,
-                ),
-          ),
+          DsFieldLabel(label: label!),
           SizedBox(height: tokens.fieldLabelGap),
         ],
         Semantics(

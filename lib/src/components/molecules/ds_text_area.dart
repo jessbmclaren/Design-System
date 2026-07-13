@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_typography.dart';
+import '../atoms/ds_field_label.dart';
 
 /// A labelled multi-line text input.
 ///
@@ -120,12 +121,7 @@ class DsTextArea extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (label != null) ...<Widget>[
-          Text(
-            label!,
-            style: tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
-                  fontWeight: tokens.mediumLabelFontWeight,
-                ),
-          ),
+          DsFieldLabel(label: label!),
           SizedBox(height: tokens.fieldLabelGap),
         ],
         Semantics(
