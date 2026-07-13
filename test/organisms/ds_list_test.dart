@@ -37,7 +37,7 @@ void main() {
       );
 
       // Three children -> two separating dividers.
-      expect(find.byType(Divider), findsNWidgets(2));
+      expect(find.byType(DsDivider), findsNWidgets(2));
     });
 
     testWidgets('draws no dividers when showDividers is false', (tester) async {
@@ -53,7 +53,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(Divider), findsNothing);
+      expect(find.byType(DsDivider), findsNothing);
     });
 
     testWidgets('bordered wraps the list in a bordered container',

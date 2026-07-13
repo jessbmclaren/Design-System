@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../atoms/ds_divider.dart';
 import '../../tokens/ds_breakpoints.dart';
 
 /// A titled group of related settings rows within a [DsSettingsView].
@@ -145,11 +146,7 @@ class _DsSettingsSectionView extends StatelessWidget {
     for (var i = 0; i < section.children.length; i++) {
       if (i > 0) {
         rows.add(
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: tokens.colorBorder,
-          ),
+          DsDivider(color: tokens.colorBorder),
         );
       }
       rows.add(section.children[i]);

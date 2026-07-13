@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_badge.dart';
+import '../atoms/ds_divider.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon_button.dart';
 import '../atoms/ds_switch.dart';
@@ -225,7 +226,7 @@ class DsCookiePreferences extends StatelessWidget {
               SizedBox(height: unit * 2),
               for (final (index, category) in categories.indexed) ...[
                 if (index > 0)
-                  Divider(height: 1, color: tokens.colorBorderSubtle),
+                  DsDivider(color: tokens.colorBorderSubtle),
                 categoryRow(category),
               ],
               SizedBox(height: unit * 3),

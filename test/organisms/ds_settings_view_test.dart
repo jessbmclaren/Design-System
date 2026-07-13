@@ -79,7 +79,7 @@ void main() {
       );
 
       // Three children within one section => two hairline dividers.
-      expect(find.byType(Divider), findsNWidgets(2));
+      expect(find.byType(DsDivider), findsNWidgets(2));
     });
 
     testWidgets('fires a callback when a section row is tapped', (

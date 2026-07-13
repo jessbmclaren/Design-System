@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../atoms/ds_divider.dart';
 
 /// A vertical list of rows separated by dividers.
 ///
@@ -39,11 +40,7 @@ class DsList extends StatelessWidget {
     for (var i = 0; i < children.length; i++) {
       rows.add(children[i]);
       if (showDividers && i < children.length - 1) {
-        rows.add(Divider(
-          height: 1,
-          thickness: 1,
-          color: tokens.colorBorder,
-        ));
+        rows.add(DsDivider(color: tokens.colorBorder));
       }
     }
 
