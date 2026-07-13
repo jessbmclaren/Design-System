@@ -17,14 +17,20 @@ final RegExp _emailFormat = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 ///
 /// Renders a real [DsSignUpView] as a single brand-led card: a centred
 /// [DsWordmark] header, an "Already have an account?" prompt above the form,
-/// a name and surname row in a [DsFormFieldGroup], live email validation once
-/// the field is touched and a password captioned by
-/// [dsFirstUnmetPasswordRule] with a [DsPasswordStrength] meter beneath. The
-/// fields start pre-filled with valid values so the first frame shows the
-/// complete card with the primary action enabled and the meter reading
-/// strong; editing a field re-runs validation via [setState], so the button
-/// disables the moment any field goes invalid. No timers, network or
-/// randomness. The captured frame is stable.
+/// a name and surname row in a [DsFormFieldGroup] and a password captioned by
+/// [dsFirstUnmetPasswordRule] with a [DsPasswordStrength] meter beneath.
+///
+/// Every required field validates on blur: its error surfaces once focus
+/// leaves it empty and clears live as the user types, so a skipped name or
+/// company is caught without nagging mid-entry, while the email also checks its
+/// format and the taken list once touched. The primary button stays enabled: a
+/// press that cannot go through reveals every outstanding error at once and
+/// moves focus to the first field to fix, rather than a dead, greyed-out
+/// button.
+///
+/// The fields start pre-filled with valid values so the first frame shows the
+/// complete card with the primary action enabled and the meter reading strong.
+/// No timers, network or randomness. The captured frame is stable.
 class SignUpDemo extends StatefulWidget {
   const SignUpDemo({super.key});
 
@@ -42,16 +48,57 @@ class _SignUpDemoState extends State<SignUpDemo> {
   final TextEditingController _password =
       TextEditingController(text: 'Mint-Trellis-4271');
 
-  // Errors stay hidden until a field is touched, so the pre-filled first
-  // frame renders clean and guidance appears only once someone edits.
+  // Every required field validates on blur, so a skipped field is caught the
+  // moment focus leaves it empty.
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _surnameFocus = FocusNode();
+  final FocusNode _companyFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+
+  // Errors stay hidden until a field is touched, so the pre-filled first frame
+  // renders clean and guidance appears only once someone edits or skips one.
+  bool _nameTouched = false;
+  bool _surnameTouched = false;
+  bool _companyTouched = false;
   bool _emailTouched = false;
   bool _passwordTouched = false;
 
-  /// The live email error: a format check first, then the taken-address
+  @override
+  void initState() {
+    super.initState();
+    _touchOnBlur(_nameFocus, () => _nameTouched, () => _nameTouched = true);
+    _touchOnBlur(
+        _surnameFocus, () => _surnameTouched, () => _surnameTouched = true);
+    _touchOnBlur(
+        _companyFocus, () => _companyTouched, () => _companyTouched = true);
+    _touchOnBlur(_emailFocus, () => _emailTouched, () => _emailTouched = true);
+    _touchOnBlur(_passwordFocus, () => _passwordTouched,
+        () => _passwordTouched = true);
+  }
+
+  /// Flips a field to "touched" the first time focus leaves it, so a required
+  /// error shows on blur rather than while the user is still typing.
+  void _touchOnBlur(
+    FocusNode node,
+    bool Function() isTouched,
+    VoidCallback markTouched,
+  ) {
+    node.addListener(() {
+      if (!node.hasFocus && !isTouched()) setState(markTouched);
+    });
+  }
+
+  /// A required text field with no format: a plain, specific prompt rather than
+  /// a generic "this field is required".
+  String? _requiredError(String value, String message) =>
+      value.trim().isEmpty ? message : null;
+
+  /// The email error: empty first, then a format check, then the taken-address
   /// check, fed straight into the field's errorText.
   String? _emailError(String value) {
     final email = value.trim();
-    if (email.isEmpty) return null;
+    if (email.isEmpty) return 'Enter your email address';
     if (!_emailFormat.hasMatch(email)) return 'This email is invalid';
     if (_takenEmails.contains(email.toLowerCase())) {
       return 'Email already taken';
@@ -59,13 +106,33 @@ class _SignUpDemoState extends State<SignUpDemo> {
     return null;
   }
 
-  bool get _isValid =>
-      _name.text.trim().isNotEmpty &&
-      _surname.text.trim().isNotEmpty &&
-      _company.text.trim().isNotEmpty &&
-      _emailFormat.hasMatch(_email.text.trim()) &&
-      !_takenEmails.contains(_email.text.trim().toLowerCase()) &&
-      dsFirstUnmetPasswordRule(_password.text) == null;
+  /// The focus node of the first field failing validation, in reading order, or
+  /// null when the whole form is valid. This is the single source of truth for
+  /// both "can we submit" and "what should we jump to".
+  FocusNode? _firstInvalidFocus() {
+    if (_name.text.trim().isEmpty) return _nameFocus;
+    if (_surname.text.trim().isEmpty) return _surnameFocus;
+    if (_company.text.trim().isEmpty) return _companyFocus;
+    if (_emailError(_email.text) != null) return _emailFocus;
+    if (dsFirstUnmetPasswordRule(_password.text) != null) return _passwordFocus;
+    return null;
+  }
+
+  /// The button stays enabled: a press that can't go through is not a dead end,
+  /// it reveals every outstanding error at once and lands the user on the first
+  /// field to fix, rather than leaving them to guess what a greyed-out button
+  /// wants. A real product would create the account here; the demo stops at
+  /// validation so it stays timer-free and its screenshot is stable.
+  void _trySubmit() {
+    setState(() {
+      _nameTouched = true;
+      _surnameTouched = true;
+      _companyTouched = true;
+      _emailTouched = true;
+      _passwordTouched = true;
+    });
+    _firstInvalidFocus()?.requestFocus();
+  }
 
   @override
   void dispose() {
@@ -74,6 +141,11 @@ class _SignUpDemoState extends State<SignUpDemo> {
     _company.dispose();
     _email.dispose();
     _password.dispose();
+    _nameFocus.dispose();
+    _surnameFocus.dispose();
+    _companyFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
@@ -104,33 +176,47 @@ class _SignUpDemoState extends State<SignUpDemo> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Name and surname share a row where there is room; on very narrow
-          // screens the group stacks them so neither placeholder clips.
+          // screens the group stacks them so neither placeholder clips. Both
+          // are required, format-free fields, so they validate on blur.
           DsFormFieldGroup(
             children: [
               DsTextField(
                 controller: _name,
+                focusNode: _nameFocus,
                 hintText: 'Name',
                 textInputAction: TextInputAction.next,
                 onChanged: (_) => setState(() {}),
+                errorText: _nameTouched
+                    ? _requiredError(_name.text, 'Enter your name')
+                    : null,
               ),
               DsTextField(
                 controller: _surname,
+                focusNode: _surnameFocus,
                 hintText: 'Surname',
                 textInputAction: TextInputAction.next,
                 onChanged: (_) => setState(() {}),
+                errorText: _surnameTouched
+                    ? _requiredError(_surname.text, 'Enter your surname')
+                    : null,
               ),
             ],
           ),
           const SizedBox(height: DsSpacing.lg),
           DsTextField(
             controller: _company,
+            focusNode: _companyFocus,
             hintText: 'Company name',
             textInputAction: TextInputAction.next,
             onChanged: (_) => setState(() {}),
+            errorText: _companyTouched
+                ? _requiredError(_company.text, 'Enter your company name')
+                : null,
           ),
           const SizedBox(height: DsSpacing.lg),
           DsTextField(
             controller: _email,
+            focusNode: _emailFocus,
             hintText: 'Work email',
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
@@ -140,6 +226,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
           const SizedBox(height: DsSpacing.lg),
           DsPasswordField(
             controller: _password,
+            focusNode: _passwordFocus,
             hintText: 'Password',
             textInputAction: TextInputAction.done,
             onChanged: (_) => setState(() => _passwordTouched = true),
@@ -156,7 +243,8 @@ class _SignUpDemoState extends State<SignUpDemo> {
         ],
       ),
       primaryActionLabel: 'Create account',
-      onSubmit: _isValid ? () {} : null,
+      // The button stays live; the press validates and reveals what is missing.
+      onSubmit: _trySubmit,
       footer: Text.rich(
         textAlign: TextAlign.center,
         TextSpan(
