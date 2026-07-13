@@ -14,7 +14,7 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `fontSizeBase` | `double` | `16` | The base font size, in logical pixels, that body text derives from. |
 | `spacingUnit` | `double` | `8` | The base spacing unit, in logical pixels, that layout spacing derives from. |
 | `borderRadius` | `double` | `6` | The general border radius used as the default for components. |
-| `colorPrimary` | `Color` | `#0074D4` | The primary brand colour used for primary actions and accents. |
+| `colorPrimary` | `Color` | `#0F766E` | The primary brand colour used for primary actions and accents. |
 | `colorBackground` | `Color` | `#FFFFFF` | The background colour for components, including overlays and surfaces. |
 | `colorText` | `Color` | `#1A1B25` | The colour used for primary text. |
 | `colorDanger` | `Color` | `#E61947` | The colour used to indicate errors or destructive actions. |
@@ -25,12 +25,12 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
-| `actionPrimaryColorText` | `Color` | `#0074D4` | The colour used for primary actions and links. |
+| `actionPrimaryColorText` | `Color` | `#0F766E` | The colour used for primary actions and links. |
 | `actionSecondaryColorText` | `Color` | `#444444` | The colour used for secondary actions and links. |
-| `buttonPrimaryColorBackground` | `Color` | `#0074D4` | The colour used as a background for primary buttons. |
-| `buttonPrimaryColorBorder` | `Color` | `#0074D4` | The border colour used for primary buttons. |
+| `buttonPrimaryColorBackground` | `Color` | `#0F766E` | The colour used as a background for primary buttons. |
+| `buttonPrimaryColorBorder` | `Color` | `#0F766E` | The border colour used for primary buttons. |
 | `buttonPrimaryColorText` | `Color` | `#FFFFFF` | The text colour used for primary buttons. |
-| `buttonPrimaryDisabledColorBackground` | `Color` | `#800074D4` | The background colour for disabled primary buttons (ARGB). Defaults to the primary background at 50% opacity; a skin can supply a solid tint instead. |
+| `buttonPrimaryDisabledColorBackground` | `Color` | `#800F766E` | The background colour for disabled primary buttons (ARGB). Defaults to the primary background at 50% opacity; a skin can supply a solid tint instead. |
 | `buttonPrimaryDisabledColorText` | `Color` | `#E6FFFFFF` | The text colour for disabled primary buttons (ARGB). Defaults to the primary text colour at 90% opacity. |
 | `buttonSecondaryColorBackground` | `Color` | `#EBEEF1` | The colour used as a background for secondary buttons. |
 | `buttonSecondaryColorBorder` | `Color` | `#EBEEF1` | The colour used as a border for secondary buttons. |
@@ -43,7 +43,7 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `buttonNeutralColorText` | `Color` | `#393B3E` | The text colour used for neutral buttons. Defaults to the secondary button text colour. |
 | `buttonTertiaryColorBackground` | `Color` | `transparent` | The background colour for tertiary (text) buttons. Transparent by default, so the label alone carries the action. |
 | `buttonTertiaryColorBorder` | `Color` | `transparent` | The border colour for tertiary (text) buttons. Transparent by default. |
-| `buttonTertiaryColorText` | `Color` | `#0074D4` | The text colour for tertiary (text) buttons. Defaults to the primary action colour. |
+| `buttonTertiaryColorText` | `Color` | `#0F766E` | The text colour for tertiary (text) buttons. Defaults to the primary action colour. |
 
 ### Text and surfaces
 
@@ -56,7 +56,7 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | `offsetBackgroundColor` | `Color` | `#FFFFFF` | The background colour used when highlighting information, like the selected row on a table. |
 | `colorSurfaceMuted` | `Color` | `#F6F8FA` | The muted surface tier: the quiet grey behind code wells, table headers and other recessed panels. Exposed to the Material scheme as surfaceContainerHighest. |
 | `formHighlightColorBorder` | `Color` | `#D7D7D7` | The colour used to highlight form items when focused. |
-| `formAccentColor` | `Color` | `#0074D4` | The colour used to fill form items such as tickboxes, radio buttons and switches. |
+| `formAccentColor` | `Color` | `#0F766E` | The colour used to fill form items such as tickboxes, radio buttons and switches. |
 | `formPlaceholderTextColor` | `Color` | `#AAAAAA` | The colour for placeholder text in form items. |
 
 ### Typography
@@ -114,12 +114,12 @@ Read tokens for the active theme with `DsTokens.of(context)`. Switch between `Ds
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
 | `actionPrimaryTextDecorationLine` | `TextDecoration` | `underline` | The line type used for text decoration of primary actions and links. |
-| `actionPrimaryTextDecorationColor` | `Color` | `#0074D4` | The colour used for text decoration of primary actions and links. |
+| `actionPrimaryTextDecorationColor` | `Color` | `#0F766E` | The colour used for text decoration of primary actions and links. |
 | `actionPrimaryTextDecorationStyle` | `TextDecorationStyle` | `solid` | The style of text decoration of primary actions and links. |
 | `actionPrimaryTextDecorationThickness` | `double` | `1` | The thickness of text decoration of primary actions and links. |
 | `actionPrimaryTextTransform` | `DsTextTransform` | `none` | The text transform for primary actions and links. |
 | `actionSecondaryTextDecorationLine` | `TextDecoration` | `underline` | The line type used for text decoration of secondary actions and links. |
-| `actionSecondaryTextDecorationColor` | `Color` | `#0074D4` | The colour used for text decoration of secondary actions and links. |
+| `actionSecondaryTextDecorationColor` | `Color` | `#0F766E` | The colour used for text decoration of secondary actions and links. |
 | `actionSecondaryTextDecorationStyle` | `TextDecorationStyle` | `solid` | The style of text decoration of secondary actions and links. |
 | `actionSecondaryTextDecorationThickness` | `double` | `1` | The thickness of text decoration of secondary actions and links. |
 | `actionSecondaryTextTransform` | `DsTextTransform` | `none` | The text transform for secondary actions and links. |

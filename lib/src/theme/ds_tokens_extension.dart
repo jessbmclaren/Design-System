@@ -293,7 +293,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bloomStops: const <Color>[],
       // A soft wash of the primary, so a brand-soft mark is legible on the
       // base; a skin supplies its own tint.
-      brandTintColor: const Color(0xFFE7F1FB),
+      brandTintColor: const Color(0xFFE6F5F2),
       wordmarkFontSize: 22,
       wordmarkLetterSpacing: -0.2,
       wordmarkHeight: 1,
@@ -305,7 +305,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The Design System dark appearance, derived from the light tokens.
   factory DsTokens.dark() {
     return DsTokens.light().copyWith(
-      colorPrimary: const Color(0xFF2388DB),
+      colorPrimary: DsColors.brandPrimaryDark,
       colorBackground: const Color(0xFF121317),
       colorText: const Color(0xFFF3F4F6),
       colorSecondaryText: const Color(0xFF9CA3AF),
@@ -313,21 +313,22 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorBorderSubtle: const Color(0xFF3F4147),
       colorSuccess: const Color(0xFF7FD860),
       colorWarning: const Color(0xFFF0B429),
-      actionPrimaryColorText: const Color(0xFF58A6F0),
-      actionPrimaryTextDecorationColor: const Color(0xFF58A6F0),
+      actionPrimaryColorText: DsColors.brandLinkDark,
+      actionPrimaryTextDecorationColor: DsColors.brandLinkDark,
       actionSecondaryColorText: const Color(0xFFC9CDD3),
-      actionSecondaryTextDecorationColor: const Color(0xFF58A6F0),
+      actionSecondaryTextDecorationColor: DsColors.brandLinkDark,
       // The tertiary label follows the dark link colour, the value the
       // button used to read from actionPrimaryColorText.
-      buttonTertiaryColorText: const Color(0xFF58A6F0),
-      // AA-safe with white label text (contrast ~5:1); the lighter #2388DB
-      // is kept for scheme accents/links only.
-      buttonPrimaryColorBackground: const Color(0xFF0B6BC7),
-      buttonPrimaryColorBorder: const Color(0xFF0B6BC7),
+      buttonTertiaryColorText: DsColors.brandLinkDark,
+      // The button fill is a deeper teal, AA-safe with white label text
+      // (contrast ~5.5:1); the lighter brandPrimaryDark is kept for scheme
+      // accents/links only.
+      buttonPrimaryColorBackground: DsColors.brandButtonDark,
+      buttonPrimaryColorBorder: DsColors.brandButtonDark,
       // Re-derived from the dark primary pair so the disabled fade matches
       // the dark fill, exactly as the button used to compute it.
       buttonPrimaryDisabledColorBackground:
-          const Color(0xFF0B6BC7).withValues(alpha: 0.5),
+          DsColors.brandButtonDark.withValues(alpha: 0.5),
       buttonPrimaryDisabledColorText:
           const Color(0xFFFFFFFF).withValues(alpha: 0.9),
       buttonSecondaryColorBackground: const Color(0xFF2A2C33),
@@ -354,7 +355,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorSurfaceMuted: const Color(0xFF1E2025),
       formBackgroundColor: const Color(0xFF17181C),
       formHighlightColorBorder: const Color(0xFF4B4E56),
-      formAccentColor: const Color(0xFF2388DB),
+      formAccentColor: DsColors.brandPrimaryDark,
       formPlaceholderTextColor: const Color(0xFF6B7280),
       overlayBackdropColor: const Color(0x99000000),
       // The same quiet drift as light, rebuilt from the dark surfaces: the
@@ -363,7 +364,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       authWashGradient: const [Color(0xFF121317), Color(0xFF1E2025)],
       bloomColor: const Color(0xFF2A2C33),
       // A dark wash toward the primary, one step above the page.
-      brandTintColor: const Color(0xFF16273A),
+      brandTintColor: const Color(0xFF123330),
     );
   }
 

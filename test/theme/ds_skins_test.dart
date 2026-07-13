@@ -15,12 +15,12 @@ void main() {
     });
 
     test('opting into a skin does NOT change the core defaults', () {
-      // The default token set must remain the neutral blue identity: a skin
+      // The default token set must remain the neutral teal identity: a skin
       // is data you pass in, never a mutation of the defaults.
-      expect(DsSkins.engenLight().colorPrimary, isNot(const Color(0xFF0074D4)));
-      expect(DsTokens.light().colorPrimary, const Color(0xFF0074D4));
+      expect(DsSkins.engenLight().colorPrimary, isNot(const Color(0xFF0F766E)));
+      expect(DsTokens.light().colorPrimary, const Color(0xFF0F766E));
       expect(DsTokens.light().buttonBorderRadius, 4);
-      expect(DsTheme.light().colorScheme.primary, const Color(0xFF0074D4));
+      expect(DsTheme.light().colorScheme.primary, const Color(0xFF0F766E));
     });
 
     test('a skin is still fully white-labellable on top', () {

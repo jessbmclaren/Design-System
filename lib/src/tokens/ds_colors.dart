@@ -11,24 +11,38 @@ abstract final class DsColors {
   // Brand & actions
   // ---------------------------------------------------------------------------
 
+  /// The white-label brand colour, isolated so a rebrand is a single edit here
+  /// (or a skin's `copyWith`, the way [DsSkins] swaps in Engen's indigo). A
+  /// neutral, professional teal by default, kept clear of the neutral grays and
+  /// the brand-neutral auth wash so the base never reads as one specific brand.
+  ///
+  /// The dark scheme lifts the same hue so it stays legible on a dark surface:
+  /// [brandPrimaryDark] for accents and form fills, [brandLinkDark] for link
+  /// text, and [brandButtonDark] for the primary button fill (AA-safe under
+  /// white label text).
+  static const Color brandPrimary = Color(0xFF0F766E); // teal-700
+  static const Color brandPrimaryDark = Color(0xFF2DD4BF); // teal-400
+  static const Color brandLinkDark = Color(0xFF5EEAD4); // teal-300
+  static const Color brandButtonDark = Color(0xFF0F766E); // teal-700
+
   /// The colour used for primary actions and links.
-  static const Color actionPrimary = Color(0xFF0074D4);
+  static const Color actionPrimary = brandPrimary;
 
   /// The colour used for secondary actions and links.
   static const Color actionSecondary = Color(0xFF444444);
 
   /// The colour used for text decoration of primary and secondary actions.
-  static const Color actionTextDecoration = Color(0xFF0074D4);
+  static const Color actionTextDecoration = brandPrimary;
 
   // ---------------------------------------------------------------------------
   // Buttons
   // ---------------------------------------------------------------------------
 
   /// The colour used as a background for primary buttons.
-  static const Color buttonPrimaryBackground = Color(0xFF0074D4);
+  static const Color buttonPrimaryBackground = brandPrimary;
 
   /// The border colour used for primary buttons.
-  static const Color buttonPrimaryBorder = Color(0xFF0074D4);
+  static const Color buttonPrimaryBorder = brandPrimary;
 
   /// The text colour used for primary buttons.
   static const Color buttonPrimaryText = Color(0xFFFFFFFF);
@@ -121,7 +135,7 @@ abstract final class DsColors {
 
   /// The colour used to fill form items such as tickboxes, radio buttons and
   /// switches.
-  static const Color formAccent = Color(0xFF0074D4);
+  static const Color formAccent = brandPrimary;
 
   /// The backdrop colour shown behind an open overlay: a translucent scrim
   /// derived from [textPrimary] so the page recedes without changing hue.
