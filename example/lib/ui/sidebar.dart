@@ -16,7 +16,6 @@ const Set<String> _tickedPageIds = {
   // Sign in and sign up, and the atoms and molecules they are built from
   'sign-in',
   'sign-up',
-  'action-buttons',
   'text-fields',
   'form-field-group',
   'icon',
