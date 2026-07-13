@@ -5,11 +5,15 @@
 // flagged — the 48dp touch target, the 320dp overflow floor, dark-mode selection
 // and the accessibility contract — rather than trusting the code.
 import 'package:design_system/design_system.dart';
+import 'package:ds_docs/app.dart';
+import 'package:ds_docs/content/doc_registry.dart';
 import 'package:ds_docs/demos/demo_registry.dart';
 import 'package:ds_docs/playground/playground.dart';
 import 'package:ds_docs/playground/playground_registry.dart';
 import 'package:ds_docs/ui/demo_stage.dart';
 import 'package:ds_docs/ui/device_frame.dart';
+import 'package:ds_docs/ui/docs_scaffold.dart';
+import 'package:ds_docs/ui/docs_skins.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -491,6 +495,70 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.byTooltip('Desktop'));
       await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  // The faithful reproduction of the reported bug: the whole docs shell
+  // (sidebar, top bar, reading column, ListView) at a real desktop window,
+  // not the panel in isolation — so any constraint the full tree imposes is
+  // exercised, closing the gap between the unit tests and what ships.
+  group('Full docs shell', () {
+    Future<void> pumpShell(WidgetTester tester, {required Size window}) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = window;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        ThemeController(
+          mode: ThemeMode.light,
+          toggle: () {},
+          skin: kDocsSkins.first,
+          selectSkin: (_) {},
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: DsTheme.light(),
+            home: DocsScaffold(page: pageIndex['action-buttons']!),
+          ),
+        ),
+      );
+      // Settle the page's one-shot entrance animation.
+      await tester.pump(const Duration(milliseconds: 600));
+    }
+
+    testWidgets('the playground button is natural width at Tablet, in the real shell', (tester) async {
+      // A tall window so the whole page lays out (the ListView is lazy) and a
+      // realistic 1440dp desktop width so the reading column and side-by-side
+      // playground match production.
+      await pumpShell(tester, window: const Size(1440, 2200));
+
+      final button = find.widgetWithText(DsButton, 'Save changes');
+      expect(button, findsOneWidget);
+      final desktopWidth = tester.getSize(button).width;
+
+      await tester.tap(find.byTooltip('Tablet'));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final tabletWidth = tester.getSize(button).width;
+      expect(tabletWidth, lessThan(320),
+          reason: 'button stretched to $tabletWidth in the full shell at Tablet');
+      expect(tabletWidth, moreOrLessEquals(desktopWidth, epsilon: 1));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the playground button is natural width at Tablet on a narrow window too', (tester) async {
+      // A window narrow enough that the playground stacks (controls below the
+      // stage), exercising the other layout branch end to end.
+      await pumpShell(tester, window: const Size(760, 2200));
+
+      final button = find.widgetWithText(DsButton, 'Save changes');
+      expect(button, findsOneWidget);
+
+      await tester.tap(find.byTooltip('Tablet'));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final w = tester.getSize(button).width;
+      expect(w, lessThan(320), reason: 'button stretched to $w in the narrow shell at Tablet');
       expect(tester.takeException(), isNull);
     });
   });
