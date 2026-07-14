@@ -11,28 +11,28 @@ final PatternPage designTokensPage = PatternPage(
   navTitle: 'Design tokens',
   title: 'Design tokens & theming',
   description:
-      'The Design System is theme-driven. Every colour, type ramp, radius and '
-      'spacing value is a token exposed through the `DsTokens` theme extension, '
-      'and every component reads its appearance from the active theme. Because '
-      'nothing is hard-coded, you re-brand the entire system by supplying your '
-      'own token set to `DsTheme.light` or `DsTheme.dark`. The system is '
-      'white-label by default.',
+      'A token is a named value the whole library reads from, one for every '
+      'colour, size, radius and font. Components never hard-code how they '
+      'look; they ask the active theme. So you can re-brand the entire system '
+      'in one place by passing your own tokens to `DsTheme.light` or '
+      '`DsTheme.dark`. Out of the box it is white-label: neutral, and ready '
+      'for your brand.',
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
-      'Read tokens for the active theme with `DsTokens.of(context)`. Switch '
-      'between `DsTheme.light()` and `DsTheme.dark()` to flip every component '
-      'at once. Sizes are expressed in logical pixels (`double`); text '
-      'transforms default to `none` and accept `uppercase`, `lowercase` or '
-      '`capitalize`. Each heading / body / label ramp row is a property of that '
-      'level\'s `DsTypeToken` (`headingXl`, `bodyMd`, …); every level also '
-      'carries a line `height` multiplier, an optional `letterSpacing` and a '
-      '`textTransform`, including `bodyMd` and `bodySm`, whose transforms stay '
-      'at `none` and are omitted from the table. Re-scale a level with '
+      'Read a token for the current theme with `DsTokens.of(context)`, then '
+      'use it like any other value. Swap `DsTheme.light()` for '
+      '`DsTheme.dark()` and every component changes at once. Sizes are plain '
+      'numbers in logical pixels. Text is left as it is written unless you set '
+      'it to uppercase, lowercase or capitalised.',
+    ),
+    ProseBlock(
+      'Type comes in levels. Each heading, body and label level is a '
+      '`DsTypeToken` that bundles its size, weight, line height and letter '
+      'spacing, so you can restyle a whole level in one line: '
       '`copyWith(headingXl: DsTypeToken(fontSize: 30, fontWeight: '
-      'DsTypography.bold))`. The button- and badge-label rows are instead flat '
-      'tokens (`buttonLabelFontSize`, `buttonLabelFontWeight`, …) overridden '
-      'individually.',
+      'DsTypography.bold))`. Button and badge labels are the exception: their '
+      'size, weight and transform are separate tokens you set on their own.',
     ),
     SubheadingBlock('Commonly used variables'),
     VariablesBlock(
@@ -194,14 +194,12 @@ final PatternPage designTokensPage = PatternPage(
     ),
     SubheadingBlock('Elevation, icons and weights'),
     ProseBlock(
-      'Elevation is themable: components cast shadows through the three '
-      '`shadow` tokens, which default to the matching `DsElevation` '
-      'primitives, so a skin can retint every raised surface at once (usually '
-      'by deriving a set with `DsElevation.tinted`). Beyond that, the system '
-      'ships two shared primitives that components use directly: an icon-size '
-      'scale and a font-weight ramp. The bundled Inter provides all '
-      'four weights (400 / 500 / 600 / 700), so hierarchy is not limited to '
-      'regular and bold.',
+      'Shadows are tokens too. A raised surface casts one of three shadows '
+      '(`shadowLow`, `shadowMedium`, `shadowHigh`), so a brand can retint '
+      'every shadow at once with `DsElevation.tinted`. The system also ships '
+      'two shared scales components use directly: a set of icon sizes and a '
+      'set of font weights. The bundled Inter font carries all four weights '
+      '(400, 500, 600 and 700), so you have more than just regular and bold.',
     ),
     VariablesBlock(
       title: 'Elevation',
@@ -234,9 +232,9 @@ final PatternPage designTokensPage = PatternPage(
     ),
     SubheadingBlock('Overlays'),
     ProseBlock(
-      'The `overlays` token controls whether a focused overlay (such as '
-      '`DsFocusView`) presents as a centred dialog or a drawer that slides in '
-      'from the edge. Choose the value that best suits your product.',
+      'The `overlays` token decides how a focused overlay like `DsFocusView` '
+      'appears: a centred dialog, or a drawer that slides in from the edge. '
+      'Pick whichever suits your product.',
     ),
     VariablesBlock(
       rows: [
@@ -247,10 +245,10 @@ final PatternPage designTokensPage = PatternPage(
     ),
     SubheadingBlock('Auth chrome and wordmark'),
     ProseBlock(
-      'The auth surfaces (sign-in, sign-up, waiting screens) paint their '
-      'backdrop from two tokens, and the wordmark\'s type metrics are tokens '
-      'too, so a brand can retune the whole first impression without forking '
-      'a component.',
+      'The sign-in, sign-up and waiting screens paint their background from '
+      'two tokens, and the wordmark\'s size and spacing are tokens too. So a '
+      'brand can restyle the whole first impression without copying a '
+      'component.',
     ),
     VariablesBlock(
       rows: [

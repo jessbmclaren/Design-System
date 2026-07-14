@@ -73,6 +73,8 @@ class DsSignUpView extends StatelessWidget {
     this.headingAlignment = DsHeadingAlignment.start,
     this.aboveForm,
     this.submitPending = false,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
     this.footer,
     this.aside,
     this.onClose,
@@ -120,6 +122,14 @@ class DsSignUpView extends StatelessWidget {
   /// Whether the primary action is in flight, which shows a spinner and
   /// prevents further taps.
   final bool submitPending;
+
+  /// Optional label for a low-commitment secondary action, rendered as a
+  /// full-width secondary [DsButton] directly beneath the primary action (for
+  /// example "Launch demo"). When null no secondary button is shown.
+  final String? secondaryActionLabel;
+
+  /// Called when the secondary action is tapped. Pass null to disable it.
+  final VoidCallback? onSecondaryAction;
 
   /// Optional content shown below the primary action, such as a sign-in link.
   /// Rendered centred beneath the button.
@@ -189,6 +199,8 @@ class DsSignUpView extends StatelessWidget {
               primaryActionLabel: primaryActionLabel,
               onSubmit: onSubmit,
               submitPending: submitPending,
+              secondaryActionLabel: secondaryActionLabel,
+              onSecondaryAction: onSecondaryAction,
               footer: footer,
               onClose: onClose,
               showBorder: showBorder,
@@ -228,6 +240,8 @@ class DsSignUpView extends StatelessWidget {
             primaryActionLabel: primaryActionLabel,
             onSubmit: onSubmit,
             submitPending: submitPending,
+            secondaryActionLabel: secondaryActionLabel,
+            onSecondaryAction: onSecondaryAction,
             footer: footer,
             onClose: onClose,
             showBorder: showBorder,
@@ -256,6 +270,8 @@ class _FormCard extends StatelessWidget {
     required this.primaryActionLabel,
     required this.onSubmit,
     required this.submitPending,
+    required this.secondaryActionLabel,
+    required this.onSecondaryAction,
     required this.footer,
     required this.onClose,
     required this.showBorder,
@@ -272,6 +288,8 @@ class _FormCard extends StatelessWidget {
   final String primaryActionLabel;
   final VoidCallback? onSubmit;
   final bool submitPending;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
   final Widget? footer;
   final VoidCallback? onClose;
   final bool showBorder;
@@ -362,6 +380,15 @@ class _FormCard extends StatelessWidget {
                   pending: submitPending,
                   fullWidth: true,
                 ),
+                if (secondaryActionLabel != null) ...[
+                  SizedBox(height: tokens.spacingUnit),
+                  DsButton(
+                    label: secondaryActionLabel!,
+                    onPressed: onSecondaryAction,
+                    variant: DsButtonVariant.secondary,
+                    fullWidth: true,
+                  ),
+                ],
                 if (footer != null) ...[
                   SizedBox(height: tokens.spacingUnit * 2),
                   Align(alignment: Alignment.center, child: footer),

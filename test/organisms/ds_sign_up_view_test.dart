@@ -139,6 +139,71 @@ void main() {
       expect(submitted, 0);
     });
 
+    testWidgets('renders the secondary action beneath the primary and fires '
+        'its callback', (tester) async {
+      var launched = 0;
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Create account',
+          onSubmit: () {},
+          secondaryActionLabel: 'Launch demo',
+          onSecondaryAction: () => launched++,
+        ),
+      );
+
+      expect(find.text('Launch demo'), findsOneWidget);
+      // The low-commitment path sits directly below the primary action.
+      expect(
+        tester.getTopLeft(find.text('Launch demo')).dy,
+        greaterThan(tester.getTopLeft(find.text('Create account')).dy),
+      );
+
+      await tester.tap(find.text('Launch demo'));
+      await tester.pump();
+
+      expect(launched, 1);
+    });
+
+    testWidgets('shows no secondary action when no label is supplied',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Create account',
+          onSubmit: () {},
+        ),
+      );
+
+      // Only the primary action button is present.
+      expect(find.byType(DsButton), findsOneWidget);
+    });
+
+    testWidgets('disables the secondary action when its callback is null',
+        (tester) async {
+      await pumpDs(
+        tester,
+        DsSignUpView(
+          title: 'Sign up',
+          form: const SizedBox.shrink(),
+          primaryActionLabel: 'Create account',
+          onSubmit: () {},
+          secondaryActionLabel: 'Launch demo',
+        ),
+      );
+
+      // The label still renders, but a null callback leaves it disabled and
+      // out of the focus order.
+      final button = tester.widget<DsButton>(
+        find.widgetWithText(DsButton, 'Launch demo'),
+      );
+      expect(button.onPressed, isNull);
+    });
+
     testWidgets('lays out without overflow on a small phone', (tester) async {
       await pumpDs(
         tester,

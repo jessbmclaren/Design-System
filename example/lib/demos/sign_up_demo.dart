@@ -162,6 +162,16 @@ class _SignUpDemoState extends State<SignUpDemo> {
     _firstInvalidFocus()?.requestFocus();
   }
 
+  // The low-commitment path: drop the visitor straight into an explorable demo
+  // instead of asking them to create an account first.
+  void _launchDemo() {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        const SnackBar(content: Text('Launching the demo workspace...')),
+      );
+  }
+
   @override
   void dispose() {
     _name.dispose();
@@ -323,6 +333,9 @@ class _SignUpDemoState extends State<SignUpDemo> {
       primaryActionLabel: 'Create account',
       // The button stays live; the press validates and reveals what is missing.
       onSubmit: _trySubmit,
+      // A low-commitment path beside the primary action: explore before signing up.
+      secondaryActionLabel: 'Launch demo',
+      onSecondaryAction: _launchDemo,
       footer: Text(
         'Need help?',
         style: tokens.bodySm.toTextStyle(color: tokens.actionPrimaryColorText),

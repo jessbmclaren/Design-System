@@ -5,6 +5,7 @@
 // deterministically. Keep it in sync with lib/content/pages/.
 
 import 'pattern_page_content.dart';
+import 'pages/documentation.dart';
 import 'pages/design_tokens.dart';
 import 'pages/motion.dart';
 import 'pages/iconography.dart';
@@ -93,6 +94,7 @@ import 'pages/spotlight.dart';
 /// Every documentation page, in sidebar order.
 final List<PatternPage> allPages = [
   // Foundations
+  documentationPage,
   designTokensPage,
   motionPage,
   iconographyPage,
