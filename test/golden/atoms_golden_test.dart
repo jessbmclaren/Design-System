@@ -117,6 +117,17 @@ void main() {
       () => DsCheckbox(value: true, label: 'Accept terms', onChanged: (_) {}),
     );
 
+    dsGoldenMatrix(
+      'atom',
+      'checkbox-dense',
+      () => DsCheckbox(
+        value: true,
+        label: 'Accept terms',
+        onChanged: (_) {},
+        dense: true,
+      ),
+    );
+
     dsGoldenMatrix('atom', 'chip', () => const DsChip(label: 'Active'));
 
     dsGoldenMatrix('atom', 'divider', () => const DsDivider());

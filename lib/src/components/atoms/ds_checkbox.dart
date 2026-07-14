@@ -42,6 +42,7 @@ class DsCheckbox extends StatefulWidget {
     this.errorText,
     this.semanticLabel,
     this.isError = false,
+    this.dense = false,
   }) : assert(
          label == null || labelWidget == null,
          'Provide a label or a labelWidget, not both.',
@@ -77,13 +78,14 @@ class DsCheckbox extends StatefulWidget {
   /// the theme's danger colour.
   final bool isError;
 
+  /// Whether to render compactly, without the 48dp minimum tap target. Use in
+  /// dense contexts such as a data-table selection cell, where the row sets its
+  /// own height; leave it false for a standalone control so touch stays
+  /// accessible.
+  final bool dense;
+
   static const double _boxSize = 18;
   static const double _labelGap = 8;
-
-  /// Inset of the hover state layer beyond the row content, so the highlight is
-  /// padded evenly on every side rather than sitting flush against the box.
-  static const double _stateLayerPadX = 8;
-  static const double _stateLayerPadY = 6;
 
   /// Focus ring geometry: an accent ring of this width, held off the box by a
   /// surface-coloured gap. There is no dedicated focus-ring token yet, so the
@@ -184,22 +186,24 @@ class _DsCheckboxState extends State<DsCheckbox> {
     }
 
     // Hover paints a rounded state layer behind the whole row — box and label
-    // together — inset evenly on every side, so the highlight has breathing
-    // room rather than sitting flush against the box. It is a Positioned
-    // overlay, so the content keeps its place (the box still aligns to the
-    // form's left edge) and the layer is invisible until hovered.
+    // together — inset from the spacing unit on every side, so the highlight has
+    // breathing room rather than sitting flush against the box. It is a
+    // Positioned overlay, so the content keeps its place (the box still aligns
+    // to the form's left edge) and the layer is invisible until hovered.
+    final double stateInsetX = tokens.spacingUnit;
+    final double stateInsetY = tokens.spacingUnit * 0.75;
     final Widget hoverable = Stack(
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          left: -DsCheckbox._stateLayerPadX,
-          right: -DsCheckbox._stateLayerPadX,
-          top: -DsCheckbox._stateLayerPadY,
-          bottom: -DsCheckbox._stateLayerPadY,
+          left: -stateInsetX,
+          right: -stateInsetX,
+          top: -stateInsetY,
+          bottom: -stateInsetY,
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: enabled && _hovered
-                  ? tokens.colorText.withValues(alpha: 0.06)
+                  ? tokens.colorText.withValues(alpha: tokens.stateHoverOpacity)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(tokens.formBorderRadius),
             ),
@@ -209,18 +213,27 @@ class _DsCheckboxState extends State<DsCheckbox> {
       ],
     );
 
+    // A standalone checkbox keeps a comfortable 48dp tap target; a dense one (a
+    // table selection cell, say) drops it so the row can set its own height.
+    // The state layer and focus ring still overflow the compact bounds, so they
+    // read the same in either mode.
+    Widget padded = widget.dense
+        ? hoverable
+        : ConstrainedBox(
+            constraints: BoxConstraints(minHeight: tokens.minTapTarget),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: tokens.spacingUnit * 0.5,
+                ),
+                child: hoverable,
+              ),
+            ),
+          );
     final control = Opacity(
-      opacity: enabled ? 1 : 0.5,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: tokens.minTapTarget),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: hoverable,
-          ),
-        ),
-      ),
+      opacity: enabled ? 1 : tokens.stateDisabledOpacity,
+      child: padded,
     );
 
     // The announced name is the override, falling back to the plain label, and

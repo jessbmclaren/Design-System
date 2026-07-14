@@ -334,5 +334,29 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('a standalone checkbox holds a 48dp tap target', (tester) async {
+      await pumpDs(tester, DsCheckbox(value: false, onChanged: (_) {}));
+
+      expect(
+        tester.getSize(find.byType(DsCheckbox)).height,
+        greaterThanOrEqualTo(kMinInteractiveDimension),
+      );
+    });
+
+    testWidgets('dense drops the tap-target minimum for compact rows', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsCheckbox(value: false, onChanged: (_) {}, dense: true),
+      );
+
+      // A dense box shrinks to its own height so a table row can stay compact.
+      expect(
+        tester.getSize(find.byType(DsCheckbox)).height,
+        lessThan(kMinInteractiveDimension),
+      );
+    });
   });
 }
