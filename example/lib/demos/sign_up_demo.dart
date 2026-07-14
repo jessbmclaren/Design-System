@@ -1,5 +1,4 @@
 import 'package:design_system/design_system.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 /// Emails already registered in this demo. Typing one shows the inline
@@ -78,14 +77,9 @@ class _SignUpDemoState extends State<SignUpDemo> {
   bool _agreedToTerms = false;
   bool _termsError = false;
 
-  // Recognizer for the inline "Sign in" link inside the already-registered
-  // notice; held as a field so it can be disposed.
-  late final TapGestureRecognizer _signInTap;
-
   @override
   void initState() {
     super.initState();
-    _signInTap = TapGestureRecognizer()..onTap = () {};
     _touchOnBlur(_nameFocus, () => _nameEdited, () => _nameTouched,
         () => _nameTouched = true);
     _touchOnBlur(_surnameFocus, () => _surnameEdited, () => _surnameTouched,
@@ -180,46 +174,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
     _companyFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
-    _signInTap.dispose();
     super.dispose();
-  }
-
-  /// The "already registered" notice: not a dead-end "email taken", but an
-  /// inline error whose own sentence carries the way out — a "Sign in" link.
-  Widget _takenEmailNotice(DsTokens tokens) {
-    return Padding(
-      padding: const EdgeInsets.only(top: DsSpacing.xs),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2, right: DsSpacing.xs),
-            child: Icon(DsIcons.error,
-                size: DsIconSize.sm, color: tokens.colorDanger),
-          ),
-          Expanded(
-            child: Text.rich(
-              TextSpan(
-                style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
-                children: [
-                  const TextSpan(
-                    text: 'An account already exists with this email. ',
-                  ),
-                  TextSpan(
-                    text: 'Sign in',
-                    style: TextStyle(color: tokens.actionPrimaryColorText),
-                    recognizer: _signInTap,
-                  ),
-                  const TextSpan(
-                    text: ' instead, or use a different email address.',
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -304,7 +259,13 @@ class _SignUpDemoState extends State<SignUpDemo> {
                 ? _emailError(_email.text)
                 : null,
           ),
-          if (_emailTouched && _emailIsTaken) _takenEmailNotice(tokens),
+          if (_emailTouched && _emailIsTaken)
+            DsInlineNotice(
+              message: 'An account already exists with this email. ',
+              actionLabel: 'Sign in',
+              onAction: () {},
+              trailingMessage: ' instead, or use a different email address.',
+            ),
           const SizedBox(height: DsSpacing.sm),
           DsPasswordField(
             controller: _password,

@@ -36,8 +36,10 @@ final PatternPage signUpPage = PatternPage(
       'work email validates live once '
       'touched: a format check surfaces "This email is invalid" through the '
       'field\'s `errorText`, while a well-formed address that already has an '
-      'account turns into an inline "Sign in instead" doorway rather than a '
-      'dead-end error, so a returning user has a way in. The password is '
+      'account turns into an inline "Sign in instead" doorway — a '
+      '`DsInlineNotice`, an error whose own sentence carries a tappable action '
+      '— rather than a dead-end, so a returning user has a way in. The password '
+      'is '
       'captioned by `dsFirstUnmetPasswordRule`, '
       'which names one rule at a time so the error always says the next '
       'thing to fix, and a `DsPasswordStrength` meter beneath the field '
@@ -160,7 +162,14 @@ DsSignUpView(
             ? _emailError(_email.text)
             : null,
       ),
-      if (_emailTouched && _emailIsTaken) _takenEmailNotice(tokens),
+      // A reusable inline notice: an error whose sentence carries an action.
+      if (_emailTouched && _emailIsTaken)
+        DsInlineNotice(
+          message: 'An account already exists with this email. ',
+          actionLabel: 'Sign in',
+          onAction: _goToSignIn,
+          trailingMessage: ' instead, or use a different email address.',
+        ),
       const SizedBox(height: DsSpacing.sm),
       DsPasswordField(
         controller: _password,

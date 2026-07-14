@@ -69,6 +69,7 @@ export 'src/components/molecules/ds_empty_state.dart';
 export 'src/components/molecules/ds_filter_chip.dart';
 export 'src/components/molecules/ds_footer_actions.dart';
 export 'src/components/molecules/ds_form_field_group.dart';
+export 'src/components/molecules/ds_inline_notice.dart';
 export 'src/components/molecules/ds_labeled_divider.dart';
 export 'src/components/molecules/ds_list_item.dart';
 export 'src/components/molecules/ds_menu.dart';
