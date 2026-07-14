@@ -34,8 +34,9 @@ void main() {
       expect(find.byIcon(DsIcons.check), findsNothing);
     });
 
-    testWidgets('tapping calls onChanged with the negated value',
-        (tester) async {
+    testWidgets('tapping calls onChanged with the negated value', (
+      tester,
+    ) async {
       bool? reported;
       await pumpDs(
         tester,
@@ -82,9 +83,7 @@ void main() {
         ),
       );
 
-      final tokens = DsTokens.of(
-        tester.element(find.byType(DsCheckbox)),
-      );
+      final tokens = DsTokens.of(tester.element(find.byType(DsCheckbox)));
       final container = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer),
       );
@@ -92,8 +91,9 @@ void main() {
       expect(decoration.border!.top.color, tokens.colorDanger);
     });
 
-    testWidgets('renders a rich labelWidget and toggles from it',
-        (tester) async {
+    testWidgets('renders a rich labelWidget and toggles from it', (
+      tester,
+    ) async {
       bool? reported;
       await pumpDs(
         tester,
@@ -132,13 +132,11 @@ void main() {
 
       final errorFinder = find.text('You must accept the terms');
       expect(errorFinder, findsOneWidget);
-      expect(tester.widget<Text>(errorFinder).style!.color,
-          tokens.colorDanger);
+      expect(tester.widget<Text>(errorFinder).style!.color, tokens.colorDanger);
 
       // The error sits below the row, not beside it.
       final boxRect = tester.getRect(find.byType(AnimatedContainer));
-      expect(tester.getRect(errorFinder).top,
-          greaterThan(boxRect.bottom));
+      expect(tester.getRect(errorFinder).top, greaterThan(boxRect.bottom));
 
       final container = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer),
@@ -165,10 +163,7 @@ void main() {
         find.bySemanticsLabel('Accept terms, You must accept the terms'),
         findsOneWidget,
       );
-      expect(
-        find.bySemanticsLabel('You must accept the terms'),
-        findsNothing,
-      );
+      expect(find.bySemanticsLabel('You must accept the terms'), findsNothing);
       handle.dispose();
     });
 
@@ -188,8 +183,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('keyboard focus shows a ring and space toggles the value',
-        (tester) async {
+    testWidgets('keyboard focus shows a ring and space toggles the value', (
+      tester,
+    ) async {
       bool? reported;
       await pumpDs(
         tester,
@@ -256,13 +252,13 @@ void main() {
       expect(reported, isTrue);
 
       // The focus ring still reflects a genuinely focused control.
-      final container =
-          tester.widget<AnimatedContainer>(find.byType(AnimatedContainer));
+      final container = tester.widget<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
       expect((container.decoration! as BoxDecoration).boxShadow, isNotNull);
     });
 
-    testWidgets('keeps the box centred on a single-line label',
-        (tester) async {
+    testWidgets('keeps the box centred on a single-line label', (tester) async {
       await pumpDs(
         tester,
         DsCheckbox(value: false, onChanged: (_) {}, label: 'Short'),
@@ -276,14 +272,14 @@ void main() {
       );
     });
 
-    testWidgets('top-aligns the box against a multiline label',
-        (tester) async {
+    testWidgets('top-aligns the box against a multiline label', (tester) async {
       await pumpDs(
         tester,
         DsCheckbox(
           value: false,
           onChanged: (_) {},
-          label: 'A long consent sentence that certainly wraps across '
+          label:
+              'A long consent sentence that certainly wraps across '
               'several lines on a narrow phone viewport',
         ),
         surfaceSize: const Size(320, 640),
@@ -301,8 +297,9 @@ void main() {
       );
     });
 
-    testWidgets('does not overflow at 320dp with a labelWidget and errorText',
-        (tester) async {
+    testWidgets('does not overflow at 320dp with a labelWidget and errorText', (
+      tester,
+    ) async {
       await pumpDs(
         tester,
         DsCheckbox(
@@ -335,7 +332,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('a standalone checkbox holds a 48dp tap target', (tester) async {
+    testWidgets('a standalone checkbox holds a 48dp tap target', (
+      tester,
+    ) async {
       await pumpDs(tester, DsCheckbox(value: false, onChanged: (_) {}));
 
       expect(
@@ -358,5 +357,39 @@ void main() {
         lessThan(kMinInteractiveDimension),
       );
     });
+
+    testWidgets(
+      'reserveErrorSpace holds the height as a one-line error toggles',
+      (tester) async {
+        await pumpDs(
+          tester,
+          const DsCheckbox(
+            value: false,
+            onChanged: _noop,
+            label: 'Accept',
+            reserveErrorSpace: true,
+          ),
+        );
+        final withoutError = tester.getSize(find.byType(DsCheckbox)).height;
+
+        await pumpDs(
+          tester,
+          const DsCheckbox(
+            value: false,
+            onChanged: _noop,
+            label: 'Accept',
+            reserveErrorSpace: true,
+            errorText: 'Required',
+          ),
+        );
+        final withError = tester.getSize(find.byType(DsCheckbox)).height;
+
+        // The reserved blank line is the same height as the one-line error, so
+        // the control does not grow when the error appears.
+        expect(withoutError, withError);
+      },
+    );
   });
 }
+
+void _noop(bool _) {}

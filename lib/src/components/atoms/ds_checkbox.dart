@@ -43,6 +43,7 @@ class DsCheckbox extends StatefulWidget {
     this.semanticLabel,
     this.isError = false,
     this.dense = false,
+    this.reserveErrorSpace = false,
   }) : assert(
          label == null || labelWidget == null,
          'Provide a label or a labelWidget, not both.',
@@ -83,6 +84,12 @@ class DsCheckbox extends StatefulWidget {
   /// own height; leave it false for a standalone control so touch stays
   /// accessible.
   final bool dense;
+
+  /// Whether to hold a blank caption line while there is no [errorText], so the
+  /// control's height does not change when a single-line error appears or
+  /// clears — whatever sits below (a submit button, say) then stays put.
+  /// Reserves one line; a wrapping, multi-line error still grows past it.
+  final bool reserveErrorSpace;
 
   static const double _boxSize = 18;
   static const double _labelGap = 8;
@@ -299,6 +306,24 @@ class _DsCheckboxState extends State<DsCheckbox> {
               child: Text(
                 widget.errorText!,
                 style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+              ),
+            ),
+          )
+        else if (widget.reserveErrorSpace)
+          // A blank caption line the same height as a one-line error, so the
+          // control keeps its height as the error appears and clears.
+          ExcludeSemantics(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: labelChild != null
+                    ? DsCheckbox._boxSize + DsCheckbox._labelGap
+                    : 0,
+              ),
+              child: Text(
+                ' ',
+                style: tokens.bodySm.toTextStyle(
+                  color: tokens.colorSecondaryText,
+                ),
               ),
             ),
           ),
