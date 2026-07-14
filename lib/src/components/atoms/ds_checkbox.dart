@@ -43,9 +43,9 @@ class DsCheckbox extends StatefulWidget {
     this.semanticLabel,
     this.isError = false,
   }) : assert(
-          label == null || labelWidget == null,
-          'Provide a label or a labelWidget, not both.',
-        );
+         label == null || labelWidget == null,
+         'Provide a label or a labelWidget, not both.',
+       );
 
   /// Whether the checkbox is currently checked.
   final bool value;
@@ -80,6 +80,11 @@ class DsCheckbox extends StatefulWidget {
   static const double _boxSize = 18;
   static const double _labelGap = 8;
 
+  /// Inset of the hover state layer beyond the row content, so the highlight is
+  /// padded evenly on every side rather than sitting flush against the box.
+  static const double _stateLayerPadX = 8;
+  static const double _stateLayerPadY = 6;
+
   /// Focus ring geometry: an accent ring of this width, held off the box by a
   /// surface-coloured gap. There is no dedicated focus-ring token yet, so the
   /// widths are fixed here and the colours come from existing tokens.
@@ -92,6 +97,7 @@ class DsCheckbox extends StatefulWidget {
 
 class _DsCheckboxState extends State<DsCheckbox> {
   bool _focused = false;
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -139,15 +145,12 @@ class _DsCheckboxState extends State<DsCheckbox> {
         boxShadow: focusRing,
       ),
       child: widget.value
-          ? const Icon(
-              DsIcons.check,
-              size: DsIconSize.xs,
-              color: Colors.white,
-            )
+          ? const Icon(DsIcons.check, size: DsIconSize.xs, color: Colors.white)
           : null,
     );
 
-    final Widget? labelChild = widget.labelWidget ??
+    final Widget? labelChild =
+        widget.labelWidget ??
         (widget.label != null
             ? Text(
                 widget.label!,
@@ -162,8 +165,10 @@ class _DsCheckboxState extends State<DsCheckbox> {
       // line, which leaves a single-line row rendered exactly as before.
       final double lineHeight =
           tokens.bodyMd.fontSize * (tokens.bodyMd.height ?? 1);
-      final double boxTopPadding =
-          math.max(0, (lineHeight - DsCheckbox._boxSize) / 2);
+      final double boxTopPadding = math.max(
+        0,
+        (lineHeight - DsCheckbox._boxSize) / 2,
+      );
       content = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -178,6 +183,32 @@ class _DsCheckboxState extends State<DsCheckbox> {
       );
     }
 
+    // Hover paints a rounded state layer behind the whole row — box and label
+    // together — inset evenly on every side, so the highlight has breathing
+    // room rather than sitting flush against the box. It is a Positioned
+    // overlay, so the content keeps its place (the box still aligns to the
+    // form's left edge) and the layer is invisible until hovered.
+    final Widget hoverable = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: -DsCheckbox._stateLayerPadX,
+          right: -DsCheckbox._stateLayerPadX,
+          top: -DsCheckbox._stateLayerPadY,
+          bottom: -DsCheckbox._stateLayerPadY,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: enabled && _hovered
+                  ? tokens.colorText.withValues(alpha: 0.06)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+            ),
+          ),
+        ),
+        content,
+      ],
+    );
+
     final control = Opacity(
       opacity: enabled ? 1 : 0.5,
       child: ConstrainedBox(
@@ -186,7 +217,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            child: content,
+            child: hoverable,
           ),
         ),
       ),
@@ -199,8 +230,8 @@ class _DsCheckboxState extends State<DsCheckbox> {
     final String? announced = widget.errorText == null
         ? announcedName
         : (announcedName == null
-            ? widget.errorText
-            : '$announcedName, ${widget.errorText}');
+              ? widget.errorText
+              : '$announcedName, ${widget.errorText}');
 
     final interactive = Semantics(
       container: true,
@@ -210,13 +241,25 @@ class _DsCheckboxState extends State<DsCheckbox> {
       // A plain-text label is spoken through the node itself; a rich label
       // keeps its descendants so inline links stay reachable.
       excludeSemantics: widget.labelWidget == null,
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: enabled ? () => widget.onChanged!(!widget.value) : null,
-          onFocusChange: (focused) => setState(() => _focused = focused),
-          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
-          child: control,
+      // The row stays one tap target and keyboard-focusable, but its own ink is
+      // suppressed: the visible hover is the box's state layer above and focus
+      // is the box's ring. A MouseRegion lets a hover anywhere on the row light
+      // that box layer, so the whole row still reads as interactive.
+      child: MouseRegion(
+        onEnter: enabled ? (_) => setState(() => _hovered = true) : null,
+        onExit: enabled ? (_) => setState(() => _hovered = false) : null,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: enabled ? () => widget.onChanged!(!widget.value) : null,
+            onFocusChange: (focused) => setState(() => _focused = focused),
+            hoverColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+            child: control,
+          ),
         ),
       ),
     );
