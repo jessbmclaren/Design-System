@@ -36,6 +36,7 @@ class DsPasswordField extends StatefulWidget {
     this.validator,
     this.autovalidateMode,
     this.newPassword = false,
+    this.reserveErrorSpace = false,
   });
 
   /// The text shown above the input. When null, no label row is rendered.
@@ -88,6 +89,10 @@ class DsPasswordField extends StatefulWidget {
   /// stored one.
   final bool newPassword;
 
+  /// Whether to always reserve the caption line, so the field keeps the same
+  /// height with or without an error. Forwarded to [DsTextField.reserveErrorSpace].
+  final bool reserveErrorSpace;
+
   @override
   State<DsPasswordField> createState() => _DsPasswordFieldState();
 }
@@ -113,6 +118,7 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
       focusNode: widget.focusNode,
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
+      reserveErrorSpace: widget.reserveErrorSpace,
       obscureText: _obscured,
       // Declare the field to password managers and keep the value away from
       // the keyboard's correction and suggestion engines.

@@ -66,6 +66,7 @@ class DsTextField extends StatelessWidget {
     this.autofillHints,
     this.autocorrect = true,
     this.enableSuggestions = true,
+    this.reserveErrorSpace = false,
   });
 
   /// The text shown above the input describing what it collects.
@@ -97,6 +98,16 @@ class DsTextField extends StatelessWidget {
   /// For [Form]-driven validation prefer [validator], which reports its
   /// message through the field itself.
   final String? errorText;
+
+  /// Whether to always reserve the caption line beneath the field, so the field
+  /// keeps the same height whether or not an error shows.
+  ///
+  /// An error then replaces the reserved line instead of growing the field and
+  /// nudging the content below it, so a stack of fields does not jump as errors
+  /// appear and clear. Off by default; opt in on forms where layout stability
+  /// matters. Ignored when [helperText] is set, since that already reserves the
+  /// line.
+  final bool reserveErrorSpace;
 
   /// Controls the text being edited. When null, the field manages its own
   /// [TextEditingController] internally.
@@ -262,7 +273,10 @@ class DsTextField extends StatelessWidget {
               // message wins over [errorText], and the decorator shows the
               // helper only while no error shows. The error borders cover
               // both error paths.
-              helperText: helperText,
+              // A single-space helper keeps the caption slot allocated when
+              // [reserveErrorSpace] is on and nothing else fills it, so the
+              // field's height does not change as an error appears and clears.
+              helperText: helperText ?? (reserveErrorSpace ? ' ' : null),
               helperStyle: tokens.bodySm
                   .toTextStyle(color: tokens.colorSecondaryText),
               helperMaxLines: 3,

@@ -82,6 +82,43 @@ void main() {
       expect(find.text('We never share it.'), findsNothing);
     });
 
+    testWidgets('reserveErrorSpace holds the field height as an error toggles',
+        (tester) async {
+      // The reserved caption line means an error replaces it rather than
+      // growing the field, so a field stack stays put.
+      await pumpDs(
+        tester,
+        const DsTextField(hintText: 'Email', reserveErrorSpace: true),
+      );
+      final quiet = tester.getSize(find.byType(TextField)).height;
+
+      await pumpDs(
+        tester,
+        const DsTextField(
+          hintText: 'Email',
+          reserveErrorSpace: true,
+          errorText: 'Invalid',
+        ),
+      );
+      expect(tester.getSize(find.byType(TextField)).height, quiet);
+      expect(find.text('Invalid'), findsOneWidget);
+    });
+
+    testWidgets('without reserveErrorSpace, an error grows the field',
+        (tester) async {
+      await pumpDs(tester, const DsTextField(hintText: 'Email'));
+      final quiet = tester.getSize(find.byType(TextField)).height;
+
+      await pumpDs(
+        tester,
+        const DsTextField(hintText: 'Email', errorText: 'Invalid'),
+      );
+      expect(
+        tester.getSize(find.byType(TextField)).height,
+        greaterThan(quiet),
+      );
+    });
+
     testWidgets('a failing validator wins over errorText, so exactly one '
         'caption shows', (tester) async {
       final formKey = GlobalKey<FormState>();

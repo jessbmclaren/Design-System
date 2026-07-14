@@ -30,11 +30,15 @@ final PatternPage signUpPage = PatternPage(
       'name and company, validate on blur: the message appears once the user '
       'has typed into a field and left it empty, then clears live as they '
       'type, so a field they never touched is not flagged just for tabbing '
-      'past it, and a skipped one still surfaces on submit. The work email '
-      'validates live once '
-      'touched: a format check surfaces "This email is invalid" and a '
-      'directory check "Email already taken", both through the field\'s '
-      '`errorText`. The password is captioned by `dsFirstUnmetPasswordRule`, '
+      'past it, and a skipped one still surfaces on submit. Each field reserves '
+      'its caption line with `reserveErrorSpace`, so an error replaces that '
+      'line rather than growing the field and nudging the button below it. The '
+      'work email validates live once '
+      'touched: a format check surfaces "This email is invalid" through the '
+      'field\'s `errorText`, while a well-formed address that already has an '
+      'account turns into an inline "Sign in instead" doorway rather than a '
+      'dead-end error, so a returning user has a way in. The password is '
+      'captioned by `dsFirstUnmetPasswordRule`, '
       'which names one rule at a time so the error always says the next '
       'thing to fix, and a `DsPasswordStrength` meter beneath the field '
       'grades the value as it is typed. A `DsPasswordStrengthHint` line sits '
@@ -43,7 +47,10 @@ final PatternPage signUpPage = PatternPage(
       'warns against a guessable password, and shows nothing otherwise. The '
       'primary button stays live: a press that cannot go through reveals every '
       'field\'s error at once and moves focus to the first one to fix, so no '
-      'one is left guessing what a greyed-out button wants. While the request '
+      'one is left guessing what a greyed-out button wants. An explicit consent '
+      '`DsCheckbox` gates the account, its Terms and Privacy links inside the '
+      'label: its error shows only on a submit without the tick and clears the '
+      'moment it is ticked. While the request '
       'is in flight, set `submitPending` to show a spinner and block repeat '
       'taps; the view never touches the network or a timer itself, so it '
       'renders identically in a screenshot and in production.',
@@ -60,25 +67,26 @@ final PatternPage signUpPage = PatternPage(
       'Earlier revisions of this pattern paired the card with a benefits '
       '`aside`. The slot still exists for trial-style layouts, but this '
       'composition drops it: the single card keeps attention on the form, '
-      'and the terms line in the `footer` stays short so the primary action '
-      'is never buried.',
+      'and a short `footer` link keeps the primary action from being buried.',
     ),
   ],
   dos: const [
     'Ask for the fewest fields that let someone get started, then progressively collect the rest.',
     'Put name and surname in one `DsFormFieldGroup` row; the group stacks them itself when the card narrows.',
     'Validate format-free required fields on blur, then clear the error live as the value is typed.',
-    'Validate the email live once touched: a format check first, then the taken-address check, both through `errorText`.',
+    'Reserve the caption line with `reserveErrorSpace` so an error replaces it instead of shifting the fields and button below.',
+    'Turn a well-formed but already-registered email into an inline "Sign in instead" doorway, not a dead-end error.',
     'Caption the password with `dsFirstUnmetPasswordRule` so the error always names the next rule to fix.',
+    'Gate the account on an explicit consent `DsCheckbox`; reveal its error only on a submit without the tick.',
     'Keep `onSubmit` live and validate on submit: reveal every error at once and move focus to the first invalid field.',
     'Use `submitPending` while the request is in flight to prevent duplicate submissions.',
   ],
   donts: const [
     'Don\'t flag an error before the field is touched; an empty field is not yet wrong until the user leaves it or submits.',
     'Don\'t leave the primary button greyed-out with nothing said; an enabled button that reveals what is missing beats a dead one.',
+    'Don\'t dead-end a taken email with just "already taken"; offer a Sign in doorway so a returning user is not stuck.',
     'Don\'t list every unmet password rule at once; the ladder shows one message at a time.',
-    'Don\'t crowd the card with links that pull people out before they finish.',
-    'Don\'t bury the primary action beneath long terms copy; one short line under the button is enough.',
+    'Don\'t pre-tick the consent box; consent must be a deliberate opt-in.',
     'Don\'t add an `aside` to this composition; the card stands alone by design.',
   ],
   code: '''
@@ -105,13 +113,15 @@ DsSignUpView(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       // Name and surname share a row; the group stacks them when narrow.
-      // Required, format-free fields validate on blur, then clear as you type.
+      // Required, format-free fields validate on blur; every field reserves its
+      // caption line so an error never shifts the stack.
       DsFormFieldGroup(
         children: [
           DsTextField(
             controller: _name,
             focusNode: _nameFocus,
             hintText: 'Name',
+            reserveErrorSpace: true,
             errorText: _nameTouched
                 ? _requiredError(_name.text, 'Enter your name')
                 : null,
@@ -120,38 +130,45 @@ DsSignUpView(
             controller: _surname,
             focusNode: _surnameFocus,
             hintText: 'Surname',
+            reserveErrorSpace: true,
             errorText: _surnameTouched
                 ? _requiredError(_surname.text, 'Enter your surname')
                 : null,
           ),
         ],
       ),
-      const SizedBox(height: DsSpacing.lg),
+      const SizedBox(height: DsSpacing.sm),
       DsTextField(
         controller: _company,
         focusNode: _companyFocus,
         hintText: 'Company name',
+        reserveErrorSpace: true,
         errorText: _companyTouched
             ? _requiredError(_company.text, 'Enter your company name')
             : null,
       ),
-      const SizedBox(height: DsSpacing.lg),
+      const SizedBox(height: DsSpacing.sm),
       DsTextField(
         controller: _email,
         focusNode: _emailFocus,
         hintText: 'Work email',
         keyboardType: TextInputType.emailAddress,
+        reserveErrorSpace: true,
         onChanged: (_) => setState(() => _emailTouched = true),
-        // Empty, 'This email is invalid' or 'Email already taken', live.
-        errorText: _emailTouched ? _emailError(_email.text) : null,
+        // A taken email shows the doorway below instead of a plain caption.
+        errorText: _emailTouched && !_emailIsTaken
+            ? _emailError(_email.text)
+            : null,
       ),
-      const SizedBox(height: DsSpacing.lg),
+      if (_emailTouched && _emailIsTaken) _takenEmailNotice(tokens),
+      const SizedBox(height: DsSpacing.sm),
       DsPasswordField(
         controller: _password,
         focusNode: _passwordFocus,
         hintText: 'Password',
         // Cue password managers to generate and save, not fill a stored value.
         newPassword: true,
+        reserveErrorSpace: true,
         onChanged: (_) => setState(() => _passwordTouched = true),
         // One rule at a time: the first unmet rule is the next fix.
         errorText: _passwordTouched
@@ -161,27 +178,41 @@ DsSignUpView(
       const SizedBox(height: DsSpacing.sm),
       DsPasswordStrength(value: _password.text, showChecklist: false),
       DsPasswordStrengthHint(value: _password.text),
+      const SizedBox(height: DsSpacing.lg),
+      // Explicit consent gates the account; Terms and Privacy live in the label.
+      DsCheckbox(
+        value: _agreedToTerms,
+        onChanged: (v) => setState(() {
+          _agreedToTerms = v;
+          if (v) _termsError = false;
+        }),
+        semanticLabel: 'I agree to the Terms of Service and Privacy Policy',
+        errorText: _termsError
+            ? 'Please accept the Terms of Service and Privacy Policy to continue.'
+            : null,
+        labelWidget: Text.rich(
+          TextSpan(
+            style: tokens.bodyMd.toTextStyle(color: tokens.colorSecondaryText),
+            children: [
+              const TextSpan(text: 'I agree to the '),
+              TextSpan(text: 'Terms of Service',
+                  style: TextStyle(color: tokens.actionPrimaryColorText)),
+              const TextSpan(text: ' and '),
+              TextSpan(text: 'Privacy Policy',
+                  style: TextStyle(color: tokens.actionPrimaryColorText)),
+              const TextSpan(text: '.'),
+            ],
+          ),
+        ),
+      ),
     ],
   ),
   primaryActionLabel: 'Create account',
   // Stays enabled; a press reveals every error and focuses the first to fix.
   onSubmit: _trySubmit,
   submitPending: _submitting,
-  footer: Text.rich(
-    textAlign: TextAlign.center,
-    TextSpan(
-      style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
-      children: [
-        const TextSpan(text: 'By continuing, you agree to our '),
-        TextSpan(text: 'Terms of Service',
-            style: TextStyle(color: tokens.actionPrimaryColorText)),
-        const TextSpan(text: ' and '),
-        TextSpan(text: 'Privacy Policy',
-            style: TextStyle(color: tokens.actionPrimaryColorText)),
-        const TextSpan(text: '.'),
-      ],
-    ),
-  ),
+  footer: Text('Need help?',
+      style: tokens.bodySm.toTextStyle(color: tokens.actionPrimaryColorText)),
 )
 ''',
   shots: const [

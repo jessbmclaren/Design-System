@@ -1,8 +1,11 @@
 import 'package:design_system/design_system.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 /// Emails already registered in this demo. Typing one shows the inline
-/// 'Email already taken' error, the way the best sign-up forms validate live.
+/// "already have an account" notice with its in-line "Sign in" link, the way
+/// the best sign-up forms turn a taken email into a way in rather than a dead
+/// end.
 const Set<String> _takenEmails = <String>{
   'sam@acmeid.com',
   'taken@acmeid.com',
@@ -20,17 +23,18 @@ final RegExp _emailFormat = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 /// a name and surname row in a [DsFormFieldGroup] and a password captioned by
 /// [dsFirstUnmetPasswordRule] with a [DsPasswordStrength] meter beneath.
 ///
-/// Every required field validates on blur: its error surfaces once focus
-/// leaves it empty and clears live as the user types, so a skipped name or
-/// company is caught without nagging mid-entry, while the email also checks its
-/// format and the taken list once touched. The primary button stays enabled: a
-/// press that cannot go through reveals every outstanding error at once and
-/// moves focus to the first field to fix, rather than a dead, greyed-out
-/// button.
+/// Every required field validates on blur and reserves its caption line
+/// ([DsTextField.reserveErrorSpace]), so an error replaces that line rather
+/// than growing the field and nudging the button — the stack stays still as
+/// errors appear and clear. A well-formed but already-registered email turns
+/// into an inline "Sign in instead" doorway rather than a dead-end error, and
+/// an explicit consent checkbox gates the account. The primary button stays
+/// enabled: a press that cannot go through reveals every outstanding error at
+/// once and moves focus to the first field to fix.
 ///
-/// The fields start pre-filled with valid values so the first frame shows the
-/// complete card with the primary action enabled and the meter reading strong.
-/// No timers, network or randomness. The captured frame is stable.
+/// The text fields start pre-filled with valid values so the first frame shows
+/// the complete card with the meter reading strong. No timers, network or
+/// randomness. The captured frame is stable.
 class SignUpDemo extends StatefulWidget {
   const SignUpDemo({super.key});
 
@@ -48,8 +52,6 @@ class _SignUpDemoState extends State<SignUpDemo> {
   final TextEditingController _password =
       TextEditingController(text: 'Mint-Trellis-4271');
 
-  // Every required field validates on blur, so a skipped field is caught the
-  // moment focus leaves it empty.
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _surnameFocus = FocusNode();
   final FocusNode _companyFocus = FocusNode();
@@ -64,18 +66,26 @@ class _SignUpDemoState extends State<SignUpDemo> {
   bool _emailTouched = false;
   bool _passwordTouched = false;
 
-  // Whether the user has actually typed into each required-only field. Blur
-  // reveals a required error only for a field they engaged with, so tabbing
-  // forward past an untouched field does not scold them mid-flow. The email and
-  // password validate live once typed, so their edit-signal is their own
-  // touched flag.
+  // Whether the user has actually typed into each required-only field, so blur
+  // reveals a required error only for a field they engaged with (not one they
+  // merely tabbed past). Email and password validate live once typed.
   bool _nameEdited = false;
   bool _surnameEdited = false;
   bool _companyEdited = false;
 
+  // Explicit consent, ticked before the account is created; the error shows
+  // only on a submit without the tick, and clears once ticked.
+  bool _agreedToTerms = false;
+  bool _termsError = false;
+
+  // Recognizer for the inline "Sign in" link inside the already-registered
+  // notice; held as a field so it can be disposed.
+  late final TapGestureRecognizer _signInTap;
+
   @override
   void initState() {
     super.initState();
+    _signInTap = TapGestureRecognizer()..onTap = () {};
     _touchOnBlur(_nameFocus, () => _nameEdited, () => _nameTouched,
         () => _nameTouched = true);
     _touchOnBlur(_surnameFocus, () => _surnameEdited, () => _surnameTouched,
@@ -88,10 +98,9 @@ class _SignUpDemoState extends State<SignUpDemo> {
         () => _passwordTouched = true);
   }
 
-  /// Flips a field to "touched" the first time focus leaves it, so a required
-  /// error shows on blur rather than while the user is still typing. Only a
-  /// field the user has actually engaged with ([isEdited]) reveals on blur, so
-  /// tabbing forward past an untouched field does not scold them.
+  /// Flips a field to "touched" the first time focus leaves it, but only once
+  /// the user has actually engaged with it ([isEdited]), so tabbing forward
+  /// past an untouched field does not scold them.
   void _touchOnBlur(
     FocusNode node,
     bool Function() isEdited,
@@ -111,15 +120,24 @@ class _SignUpDemoState extends State<SignUpDemo> {
       value.trim().isEmpty ? message : null;
 
   /// The email error: empty first, then a format check, then the taken-address
-  /// check, fed straight into the field's errorText.
+  /// check. The taken case is shown by [_takenEmailNotice] instead, so its
+  /// message here only feeds submit-gating and focus.
   String? _emailError(String value) {
     final email = value.trim();
     if (email.isEmpty) return 'Enter your email address';
     if (!_emailFormat.hasMatch(email)) return 'This email is invalid';
     if (_takenEmails.contains(email.toLowerCase())) {
-      return 'Email already taken';
+      return 'This email already has an account';
     }
     return null;
+  }
+
+  /// A well-formed address that already has an account — the case worth turning
+  /// into a "Sign in instead" doorway rather than a dead-end error.
+  bool get _emailIsTaken {
+    final e = _email.text.trim();
+    if (e.isEmpty || !_emailFormat.hasMatch(e)) return false;
+    return _takenEmails.contains(e.toLowerCase());
   }
 
   /// The focus node of the first field failing validation, in reading order, or
@@ -134,11 +152,10 @@ class _SignUpDemoState extends State<SignUpDemo> {
     return null;
   }
 
-  /// The button stays enabled: a press that can't go through is not a dead end,
-  /// it reveals every outstanding error at once and lands the user on the first
-  /// field to fix, rather than leaving them to guess what a greyed-out button
-  /// wants. A real product would create the account here; the demo stops at
-  /// validation so it stays timer-free and its screenshot is stable.
+  /// The button stays enabled: a press that can't go through reveals every
+  /// outstanding error at once and lands the user on the first field to fix.
+  /// A real product would create the account here; the demo stops at validation
+  /// so it stays timer-free and its screenshot is stable.
   void _trySubmit() {
     setState(() {
       _nameTouched = true;
@@ -146,6 +163,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
       _companyTouched = true;
       _emailTouched = true;
       _passwordTouched = true;
+      _termsError = !_agreedToTerms;
     });
     _firstInvalidFocus()?.requestFocus();
   }
@@ -162,7 +180,46 @@ class _SignUpDemoState extends State<SignUpDemo> {
     _companyFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
+    _signInTap.dispose();
     super.dispose();
+  }
+
+  /// The "already registered" notice: not a dead-end "email taken", but an
+  /// inline error whose own sentence carries the way out — a "Sign in" link.
+  Widget _takenEmailNotice(DsTokens tokens) {
+    return Padding(
+      padding: const EdgeInsets.only(top: DsSpacing.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2, right: DsSpacing.xs),
+            child: Icon(DsIcons.error,
+                size: DsIconSize.sm, color: tokens.colorDanger),
+          ),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                style: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+                children: [
+                  const TextSpan(
+                    text: 'An account already exists with this email. ',
+                  ),
+                  TextSpan(
+                    text: 'Sign in',
+                    style: TextStyle(color: tokens.actionPrimaryColorText),
+                    recognizer: _signInTap,
+                  ),
+                  const TextSpan(
+                    text: ' instead, or use a different email address.',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -192,8 +249,8 @@ class _SignUpDemoState extends State<SignUpDemo> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Name and surname share a row where there is room; on very narrow
-          // screens the group stacks them so neither placeholder clips. Both
-          // are required, format-free fields, so they validate on blur.
+          // screens the group stacks them so neither placeholder clips. Every
+          // field reserves its caption line so an error never nudges the stack.
           DsFormFieldGroup(
             children: [
               DsTextField(
@@ -201,6 +258,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
                 focusNode: _nameFocus,
                 hintText: 'Name',
                 textInputAction: TextInputAction.next,
+                reserveErrorSpace: true,
                 onChanged: (_) => setState(() => _nameEdited = true),
                 errorText: _nameTouched
                     ? _requiredError(_name.text, 'Enter your name')
@@ -211,6 +269,7 @@ class _SignUpDemoState extends State<SignUpDemo> {
                 focusNode: _surnameFocus,
                 hintText: 'Surname',
                 textInputAction: TextInputAction.next,
+                reserveErrorSpace: true,
                 onChanged: (_) => setState(() => _surnameEdited = true),
                 errorText: _surnameTouched
                     ? _requiredError(_surname.text, 'Enter your surname')
@@ -218,33 +277,41 @@ class _SignUpDemoState extends State<SignUpDemo> {
               ),
             ],
           ),
-          const SizedBox(height: DsSpacing.lg),
+          const SizedBox(height: DsSpacing.sm),
           DsTextField(
             controller: _company,
             focusNode: _companyFocus,
             hintText: 'Company name',
             textInputAction: TextInputAction.next,
+            reserveErrorSpace: true,
             onChanged: (_) => setState(() => _companyEdited = true),
             errorText: _companyTouched
                 ? _requiredError(_company.text, 'Enter your company name')
                 : null,
           ),
-          const SizedBox(height: DsSpacing.lg),
+          const SizedBox(height: DsSpacing.sm),
           DsTextField(
             controller: _email,
             focusNode: _emailFocus,
             hintText: 'Work email',
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
+            reserveErrorSpace: true,
             onChanged: (_) => setState(() => _emailTouched = true),
-            errorText: _emailTouched ? _emailError(_email.text) : null,
+            // The taken case shows its own richer notice below (with the inline
+            // "Sign in" link), so suppress the plain caption for it here.
+            errorText: _emailTouched && !_emailIsTaken
+                ? _emailError(_email.text)
+                : null,
           ),
-          const SizedBox(height: DsSpacing.lg),
+          if (_emailTouched && _emailIsTaken) _takenEmailNotice(tokens),
+          const SizedBox(height: DsSpacing.sm),
           DsPasswordField(
             controller: _password,
             focusNode: _passwordFocus,
             hintText: 'Password',
             textInputAction: TextInputAction.done,
+            reserveErrorSpace: true,
             onChanged: (_) => setState(() => _passwordTouched = true),
             errorText: _passwordTouched
                 ? dsFirstUnmetPasswordRule(_password.text)
@@ -256,29 +323,48 @@ class _SignUpDemoState extends State<SignUpDemo> {
           // error ladder above names the rules, so the checklist stays off.
           DsPasswordStrength(value: _password.text, showChecklist: false),
           DsPasswordStrengthHint(value: _password.text),
+          const SizedBox(height: DsSpacing.lg),
+          // Explicit consent, ticked before the account is created — it replaces
+          // the passive "by continuing you agree" line. Terms and Privacy sit
+          // inside the label, and the whole row toggles the box.
+          DsCheckbox(
+            value: _agreedToTerms,
+            onChanged: (v) => setState(() {
+              _agreedToTerms = v;
+              if (v) _termsError = false;
+            }),
+            semanticLabel: 'I agree to the Terms of Service and Privacy Policy',
+            errorText: _termsError
+                ? 'Please accept the Terms of Service and Privacy Policy to '
+                    'continue.'
+                : null,
+            labelWidget: Text.rich(
+              TextSpan(
+                style: tokens.bodyMd.toTextStyle(color: tokens.colorSecondaryText),
+                children: [
+                  const TextSpan(text: 'I agree to the '),
+                  TextSpan(
+                    text: 'Terms of Service',
+                    style: TextStyle(color: tokens.actionPrimaryColorText),
+                  ),
+                  const TextSpan(text: ' and '),
+                  TextSpan(
+                    text: 'Privacy Policy',
+                    style: TextStyle(color: tokens.actionPrimaryColorText),
+                  ),
+                  const TextSpan(text: '.'),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       primaryActionLabel: 'Create account',
       // The button stays live; the press validates and reveals what is missing.
       onSubmit: _trySubmit,
-      footer: Text.rich(
-        textAlign: TextAlign.center,
-        TextSpan(
-          style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
-          children: [
-            const TextSpan(text: 'By continuing, you agree to our '),
-            TextSpan(
-              text: 'Terms of Service',
-              style: TextStyle(color: tokens.actionPrimaryColorText),
-            ),
-            const TextSpan(text: ' and '),
-            TextSpan(
-              text: 'Privacy Policy',
-              style: TextStyle(color: tokens.actionPrimaryColorText),
-            ),
-            const TextSpan(text: '.'),
-          ],
-        ),
+      footer: Text(
+        'Need help?',
+        style: tokens.bodySm.toTextStyle(color: tokens.actionPrimaryColorText),
       ),
     );
   }
