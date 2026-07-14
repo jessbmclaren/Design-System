@@ -40,6 +40,13 @@ DsSignInView(
   form: Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      if (_error) ...[
+        const DsBanner(
+          variant: DsBannerVariant.danger,
+          title: 'Incorrect email or password.',
+        ),
+        const SizedBox(height: DsSpacing.lg),
+      ],
       DsTextField(
         label: 'Email',
         hintText: 'you@company.com',
@@ -77,6 +84,8 @@ DsSignInView(
       DsButton.social(icon: DsIcons.web, label: 'Google', onPressed: _google),
       const SizedBox(height: DsSpacing.md),
       DsButton.social(icon: DsIcons.key, label: 'Passkey', onPressed: _passkey),
+      const SizedBox(height: DsSpacing.md),
+      DsButton.social(icon: DsIcons.verified, label: 'SSO', onPressed: _sso),
     ],
   ),
   footerBand: Wrap(
