@@ -29,6 +29,9 @@ import 'pages/date_field.dart';
 import 'pages/form_field_group.dart';
 import 'pages/field_label.dart';
 import 'pages/password_field.dart';
+import 'pages/choose_password.dart';
+import 'pages/password_requirements.dart';
+import 'pages/resend_control.dart';
 import 'pages/password_strength.dart';
 import 'pages/icon_button.dart';
 import 'pages/wordmark.dart';
@@ -110,6 +113,9 @@ final List<PatternPage> allPages = [
   textFieldsPage,
   fieldLabelPage,
   passwordFieldPage,
+  passwordRequirementsPage,
+  resendControlPage,
+  choosePasswordPage,
   passwordStrengthPage,
   textAreaPage,
   selectDropdownPage,

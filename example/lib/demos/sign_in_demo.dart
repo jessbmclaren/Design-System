@@ -1,6 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
+/// Which step of the sign-in / recovery journey the demo is showing.
+enum _Mode { signIn, forgot, sent }
+
 /// Live demo for the Sign in page.
 ///
 /// Renders a real [DsSignInView] in its form-led composition: a left-aligned
@@ -9,8 +12,12 @@ import 'package:flutter/material.dart';
 /// action, a labelled divider above the alternative providers and a
 /// create-account prompt in the tinted footer band. A failed sign-in surfaces
 /// a `DsBanner` above the form — the pattern the page prescribes — cleared the
-/// moment either field is edited. The fields start pre-filled so the first
-/// frame is complete. No timers, network or randomness.
+/// moment either field is edited.
+///
+/// The forgot-password link is live: it morphs the card through the recovery
+/// steps ([DsForgotPasswordView]) — request a link, then "check your email" —
+/// and back, so the whole journey is walkable. The fields start pre-filled so
+/// the first frame is complete. No timers, network or randomness.
 class SignInDemo extends StatefulWidget {
   const SignInDemo({super.key});
 
@@ -23,13 +30,18 @@ class _SignInDemoState extends State<SignInDemo> {
       TextEditingController(text: 'jordan@northwind.io');
   final TextEditingController _password =
       TextEditingController(text: 'correct-horse-battery');
+  final TextEditingController _resetEmail =
+      TextEditingController(text: 'jordan@northwind.io');
   bool _remember = true;
   bool _error = false;
+  _Mode _mode = _Mode.signIn;
+  String _sentTo = '';
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _resetEmail.dispose();
     super.dispose();
   }
 
@@ -50,6 +62,14 @@ class _SignInDemoState extends State<SignInDemo> {
 
   @override
   Widget build(BuildContext context) {
+    return switch (_mode) {
+      _Mode.signIn => _buildSignIn(context),
+      _Mode.forgot => _buildForgot(context),
+      _Mode.sent => _buildSent(context),
+    };
+  }
+
+  Widget _buildSignIn(BuildContext context) {
     final tokens = DsTokens.of(context);
 
     return DsSignInView(
@@ -85,7 +105,7 @@ class _SignInDemoState extends State<SignInDemo> {
                   alignment: Alignment.centerRight,
                   child: DsLink(
                     label: 'Forgot your password?',
-                    onPressed: () {},
+                    onPressed: () => setState(() => _mode = _Mode.forgot),
                   ),
                 ),
               ),
@@ -146,5 +166,77 @@ class _SignInDemoState extends State<SignInDemo> {
         ],
       ),
     );
+  }
+
+  /// A4 — request a reset link.
+  Widget _buildForgot(BuildContext context) {
+    return DsForgotPasswordView(
+      title: 'Reset your password',
+      description:
+          'Enter the email address associated with your account and we’ll '
+          'send you a link to reset your password.',
+      form: DsTextField(
+        label: 'Email',
+        hintText: 'you@company.com',
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.done,
+        controller: _resetEmail,
+        autofillHints: const [AutofillHints.username, AutofillHints.email],
+        onSubmitted: (_) => _sendResetLink(),
+      ),
+      primaryAction:
+          DsSignInAction(label: 'Continue', onPressed: _sendResetLink),
+      footer: DsLink(
+        label: 'Return to sign-in',
+        onPressed: () => setState(() => _mode = _Mode.signIn),
+      ),
+    );
+  }
+
+  /// A5 — confirm the link is on its way, without leaking whether the account
+  /// exists.
+  Widget _buildSent(BuildContext context) {
+    final tokens = DsTokens.of(context);
+    return DsForgotPasswordView(
+      title: 'Check your email',
+      descriptionRich: Text.rich(
+        TextSpan(
+          children: [
+            const TextSpan(text: 'If an account exists for '),
+            TextSpan(
+              text: _sentTo,
+              style: TextStyle(color: tokens.colorText),
+            ),
+            const TextSpan(
+              text: ', we’ve sent a link to reset your password.',
+            ),
+          ],
+        ),
+      ),
+      primaryAction: DsSignInAction(
+        label: 'Return to sign-in',
+        onPressed: () => setState(() => _mode = _Mode.signIn),
+      ),
+      footer: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            'Didn’t get it? ',
+            style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
+          ),
+          DsLink(label: 'Resend', onPressed: () {}),
+        ],
+      ),
+    );
+  }
+
+  void _sendResetLink() {
+    setState(() {
+      _sentTo = _resetEmail.text.trim().isEmpty
+          ? 'your email'
+          : _resetEmail.text.trim();
+      _mode = _Mode.sent;
+    });
   }
 }

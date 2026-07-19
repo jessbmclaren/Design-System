@@ -111,6 +111,20 @@ void main() {
       ),
     );
 
+    // All three readings side by side: satisfied, still to do, and refused.
+    dsGoldenMatrix(
+      'atom',
+      'check_dot',
+      () => const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          DsCheckDot(met: true),
+          DsCheckDot(met: false),
+          DsCheckDot(met: false, unmetTone: DsCheckDotTone.danger),
+        ],
+      ),
+    );
+
     dsGoldenMatrix(
       'atom',
       'checkbox',

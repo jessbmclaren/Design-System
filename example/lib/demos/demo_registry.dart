@@ -16,6 +16,9 @@ import 'menu_demo.dart';
 import 'tooltip_demo.dart';
 import 'text_fields_demo.dart';
 import 'password_field_demo.dart';
+import 'choose_password_demo.dart';
+import 'password_requirements_demo.dart';
+import 'resend_control_demo.dart';
 import 'password_strength_demo.dart';
 import 'text_area_demo.dart';
 import 'selection_controls_demo.dart';
@@ -85,6 +88,9 @@ final Map<String, Widget Function()> _demos = {
   'tooltip': () => const TooltipDemo(),
   'text-fields': () => const TextFieldsDemo(),
   'password-field': () => const PasswordFieldDemo(),
+  'password-requirements': () => const PasswordRequirementsDemo(),
+  'resend-control': () => const ResendControlDemo(),
+  'choose-password': () => const ChoosePasswordDemo(),
   'password-strength': () => const PasswordStrengthDemo(),
   'text-area': () => const TextAreaDemo(),
   'selection-controls': () => const SelectionControlsDemo(),

@@ -65,9 +65,9 @@ Components are organised into atomic design layers under
 
 | Layer | Components |
 | --- | --- |
-| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsSegmentedControl`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom` |
-| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordStrength`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner` |
-| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences` |
+| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsCheckDot`, `DsSegmentedControl`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom` |
+| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordRequirements`, `DsPasswordStrength`, `DsResendControl`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner` |
+| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsChoosePasswordView`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences` |
 | **Templates** | `DsPageScaffold`, `DsAuthShell` |
 | **Pages** | the documentation demos in [`example/`](example/) |
 

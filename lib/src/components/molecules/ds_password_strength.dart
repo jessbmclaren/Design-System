@@ -4,6 +4,7 @@ import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
+import 'ds_password_requirements.dart';
 
 // ---------------------------------------------------------------------------
 // Model (pure Dart, no Flutter): the rules and grading used by the meter. It
@@ -329,7 +330,7 @@ class DsPasswordStrength extends StatelessWidget {
             ],
             if (showChecklist) ...<Widget>[
               SizedBox(height: tokens.spacingUnit),
-              _Checklist(rules: rules),
+              _Checklist(value: value, rules: rules),
             ],
           ],
         );
@@ -345,9 +346,14 @@ class DsPasswordStrength extends StatelessWidget {
 
 /// The rule checklist: two columns where each fits a label at the ambient
 /// text scale, one column otherwise.
+///
+/// The rows themselves are [DsPasswordRequirements], so the meter's checklist
+/// and a standalone one are the same code. This wrapper only decides how many
+/// columns the available width affords.
 class _Checklist extends StatelessWidget {
-  const _Checklist({required this.rules});
+  const _Checklist({required this.value, required this.rules});
 
+  final String value;
   final List<DsPasswordRule> rules;
 
   @override
@@ -363,102 +369,19 @@ class _Checklist extends StatelessWidget {
         final double minItemWidth = MediaQuery.textScalerOf(
           context,
         ).scale(DsPasswordStrength._minChecklistItemWidth);
-        if (itemWidth < minItemWidth) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              for (final rule in rules)
-                Padding(
-                  padding: EdgeInsets.only(bottom: tokens.spacingUnit / 2),
-                  child: _RuleRow(rule: rule),
-                ),
-            ],
-          );
-        }
-        return Wrap(
-          spacing: tokens.spacingUnit * 1.5,
-          runSpacing: tokens.spacingUnit / 2,
-          children: <Widget>[
-            for (final rule in rules)
-              SizedBox(
-                width: itemWidth,
-                child: _RuleRow(rule: rule),
-              ),
-          ],
+        return DsPasswordRequirements(
+          value: value,
+          // Already computed one level up, so they are passed through rather
+          // than graded a second time on every keystroke.
+          rules: rules,
+          itemWidth: itemWidth < minItemWidth ? null : itemWidth,
         );
       },
     );
   }
 }
 
-/// One checklist entry: a dot marker and the rule label.
-class _RuleRow extends StatelessWidget {
-  const _RuleRow({required this.rule});
 
-  final DsPasswordRule rule;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    // The row reads as one node with a checked state, so assistive
-    // technology hears whether the rule is met rather than a bare label.
-    return Semantics(
-      container: true,
-      checked: rule.met,
-      child: Row(
-        children: <Widget>[
-          _CheckDot(met: rule.met),
-          SizedBox(width: tokens.spacingUnit),
-          Expanded(
-            child: Text(
-              rule.label,
-              style: tokens.bodySm.toTextStyle(
-                color: rule.met ? tokens.colorText : tokens.colorSecondaryText,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The checklist marker: a filled check dot once the rule is met, an empty
-/// outlined circle until then. The dot is decorative; the label's colour and
-/// the check glyph pair up so the state never rests on colour alone.
-class _CheckDot extends StatelessWidget {
-  const _CheckDot({required this.met});
-
-  final bool met;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = DsTokens.of(context);
-    return Container(
-      width: DsIconSize.md,
-      height: DsIconSize.md,
-      alignment: Alignment.center,
-      decoration: met
-          ? BoxDecoration(
-              shape: BoxShape.circle,
-              color: tokens.badgeSuccessColorBackground,
-              border: Border.all(color: tokens.badgeSuccessColorBorder),
-            )
-          : BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: tokens.colorBorder, width: 1.5),
-            ),
-      child: met
-          ? Icon(
-              DsIcons.check,
-              size: DsIconSize.xxs,
-              color: tokens.badgeSuccessColorText,
-            )
-          : null,
-    );
-  }
-}
 
 /// An inline warning shown while the password still needs work.
 ///
