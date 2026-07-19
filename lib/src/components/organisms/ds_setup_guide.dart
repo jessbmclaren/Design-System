@@ -9,7 +9,7 @@ import '../../util/ds_motion.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_link.dart';
 import '../atoms/ds_progress_bar.dart';
-import '../molecules/ds_tooltip.dart';
+import '../atoms/ds_tooltip.dart';
 
 /// Diameter of a task's leading status marker.
 const double _markerSize = 18;

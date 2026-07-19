@@ -5,7 +5,7 @@ import '../../tokens/ds_breakpoints.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_divider.dart';
 import '../molecules/ds_footer_actions.dart';
-import 'ds_progress_stepper.dart';
+import '../molecules/ds_progress_stepper.dart';
 
 /// A single step within a [DsOnboardingWizard].
 ///
