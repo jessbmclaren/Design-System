@@ -57,6 +57,15 @@ abstract final class DsIcons {
   /// Back navigation.
   static const IconData arrowBack = LucideIcons.arrow_left;
 
+  /// A left-pointing chevron (pagination previous, step back).
+  static const IconData chevronLeft = LucideIcons.chevron_left;
+
+  /// A bidirectional sort control on a table column.
+  static const IconData sort = LucideIcons.arrow_up_down;
+
+  /// A transfer between two accounts or places.
+  static const IconData transfer = LucideIcons.arrow_right_left;
+
   // --- Actions --------------------------------------------------------------
 
   /// Dismiss / clear / remove-from-view.
@@ -131,6 +140,43 @@ abstract final class DsIcons {
   /// Contextual help.
   static const IconData help = LucideIcons.circle_question_mark;
 
+  /// Search a collection.
+  static const IconData search = LucideIcons.search;
+
+  /// The navigation menu (hamburger) trigger.
+  static const IconData menu = LucideIcons.menu;
+
+  /// Fine-tune the active filters.
+  static const IconData tune = LucideIcons.sliders_horizontal;
+
+  /// Product or account settings.
+  static const IconData settings = LucideIcons.settings;
+
+  /// Switch a collection to its list view.
+  static const IconData list = LucideIcons.list;
+
+  /// Switch a collection to its grid view.
+  static const IconData gridView = LucideIcons.layout_grid;
+
+  /// Start or run a job.
+  static const IconData play = LucideIcons.play;
+
+  /// Launch a guided flow.
+  static const IconData launch = LucideIcons.rocket;
+
+  /// A checklist of items to work through.
+  static const IconData checklist = LucideIcons.list_checks;
+
+  /// Switch the visual theme or brand.
+  static const IconData palette = LucideIcons.palette;
+
+  /// A repeating schedule or frequency.
+  static const IconData repeat = LucideIcons.repeat;
+
+  /// Upload from the device, drawn as the tray-and-arrow variant. [upload]
+  /// keeps the cloud glyph.
+  static const IconData uploadTray = LucideIcons.upload;
+
   // --- Status ---------------------------------------------------------------
 
   /// Success / positive confirmation.
@@ -156,6 +202,15 @@ abstract final class DsIcons {
 
   /// A time, schedule or pending state.
   static const IconData time = LucideIcons.clock;
+
+  /// A blocked or locked-out state.
+  static const IconData blocked = LucideIcons.ban;
+
+  /// A security alert that needs attention.
+  static const IconData securityAlert = LucideIcons.shield_alert;
+
+  /// A plain circular marker.
+  static const IconData circle = LucideIcons.circle;
 
   // --- Selection & true-state ----------------------------------------------
 
@@ -239,4 +294,40 @@ abstract final class DsIcons {
 
   /// A receipt / billing record.
   static const IconData receipt = LucideIcons.receipt;
+
+  /// The home destination.
+  static const IconData home = LucideIcons.house;
+
+  /// Fuel and refuelling.
+  static const IconData fuel = LucideIcons.fuel;
+
+  /// A package or parcel.
+  static const IconData package = LucideIcons.package;
+
+  /// A wallet or account balance.
+  static const IconData wallet = LucideIcons.wallet;
+
+  /// A reward or gift.
+  static const IconData reward = LucideIcons.gift;
+
+  /// A place on the map.
+  static const IconData location = LucideIcons.map_pin;
+
+  /// A balance or comparison of amounts.
+  static const IconData balance = LucideIcons.scale;
+
+  /// A developer terminal.
+  static const IconData terminal = LucideIcons.square_terminal;
+
+  /// Discover and explore.
+  static const IconData discover = LucideIcons.binoculars;
+
+  /// An organisation or business.
+  static const IconData organisation = LucideIcons.building_2;
+
+  /// A closed folder. [folder] keeps the open-folder glyph.
+  static const IconData folderClosed = LucideIcons.folder;
+
+  /// A document with lined text. [file] keeps the plain sheet.
+  static const IconData fileText = LucideIcons.file_text;
 }
