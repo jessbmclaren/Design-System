@@ -55,6 +55,7 @@ import 'pages/menu_sheet.dart';
 import 'pages/nav_rail.dart';
 import 'pages/status_bar.dart';
 import 'pages/app_shell.dart';
+import 'pages/table_views.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
 import 'pages/focus_view.dart';
@@ -166,6 +167,7 @@ final List<PatternPage> allPages = [
   cookiePreferencesPage,
   // Data
   dataGridPage,
+  tableViewsPage,
   cellTypesPage,
   groupingPage,
   filteringSortingPage,

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show listEquals, mapEquals;
 import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 import 'package:flutter/semantics.dart';
@@ -306,6 +307,87 @@ class DsGridSort {
   int get hashCode => Object.hash(columnKey, ascending);
 }
 
+/// A table-view configuration for a [DsDataGrid]: which columns show, in what
+/// order, under what display labels, with what sort and which column-bottom
+/// calculations.
+///
+/// A view is plain data the caller owns. Pass one to [DsDataGrid.view] and the
+/// grid renders it; also pass [DsDataGrid.onViewChanged] and the grid grows
+/// its management surface (a per-column header menu, drag-to-reorder headers,
+/// an add-column affordance and an editable calculations footer), reporting
+/// every change back as a new value. Persisting, naming and switching between
+/// saved views is the application's concern; a view switcher composes from
+/// `DsTabs` or `DsMenu`.
+@immutable
+class DsGridView {
+  /// Creates a table-view configuration.
+  const DsGridView({
+    this.visibleColumns,
+    this.columnLabels = const <String, String>{},
+    this.sort,
+    this.calculations = const <String, DsAggregation>{},
+  });
+
+  /// The [DsGridColumn.key]s to show, in display order. Null shows every
+  /// column in its definition order.
+  final List<String>? visibleColumns;
+
+  /// Display-only header relabels, keyed by column key. A column absent from
+  /// the map keeps its [DsGridColumn.title]; relabelling never renames the
+  /// underlying column.
+  final Map<String, String> columnLabels;
+
+  /// The view's sort. When a view is set this is the grid's authoritative
+  /// sort; header taps report the next sort through
+  /// [DsDataGrid.onViewChanged].
+  final DsGridSort? sort;
+
+  /// The column-bottom calculations shown in the footer band, keyed by column
+  /// key. An empty map renders no values (the managed grid still offers the
+  /// add-calculation affordance).
+  final Map<String, DsAggregation> calculations;
+
+  static const Object _unset = Object();
+
+  /// Returns a copy with the given fields replaced. Pass `sort: null`
+  /// explicitly to clear the sort.
+  DsGridView copyWith({
+    Object? visibleColumns = _unset,
+    Map<String, String>? columnLabels,
+    Object? sort = _unset,
+    Map<String, DsAggregation>? calculations,
+  }) {
+    return DsGridView(
+      visibleColumns: identical(visibleColumns, _unset)
+          ? this.visibleColumns
+          : visibleColumns as List<String>?,
+      columnLabels: columnLabels ?? this.columnLabels,
+      sort: identical(sort, _unset) ? this.sort : sort as DsGridSort?,
+      calculations: calculations ?? this.calculations,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DsGridView &&
+          runtimeType == other.runtimeType &&
+          listEquals(visibleColumns, other.visibleColumns) &&
+          mapEquals(columnLabels, other.columnLabels) &&
+          sort == other.sort &&
+          mapEquals(calculations, other.calculations);
+
+  @override
+  int get hashCode => Object.hash(
+        visibleColumns == null ? null : Object.hashAll(visibleColumns!),
+        Object.hashAll(
+            columnLabels.entries.map((e) => Object.hash(e.key, e.value))),
+        sort,
+        Object.hashAll(
+            calculations.entries.map((e) => Object.hash(e.key, e.value))),
+      );
+}
+
 /// A flagship, spreadsheet-grade data grid for the Design System.
 ///
 /// [DsDataGrid] renders typed [rows] against a set of [columns] with the polish
@@ -381,6 +463,19 @@ class DsGridSort {
 /// to the stacked-card layout, where a collapsible header precedes each group's
 /// cards. When [groupBy] is empty the grid renders exactly as an ungrouped one.
 ///
+/// ## Views
+///
+/// Pass a [DsGridView] to [view] and the grid renders that configuration:
+/// only the view's columns, in its order, under its display labels, sorted by
+/// its sort, with its column-bottom calculations in a footer band. Also pass
+/// [onViewChanged] and the grid grows its management surface: every header
+/// gains a column menu (sort, move, relabel, hide), headers reorder by
+/// long-press drag, a trailing add-column affordance restores hidden columns
+/// and each footer slot opens a calculation picker. The view is controlled
+/// data the caller owns — the grid reports each change as a new value and
+/// never stores one itself, so saved views, naming and switching are the
+/// application's to build (a switcher composes from `DsTabs` or `DsMenu`).
+///
 /// ## Accessibility & screenshots
 ///
 /// Header cells expose a semantics button with a sort key and an announced sort
@@ -409,6 +504,8 @@ class DsDataGrid extends StatefulWidget {
     this.groupBy = const [],
     this.aggregations = const {},
     this.initiallyExpanded = true,
+    this.view,
+    this.onViewChanged,
   });
 
   /// The column definitions, in display order. Columns with
@@ -489,6 +586,20 @@ class DsDataGrid extends StatefulWidget {
   /// header band.
   final bool initiallyExpanded;
 
+  /// The table-view configuration to render: visible columns and their order,
+  /// display labels, the view's sort and the footer calculations. Null renders
+  /// every column exactly as before. When set, [view]'s sort is authoritative
+  /// and [columns] acts as the catalogue the view picks from.
+  final DsGridView? view;
+
+  /// Called with the next [DsGridView] whenever the user changes the view.
+  /// Providing it (alongside [view]) enables the management surface: each
+  /// header gains a column menu (sort, move, relabel, hide), headers reorder
+  /// by long-press drag, a trailing add-column affordance restores hidden
+  /// columns and the calculations footer becomes editable. The grid never
+  /// mutates the view itself; the caller stores it and passes it back.
+  final ValueChanged<DsGridView>? onViewChanged;
+
   @override
   State<DsDataGrid> createState() => _DsDataGridState();
 }
@@ -498,10 +609,12 @@ class _DsDataGridState extends State<DsDataGrid> {
   static const double _seamWidth = 6;
   static const double _resizeHandleWidth = 6;
   static const double _checkboxSize = 18;
+  static const double _addColumnWidth = 44;
 
   final ScrollController _verticalController = ScrollController();
   final ScrollController _headerHController = ScrollController();
   final ScrollController _bodyHController = ScrollController();
+  final ScrollController _footerHController = ScrollController();
 
   /// Live column widths, keyed by column key. Seeded from the column
   /// definitions and mutated by drag-to-resize.
@@ -524,6 +637,9 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   /// The column key of the cell currently in an inline text editor.
   String? _editingColumnKey;
+
+  /// The key of the column whose header label is being edited inline, or null.
+  String? _editingHeaderKey;
 
   /// The live overlay entry for an open select / multi-select menu, kept so at
   /// most one is shown at a time and so it can be dismissed and disposed.
@@ -561,6 +677,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     _verticalController.dispose();
     _headerHController.dispose();
     _bodyHController.dispose();
+    _footerHController.dispose();
     super.dispose();
   }
 
@@ -578,14 +695,22 @@ class _DsDataGridState extends State<DsDataGrid> {
   }
 
   void _syncHeaderOffset() {
-    if (!_headerHController.hasClients || !_bodyHController.hasClients) return;
-    final position = _headerHController.position;
-    final target = _bodyHController.offset.clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
-    );
-    if ((_headerHController.offset - target).abs() > 0.5) {
-      _headerHController.jumpTo(target);
+    if (!_bodyHController.hasClients) return;
+    // The header and the calculations footer both mirror the body's offset;
+    // neither is user-scrollable itself.
+    for (final follower in <ScrollController>[
+      _headerHController,
+      _footerHController,
+    ]) {
+      if (!follower.hasClients) continue;
+      final position = follower.position;
+      final target = _bodyHController.offset.clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      if ((follower.offset - target).abs() > 0.5) {
+        follower.jumpTo(target);
+      }
     }
   }
 
@@ -599,14 +724,121 @@ class _DsDataGridState extends State<DsDataGrid> {
     });
   }
 
+  // --- View plumbing --------------------------------------------------------
+
+  /// Whether the grid renders a caller-owned view with its management surface.
+  bool get _viewManaged => widget.view != null && widget.onViewChanged != null;
+
+  /// The columns actually displayed, honouring the view's visible set and
+  /// order. Without a view (or with its default null set) this is the full
+  /// catalogue in definition order.
+  List<DsGridColumn> get _displayColumns {
+    final List<String>? visible = widget.view?.visibleColumns;
+    if (visible == null) return widget.columns;
+    return [
+      for (final key in visible)
+        if (_columnForKey(key) != null) _columnForKey(key)!,
+    ];
+  }
+
+  /// The catalogue columns the view currently hides, in definition order.
+  List<DsGridColumn> get _hiddenColumns {
+    final visible = {for (final c in _displayColumns) c.key};
+    return [
+      for (final column in widget.columns)
+        if (!visible.contains(column.key)) column,
+    ];
+  }
+
+  /// The display keys in order, materialised for view mutations.
+  List<String> get _visibleKeys =>
+      [for (final c in _displayColumns) c.key];
+
+  /// The header title for [column], honouring the view's display relabel.
+  String _titleFor(DsGridColumn column) =>
+      widget.view?.columnLabels[column.key] ?? column.title;
+
+  void _emitView(DsGridView next) => widget.onViewChanged?.call(next);
+
+  void _hideColumn(DsGridColumn column) {
+    final keys = _visibleKeys;
+    if (keys.length <= 1) return;
+    keys.remove(column.key);
+    _emitView(widget.view!.copyWith(visibleColumns: keys));
+  }
+
+  void _showColumn(DsGridColumn column) {
+    final keys = _visibleKeys..add(column.key);
+    _emitView(widget.view!.copyWith(visibleColumns: keys));
+  }
+
+  /// Moves [column] by [delta] places within the visible order.
+  void _moveColumn(DsGridColumn column, int delta) {
+    final keys = _visibleKeys;
+    final from = keys.indexOf(column.key);
+    final to = from + delta;
+    if (from == -1 || to < 0 || to >= keys.length) return;
+    keys.removeAt(from);
+    keys.insert(to, column.key);
+    _emitView(widget.view!.copyWith(visibleColumns: keys));
+  }
+
+  /// Moves the dragged column [key] to sit before [target] in the visible
+  /// order (or after it when dragged from the left).
+  void _reorderColumn(String key, DsGridColumn target) {
+    if (key == target.key) return;
+    final keys = _visibleKeys;
+    final from = keys.indexOf(key);
+    var to = keys.indexOf(target.key);
+    if (from == -1 || to == -1) return;
+    keys.removeAt(from);
+    if (from < to) to -= 1;
+    keys.insert(to, key);
+    _emitView(widget.view!.copyWith(visibleColumns: keys));
+  }
+
+  /// Commits an inline header relabel: an empty or unchanged label clears the
+  /// override, anything else stores it.
+  void _commitHeaderLabel(DsGridColumn column, String raw) {
+    final labels = Map<String, String>.of(widget.view!.columnLabels);
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty || trimmed == column.title) {
+      labels.remove(column.key);
+    } else {
+      labels[column.key] = trimmed;
+    }
+    setState(() => _editingHeaderKey = null);
+    _emitView(widget.view!.copyWith(columnLabels: labels));
+  }
+
+  void _setCalculation(DsGridColumn column, DsAggregation aggregation) {
+    final calculations =
+        Map<String, DsAggregation>.of(widget.view!.calculations);
+    if (aggregation == DsAggregation.none) {
+      calculations.remove(column.key);
+    } else {
+      calculations[column.key] = aggregation;
+    }
+    _emitView(widget.view!.copyWith(calculations: calculations));
+  }
+
+  /// The width reserved at the trailing edge of the scrolling panes for the
+  /// add-column affordance, so the header and body scroll extents stay equal.
+  double get _trailingAddWidth =>
+      _viewManaged && _hiddenColumns.isNotEmpty ? _addColumnWidth : 0;
+
   List<DsGridColumn> get _pinnedColumns =>
-      widget.columns.where((c) => c.frozen).toList(growable: false);
+      _displayColumns.where((c) => c.frozen).toList(growable: false);
 
   List<DsGridColumn> get _scrollableColumns =>
-      widget.columns.where((c) => !c.frozen).toList(growable: false);
+      _displayColumns.where((c) => !c.frozen).toList(growable: false);
 
-  DsGridSort? get _activeSort =>
-      widget.onSort != null ? widget.sort : _internalSort;
+  /// The active sort. A set [DsDataGrid.view] is authoritative; otherwise the
+  /// controlled [DsDataGrid.onSort] contract or the internal sort applies.
+  DsGridSort? get _activeSort {
+    if (widget.view != null) return widget.view!.sort;
+    return widget.onSort != null ? widget.sort : _internalSort;
+  }
 
   double get _headerHeight => widget.rowHeight;
 
@@ -617,10 +849,13 @@ class _DsDataGridState extends State<DsDataGrid> {
     return null;
   }
 
-  /// The rows in display order — reordered locally when the grid owns its sort.
+  /// The rows in display order — reordered locally when the grid owns its
+  /// sort. A view's sort is applied here too: the view describes presentation,
+  /// so the grid orders the caller's rows itself.
   List<DsGridRow> get _displayRows {
     final sort = _activeSort;
-    if (widget.onSort != null || sort == null) return widget.rows;
+    if (sort == null) return widget.rows;
+    if (widget.view == null && widget.onSort != null) return widget.rows;
     final column = _columnForKey(sort.columnKey);
     if (column == null) return widget.rows;
     final ordered = List<DsGridRow>.of(widget.rows);
@@ -646,7 +881,12 @@ class _DsDataGridState extends State<DsDataGrid> {
     } else {
       next = null;
     }
-    if (widget.onSort != null) {
+    if (widget.view != null) {
+      // A read-only view (no onViewChanged) keeps its sort fixed.
+      if (widget.onViewChanged != null) {
+        _emitView(widget.view!.copyWith(sort: next));
+      }
+    } else if (widget.onSort != null) {
       widget.onSort!(next);
     } else {
       setState(() => _internalSort = next);
@@ -921,6 +1161,249 @@ class _DsDataGridState extends State<DsDataGrid> {
     overlay.insert(entry);
   }
 
+  // --- View management menus ------------------------------------------------
+
+  /// Shows [panel] anchored beneath [context]'s render box, reusing the grid's
+  /// single-overlay slot so at most one menu is ever open.
+  void _openAnchoredPanel(BuildContext context, Widget panel) {
+    _dismissOptionsOverlay();
+    final overlay = Overlay.of(context);
+    final box = context.findRenderObject() as RenderBox?;
+    final overlayBox = overlay.context.findRenderObject() as RenderBox?;
+    if (box == null || overlayBox == null) return;
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => _AnchoredOverlay(
+        anchorOffset: box.localToGlobal(Offset.zero, ancestor: overlayBox),
+        anchorSize: box.size,
+        overlaySize: overlayBox.size,
+        onDismiss: _dismissOptionsOverlay,
+        child: panel,
+      ),
+    );
+    _optionsOverlay = entry;
+    overlay.insert(entry);
+  }
+
+  /// A single action row in a view-management menu.
+  Widget _actionRow(
+    DsTokens tokens, {
+    required String label,
+    IconData? icon,
+    bool enabled = true,
+    bool selected = false,
+    required VoidCallback onTap,
+  }) {
+    final Color ink = enabled
+        ? tokens.colorText
+        : tokens.colorText.withValues(alpha: tokens.stateDisabledOpacity);
+    return InkWell(
+      onTap: enabled
+          ? () {
+              _dismissOptionsOverlay();
+              onTap();
+            }
+          : null,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 40),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DsSpacing.md,
+            vertical: DsSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                DsIcon(
+                  icon: icon,
+                  size: DsIconSize.sm,
+                  color: enabled
+                      ? tokens.colorSecondaryText
+                      : tokens.colorSecondaryText
+                          .withValues(alpha: tokens.stateDisabledOpacity),
+                ),
+                const SizedBox(width: DsSpacing.sm),
+              ],
+              Expanded(
+                child: Text(
+                  label,
+                  style: tokens.bodyMd.toTextStyle(color: ink),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (selected) ...[
+                const SizedBox(width: DsSpacing.sm),
+                DsIcon(
+                  icon: DsIcons.check,
+                  size: DsIconSize.sm,
+                  color: tokens.formAccentColor,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The per-column management menu behind the header's trigger: sort, move,
+  /// relabel and hide.
+  void _openHeaderMenu(BuildContext context, DsGridColumn column) {
+    final tokens = DsTokens.of(context);
+    final active = _activeSort?.columnKey == column.key ? _activeSort : null;
+    final index = _displayColumns.indexOf(column);
+    final view = widget.view!;
+
+    _openAnchoredPanel(
+      context,
+      _overlaySurface(
+        tokens,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (column.sortable) ...[
+              _actionRow(
+                tokens,
+                label: 'Sort ascending',
+                icon: DsIcons.arrowUp,
+                selected: active?.ascending == true,
+                onTap: () => _emitView(view.copyWith(
+                  sort: DsGridSort(columnKey: column.key),
+                )),
+              ),
+              _actionRow(
+                tokens,
+                label: 'Sort descending',
+                icon: DsIcons.arrowDown,
+                selected: active?.ascending == false,
+                onTap: () => _emitView(view.copyWith(
+                  sort: DsGridSort(columnKey: column.key, ascending: false),
+                )),
+              ),
+              if (active != null)
+                _actionRow(
+                  tokens,
+                  label: 'Clear sort',
+                  icon: DsIcons.close,
+                  onTap: () => _emitView(view.copyWith(sort: null)),
+                ),
+            ],
+            _actionRow(
+              tokens,
+              label: 'Move left',
+              icon: DsIcons.chevronLeft,
+              enabled: index > 0,
+              onTap: () => _moveColumn(column, -1),
+            ),
+            _actionRow(
+              tokens,
+              label: 'Move right',
+              icon: DsIcons.chevronRight,
+              enabled: index < _displayColumns.length - 1,
+              onTap: () => _moveColumn(column, 1),
+            ),
+            _actionRow(
+              tokens,
+              label: 'Edit label',
+              icon: DsIcons.edit,
+              onTap: () => setState(() => _editingHeaderKey = column.key),
+            ),
+            _actionRow(
+              tokens,
+              label: 'Hide column',
+              icon: DsIcons.visibilityOff,
+              enabled: _visibleKeys.length > 1,
+              onTap: () => _hideColumn(column),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The add-column menu behind the trailing "+" affordance, listing every
+  /// catalogue column the view currently hides.
+  void _openAddColumnMenu(BuildContext context) {
+    final tokens = DsTokens.of(context);
+    _openAnchoredPanel(
+      context,
+      _overlaySurface(
+        tokens,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final column in _hiddenColumns)
+              _actionRow(
+                tokens,
+                label: column.title,
+                icon: column.icon,
+                onTap: () => _showColumn(column),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The calculation picker behind a footer slot. Numeric aggregations are
+  /// offered only for numeric column types; count applies to any column.
+  void _openAggregationMenu(BuildContext context, DsGridColumn column) {
+    final tokens = DsTokens.of(context);
+    final current = widget.view!.calculations[column.key] ?? DsAggregation.none;
+    final numeric = switch (column.type) {
+      DsCellType.number ||
+      DsCellType.currency ||
+      DsCellType.rating ||
+      DsCellType.progress =>
+        true,
+      _ => false,
+    };
+    final choices = <DsAggregation>[
+      DsAggregation.none,
+      DsAggregation.count,
+      if (numeric) ...[
+        DsAggregation.sum,
+        DsAggregation.average,
+        DsAggregation.min,
+        DsAggregation.max,
+      ],
+    ];
+    _openAnchoredPanel(
+      context,
+      _overlaySurface(
+        tokens,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final aggregation in choices)
+              _actionRow(
+                tokens,
+                label: aggregation == DsAggregation.none
+                    ? 'None'
+                    : _aggregationName(aggregation),
+                selected: aggregation == current,
+                onTap: () => _setCalculation(column, aggregation),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The human name of an aggregation, as shown in footer slots and menus.
+  String _aggregationName(DsAggregation aggregation) => switch (aggregation) {
+        DsAggregation.none => '',
+        DsAggregation.count => 'Count',
+        DsAggregation.sum => 'Sum',
+        DsAggregation.average => 'Average',
+        DsAggregation.min => 'Min',
+        DsAggregation.max => 'Max',
+      };
+
   // --- Build ----------------------------------------------------------------
 
   @override
@@ -1057,12 +1540,78 @@ class _DsDataGridState extends State<DsDataGrid> {
         ],
       );
     }
-    if (height == null) return list;
+    // The compact counterpart of the calculations footer: a read-only summary
+    // card beneath the stacked cards.
+    final calculations = widget.view?.calculations ?? const {};
+    final Widget listWithSummary;
+    if (calculations.isEmpty) {
+      listWithSummary = list;
+    } else {
+      final entries = <Widget>[];
+      for (final column in _displayColumns) {
+        final aggregation = calculations[column.key];
+        if (aggregation == null || aggregation == DsAggregation.none) continue;
+        final value = _aggregationLabel(column, aggregation, rows);
+        if (value == null) continue;
+        entries.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: DsSpacing.xxs),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _titleFor(column),
+                    style: tokens.bodySm
+                        .toTextStyle(color: tokens.colorSecondaryText),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: DsSpacing.md),
+                Text(
+                  '${_aggregationName(aggregation)} $value',
+                  style: tokens.labelSm.toTextStyle(color: tokens.colorText),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      listWithSummary = entries.isEmpty
+          ? list
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                list,
+                const SizedBox(height: DsSpacing.sm),
+                Container(
+                  decoration: BoxDecoration(
+                    color: tokens.offsetBackgroundColor,
+                    border: Border.all(color: tokens.colorBorder),
+                    borderRadius:
+                        BorderRadius.circular(tokens.formBorderRadius),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DsSpacing.md,
+                    vertical: DsSpacing.sm,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: entries,
+                  ),
+                ),
+              ],
+            );
+    }
+
+    if (height == null) return listWithSummary;
     final scrollable = Scrollbar(
       controller: _verticalController,
       child: SingleChildScrollView(
         controller: _verticalController,
-        child: list,
+        child: listWithSummary,
       ),
     );
     // The fill sentinel: scroll within whatever bounded height the parent
@@ -1089,7 +1638,7 @@ class _DsDataGridState extends State<DsDataGrid> {
             ),
           ),
         ),
-      for (final column in widget.columns)
+      for (final column in _displayColumns)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
           child: Row(
@@ -1098,7 +1647,7 @@ class _DsDataGridState extends State<DsDataGrid> {
               Expanded(
                 flex: 2,
                 child: Text(
-                  column.title,
+                  _titleFor(column),
                   style: tokens.bodySm.toTextStyle(
                     color: tokens.colorSecondaryText,
                   ),
@@ -1182,8 +1731,13 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     final contentHeight = lineCount * widget.rowHeight;
     final headerHeight = _headerHeight;
+    // The calculations footer renders whenever a view carries calculations,
+    // and always on a managed view so its add affordances are reachable.
+    final hasFooter = widget.view != null &&
+        (widget.view!.calculations.isNotEmpty || _viewManaged);
+    final footerHeight = hasFooter ? widget.rowHeight + 1 : 0.0;
     final availableBody = height != null
-        ? math.max(0.0, height - headerHeight - 1)
+        ? math.max(0.0, height - headerHeight - footerHeight - 1)
         : contentHeight;
     final bodyHeight = math.min(contentHeight, availableBody);
 
@@ -1233,7 +1787,20 @@ class _DsDataGridState extends State<DsDataGrid> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [header, body],
+            children: [
+              header,
+              body,
+              if (hasFooter)
+                _buildFooter(
+                  tokens,
+                  rows,
+                  pinnedColumns,
+                  scrollableColumns,
+                  pinnedWidth,
+                  hasPinned,
+                  scrollContentWidth,
+                ),
+            ],
           ),
         ),
       ),
@@ -1282,8 +1849,10 @@ class _DsDataGridState extends State<DsDataGrid> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final width =
-                        math.max(scrollContentWidth, constraints.maxWidth);
+                    final width = math.max(
+                      scrollContentWidth + _trailingAddWidth,
+                      constraints.maxWidth,
+                    );
                     return SingleChildScrollView(
                       controller: _headerHController,
                       scrollDirection: Axis.horizontal,
@@ -1295,6 +1864,8 @@ class _DsDataGridState extends State<DsDataGrid> {
                           children: [
                             for (final column in scrollableColumns)
                               _headerCell(tokens, column),
+                            if (_trailingAddWidth > 0)
+                              _addColumnCell(tokens),
                           ],
                         ),
                       ),
@@ -1348,8 +1919,10 @@ class _DsDataGridState extends State<DsDataGrid> {
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final width =
-                  math.max(scrollContentWidth, constraints.maxWidth);
+              final width = math.max(
+                scrollContentWidth + _trailingAddWidth,
+                constraints.maxWidth,
+              );
               return SingleChildScrollView(
                 controller: _bodyHController,
                 scrollDirection: Axis.horizontal,
@@ -1443,8 +2016,10 @@ class _DsDataGridState extends State<DsDataGrid> {
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final width =
-                  math.max(scrollContentWidth, constraints.maxWidth);
+              final width = math.max(
+                scrollContentWidth + _trailingAddWidth,
+                constraints.maxWidth,
+              );
               return SingleChildScrollView(
                 controller: _bodyHController,
                 scrollDirection: Axis.horizontal,
@@ -1671,14 +2246,14 @@ class _DsDataGridState extends State<DsDataGrid> {
     final radius = BorderRadius.circular(tokens.formBorderRadius);
 
     final aggregations = <Widget>[];
-    for (final column in widget.columns) {
+    for (final column in _displayColumns) {
       final aggregation = widget.aggregations[column.key] ?? DsAggregation.none;
       if (aggregation == DsAggregation.none) continue;
       final text = _aggregationLabel(column, aggregation, node.rows);
       if (text == null) continue;
       aggregations.add(
         Text(
-          '${column.title}: $text',
+          '${_titleFor(column)}: $text',
           style: tokens.bodySm.toTextStyle(color: tokens.colorSecondaryText),
         ),
       );
@@ -1983,7 +2558,34 @@ class _DsDataGridState extends State<DsDataGrid> {
     final align = column.effectiveAlign;
     final width = _columnWidth(column);
     final active = _activeSort?.columnKey == column.key ? _activeSort : null;
-    final index = widget.columns.indexOf(column);
+    final index = _displayColumns.indexOf(column);
+    final title = _titleFor(column);
+    final managed = _viewManaged;
+
+    // The inline header-label editor replaces the whole cell while active.
+    if (managed && _editingHeaderKey == column.key) {
+      return SizedBox(
+        width: width,
+        height: _headerHeight,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: _cellPaddingX,
+            vertical: DsSpacing.xs,
+          ),
+          child: _CellTextEditor(
+            key: ValueKey<String>('header ${column.key}'),
+            tokens: tokens,
+            dense: true,
+            align: align,
+            initialText: title,
+            keyboardType: TextInputType.text,
+            semanticsLabel: 'Edit label for ${column.title}',
+            onCommit: (text) => _commitHeaderLabel(column, text),
+            onCancel: () => setState(() => _editingHeaderKey = null),
+          ),
+        ),
+      );
+    }
 
     final row = Row(
       mainAxisAlignment: _mainAxisOf(align),
@@ -1998,7 +2600,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         ],
         Flexible(
           child: Text(
-            DsTextTransform.uppercase.apply(column.title),
+            DsTextTransform.uppercase.apply(title),
             style: tokens.headingXs.toTextStyle(
               color: tokens.colorSecondaryText,
             ),
@@ -2019,7 +2621,12 @@ class _DsDataGridState extends State<DsDataGrid> {
     );
 
     final padded = Padding(
-      padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
+      // The managed header reserves trailing room for the column-menu
+      // trigger so the title never sits beneath it.
+      padding: EdgeInsetsDirectional.only(
+        start: _cellPaddingX,
+        end: managed ? _cellPaddingX + 20 : _cellPaddingX,
+      ),
       child: row,
     );
 
@@ -2033,24 +2640,50 @@ class _DsDataGridState extends State<DsDataGrid> {
         ? Semantics(
             button: true,
             sortKey: OrdinalSortKey(index.toDouble()),
-            label: '${column.title}, $sortState',
+            label: '$title, $sortState',
             child: InkWell(onTap: () => _onHeaderTap(column), child: padded),
           )
         : Semantics(
             header: true,
             sortKey: OrdinalSortKey(index.toDouble()),
-            label: column.title,
+            label: title,
             child: padded,
           );
 
     final resizable = widget.resizableColumns && column.resizable;
 
-    return SizedBox(
+    Widget cell = SizedBox(
       width: width,
       height: _headerHeight,
       child: Stack(
         children: [
           Positioned.fill(child: content),
+          if (managed)
+            PositionedDirectional(
+              top: 0,
+              bottom: 0,
+              end: _resizeHandleWidth,
+              child: Center(
+                child: Semantics(
+                  button: true,
+                  label: 'Column options for $title',
+                  child: Builder(
+                    builder: (context) => InkWell(
+                      borderRadius: BorderRadius.circular(999),
+                      onTap: () => _openHeaderMenu(context, column),
+                      child: Padding(
+                        padding: const EdgeInsets.all(DsSpacing.xxs),
+                        child: DsIcon(
+                          icon: DsIcons.expandMore,
+                          size: DsIconSize.xs,
+                          color: tokens.colorSecondaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           if (resizable)
             Positioned(
               top: 0,
@@ -2062,6 +2695,219 @@ class _DsDataGridState extends State<DsDataGrid> {
             ),
         ],
       ),
+    );
+
+    if (!managed) return cell;
+
+    // Long-press lifts the header for drag-to-reorder; the column menu's
+    // move actions cover keyboard and assistive users.
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (details) => details.data != column.key,
+      onAcceptWithDetails: (details) => _reorderColumn(details.data, column),
+      builder: (context, candidates, rejected) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: candidates.isNotEmpty
+              ? tokens.brandTintColor
+              : const Color(0x00000000),
+        ),
+        child: LongPressDraggable<String>(
+          data: column.key,
+          feedback: Material(
+            color: const Color(0x00000000),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: tokens.formBackgroundColor,
+                borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+                border: Border.all(color: tokens.colorBorder),
+                boxShadow: tokens.shadowMedium,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DsSpacing.md,
+                  vertical: DsSpacing.sm,
+                ),
+                child: Text(
+                  DsTextTransform.uppercase.apply(title),
+                  style: tokens.headingXs
+                      .toTextStyle(color: tokens.colorSecondaryText),
+                ),
+              ),
+            ),
+          ),
+          child: cell,
+        ),
+      ),
+    );
+  }
+
+  /// The trailing "+" header cell that restores hidden columns.
+  Widget _addColumnCell(DsTokens tokens) {
+    return SizedBox(
+      width: _addColumnWidth,
+      height: _headerHeight,
+      child: Semantics(
+        button: true,
+        label: 'Add column',
+        child: Builder(
+          builder: (context) => InkWell(
+            onTap: () => _openAddColumnMenu(context),
+            child: Center(
+              child: DsIcon(
+                icon: DsIcons.add,
+                size: DsIconSize.sm,
+                color: tokens.colorSecondaryText,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The calculations footer band: per-column aggregation slots aligned under
+  /// the columns, mirroring the header's frozen/scrolling split. On a managed
+  /// view every slot is a button opening the calculation picker.
+  Widget _buildFooter(
+    DsTokens tokens,
+    List<DsGridRow> rows,
+    List<DsGridColumn> pinnedColumns,
+    List<DsGridColumn> scrollableColumns,
+    double pinnedWidth,
+    bool hasPinned,
+    double scrollContentWidth,
+  ) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tokens.offsetBackgroundColor,
+        border: Border(top: BorderSide(color: tokens.colorBorder)),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: SizedBox(
+          height: widget.rowHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (hasPinned)
+                SizedBox(
+                  width: pinnedWidth,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (widget.selectable)
+                        const SizedBox(width: _selectionColumnWidth),
+                      for (final column in pinnedColumns)
+                        _footerCell(tokens, column, rows),
+                    ],
+                  ),
+                ),
+              if (hasPinned) _seam(tokens),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = math.max(
+                      scrollContentWidth + _trailingAddWidth,
+                      constraints.maxWidth,
+                    );
+                    return SingleChildScrollView(
+                      controller: _footerHController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: SizedBox(
+                        width: width,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final column in scrollableColumns)
+                              _footerCell(tokens, column, rows),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// One slot in the calculations footer: the aggregation's name and value
+  /// aligned like the column's cells, an add affordance when the managed slot
+  /// is empty, or a blank spacer on a read-only view.
+  Widget _footerCell(DsTokens tokens, DsGridColumn column, List<DsGridRow> rows) {
+    final aggregation = widget.view?.calculations[column.key];
+    final managed = _viewManaged;
+    final title = _titleFor(column);
+
+    final Widget content;
+    final String? semanticsLabel;
+    if (aggregation != null && aggregation != DsAggregation.none) {
+      final value = _aggregationLabel(column, aggregation, rows) ?? '—';
+      final name = _aggregationName(aggregation);
+      semanticsLabel = '$name of $title: $value';
+      content = Row(
+        mainAxisAlignment: _mainAxisOf(column.effectiveAlign),
+        children: [
+          Flexible(
+            child: Text(
+              DsTextTransform.uppercase.apply(name),
+              style:
+                  tokens.headingXs.toTextStyle(color: tokens.colorSecondaryText),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: DsSpacing.xs),
+          Text(
+            value,
+            style: tokens.labelSm.toTextStyle(color: tokens.colorText),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    } else if (managed) {
+      semanticsLabel = 'Add calculation for $title';
+      content = Align(
+        alignment: _alignmentOf(column.effectiveAlign),
+        child: DsIcon(
+          icon: DsIcons.add,
+          size: DsIconSize.xs,
+          color: tokens.colorSecondaryText
+              .withValues(alpha: tokens.stateDisabledIconOpacity),
+        ),
+      );
+    } else {
+      return SizedBox(width: _columnWidth(column), height: widget.rowHeight);
+    }
+
+    final cell = Padding(
+      padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
+      child: Center(child: content),
+    );
+
+    return SizedBox(
+      width: _columnWidth(column),
+      height: widget.rowHeight,
+      child: managed
+          ? Semantics(
+              button: true,
+              label: semanticsLabel,
+              child: Builder(
+                builder: (context) => InkWell(
+                  onTap: () => _openAggregationMenu(context, column),
+                  child: cell,
+                ),
+              ),
+            )
+          : Semantics(
+              container: true,
+              label: semanticsLabel,
+              child: ExcludeSemantics(child: cell),
+            ),
     );
   }
 
