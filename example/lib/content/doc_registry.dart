@@ -50,6 +50,11 @@ import 'pages/policies.dart';
 import 'pages/data_import.dart';
 import 'pages/record_panel.dart';
 import 'pages/full_page_layouts.dart';
+import 'pages/search_field.dart';
+import 'pages/menu_sheet.dart';
+import 'pages/nav_rail.dart';
+import 'pages/status_bar.dart';
+import 'pages/app_shell.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
 import 'pages/focus_view.dart';
@@ -127,6 +132,7 @@ final List<PatternPage> allPages = [
   addressFieldGroupPage,
   uploadFieldPage,
   filterControlsPage,
+  searchFieldPage,
   // Display
   accordionPage,
   avatarPage,
@@ -150,6 +156,7 @@ final List<PatternPage> allPages = [
   waitingScreensPage,
   // Overlays
   menuPage,
+  menuSheetPage,
   tooltipPage,
   coachmarkPage,
   focusViewPage,
@@ -173,8 +180,11 @@ final List<PatternPage> allPages = [
   meterChartPage,
   sparklinePage,
   // Layout
+  appShellPage,
   authGradientPage,
   authShellPage,
+  navRailPage,
+  statusBarPage,
   boxPage,
   brandBloomPage,
   fadeSlideInPage,

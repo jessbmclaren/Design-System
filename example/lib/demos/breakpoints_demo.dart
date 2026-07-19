@@ -11,7 +11,8 @@ class BreakpointsDemo extends StatelessWidget {
   static const _classes = [
     (DsWindowSize.compact, 'Compact', 'below 600dp'),
     (DsWindowSize.medium, 'Medium', '600 to 839dp'),
-    (DsWindowSize.expanded, 'Expanded', '840dp and up'),
+    (DsWindowSize.expanded, 'Expanded', '840 to 1199dp'),
+    (DsWindowSize.large, 'Large', '1200dp and up'),
   ];
 
   @override

@@ -46,7 +46,8 @@ final PatternPage breakpointsPage = PatternPage(
         VariableRow(name: 'DsBreakpoints.windowSizeFor(width)', type: 'DsWindowSize', example: 'compact', description: 'The class for any width, such as a LayoutBuilder constraint.'),
         VariableRow(name: 'DsWindowSize.compact', type: 'enum', example: 'below 600dp', description: 'Phones in portrait. One column, stacked actions, full-width panels.'),
         VariableRow(name: 'DsWindowSize.medium', type: 'enum', example: '600 to 839dp', description: 'Tablets in portrait and large phones in landscape.'),
-        VariableRow(name: 'DsWindowSize.expanded', type: 'enum', example: '840dp and up', description: 'Tablets in landscape and desktops. Constrain content and centre the surplus.'),
+        VariableRow(name: 'DsWindowSize.expanded', type: 'enum', example: '840 to 1199dp', description: 'Tablets in landscape and desktops. Constrain content and centre the surplus.'),
+        VariableRow(name: 'DsWindowSize.large', type: 'enum', example: '1200dp and up', description: 'Large desktops. App chrome such as a navigation sidebar can stay permanently expanded.'),
       ],
     ),
     ProseBlock(

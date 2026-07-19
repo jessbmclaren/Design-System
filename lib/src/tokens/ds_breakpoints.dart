@@ -8,8 +8,12 @@ enum DsWindowSize {
   /// 600dp ≤ width < 840dp: tablets in portrait, large phones in landscape.
   medium,
 
-  /// Width ≥ 840dp: tablets in landscape, desktops.
-  expanded;
+  /// 840dp ≤ width < 1200dp: tablets in landscape, small desktops.
+  expanded,
+
+  /// Width ≥ 1200dp: large desktops, where app chrome such as a navigation
+  /// sidebar can stay permanently expanded.
+  large;
 
   /// Whether this size is at least [other].
   bool operator >=(DsWindowSize other) => index >= other.index;
@@ -17,15 +21,18 @@ enum DsWindowSize {
 
 /// Design System responsive breakpoints.
 ///
-/// Design System layouts adapt across three window size classes rather than targeting
-/// devices: [DsWindowSize.compact], [DsWindowSize.medium] and
-/// [DsWindowSize.expanded].
+/// Design System layouts adapt across four window size classes rather than
+/// targeting devices: [DsWindowSize.compact], [DsWindowSize.medium],
+/// [DsWindowSize.expanded] and [DsWindowSize.large].
 abstract final class DsBreakpoints {
   /// Lower bound of the medium window class.
   static const double medium = 600;
 
   /// Lower bound of the expanded window class.
   static const double expanded = 840;
+
+  /// Lower bound of the large window class.
+  static const double large = 1200;
 
   /// The maximum width of a page's main content area on wide screens, in
   /// logical pixels. Constrain content to this and centre the surplus so a
@@ -35,6 +42,7 @@ abstract final class DsBreakpoints {
 
   /// Resolves the window size class for [width].
   static DsWindowSize windowSizeFor(double width) {
+    if (width >= large) return DsWindowSize.large;
     if (width >= expanded) return DsWindowSize.expanded;
     if (width >= medium) return DsWindowSize.medium;
     return DsWindowSize.compact;

@@ -20,7 +20,8 @@ Resolve the class for the window with `DsBreakpoints.of(context)`, or for any me
 | `DsBreakpoints.windowSizeFor(width)` | `DsWindowSize` | `compact` | The class for any width, such as a LayoutBuilder constraint. |
 | `DsWindowSize.compact` | `enum` | `below 600dp` | Phones in portrait. One column, stacked actions, full-width panels. |
 | `DsWindowSize.medium` | `enum` | `600 to 839dp` | Tablets in portrait and large phones in landscape. |
-| `DsWindowSize.expanded` | `enum` | `840dp and up` | Tablets in landscape and desktops. Constrain content and centre the surplus. |
+| `DsWindowSize.expanded` | `enum` | `840 to 1199dp` | Tablets in landscape and desktops. Constrain content and centre the surplus. |
+| `DsWindowSize.large` | `enum` | `1200dp and up` | Large desktops. App chrome such as a navigation sidebar can stay permanently expanded. |
 
 The system is tested the way it is used: every component holds from a 320dp phone to a 1920dp desktop without overflow, and the docs sweep each live demo across eleven widths between those ends. Treat the boundaries as ranges, not targets; a layout must flex all the way through a class, not just at its edges. Honour the user's text scale too: text wraps or ellipsizes, it never clips.
 
