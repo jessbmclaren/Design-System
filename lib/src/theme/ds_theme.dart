@@ -57,12 +57,15 @@ abstract final class DsTheme {
 
     // Resolve the effective font. When the caller keeps the default family we
     // use the bundled Inter directly (so it renders identically everywhere);
-    // when they override it we use their family and fall back to bundled Inter.
+    // when they override it we use their family and fall back to bundled
+    // Inter. A null family passes straight through, so the platform system
+    // font renders with no bundled fallback.
     final usesDefaultFont = tokens.fontFamily == DsTypography.fontFamily;
     final effectiveFamily =
         usesDefaultFont ? DsTypography.packagedFontFamily : tokens.fontFamily;
-    final effectiveFallback =
-        usesDefaultFont ? const <String>[] : const [DsTypography.packagedFontFamily];
+    final effectiveFallback = usesDefaultFont || tokens.fontFamily == null
+        ? const <String>[]
+        : const [DsTypography.packagedFontFamily];
 
     final base = ThemeData(
       useMaterial3: true,
@@ -115,7 +118,7 @@ abstract final class DsTheme {
   static TextTheme _textTheme(
     TextTheme base,
     DsTokens tokens,
-    String family,
+    String? family,
     List<String> fallback,
   ) {
     final onSurface = tokens.colorText;

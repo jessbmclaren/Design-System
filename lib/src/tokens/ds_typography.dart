@@ -141,6 +141,9 @@ abstract final class DsTypography {
   /// Bold weight: headings.
   static const FontWeight bold = FontWeight.w700;
 
+  /// Extra bold weight: display text and wordmark accents.
+  static const FontWeight extraBold = FontWeight.w800;
+
   // Headings, weight 700.
 
   /// Extra large heading. 28px / 700.

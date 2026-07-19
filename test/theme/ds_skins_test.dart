@@ -54,14 +54,22 @@ void main() {
     test('the Engen skin brands the auth chrome; the defaults stay neutral',
         () {
       final engen = DsSkins.engenLight();
+      // The corrected wash: white easing out to clear, left to right.
       expect(
         engen.authWashGradient,
-        const [Color(0xFFFFFFFF), Color(0xFFEAF2FA)],
+        const [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
       );
+      expect(engen.authWashStops, const [0.42, 0.74]);
+      expect(engen.authWashBegin, Alignment.centerLeft);
+      expect(engen.authWashEnd, Alignment.centerRight);
       expect(engen.bloomColor, const Color(0xFF5AA8E0));
 
-      // The white-label defaults keep the quiet neutral wash.
+      // The white-label defaults keep the quiet neutral wash on its
+      // original top-to-bottom axis.
       expect(DsTokens.light().authWashGradient, DsColors.authWash);
+      expect(DsTokens.light().authWashStops, isNull);
+      expect(DsTokens.light().authWashBegin, Alignment.topCenter);
+      expect(DsTokens.light().authWashEnd, Alignment.bottomCenter);
       expect(DsTokens.light().bloomColor, DsColors.bloom);
     });
 
@@ -91,19 +99,29 @@ void main() {
       expect(engen.buttonNeutralColorText, engen.buttonSecondaryColorText);
     });
 
-    test('the dark Engen skin keeps the light heading overrides', () {
+    test('the Engen skins keep the brand heading voice', () {
       final light = DsSkins.engenLight();
       final dark = DsSkins.engenDark();
-      expect(dark.headingXl, light.headingXl);
-      expect(dark.headingLg, light.headingLg);
-      expect(dark.headingMd, light.headingMd);
+      // The corrected light ramp: a tighter, shorter top tier.
+      expect(light.headingXl.height, 1.15);
+      expect(light.headingXl.letterSpacing, -0.6);
+      expect(light.headingLg.letterSpacing, -0.3);
+      expect(light.headingMd.height, 1.2);
+      expect(light.headingMd.letterSpacing, -0.3);
+      // Dark keeps its own heading overrides, bold in both themes, and the
+      // shared small heading is identical.
       expect(dark.headingSm, light.headingSm);
+      for (final token in [dark.headingXl, dark.headingLg, dark.headingMd]) {
+        expect(token.fontWeight, DsTypography.bold);
+      }
     });
 
     test('the Engen skins keep the tertiary label and icon maths in step', () {
       for (final skin in [DsSkins.engenLight(), DsSkins.engenDark()]) {
         expect(skin.buttonTertiaryColorText, skin.actionPrimaryColorText);
-        expect(skin.buttonIconSize, skin.buttonLabelFontSize + 2);
+        // The brand spec pins a 16dp glyph beside the 15dp label.
+        expect(skin.buttonLabelFontSize, 15);
+        expect(skin.buttonIconSize, 16);
       }
     });
   });

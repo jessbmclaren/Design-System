@@ -50,12 +50,17 @@ abstract final class DsSkins {
   /// tightly-tracked heading ramp and a soft indigo card shadow.
   static DsTokens engenLight() {
     return DsTokens.light().copyWith(
+      // Font: the platform system font, per the brand spec.
+      fontFamily: null,
       // Brand
       colorPrimary: _indigo,
       buttonPrimaryColorBackground: _indigo,
       buttonPrimaryColorBorder: _indigo,
       actionPrimaryColorText: _indigo,
       actionPrimaryTextDecorationColor: _indigo,
+      actionSecondaryColorText: _slate,
+      // Ink on brand fills: a soft off-white rather than pure white.
+      colorOnPrimary: const Color(0xFFF4F6FC),
       // The tertiary label follows the brand link colour.
       buttonTertiaryColorText: _indigo,
       formAccentColor: _indigo,
@@ -67,7 +72,19 @@ abstract final class DsSkins {
       colorBorderSubtle: _hairline,
       colorBackground: _page,
       offsetBackgroundColor: _fill,
+      colorSurfaceMuted: _fill,
       formPlaceholderTextColor: _placeholder,
+      colorIconMuted: const Color(0xFF7A8295),
+      colorTextDisabled: const Color(0xFFBCC2D0),
+      // Inverse panel: the navy slate with white ink and a softened danger.
+      colorInverseSurface: const Color(0xFF101828),
+      colorOnInverse: const Color(0xFFFFFFFF),
+      colorDangerOnInverse: const Color(0xFFFF8A80),
+      // States and controls: an indigo press tint, a hairline hover fill and
+      // a hairline track.
+      statePressedTintColor: const Color(0xFFB3BDE0),
+      surfaceHoverColor: _hairline,
+      controlTrackColor: _hairline,
       colorDanger: _danger,
       // Bright signal tier for meters and live status (distinct from the
       // AA-safe badge container inks).
@@ -103,45 +120,87 @@ abstract final class DsSkins {
       badgeDangerColorBackground: const Color(0xFFFCE8EC),
       badgeDangerColorText: const Color(0xFFB01030),
       badgeDangerColorBorder: const Color(0xFFFCE8EC),
+      badgeInfoColorBackground: const Color(0xFFEEF1F8),
+      badgeInfoColorText: _indigo,
+      badgeInfoColorBorder: const Color(0xFFEEF1F8),
+      // Badge metrics per the brand spec.
+      badgePaddingX: 10,
+      badgePaddingY: 4,
+      badgeLabelFontSize: 13,
+      badgeLabelFontWeight: DsTypography.medium,
       // Shape: roomier corners.
       buttonBorderRadius: 10,
       formBorderRadius: 10,
       badgeBorderRadius: 8,
       overlayBorderRadius: 16,
       borderRadius: 16,
+      // Overlays: a navy-tinted backdrop.
+      overlayBackdropColor: const Color(0x66101828),
+      // Surfaces: the roomier Engen card inset.
+      cardPadding: 40,
       // Type: bold headings with the brand's tight tracking; semi-bold labels.
       headingXl: const DsTypeToken(
           fontSize: 32,
           fontWeight: DsTypography.bold,
-          height: 1.2,
-          letterSpacing: -0.4),
+          height: 1.15,
+          letterSpacing: -0.6),
       headingLg: const DsTypeToken(
           fontSize: 24,
           fontWeight: DsTypography.bold,
           height: 1.2,
-          letterSpacing: -0.4),
+          letterSpacing: -0.3),
       headingMd: const DsTypeToken(
           fontSize: 20,
           fontWeight: DsTypography.bold,
-          height: 1.25,
-          letterSpacing: -0.2),
+          height: 1.2,
+          letterSpacing: -0.3),
       headingSm: const DsTypeToken(
           fontSize: 16, fontWeight: DsTypography.bold, height: 1.3),
+      bodyLg: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
+      bodyMd: const DsTypeToken(
+          fontSize: 16, fontWeight: DsTypography.regular, height: 1.4),
+      bodySm: const DsTypeToken(
+          fontSize: 14, fontWeight: DsTypography.regular, height: 1.4),
       labelMd: const DsTypeToken(
-          fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.4),
+          fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.3),
       labelSm: const DsTypeToken(
           fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
+      // The step and display tiers carry the ramp defaults, stated here so
+      // the skin pins them.
+      stepTitle: const DsTypeToken(
+          fontSize: 28,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      display: const DsTypeToken(
+          fontSize: 60,
+          fontWeight: DsTypography.extraBold,
+          height: 1.05,
+          letterSpacing: -1.8),
+      mediumLabelFontWeight: DsTypography.semiBold,
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
-      // The glyph keeps its 2dp lead over the 15dp label.
-      buttonIconSize: 17,
+      // Button metrics per the brand spec: a 16dp glyph beside the 15dp
+      // label.
+      buttonPaddingX: 22,
+      buttonPaddingY: 15,
+      buttonIconSize: 16,
+      // Inputs: a denser field inset.
+      inputFieldPaddingX: 12,
+      textFieldPaddingY: 10,
       // Elevation: the brand-tinted scale (low / medium / high).
       shadowLow: _shadowLow,
       shadowMedium: _shadowMedium,
       shadowHigh: _shadowHigh,
-      // Auth chrome: clean paper drifting into a pale sky wash, with a soft
-      // blue bloom, sampled from the brand's marketing surfaces.
-      authWashGradient: const [Color(0xFFFFFFFF), Color(0xFFEAF2FA)],
+      // Auth chrome: white easing out to clear across the page, left to
+      // right, so the wash lifts the card side and lets the bloom read on
+      // the other.
+      authWashGradient: const [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+      authWashStops: const [0.42, 0.74],
+      authWashBegin: Alignment.centerLeft,
+      authWashEnd: Alignment.centerRight,
+      // The single-hue fallback to bloomStops.
       bloomColor: const Color(0xFF5AA8E0),
       // The five-pool spotlight bloom, read left to right along the bottom
       // edge: a coral lift, warm red, sky and light blue, into the deep navy
@@ -156,6 +215,19 @@ abstract final class DsSkins {
       // A pale indigo tint for brand-soft badges and washes (the "verifying"
       // receipt check), with the indigo action colour as the ink on top.
       brandTintColor: const Color(0xFFEEF1F8),
+      // The brand headline sweep: coral through sky and cobalt into the deep
+      // indigo.
+      headlineGradient: const [
+        Color(0xFFE2231A),
+        Color(0xFF6BB4DE),
+        Color(0xFF2F6FBF),
+        Color(0xFF15259B),
+      ],
+      // Wordmark: EngenXT, bold with an extra-bold accent.
+      wordmarkPrimaryText: 'Engen',
+      wordmarkAccentText: 'XT',
+      wordmarkPrimaryFontWeight: DsTypography.bold,
+      wordmarkAccentFontWeight: DsTypography.extraBold,
     );
   }
 
@@ -202,10 +274,30 @@ abstract final class DsSkins {
           fontSize: 14, fontWeight: DsTypography.semiBold, height: 1.4),
       labelSm: const DsTypeToken(
           fontSize: 12, fontWeight: DsTypography.medium, height: 1.35),
+      mediumLabelFontWeight: DsTypography.semiBold,
       buttonLabelFontSize: 15,
       buttonLabelFontWeight: DsTypography.semiBold,
-      // The glyph keeps its 2dp lead over the 15dp label.
-      buttonIconSize: 17,
+      // Button metrics per the brand spec: a 16dp glyph beside the 15dp
+      // label.
+      buttonPaddingX: 22,
+      buttonPaddingY: 15,
+      buttonIconSize: 16,
+      // Inputs: a denser field inset.
+      inputFieldPaddingX: 12,
+      textFieldPaddingY: 10,
+      // Badge metrics carried into dark, with an indigo info container and
+      // the dark link ink.
+      badgePaddingX: 10,
+      badgePaddingY: 4,
+      badgeLabelFontSize: 13,
+      badgeLabelFontWeight: DsTypography.medium,
+      badgeInfoColorBackground: const Color(0xFF20264D),
+      badgeInfoColorText: const Color(0xFF9DA8F0),
+      badgeInfoColorBorder: const Color(0xFF20264D),
+      // A dark indigo press tint.
+      statePressedTintColor: const Color(0xFF2A3470),
+      // Surfaces: the roomier Engen card inset.
+      cardPadding: 40,
       // Deeper drops read on the dark surfaces.
       shadowLow: const <BoxShadow>[
         BoxShadow(
@@ -235,6 +327,11 @@ abstract final class DsSkins {
       // A dark indigo tint for brand-soft badges, with the dark link colour as
       // the ink on top.
       brandTintColor: const Color(0xFF20264D),
+      // Wordmark: EngenXT, bold with an extra-bold accent.
+      wordmarkPrimaryText: 'Engen',
+      wordmarkAccentText: 'XT',
+      wordmarkPrimaryFontWeight: DsTypography.bold,
+      wordmarkAccentFontWeight: DsTypography.extraBold,
     );
   }
 }
