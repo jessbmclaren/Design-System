@@ -34,15 +34,25 @@ abstract final class DsMotion {
 
   /// The standard transition for most state changes (selection, reveal, colour
   /// and position shifts).
-  static const Duration base = Duration(milliseconds: 220);
+  static const Duration base = Duration(milliseconds: 200);
 
   /// Deliberate transitions for larger surfaces (sheets, dialogs, an
   /// accordion expanding) where the extra time reads as weight.
-  static const Duration slow = Duration(milliseconds: 360);
+  static const Duration slow = Duration(milliseconds: 320);
 
   /// Choreographed, hero moments: an onboarding reveal, a celebratory
   /// confirmation. Use sparingly; expressive motion is a spotlight.
-  static const Duration expressive = Duration(milliseconds: 520);
+  static const Duration expressive = Duration(milliseconds: 500);
+
+  /// The scene scale, for narrated beats (a guided tour's dwell on a frame)
+  /// rather than widget transitions: the short beat.
+  static const Duration sceneShort = Duration(milliseconds: 900);
+
+  /// The scene scale's standard beat.
+  static const Duration scene = Duration(milliseconds: 1400);
+
+  /// The scene scale's long beat, for a closing or emphasised frame.
+  static const Duration sceneLong = Duration(milliseconds: 1900);
 
   // --- Curves ---------------------------------------------------------------
 
@@ -62,7 +72,7 @@ abstract final class DsMotion {
   /// A physical settle with a subtle overshoot, for a value snapping into place
   /// (a switch, a card lifting, a sheet catching). Restrained on purpose: it
   /// settles, it does not bounce.
-  static const Curve settle = Cubic(0.34, 1.35, 0.64, 1.0);
+  static const Curve settle = Cubic(0.175, 0.885, 0.32, 1.08);
 
   // --- Physics --------------------------------------------------------------
 
@@ -94,8 +104,8 @@ abstract final class DsMotion {
   static Duration stagger(
     BuildContext context,
     int index, {
-    Duration step = const Duration(milliseconds: 40),
-    Duration max = const Duration(milliseconds: 240),
+    Duration step = const Duration(milliseconds: 60),
+    Duration max = const Duration(milliseconds: 300),
   }) {
     if (reduced(context) || index <= 0) return Duration.zero;
     final total = step * index;

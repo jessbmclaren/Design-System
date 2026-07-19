@@ -10,9 +10,12 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | --- | --- | --- | --- |
 | `DsMotion.instant` | `Duration` | `0ms` | No motion: an immediate change. What every other duration collapses to under reduced motion. |
 | `DsMotion.fast` | `Duration` | `120ms` | Micro-interactions: hover, press, a toggle flipping. |
-| `DsMotion.base` | `Duration` | `220ms` | The standard transition for most state changes. |
-| `DsMotion.slow` | `Duration` | `360ms` | Larger surfaces (sheets, dialogs, an accordion) where time reads as weight. |
-| `DsMotion.expressive` | `Duration` | `520ms` | Choreographed, hero moments. Use sparingly; it is a spotlight. |
+| `DsMotion.base` | `Duration` | `200ms` | The standard transition for most state changes. |
+| `DsMotion.slow` | `Duration` | `320ms` | Larger surfaces (sheets, dialogs, an accordion) where time reads as weight. |
+| `DsMotion.expressive` | `Duration` | `500ms` | Choreographed, hero moments. Use sparingly; it is a spotlight. |
+| `DsMotion.sceneShort` | `Duration` | `900ms` | The scene scale's short beat, for narrated dwells rather than widget transitions. |
+| `DsMotion.scene` | `Duration` | `1400ms` | The scene scale's standard beat. |
+| `DsMotion.sceneLong` | `Duration` | `1900ms` | The scene scale's long beat, for a closing or emphasised frame. |
 
 ## Curves
 
@@ -22,7 +25,7 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | `DsMotion.emphasized` | `Curve` | `cubic(0.2, 0, 0, 1)` | A strong decelerate for entrances: fast off the mark, softly landing. |
 | `DsMotion.decelerate` | `Curve` | `cubic(0.05, 0.7, 0.1, 1)` | Pure decelerate for elements arriving from off-screen. |
 | `DsMotion.accelerate` | `Curve` | `cubic(0.3, 0, 0.8, 0.15)` | Accelerate for elements leaving the screen entirely. |
-| `DsMotion.settle` | `Curve` | `cubic(0.34, 1.35, 0.64, 1)` | A physical settle with a restrained overshoot: the premium, alive arrival. |
+| `DsMotion.settle` | `Curve` | `cubic(0.175, 0.885, 0.32, 1.08)` | A physical settle with a restrained overshoot: the premium, alive arrival. |
 
 ## Physics
 
@@ -41,7 +44,7 @@ Never read the raw tokens in an animating widget; resolve them through the helpe
 | --- | --- | --- | --- |
 | `DsMotion.durationOf(context, full)` | `Duration` | `base → 0ms` | Returns full when motion is allowed and Duration.zero under reduce-motion. |
 | `DsMotion.curveOf(context, full)` | `Curve` | `settle → linear` | Returns full when motion is allowed and Curves.linear under reduce-motion; there is no easing to perceive across a zero-length animation. |
-| `DsMotion.stagger(context, index)` | `Duration` | `40ms × index` | The delay before the item at index begins in a choreographed group, stepped 40ms apart and capped at 240ms. Zero under reduce-motion so the group arrives together. |
+| `DsMotion.stagger(context, index)` | `Duration` | `60ms × index` | The delay before the item at index begins in a choreographed group, stepped 60ms apart and capped at 300ms. Zero under reduce-motion so the group arrives together. |
 | `DsMotion.reduced(context)` | `bool` | `false` | Whether the platform asks for reduced motion. Gate any bespoke animation behind it. |
 
 One law above all: **respect reduced motion.** When a person has asked their platform for less motion, animation is not softened. It is removed. Resolve every duration and curve through `DsMotion.durationOf` and `DsMotion.curveOf`, which collapse to a still, instant change under the setting, and gate any bespoke animation behind `DsMotion.reduced`. The live demo obeys this: press Replay with reduce-motion on and it stays put.

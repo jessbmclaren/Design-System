@@ -31,9 +31,12 @@ final PatternPage motionPage = PatternPage(
     VariablesBlock(rows: [
       VariableRow(name: 'DsMotion.instant', type: 'Duration', example: '0ms', description: 'No motion: an immediate change. What every other duration collapses to under reduced motion.'),
       VariableRow(name: 'DsMotion.fast', type: 'Duration', example: '120ms', description: 'Micro-interactions: hover, press, a toggle flipping.'),
-      VariableRow(name: 'DsMotion.base', type: 'Duration', example: '220ms', description: 'The standard transition for most state changes.'),
-      VariableRow(name: 'DsMotion.slow', type: 'Duration', example: '360ms', description: 'Larger surfaces (sheets, dialogs, an accordion) where time reads as weight.'),
-      VariableRow(name: 'DsMotion.expressive', type: 'Duration', example: '520ms', description: 'Choreographed, hero moments. Use sparingly; it is a spotlight.'),
+      VariableRow(name: 'DsMotion.base', type: 'Duration', example: '200ms', description: 'The standard transition for most state changes.'),
+      VariableRow(name: 'DsMotion.slow', type: 'Duration', example: '320ms', description: 'Larger surfaces (sheets, dialogs, an accordion) where time reads as weight.'),
+      VariableRow(name: 'DsMotion.expressive', type: 'Duration', example: '500ms', description: 'Choreographed, hero moments. Use sparingly; it is a spotlight.'),
+      VariableRow(name: 'DsMotion.sceneShort', type: 'Duration', example: '900ms', description: 'The scene scale\'s short beat, for narrated dwells rather than widget transitions.'),
+      VariableRow(name: 'DsMotion.scene', type: 'Duration', example: '1400ms', description: 'The scene scale\'s standard beat.'),
+      VariableRow(name: 'DsMotion.sceneLong', type: 'Duration', example: '1900ms', description: 'The scene scale\'s long beat, for a closing or emphasised frame.'),
     ]),
     SubheadingBlock('Curves'),
     VariablesBlock(rows: [
@@ -41,7 +44,7 @@ final PatternPage motionPage = PatternPage(
       VariableRow(name: 'DsMotion.emphasized', type: 'Curve', example: 'cubic(0.2, 0, 0, 1)', description: 'A strong decelerate for entrances: fast off the mark, softly landing.'),
       VariableRow(name: 'DsMotion.decelerate', type: 'Curve', example: 'cubic(0.05, 0.7, 0.1, 1)', description: 'Pure decelerate for elements arriving from off-screen.'),
       VariableRow(name: 'DsMotion.accelerate', type: 'Curve', example: 'cubic(0.3, 0, 0.8, 0.15)', description: 'Accelerate for elements leaving the screen entirely.'),
-      VariableRow(name: 'DsMotion.settle', type: 'Curve', example: 'cubic(0.34, 1.35, 0.64, 1)', description: 'A physical settle with a restrained overshoot: the premium, alive arrival.'),
+      VariableRow(name: 'DsMotion.settle', type: 'Curve', example: 'cubic(0.175, 0.885, 0.32, 1.08)', description: 'A physical settle with a restrained overshoot: the premium, alive arrival.'),
     ]),
     SubheadingBlock('Physics'),
     ProseBlock(
@@ -62,7 +65,7 @@ final PatternPage motionPage = PatternPage(
     VariablesBlock(rows: [
       VariableRow(name: 'DsMotion.durationOf(context, full)', type: 'Duration', example: 'base → 0ms', description: 'Returns full when motion is allowed and Duration.zero under reduce-motion.'),
       VariableRow(name: 'DsMotion.curveOf(context, full)', type: 'Curve', example: 'settle → linear', description: 'Returns full when motion is allowed and Curves.linear under reduce-motion; there is no easing to perceive across a zero-length animation.'),
-      VariableRow(name: 'DsMotion.stagger(context, index)', type: 'Duration', example: '40ms × index', description: 'The delay before the item at index begins in a choreographed group, stepped 40ms apart and capped at 240ms. Zero under reduce-motion so the group arrives together.'),
+      VariableRow(name: 'DsMotion.stagger(context, index)', type: 'Duration', example: '60ms × index', description: 'The delay before the item at index begins in a choreographed group, stepped 60ms apart and capped at 300ms. Zero under reduce-motion so the group arrives together.'),
       VariableRow(name: 'DsMotion.reduced(context)', type: 'bool', example: 'false', description: 'Whether the platform asks for reduced motion. Gate any bespoke animation behind it.'),
     ]),
     ProseBlock(
