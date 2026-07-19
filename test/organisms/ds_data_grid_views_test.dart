@@ -343,6 +343,58 @@ void main() {
     expect(find.text('STATUS'), findsOneWidget);
   });
 
+  testWidgets('multi-sort chains tie-breaks in precedence order', (
+    tester,
+  ) async {
+    await pumpDs(
+      tester,
+      _grid(
+        view: const DsGridView(
+          sorts: <DsGridSort>[
+            DsGridSort(columnKey: 'status'),
+            DsGridSort(columnKey: 'amount', ascending: false),
+          ],
+        ),
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    // Primary: status ascending groups Active before Pending; within Active
+    // the amount tie-break descends, so Gamma (20) sits above Alpha (10).
+    final double gammaY = tester.getTopLeft(find.text('Gamma')).dy;
+    final double alphaY = tester.getTopLeft(find.text('Alpha')).dy;
+    final double betaY = tester.getTopLeft(find.text('Beta')).dy;
+    expect(gammaY, lessThan(alphaY));
+    expect(alphaY, lessThan(betaY));
+  });
+
+  testWidgets('a header tap makes the column primary and keeps tie-breaks', (
+    tester,
+  ) async {
+    DsGridView? emitted;
+    await pumpDs(
+      tester,
+      _grid(
+        view: const DsGridView(
+          sorts: <DsGridSort>[
+            DsGridSort(columnKey: 'status'),
+            DsGridSort(columnKey: 'amount'),
+          ],
+        ),
+        onViewChanged: (DsGridView next) => emitted = next,
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    await tester.tap(find.text('NAME'));
+    await tester.pump();
+
+    expect(emitted!.sorts.map((s) => s.columnKey).toList(),
+        <String>['name', 'status', 'amount']);
+    // The convenience single sort tracks the primary rule.
+    expect(emitted!.sort!.columnKey, 'name');
+  });
+
   testWidgets('view equality is by value', (tester) async {
     const DsGridView a = DsGridView(
       visibleColumns: <String>['name'],

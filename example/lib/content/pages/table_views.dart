@@ -28,6 +28,15 @@ final PatternPage tableViewsPage = PatternPage(
       'display-only; the underlying column and its data key never change.',
     ),
     ProseBlock(
+      'Sorting is precedence-ordered: `sorts` holds the rules first rule '
+      'first, and each later rule breaks the ties of the ones before it. A '
+      'header tap rewrites the primary rule and keeps the tie-breaks, while '
+      'tie-break columns show their precedence beside the arrow. Edit the '
+      'whole list with `DsSortBuilder`, or drop a `DsSortPill` into the '
+      'toolbar above the grid: it reads `Sorted by Amount +1` and opens the '
+      'builder in place.',
+    ),
+    ProseBlock(
       'The grid never stores a view itself. Persisting views, naming them '
       'and switching between them belongs to the application: hold a list '
       'of `DsGridView` values, show the active one, and compose a switcher '
@@ -58,8 +67,19 @@ DsDataGrid(
 const overdue = DsGridView(
   visibleColumns: ['driver', 'amount', 'status'],
   columnLabels: {'driver': 'Account holder'},
-  sort: DsGridSort(columnKey: 'amount', ascending: false),
+  sorts: [
+    DsGridSort(columnKey: 'amount', ascending: false),
+    DsGridSort(columnKey: 'driver'),
+  ],
   calculations: {'amount': DsAggregation.sum},
+);
+
+// The toolbar pill above the grid:
+DsSortPill(
+  columns: columns,
+  sorts: activeView.sorts,
+  onChanged: (next) => setState(() => activeView =
+      activeView.copyWith(sorts: next, sort: next.isEmpty ? null : next.first)),
 );
 ''',
   related: const ['data-grid', 'cell-types', 'grouping', 'filtering-sorting'],

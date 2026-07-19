@@ -325,6 +325,7 @@ class DsGridView {
     this.visibleColumns,
     this.columnLabels = const <String, String>{},
     this.sort,
+    this.sorts = const <DsGridSort>[],
     this.calculations = const <String, DsAggregation>{},
   });
 
@@ -337,10 +338,17 @@ class DsGridView {
   /// underlying column.
   final Map<String, String> columnLabels;
 
-  /// The view's sort. When a view is set this is the grid's authoritative
-  /// sort; header taps report the next sort through
-  /// [DsDataGrid.onViewChanged].
+  /// The view's single sort, a convenience for the common case. Ignored while
+  /// [sorts] is non-empty; the grid keeps it in step with the primary rule
+  /// when it emits a changed view.
   final DsGridSort? sort;
+
+  /// The view's precedence-ordered sorts: the first rule is the primary sort
+  /// and each later rule breaks the ties of the ones before it. When
+  /// non-empty this list is authoritative and [sort] is ignored. Edit it with
+  /// `DsSortBuilder` or `DsSortPill`; header taps rewrite the primary rule
+  /// and keep the tie-breaks.
+  final List<DsGridSort> sorts;
 
   /// The column-bottom calculations shown in the footer band, keyed by column
   /// key. An empty map renders no values (the managed grid still offers the
@@ -351,10 +359,16 @@ class DsGridView {
 
   /// Returns a copy with the given fields replaced. Pass `sort: null`
   /// explicitly to clear the sort.
+  /// The effective precedence-ordered sorts: [sorts] when non-empty,
+  /// otherwise the single [sort] as a one-rule list.
+  List<DsGridSort> get effectiveSorts =>
+      sorts.isNotEmpty ? sorts : [?sort];
+
   DsGridView copyWith({
     Object? visibleColumns = _unset,
     Map<String, String>? columnLabels,
     Object? sort = _unset,
+    List<DsGridSort>? sorts,
     Map<String, DsAggregation>? calculations,
   }) {
     return DsGridView(
@@ -363,6 +377,7 @@ class DsGridView {
           : visibleColumns as List<String>?,
       columnLabels: columnLabels ?? this.columnLabels,
       sort: identical(sort, _unset) ? this.sort : sort as DsGridSort?,
+      sorts: sorts ?? this.sorts,
       calculations: calculations ?? this.calculations,
     );
   }
@@ -375,6 +390,7 @@ class DsGridView {
           listEquals(visibleColumns, other.visibleColumns) &&
           mapEquals(columnLabels, other.columnLabels) &&
           sort == other.sort &&
+          listEquals(sorts, other.sorts) &&
           mapEquals(calculations, other.calculations);
 
   @override
@@ -383,6 +399,7 @@ class DsGridView {
         Object.hashAll(
             columnLabels.entries.map((e) => Object.hash(e.key, e.value))),
         sort,
+        Object.hashAll(sorts),
         Object.hashAll(
             calculations.entries.map((e) => Object.hash(e.key, e.value))),
       );
@@ -833,11 +850,27 @@ class _DsDataGridState extends State<DsDataGrid> {
   List<DsGridColumn> get _scrollableColumns =>
       _displayColumns.where((c) => !c.frozen).toList(growable: false);
 
-  /// The active sort. A set [DsDataGrid.view] is authoritative; otherwise the
-  /// controlled [DsDataGrid.onSort] contract or the internal sort applies.
-  DsGridSort? get _activeSort {
-    if (widget.view != null) return widget.view!.sort;
-    return widget.onSort != null ? widget.sort : _internalSort;
+  /// The active precedence-ordered sorts. A set [DsDataGrid.view] is
+  /// authoritative; otherwise the controlled [DsDataGrid.onSort] contract or
+  /// the internal sort supplies at most one rule.
+  List<DsGridSort> get _activeSorts {
+    final view = widget.view;
+    if (view != null) return view.effectiveSorts;
+    final single = widget.onSort != null ? widget.sort : _internalSort;
+    return [?single];
+  }
+
+  /// The primary sort, used where a single rule is enough.
+  DsGridSort? get _activeSort =>
+      _activeSorts.isEmpty ? null : _activeSorts.first;
+
+  /// Emits a rewritten sort list, keeping the convenience [DsGridView.sort]
+  /// in step with the primary rule.
+  void _emitSorts(List<DsGridSort> sorts) {
+    _emitView(widget.view!.copyWith(
+      sorts: sorts,
+      sort: sorts.isEmpty ? null : sorts.first,
+    ));
   }
 
   double get _headerHeight => widget.rowHeight;
@@ -850,28 +883,52 @@ class _DsDataGridState extends State<DsDataGrid> {
   }
 
   /// The rows in display order — reordered locally when the grid owns its
-  /// sort. A view's sort is applied here too: the view describes presentation,
-  /// so the grid orders the caller's rows itself.
+  /// sort. A view's sorts are applied here too, first rule first with each
+  /// later rule breaking the ties of the ones before it.
   List<DsGridRow> get _displayRows {
-    final sort = _activeSort;
-    if (sort == null) return widget.rows;
+    final sorts = _activeSorts;
+    if (sorts.isEmpty) return widget.rows;
     if (widget.view == null && widget.onSort != null) return widget.rows;
-    final column = _columnForKey(sort.columnKey);
-    if (column == null) return widget.rows;
     final ordered = List<DsGridRow>.of(widget.rows);
     ordered.sort((a, b) {
-      final result = _compareValues(
-        column,
-        a.cells[sort.columnKey],
-        b.cells[sort.columnKey],
-      );
-      return sort.ascending ? result : -result;
+      for (final sort in sorts) {
+        final column = _columnForKey(sort.columnKey);
+        if (column == null) continue;
+        final result = _compareValues(
+          column,
+          a.cells[sort.columnKey],
+          b.cells[sort.columnKey],
+        );
+        if (result != 0) return sort.ascending ? result : -result;
+      }
+      return 0;
     });
     return ordered;
   }
 
   void _onHeaderTap(DsGridColumn column) {
     if (!column.sortable) return;
+    if (widget.view != null) {
+      // A read-only view (no onViewChanged) keeps its sorts fixed. A managed
+      // header tap rewrites the primary rule and keeps the tie-breaks: an
+      // untouched column becomes the new primary, the current primary cycles
+      // ascending → descending → removed.
+      if (widget.onViewChanged == null) return;
+      final sorts = List<DsGridSort>.of(_activeSorts);
+      final primary = sorts.isEmpty ? null : sorts.first;
+      if (primary != null && primary.columnKey == column.key) {
+        if (primary.ascending) {
+          sorts[0] = DsGridSort(columnKey: column.key, ascending: false);
+        } else {
+          sorts.removeAt(0);
+        }
+      } else {
+        sorts.removeWhere((s) => s.columnKey == column.key);
+        sorts.insert(0, DsGridSort(columnKey: column.key));
+      }
+      _emitSorts(sorts);
+      return;
+    }
     final current = _activeSort;
     final DsGridSort? next;
     if (current == null || current.columnKey != column.key) {
@@ -881,12 +938,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     } else {
       next = null;
     }
-    if (widget.view != null) {
-      // A read-only view (no onViewChanged) keeps its sort fixed.
-      if (widget.onViewChanged != null) {
-        _emitView(widget.view!.copyWith(sort: next));
-      }
-    } else if (widget.onSort != null) {
+    if (widget.onSort != null) {
       widget.onSort!(next);
     } else {
       setState(() => _internalSort = next);
@@ -1251,9 +1303,19 @@ class _DsDataGridState extends State<DsDataGrid> {
   /// relabel and hide.
   void _openHeaderMenu(BuildContext context, DsGridColumn column) {
     final tokens = DsTokens.of(context);
-    final active = _activeSort?.columnKey == column.key ? _activeSort : null;
+    final sortIndex =
+        _activeSorts.indexWhere((s) => s.columnKey == column.key);
+    final active = sortIndex == -1 ? null : _activeSorts[sortIndex];
     final index = _displayColumns.indexOf(column);
-    final view = widget.view!;
+
+    // Makes this column the primary rule with [ascending], keeping the other
+    // rules as tie-breaks.
+    void sortPrimary({required bool ascending}) {
+      final sorts = List<DsGridSort>.of(_activeSorts)
+        ..removeWhere((s) => s.columnKey == column.key)
+        ..insert(0, DsGridSort(columnKey: column.key, ascending: ascending));
+      _emitSorts(sorts);
+    }
 
     _openAnchoredPanel(
       context,
@@ -1269,25 +1331,24 @@ class _DsDataGridState extends State<DsDataGrid> {
                 label: 'Sort ascending',
                 icon: DsIcons.arrowUp,
                 selected: active?.ascending == true,
-                onTap: () => _emitView(view.copyWith(
-                  sort: DsGridSort(columnKey: column.key),
-                )),
+                onTap: () => sortPrimary(ascending: true),
               ),
               _actionRow(
                 tokens,
                 label: 'Sort descending',
                 icon: DsIcons.arrowDown,
                 selected: active?.ascending == false,
-                onTap: () => _emitView(view.copyWith(
-                  sort: DsGridSort(columnKey: column.key, ascending: false),
-                )),
+                onTap: () => sortPrimary(ascending: false),
               ),
               if (active != null)
                 _actionRow(
                   tokens,
                   label: 'Clear sort',
                   icon: DsIcons.close,
-                  onTap: () => _emitView(view.copyWith(sort: null)),
+                  onTap: () => _emitSorts(
+                    List<DsGridSort>.of(_activeSorts)
+                      ..removeWhere((s) => s.columnKey == column.key),
+                  ),
                 ),
             ],
             _actionRow(
@@ -2557,7 +2618,9 @@ class _DsDataGridState extends State<DsDataGrid> {
   Widget _headerCell(DsTokens tokens, DsGridColumn column) {
     final align = column.effectiveAlign;
     final width = _columnWidth(column);
-    final active = _activeSort?.columnKey == column.key ? _activeSort : null;
+    final sortIndex =
+        _activeSorts.indexWhere((s) => s.columnKey == column.key);
+    final active = sortIndex == -1 ? null : _activeSorts[sortIndex];
     final index = _displayColumns.indexOf(column);
     final title = _titleFor(column);
     final managed = _viewManaged;
@@ -2616,6 +2679,13 @@ class _DsDataGridState extends State<DsDataGrid> {
             size: DsIconSize.xs,
             color: tokens.colorSecondaryText,
           ),
+          // A tie-break rule shows its precedence beside the arrow.
+          if (sortIndex > 0)
+            Text(
+              '${sortIndex + 1}',
+              style: tokens.labelSm
+                  .toTextStyle(color: tokens.colorSecondaryText),
+            ),
         ],
       ],
     );
@@ -2632,9 +2702,8 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     final sortState = active == null
         ? 'not sorted'
-        : active.ascending
-            ? 'sorted ascending'
-            : 'sorted descending';
+        : '${active.ascending ? 'sorted ascending' : 'sorted descending'}'
+            '${_activeSorts.length > 1 ? ', sort ${sortIndex + 1} of ${_activeSorts.length}' : ''}';
 
     final Widget content = column.sortable
         ? Semantics(

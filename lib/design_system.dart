@@ -115,6 +115,7 @@ export 'src/components/organisms/ds_setup_guide.dart';
 export 'src/components/organisms/ds_sign_in_view.dart';
 export 'src/components/organisms/ds_sign_up_view.dart';
 export 'src/components/organisms/ds_sort_builder.dart';
+export 'src/components/organisms/ds_sort_pill.dart';
 export 'src/components/organisms/ds_spotlight.dart';
 export 'src/components/organisms/ds_status_bar.dart';
 export 'src/components/organisms/ds_takeover.dart';
