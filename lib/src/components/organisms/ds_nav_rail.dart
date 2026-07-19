@@ -198,11 +198,11 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
         : _hovered && enabled
             ? tokens.colorText.withValues(alpha: tokens.stateHoverOpacity)
             : Colors.transparent;
+    // Idle glyphs use the secondary text colour in both forms: it clears the
+    // 3:1 graphic bar in every theme, which the placeholder grey does not.
     final Color iconColor = widget.selected
         ? tokens.actionPrimaryColorText
-        : widget.extended
-            ? tokens.formPlaceholderTextColor
-            : tokens.colorSecondaryText;
+        : tokens.colorSecondaryText;
     final Color labelColor =
         widget.selected ? tokens.actionPrimaryColorText : tokens.colorText;
 

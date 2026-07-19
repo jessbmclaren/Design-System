@@ -90,6 +90,10 @@ class _DsSearchFieldState extends State<DsSearchField> {
   /// The internal controller, created only when the caller passes none.
   TextEditingController? _internalController;
 
+  /// Whether the field holds text, tracked so the widget rebuilds only when
+  /// emptiness flips rather than on every keystroke.
+  bool _hasText = false;
+
   TextEditingController get _controller =>
       widget.controller ?? (_internalController ??= TextEditingController());
 
@@ -97,6 +101,7 @@ class _DsSearchFieldState extends State<DsSearchField> {
   void initState() {
     super.initState();
     _controller.addListener(_onTextChanged);
+    _hasText = _controller.text.isNotEmpty;
   }
 
   @override
@@ -106,6 +111,7 @@ class _DsSearchFieldState extends State<DsSearchField> {
       (oldWidget.controller ?? _internalController)
           ?.removeListener(_onTextChanged);
       _controller.addListener(_onTextChanged);
+      _hasText = _controller.text.isNotEmpty;
     }
   }
 
@@ -116,8 +122,13 @@ class _DsSearchFieldState extends State<DsSearchField> {
     super.dispose();
   }
 
-  /// Rebuilds so the clear affordance tracks whether there is text to clear.
-  void _onTextChanged() => setState(() {});
+  /// Rebuilds only when there is a change to whether text can be cleared.
+  void _onTextChanged() {
+    final bool hasText = _controller.text.isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() => _hasText = hasText);
+    }
+  }
 
   void _clear() {
     _controller.clear();
@@ -129,7 +140,7 @@ class _DsSearchFieldState extends State<DsSearchField> {
   Widget build(BuildContext context) {
     final DsTokens tokens = DsTokens.of(context);
     final bool enabled = widget.onChanged != null;
-    final bool hasText = _controller.text.isNotEmpty;
+    final bool hasText = _hasText;
 
     // The trailing slot: a spinner while a lookup is pending, the clear
     // button while there is text, otherwise nothing.
@@ -162,10 +173,13 @@ class _DsSearchFieldState extends State<DsSearchField> {
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         textInputAction: TextInputAction.search,
+        // The glyph is a graphic, so it uses the secondary text colour, which
+        // clears the 3:1 graphic bar in every theme; the placeholder grey
+        // does not on the neutral light base.
         prefixIcon: Icon(
           DsIcons.search,
           size: DsIconSize.md,
-          color: tokens.formPlaceholderTextColor,
+          color: tokens.colorSecondaryText,
         ),
         suffixIcon: suffix,
       ),

@@ -102,6 +102,9 @@ class DsMenuSheet extends StatelessWidget {
           top: Radius.circular(tokens.overlayBorderRadius),
         ),
       ),
+      // Material 3 caps a modal bottom sheet at 640dp, so on a wide window
+      // it floats centred instead of spanning edge to edge.
+      constraints: const BoxConstraints(maxWidth: 640),
       isScrollControlled: false,
       builder: (BuildContext context) => DsMenuSheet(items: items),
     );
@@ -165,11 +168,13 @@ class _DsMenuSheetRow extends StatelessWidget {
         : item.selected
             ? tokens.actionPrimaryColorText
             : tokens.colorText;
+    // Idle glyphs use the secondary text colour, which clears the 3:1
+    // graphic bar in every theme; the placeholder grey does not.
     final Color iconColor = item.destructive
         ? tokens.colorDanger
         : item.selected
             ? tokens.actionPrimaryColorText
-            : tokens.formPlaceholderTextColor;
+            : tokens.colorSecondaryText;
     final bool enabled = item.enabled;
     final double disabledOpacity = tokens.stateDisabledOpacity;
 

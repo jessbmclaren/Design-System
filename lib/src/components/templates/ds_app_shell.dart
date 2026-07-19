@@ -118,6 +118,12 @@ class DsAppShell extends StatelessWidget {
   /// The widest the [search] slot grows inside the top bar.
   static const double searchMaxWidth = 440;
 
+  /// The narrowest slot the [search] widget is given. When the bar cannot
+  /// spare this much beside the brand and trailing widgets the slot hides,
+  /// so a squeezed field never breaks the bar; surface search in the page
+  /// on such widths instead.
+  static const double searchMinWidth = 160;
+
   void _openMenuSheet(BuildContext context) {
     DsMenuSheet.show(
       context,
@@ -162,7 +168,10 @@ class DsAppShell extends StatelessWidget {
               : null,
         );
 
-        return ColoredBox(
+        // The shell is a page-level frame, so like [Scaffold] it provides the
+        // Material its descendants (fields, ink, menus) require, rather than
+        // assuming the caller wrapped it in one.
+        return Material(
           color: tokens.colorBackground,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -236,20 +245,32 @@ class _DsAppShellTopBar extends StatelessWidget {
                 SizedBox(width: unit),
               ],
               ?brand,
-              if (search != null) ...<Widget>[
-                SizedBox(width: unit * 3),
+              if (search != null)
                 Flexible(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: DsAppShell.searchMaxWidth,
-                      ),
-                      child: search!,
-                    ),
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints slot) {
+                      // Hide the slot rather than hand the field a sliver it
+                      // cannot lay out in; see [DsAppShell.searchMinWidth].
+                      if (slot.maxWidth <
+                          DsAppShell.searchMinWidth + unit * 3) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: EdgeInsetsDirectional.only(start: unit * 3),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: DsAppShell.searchMaxWidth,
+                            ),
+                            child: search!,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ] else
+                )
+              else
                 const Spacer(),
               for (final Widget widget in trailing) ...<Widget>[
                 SizedBox(width: unit),

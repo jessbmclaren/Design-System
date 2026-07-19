@@ -69,7 +69,7 @@ class DsStatusBar extends StatelessWidget {
             DsIcon(
               icon: icon!,
               size: DsIconSize.sm,
-              color: tokens.formPlaceholderTextColor,
+              color: tokens.colorSecondaryText,
             ),
             SizedBox(width: unit),
           ],
