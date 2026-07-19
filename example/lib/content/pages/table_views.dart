@@ -43,6 +43,17 @@ final PatternPage tableViewsPage = PatternPage(
       'from `DsTabs` or `DsMenu`. Passing a view without `onViewChanged` '
       'renders it read-only, which is how a shared or locked view ships.',
     ),
+    ProseBlock(
+      'The table also keyboards like a spreadsheet. The body joins the '
+      'focus order; arrow keys move a focused cell, Shift with the arrows '
+      'grows a rectangular range, Ctrl or Cmd with C copies the cell or '
+      'range as tab-separated text and Ctrl or Cmd with V pastes '
+      'tab-separated text into editable cells, coercing each value to its '
+      'column type and skipping anything incompatible. Enter opens the '
+      'focused cell\'s inline editor or toggles a checkbox, and arrows '
+      'resume when the edit commits. Set `enableCellNavigation: false` to '
+      'opt a grid out.',
+    ),
   ],
   dos: const [
     'Store the emitted view and pass it straight back; the grid renders only what you give it.',

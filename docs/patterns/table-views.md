@@ -8,6 +8,8 @@ Sorting is precedence-ordered: `sorts` holds the rules first rule first, and eac
 
 The grid never stores a view itself. Persisting views, naming them and switching between them belongs to the application: hold a list of `DsGridView` values, show the active one, and compose a switcher from `DsTabs` or `DsMenu`. Passing a view without `onViewChanged` renders it read-only, which is how a shared or locked view ships.
 
+The table also keyboards like a spreadsheet. The body joins the focus order; arrow keys move a focused cell, Shift with the arrows grows a rectangular range, Ctrl or Cmd with C copies the cell or range as tab-separated text and Ctrl or Cmd with V pastes tab-separated text into editable cells, coercing each value to its column type and skipping anything incompatible. Enter opens the focused cell's inline editor or toggles a checkbox, and arrows resume when the edit commits. Set `enableCellNavigation: false` to opt a grid out.
+
 ## Guidelines
 
 **Do**

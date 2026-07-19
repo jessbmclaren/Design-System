@@ -523,6 +523,7 @@ class DsDataGrid extends StatefulWidget {
     this.initiallyExpanded = true,
     this.view,
     this.onViewChanged,
+    this.enableCellNavigation = true,
   });
 
   /// The column definitions, in display order. Columns with
@@ -617,6 +618,15 @@ class DsDataGrid extends StatefulWidget {
   /// mutates the view itself; the caller stores it and passes it back.
   final ValueChanged<DsGridView>? onViewChanged;
 
+  /// Whether the table body joins the focus order for spreadsheet-style
+  /// keyboarding: arrow keys move a focused cell, Shift with the arrows
+  /// grows a rectangular range, Ctrl or Cmd with C copies the cell or range
+  /// as tab-separated text, Ctrl or Cmd with V pastes tab-separated text
+  /// into editable cells and Enter opens the focused cell's inline editor
+  /// (or toggles a checkbox). Defaults to true; the compact stacked-card
+  /// layout never keyboards.
+  final bool enableCellNavigation;
+
   @override
   State<DsDataGrid> createState() => _DsDataGridState();
 }
@@ -658,6 +668,30 @@ class _DsDataGridState extends State<DsDataGrid> {
   /// The key of the column whose header label is being edited inline, or null.
   String? _editingHeaderKey;
 
+  /// The focus node that hosts spreadsheet keyboarding over the table body.
+  final FocusNode _cellsFocusNode =
+      FocusNode(debugLabel: 'DsDataGrid cells');
+
+  /// The keyboard-focused cell as (row, column) indices into the navigable
+  /// rows and display columns, or null while no cell is focused.
+  int? _focusRow;
+  int? _focusCol;
+
+  /// The anchor of a Shift-grown rectangular range, or null without a range.
+  int? _anchorRow;
+  int? _anchorCol;
+
+  /// The navigable rows in display order, cached each build for the key
+  /// handler and the cell highlight lookups.
+  List<DsGridRow> _navRows = const <DsGridRow>[];
+
+  /// Row-id → navigable index, rebuilt each build.
+  Map<String, int> _navRowIndex = const <String, int>{};
+
+  /// Column-key → navigable index ([_pinnedColumns] then
+  /// [_scrollableColumns]), rebuilt each build.
+  Map<String, int> _navColIndex = const <String, int>{};
+
   /// The live overlay entry for an open select / multi-select menu, kept so at
   /// most one is shown at a time and so it can be dismissed and disposed.
   OverlayEntry? _optionsOverlay;
@@ -695,6 +729,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     _headerHController.dispose();
     _bodyHController.dispose();
     _footerHController.dispose();
+    _cellsFocusNode.dispose();
     super.dispose();
   }
 
@@ -1070,6 +1105,11 @@ class _DsDataGridState extends State<DsDataGrid> {
         _editingRowId = null;
         _editingColumnKey = null;
       });
+      // Hand keyboard control back to the cells so arrows keep working
+      // after an edit commits or cancels.
+      if (widget.enableCellNavigation && _focusRow != null) {
+        _cellsFocusNode.requestFocus();
+      }
     }
   }
 
@@ -1081,6 +1121,11 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   /// Dispatches a tap on an editable cell to the right editor for its type.
   void _beginEdit(BuildContext context, DsGridColumn column, DsGridRow row) {
+    // A pointer edit also moves the keyboard focus cell, so arrows continue
+    // from where the user is working.
+    final rowIndex = _navRowIndex[row.id];
+    final colIndex = _navColIndex[column.key];
+    if (rowIndex != null && colIndex != null) _focusCell(rowIndex, colIndex);
     switch (column.type) {
       case DsCellType.text:
       case DsCellType.number:
@@ -1211,6 +1256,329 @@ class _DsDataGridState extends State<DsDataGrid> {
     );
     _optionsOverlay = entry;
     overlay.insert(entry);
+  }
+
+  // --- Spreadsheet keyboarding ---------------------------------------------
+
+  /// Rebuilds the navigable-cell caches for this frame: the rows in display
+  /// order (honouring grouping's visible segments) and the index maps the key
+  /// handler and highlight lookups use.
+  void _syncNavCaches() {
+    final rows = _displayRows;
+    _navRows = widget.groupBy.isEmpty
+        ? rows
+        : [
+            for (final segment in _visibleSegments(rows))
+              if (segment.row != null) segment.row!,
+          ];
+    _navRowIndex = {
+      for (var i = 0; i < _navRows.length; i++) _navRows[i].id: i,
+    };
+    final columns = [..._pinnedColumns, ..._scrollableColumns];
+    _navColIndex = {
+      for (var i = 0; i < columns.length; i++) columns[i].key: i,
+    };
+    // Clamp a stale focus after rows or columns changed under it.
+    if (_focusRow != null && _navRows.isNotEmpty) {
+      _focusRow = _focusRow!.clamp(0, _navRows.length - 1);
+      _focusCol = _focusCol!.clamp(0, columns.length - 1);
+    } else if (_navRows.isEmpty) {
+      _focusRow = null;
+      _focusCol = null;
+      _anchorRow = null;
+      _anchorCol = null;
+    }
+  }
+
+  /// The display columns in navigable order (frozen first).
+  List<DsGridColumn> get _navColumns =>
+      [..._pinnedColumns, ..._scrollableColumns];
+
+  bool _isCellFocused(DsGridRow row, DsGridColumn column) =>
+      _focusRow != null &&
+      _navRowIndex[row.id] == _focusRow &&
+      _navColIndex[column.key] == _focusCol;
+
+  bool _isCellInRange(DsGridRow row, DsGridColumn column) {
+    if (_focusRow == null || _anchorRow == null) return false;
+    final r = _navRowIndex[row.id];
+    final c = _navColIndex[column.key];
+    if (r == null || c == null) return false;
+    final r1 = math.min(_focusRow!, _anchorRow!);
+    final r2 = math.max(_focusRow!, _anchorRow!);
+    final c1 = math.min(_focusCol!, _anchorCol!);
+    final c2 = math.max(_focusCol!, _anchorCol!);
+    return r >= r1 && r <= r2 && c >= c1 && c <= c2;
+  }
+
+  /// Sets the keyboard-focused cell, collapsing any range.
+  void _focusCell(int row, int col) {
+    setState(() {
+      _focusRow = row;
+      _focusCol = col;
+      _anchorRow = null;
+      _anchorCol = null;
+    });
+  }
+
+  /// Scrolls vertically so the focused row's line is inside the viewport.
+  void _ensureFocusVisible() {
+    if (_focusRow == null || !_verticalController.hasClients) return;
+    final row = _navRows[_focusRow!];
+    int line = _focusRow!;
+    if (widget.groupBy.isNotEmpty) {
+      final segments = _visibleSegments(_displayRows);
+      line = segments.indexWhere((s) => s.row?.id == row.id);
+      if (line == -1) return;
+    }
+    final position = _verticalController.position;
+    final top = line * widget.rowHeight;
+    final bottom = top + widget.rowHeight;
+    if (top < position.pixels) {
+      _verticalController.jumpTo(
+        top.toDouble().clamp(0, position.maxScrollExtent),
+      );
+    } else if (bottom > position.pixels + position.viewportDimension) {
+      _verticalController.jumpTo(
+        (bottom - position.viewportDimension)
+            .clamp(0, position.maxScrollExtent),
+      );
+    }
+  }
+
+  KeyEventResult _onCellsKey(FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
+    // Leave every key alone while an inline editor (or anything else inside
+    // the grid) holds focus.
+    if (FocusManager.instance.primaryFocus != _cellsFocusNode) {
+      return KeyEventResult.ignored;
+    }
+    if (_navRows.isEmpty || _navColumns.isEmpty) return KeyEventResult.ignored;
+
+    final pressed = HardwareKeyboard.instance;
+    final bool shift = pressed.isShiftPressed;
+    final bool primary = pressed.isControlPressed || pressed.isMetaPressed;
+    final key = event.logicalKey;
+
+    int dRow = 0;
+    int dCol = 0;
+    if (key == LogicalKeyboardKey.arrowUp) {
+      dRow = -1;
+    } else if (key == LogicalKeyboardKey.arrowDown) {
+      dRow = 1;
+    } else if (key == LogicalKeyboardKey.arrowLeft) {
+      dCol = -1;
+    } else if (key == LogicalKeyboardKey.arrowRight) {
+      dCol = 1;
+    } else if (primary && key == LogicalKeyboardKey.keyC) {
+      _copyFocusOrRange();
+      return KeyEventResult.handled;
+    } else if (primary && key == LogicalKeyboardKey.keyV) {
+      _pasteAtFocus();
+      return KeyEventResult.handled;
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.f2) {
+      _editFocusedCell();
+      return KeyEventResult.handled;
+    } else if (key == LogicalKeyboardKey.escape) {
+      if (_anchorRow != null) {
+        setState(() {
+          _anchorRow = null;
+          _anchorCol = null;
+        });
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    } else {
+      return KeyEventResult.ignored;
+    }
+
+    setState(() {
+      if (_focusRow == null) {
+        _focusRow = 0;
+        _focusCol = 0;
+      } else {
+        if (shift) {
+          _anchorRow ??= _focusRow;
+          _anchorCol ??= _focusCol;
+        } else {
+          _anchorRow = null;
+          _anchorCol = null;
+        }
+        _focusRow =
+            (_focusRow! + dRow).clamp(0, _navRows.length - 1);
+        _focusCol =
+            (_focusCol! + dCol).clamp(0, _navColumns.length - 1);
+      }
+    });
+    _ensureFocusVisible();
+    return KeyEventResult.handled;
+  }
+
+  /// Opens the focused cell's editor where the type edits inline (text,
+  /// number, currency, link, user), or toggles a focused checkbox. The
+  /// anchored editors (selects, dates) stay pointer-driven.
+  void _editFocusedCell() {
+    if (_focusRow == null) return;
+    final row = _navRows[_focusRow!];
+    final column = _navColumns[_focusCol!];
+    if (!_isCellEditable(column)) return;
+    switch (column.type) {
+      case DsCellType.text:
+      case DsCellType.number:
+      case DsCellType.currency:
+      case DsCellType.link:
+      case DsCellType.user:
+        _startInlineEdit(row, column);
+      case DsCellType.checkbox:
+        _emit(row, column, !(_asBool(row.cells[column.key]) ?? false));
+      default:
+        break;
+    }
+  }
+
+  /// Copies the focused cell — or the rectangular range — to the clipboard
+  /// as tab-separated text, one line per row.
+  void _copyFocusOrRange() {
+    if (_focusRow == null) return;
+    final r1 = math.min(_focusRow!, _anchorRow ?? _focusRow!);
+    final r2 = math.max(_focusRow!, _anchorRow ?? _focusRow!);
+    final c1 = math.min(_focusCol!, _anchorCol ?? _focusCol!);
+    final c2 = math.max(_focusCol!, _anchorCol ?? _focusCol!);
+    final columns = _navColumns;
+    final lines = <String>[
+      for (var r = r1; r <= r2; r++)
+        [
+          for (var c = c1; c <= c2; c++)
+            _clipboardCellText(columns[c], _navRows[r].cells[columns[c].key]),
+        ].join('\t'),
+    ];
+    Clipboard.setData(ClipboardData(text: lines.join('\n')));
+  }
+
+  /// Pastes tab-separated clipboard text starting at the focused cell,
+  /// writing only into editable cells whose type accepts the value, each
+  /// through [DsDataGrid.onCellChanged].
+  Future<void> _pasteAtFocus() async {
+    if (_focusRow == null || widget.onCellChanged == null) return;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
+    final text = data?.text;
+    if (text == null || text.isEmpty) return;
+    final lines = text.replaceAll('\r\n', '\n').replaceAll('\r', '\n').split('\n');
+    if (lines.isNotEmpty && lines.last.isEmpty) lines.removeLast();
+    final columns = _navColumns;
+    for (var r = 0; r < lines.length; r++) {
+      final targetRowIndex = _focusRow! + r;
+      if (targetRowIndex >= _navRows.length) break;
+      final cells = lines[r].split('\t');
+      for (var c = 0; c < cells.length; c++) {
+        final targetColIndex = _focusCol! + c;
+        if (targetColIndex >= columns.length) break;
+        final column = columns[targetColIndex];
+        if (!_isCellEditable(column)) continue;
+        final (bool ok, Object? value) = _coercePasted(column, cells[c]);
+        if (!ok) continue;
+        _emit(_navRows[targetRowIndex], column, value);
+      }
+    }
+  }
+
+  /// The plain clipboard text for a cell, spreadsheet-compatible: raw
+  /// strings, ungrouped numbers, ISO dates, TRUE/FALSE checkboxes and
+  /// comma-joined multi-select labels.
+  String _clipboardCellText(DsGridColumn column, Object? value) {
+    switch (column.type) {
+      case DsCellType.text:
+      case DsCellType.link:
+      case DsCellType.user:
+      case DsCellType.singleSelect:
+      case DsCellType.status:
+        return _asString(value) ?? '';
+      case DsCellType.number:
+      case DsCellType.currency:
+      case DsCellType.rating:
+      case DsCellType.progress:
+        final number = _asNum(value);
+        return number == null ? '' : _plainNumberText(number);
+      case DsCellType.date:
+        final date = _asDate(value);
+        return date == null ? '' : _formatDate(date);
+      case DsCellType.checkbox:
+        final boolean = _asBool(value);
+        return boolean == null ? '' : (boolean ? 'TRUE' : 'FALSE');
+      case DsCellType.multiSelect:
+        return _asStringList(value)?.join(', ') ?? '';
+    }
+  }
+
+  /// Coerces pasted [raw] text for [column], returning whether the value is
+  /// compatible and the value to write. Incompatible text is skipped rather
+  /// than corrupting the cell.
+  (bool, Object?) _coercePasted(DsGridColumn column, String raw) {
+    final trimmed = raw.trim();
+    switch (column.type) {
+      case DsCellType.text:
+      case DsCellType.link:
+      case DsCellType.user:
+        return (true, raw);
+      case DsCellType.number:
+      case DsCellType.currency:
+        if (trimmed.isEmpty) return (true, null);
+        final number = _parseEditableNumber(trimmed);
+        return number == null ? (false, null) : (true, number);
+      case DsCellType.rating:
+        final number = num.tryParse(trimmed);
+        return number == null
+            ? (false, null)
+            : (true, number.clamp(0, 5));
+      case DsCellType.date:
+        final date = DateTime.tryParse(trimmed);
+        return date == null ? (false, null) : (true, date);
+      case DsCellType.checkbox:
+        final lowered = trimmed.toLowerCase();
+        if (lowered == 'true' || lowered == '1' || lowered == 'yes') {
+          return (true, true);
+        }
+        if (lowered == 'false' || lowered == '0' || lowered == 'no') {
+          return (true, false);
+        }
+        return (false, null);
+      case DsCellType.singleSelect:
+      case DsCellType.status:
+        final options = column.options;
+        if (options == null) return (true, trimmed);
+        for (final option in options) {
+          if (option.value.toLowerCase() == trimmed.toLowerCase() ||
+              option.effectiveLabel.toLowerCase() == trimmed.toLowerCase()) {
+            return (true, option.value);
+          }
+        }
+        return (false, null);
+      case DsCellType.multiSelect:
+        final parts = [
+          for (final part in trimmed.split(','))
+            if (part.trim().isNotEmpty) part.trim(),
+        ];
+        final options = column.options;
+        if (options == null) return (true, parts);
+        final resolved = <String>[];
+        for (final part in parts) {
+          var matched = part;
+          for (final option in options) {
+            if (option.value.toLowerCase() == part.toLowerCase() ||
+                option.effectiveLabel.toLowerCase() == part.toLowerCase()) {
+              matched = option.value;
+              break;
+            }
+          }
+          resolved.add(matched);
+        }
+        return (true, resolved);
+      case DsCellType.progress:
+        // Progress cells are never editable.
+        return (false, null);
+    }
   }
 
   // --- View management menus ------------------------------------------------
@@ -1470,6 +1838,7 @@ class _DsDataGridState extends State<DsDataGrid> {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
+    _syncNavCaches();
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth.isFinite
@@ -1835,7 +2204,7 @@ class _DsDataGridState extends State<DsDataGrid> {
             bodyHeight,
           );
 
-    return SizedBox(
+    final table = SizedBox(
       width: maxWidth,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -1865,6 +2234,21 @@ class _DsDataGridState extends State<DsDataGrid> {
           ),
         ),
       ),
+    );
+
+    if (!widget.enableCellNavigation) return table;
+    // The table body joins the focus order; arrow keys and the clipboard
+    // then operate on the focused cell. The handler acts only while this
+    // node itself is the primary focus, so inline editors keep their keys.
+    return Focus(
+      focusNode: _cellsFocusNode,
+      onKeyEvent: _onCellsKey,
+      onFocusChange: (bool focused) {
+        if (focused && _focusRow == null && _navRows.isNotEmpty) {
+          _focusCell(0, 0);
+        }
+      },
+      child: table,
     );
   }
 
@@ -3073,12 +3457,26 @@ class _DsDataGridState extends State<DsDataGrid> {
         : _cellContent(tokens, column, row.cells[column.key],
             dense: true, align: align);
 
+    final bool focused = _isCellFocused(row, column);
+    final bool inRange = _anchorRow != null && _isCellInRange(row, column);
+
     Widget cell = SizedBox(
       width: width,
       height: widget.rowHeight,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
-        child: Align(alignment: _alignmentOf(align), child: content),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: inRange ? tokens.brandTintColor : null,
+          border: focused
+              ? Border.all(
+                  color: tokens.formAccentColor,
+                  width: tokens.focusRingWidth,
+                )
+              : null,
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: _cellPaddingX),
+          child: Align(alignment: _alignmentOf(align), child: content),
+        ),
       ),
     );
 
