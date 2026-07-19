@@ -59,7 +59,7 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | `colorSurfaceMuted` | `Color` | `#F6F8FA` | The muted surface tier: the quiet grey behind code wells, table headers and other recessed panels. Exposed to the Material scheme as surfaceContainerHighest. |
 | `formHighlightColorBorder` | `Color` | `#D7D7D7` | The colour used to highlight form items when focused. |
 | `formAccentColor` | `Color` | `#0F766E` | The colour used to fill form items such as tickboxes, radio buttons and switches. |
-| `formPlaceholderTextColor` | `Color` | `#AAAAAA` | The colour for placeholder text in form items. |
+| `formPlaceholderTextColor` | `Color` | `#767676` | The colour for placeholder text in form items. |
 
 ### Typography
 

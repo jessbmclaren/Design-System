@@ -74,4 +74,38 @@ void main() {
       });
     });
   }
+
+  // Placeholder text is still text: it must clear AA on the field fill while
+  // staying visibly lighter than the value ink, in the base themes and in
+  // every shipped skin.
+  final skinned = <String, DsTokens>{
+    'light': DsTokens.light(),
+    'dark': DsTokens.dark(),
+    'engen light': DsSkins.engenLight(),
+    'engen dark': DsSkins.engenDark(),
+  };
+  for (final entry in skinned.entries) {
+    final t = entry.value;
+
+    group('placeholder contrast · ${entry.key}', () {
+      test('placeholder on the field fill is AA (>=4.5:1)', () {
+        final ratio =
+            _contrast(t.formPlaceholderTextColor, t.formBackgroundColor);
+        expect(ratio, greaterThanOrEqualTo(4.5),
+            reason:
+                'placeholder is ${ratio.toStringAsFixed(2)}:1 on the field fill');
+      });
+
+      test('placeholder stays lighter than the value ink', () {
+        // The empty state must still read as empty: the placeholder sits
+        // meaningfully closer to the surface than entered text does.
+        final placeholder =
+            _contrast(t.formPlaceholderTextColor, t.formBackgroundColor);
+        final ink = _contrast(t.colorText, t.formBackgroundColor);
+        expect(ink - placeholder, greaterThanOrEqualTo(2.0),
+            reason: 'placeholder ${placeholder.toStringAsFixed(2)}:1 vs '
+                'ink ${ink.toStringAsFixed(2)}:1');
+      });
+    });
+  }
 }

@@ -104,8 +104,10 @@ abstract final class DsColors {
   /// The colour used for secondary text.
   static const Color textSecondary = Color(0xFF717171);
 
-  /// The colour for placeholder text in form items.
-  static const Color formPlaceholderText = Color(0xFFAAAAAA);
+  /// The colour for placeholder text in form items. Deep enough to clear AA
+  /// contrast (4.5:1) on [formBackground] while staying clearly lighter than
+  /// [text], so an empty field still reads as empty.
+  static const Color formPlaceholderText = Color(0xFF767676);
 
   // ---------------------------------------------------------------------------
   // Surfaces & borders

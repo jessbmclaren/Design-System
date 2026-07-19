@@ -29,7 +29,9 @@ abstract final class DsSkins {
   static const Color _hairline = Color(0xFFE5E8F0); // badge / divider hairline
   static const Color _fill = Color(0xFFEEF0F5); // muted fill / offset surface
   static const Color _page = Color(0xFFFAFBFD); // page background
-  static const Color _placeholder = Color(0xFF7A8295); // placeholder text
+  // Placeholder text: the slate ramp step that clears AA contrast (4.5:1) on
+  // the white field fill while staying lighter than the secondary slate.
+  static const Color _placeholder = Color(0xFF6E7686);
   static const Color _danger = Color(0xFFDF1B41);
 
   /// The brand-tinted elevation scale: one soft indigo drop that deepens with

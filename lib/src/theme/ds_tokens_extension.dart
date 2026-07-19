@@ -356,7 +356,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formBackgroundColor: const Color(0xFF17181C),
       formHighlightColorBorder: const Color(0xFF4B4E56),
       formAccentColor: DsColors.brandPrimaryDark,
-      formPlaceholderTextColor: const Color(0xFF6B7280),
+      // Clears AA contrast (4.5:1) on the dark field fill while staying
+      // clearly dimmer than the value ink.
+      formPlaceholderTextColor: const Color(0xFF8A93A6),
       overlayBackdropColor: const Color(0x99000000),
       // The same quiet drift as light, rebuilt from the dark surfaces: the
       // page background into the offset surface, with the secondary button

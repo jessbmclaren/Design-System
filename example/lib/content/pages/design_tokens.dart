@@ -85,7 +85,7 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'colorSurfaceMuted', type: 'Color', example: '#F6F8FA', description: 'The muted surface tier: the quiet grey behind code wells, table headers and other recessed panels. Exposed to the Material scheme as surfaceContainerHighest.'),
         VariableRow(name: 'formHighlightColorBorder', type: 'Color', example: '#D7D7D7', description: 'The colour used to highlight form items when focused.'),
         VariableRow(name: 'formAccentColor', type: 'Color', example: '#0F766E', description: 'The colour used to fill form items such as tickboxes, radio buttons and switches.'),
-        VariableRow(name: 'formPlaceholderTextColor', type: 'Color', example: '#AAAAAA', description: 'The colour for placeholder text in form items.'),
+        VariableRow(name: 'formPlaceholderTextColor', type: 'Color', example: '#767676', description: 'The colour for placeholder text in form items.'),
       ],
     ),
     VariablesBlock(
