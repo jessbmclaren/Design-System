@@ -7,10 +7,11 @@ import '../../theme/ds_tokens_extension.dart';
 /// border tokens defined in the theme:
 ///
 /// * [neutral]: informational or default state with no strong connotation.
+/// * [info]: a brand-tinted informational state, stronger than neutral.
 /// * [success]: positive, completed or healthy state.
 /// * [warning]: cautionary state that may need attention.
 /// * [danger]: error, failure or destructive state.
-enum DsBadgeVariant { neutral, success, warning, danger }
+enum DsBadgeVariant { neutral, info, success, warning, danger }
 
 /// A compact status badge rendered as a rounded pill.
 ///
@@ -70,6 +71,11 @@ class DsBadge extends StatelessWidget {
           tokens.badgeNeutralColorBackground,
           tokens.badgeNeutralColorText,
           tokens.badgeNeutralColorBorder,
+        ),
+      DsBadgeVariant.info => (
+          tokens.badgeInfoColorBackground,
+          tokens.badgeInfoColorText,
+          tokens.badgeInfoColorBorder,
         ),
       DsBadgeVariant.success => (
           tokens.badgeSuccessColorBackground,

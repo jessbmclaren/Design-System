@@ -33,21 +33,28 @@ class DsAuthGradient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final stops = tokens.authWashGradient;
+    final colors = tokens.authWashGradient;
     // A gradient needs two stops; fewer degrades to a solid fill rather
-    // than throwing at paint time.
+    // than throwing at paint time. The axis and stop positions come from the
+    // wash tokens, so a skin can run its veil horizontally or hold a colour
+    // band; mismatched stops fall back to even spacing.
+    final stopPositions = tokens.authWashStops;
     final wash = ExcludeSemantics(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: stops.length < 2
-              ? (stops.isEmpty ? tokens.colorBackground : stops.first)
+          color: colors.length < 2
+              ? (colors.isEmpty ? tokens.colorBackground : colors.first)
               : null,
-          gradient: stops.length < 2
+          gradient: colors.length < 2
               ? null
               : LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: stops,
+                  begin: tokens.authWashBegin,
+                  end: tokens.authWashEnd,
+                  colors: colors,
+                  stops: stopPositions != null &&
+                          stopPositions.length == colors.length
+                      ? stopPositions
+                      : null,
                 ),
         ),
       ),

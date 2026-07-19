@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../tokens/ds_typography.dart';
@@ -41,6 +43,9 @@ abstract final class DsTheme {
     DsTokens tokens,
     Color? seedColor,
   ) {
+    // A skin that breaks the accessibility contract fails fast in debug
+    // rather than shipping unreadable text.
+    assert(_debugContrastHolds(tokens));
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor ?? tokens.colorPrimary,
       brightness: brightness,
@@ -85,6 +90,20 @@ abstract final class DsTheme {
 
     return base.copyWith(
       textTheme: _textTheme(base.textTheme, tokens, effectiveFamily, effectiveFallback),
+      // Flat interactions: the system never splashes; hover, focus and press
+      // read as tints, not ripples.
+      splashFactory: NoSplash.splashFactory,
+      tooltipTheme: TooltipThemeData(
+        waitDuration: const Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          color: tokens.colorInverseSurface,
+          borderRadius: BorderRadius.circular(tokens.tooltipBorderRadius),
+        ),
+        textStyle: tokens.labelSm
+            .copyWith(height: 1.3)
+            .toTextStyle(color: tokens.colorOnInverse),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      ),
       dividerTheme: DividerThemeData(
         // The hairline tier, so a plain Divider matches DsDivider under a
         // skin that lightens its hairlines.
@@ -107,12 +126,120 @@ abstract final class DsTheme {
       ),
       popupMenuTheme: PopupMenuThemeData(shape: generalShape),
       dialogTheme: DialogThemeData(shape: generalShape),
+      // The full field recipe, so a bare TextField inside the theme already
+      // renders as a Ds field: filled white, all six border states and the
+      // token hint and error styling.
       inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: tokens.formBackgroundColor,
+        isDense: false,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: tokens.inputFieldPaddingX,
+          vertical: tokens.textFieldPaddingY,
+        ),
+        hintStyle: tokens.bodyMd
+            .copyWith(height: 1.3)
+            .toTextStyle(color: tokens.formPlaceholderTextColor),
+        errorStyle: tokens.bodySm.toTextStyle(color: tokens.colorDanger),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.colorBorder,
+            width: tokens.inputBorderWidth,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.colorBorderSubtle,
+            width: tokens.inputBorderWidth,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.formHighlightColorBorder,
+            width: tokens.inputFocusBorderWidth,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.colorDanger,
+            width: tokens.inputBorderWidth,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.colorDanger,
+            width: tokens.inputFocusBorderWidth,
+          ),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(tokens.formBorderRadius),
+          borderSide: BorderSide(
+            color: tokens.colorBorder,
+            width: tokens.inputBorderWidth,
+          ),
         ),
       ),
     );
+  }
+
+  /// WCAG relative luminance of an sRGB colour.
+  static double _luminance(Color c) {
+    double channel(double v) => v <= 0.03928
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+    return 0.2126 * channel(c.r) +
+        0.7152 * channel(c.g) +
+        0.0722 * channel(c.b);
+  }
+
+  /// WCAG contrast ratio between two colours (1..21).
+  static double _contrast(Color a, Color b) {
+    final la = _luminance(a);
+    final lb = _luminance(b);
+    return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+  }
+
+  /// The debug-only contrast guard: asserts the core text pairs clear AA
+  /// (4.5:1) so a skin that breaks the contract fails at construction with a
+  /// named pair instead of shipping unreadable text. Always returns true in
+  /// release builds.
+  static bool _debugContrastHolds(DsTokens t) {
+    void check(String pair, Color fg, Color bg) {
+      final ratio = _contrast(fg, bg);
+      assert(
+        ratio >= 4.5,
+        'DsTheme contrast: $pair is ${ratio.toStringAsFixed(2)}:1, '
+        'needs 4.5:1',
+      );
+    }
+
+    check('colorText on colorBackground', t.colorText, t.colorBackground);
+    check('colorSecondaryText on colorBackground', t.colorSecondaryText,
+        t.colorBackground);
+    check('primary button label on its fill', t.buttonPrimaryColorText,
+        t.buttonPrimaryColorBackground);
+    check('danger button label on its fill', t.buttonDangerColorText,
+        t.buttonDangerColorBackground);
+    check('neutral badge ink on its fill', t.badgeNeutralColorText,
+        t.badgeNeutralColorBackground);
+    check('info badge ink on its fill', t.badgeInfoColorText,
+        t.badgeInfoColorBackground);
+    check('success badge ink on its fill', t.badgeSuccessColorText,
+        t.badgeSuccessColorBackground);
+    check('warning badge ink on its fill', t.badgeWarningColorText,
+        t.badgeWarningColorBackground);
+    check('danger badge ink on its fill', t.badgeDangerColorText,
+        t.badgeDangerColorBackground);
+    check('placeholder on the field fill', t.formPlaceholderTextColor,
+        t.formBackgroundColor);
+    check('inverse ink on the inverse surface', t.colorOnInverse,
+        t.colorInverseSurface);
+    return true;
   }
 
   static TextTheme _textTheme(

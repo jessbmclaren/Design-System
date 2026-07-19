@@ -4131,6 +4131,7 @@ Color? _optionSwatch(DsTokens tokens, DsGridOption option) {
     DsBadgeVariant.success => tokens.badgeSuccessColorText,
     DsBadgeVariant.warning => tokens.badgeWarningColorText,
     DsBadgeVariant.danger => tokens.badgeDangerColorText,
+    DsBadgeVariant.info => tokens.badgeInfoColorText,
     DsBadgeVariant.neutral => tokens.badgeNeutralColorText,
     null => null,
   };

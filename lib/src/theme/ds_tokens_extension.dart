@@ -347,7 +347,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // The info badge shares the neutral container on the base, with the
       // primary as its ink, so it stays quiet until a skin tints it.
       badgeInfoColorBackground: DsColors.badgeNeutralBackground,
-      badgeInfoColorText: DsColors.actionPrimary,
+      // A deepened brand blue: the action primary sits below AA on the pale
+      // container, so the info ink runs one step darker.
+      badgeInfoColorText: const Color(0xFF005FB8),
       badgeInfoColorBorder: DsColors.badgeNeutralBackground,
       offsetBackgroundColor: DsColors.offsetBackground,
       colorSurfaceMuted: DsColors.surfaceMuted,

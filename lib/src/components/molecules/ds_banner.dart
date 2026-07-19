@@ -90,32 +90,32 @@ class DsBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
 
-    final (background, foreground, border, icon) = switch (variant) {
+    // A banner is a flat container: its border always matches its fill, so
+    // the badge border tokens are free to carry a stronger badge-only
+    // treatment without re-bordering banners.
+    final (background, foreground, icon) = switch (variant) {
       DsBannerVariant.info => (
-          tokens.badgeNeutralColorBackground,
-          tokens.badgeNeutralColorText,
-          tokens.badgeNeutralColorBorder,
+          tokens.badgeInfoColorBackground,
+          tokens.badgeInfoColorText,
           DsIcons.info,
         ),
       DsBannerVariant.success => (
           tokens.badgeSuccessColorBackground,
           tokens.badgeSuccessColorText,
-          tokens.badgeSuccessColorBorder,
           DsIcons.success,
         ),
       DsBannerVariant.warning => (
           tokens.badgeWarningColorBackground,
           tokens.badgeWarningColorText,
-          tokens.badgeWarningColorBorder,
           DsIcons.warning,
         ),
       DsBannerVariant.danger => (
           tokens.badgeDangerColorBackground,
           tokens.badgeDangerColorText,
-          tokens.badgeDangerColorBorder,
           DsIcons.error,
         ),
     };
+    final border = background;
 
     final textColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,

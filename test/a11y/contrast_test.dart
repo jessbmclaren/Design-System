@@ -57,6 +57,7 @@ void main() {
       test('each badge text on its background is AA', () {
         final pairs = <(Color, Color)>[
           (t.badgeNeutralColorText, t.badgeNeutralColorBackground),
+          (t.badgeInfoColorText, t.badgeInfoColorBackground),
           (t.badgeSuccessColorText, t.badgeSuccessColorBackground),
           (t.badgeWarningColorText, t.badgeWarningColorBackground),
           (t.badgeDangerColorText, t.badgeDangerColorBackground),
