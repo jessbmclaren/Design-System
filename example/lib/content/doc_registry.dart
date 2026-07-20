@@ -58,6 +58,15 @@ import 'pages/app_shell.dart';
 import 'pages/table_views.dart';
 import 'pages/task_view.dart';
 import 'pages/dialog.dart';
+import 'pages/key_hint.dart';
+import 'pages/stat_tile.dart';
+import 'pages/phone_field.dart';
+import 'pages/choice_chips.dart';
+import 'pages/time_field.dart';
+import 'pages/site_nav.dart';
+import 'pages/intro_card.dart';
+import 'pages/summary_section.dart';
+import 'pages/validators.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
 import 'pages/focus_view.dart';
@@ -110,6 +119,7 @@ final List<PatternPage> allPages = [
   motionPage,
   iconographyPage,
   breakpointsPage,
+  validatorsPage,
   // Actions
   actionButtonsPage,
   backLinkPage,
@@ -117,6 +127,7 @@ final List<PatternPage> allPages = [
   footerActionsPage,
   linkPage,
   iconButtonPage,
+  keyHintPage,
   // Inputs
   textFieldsPage,
   fieldLabelPage,
@@ -136,6 +147,9 @@ final List<PatternPage> allPages = [
   uploadFieldPage,
   filterControlsPage,
   searchFieldPage,
+  phoneFieldPage,
+  choiceChipsPage,
+  timeFieldPage,
   // Display
   accordionPage,
   avatarPage,
@@ -148,6 +162,7 @@ final List<PatternPage> allPages = [
   listsPage,
   stepHeaderPage,
   wordmarkPage,
+  summarySectionPage,
   // Feedback
   animatedEllipsisPage,
   communicatingStatePage,
@@ -171,6 +186,7 @@ final List<PatternPage> allPages = [
   // Data
   dataGridPage,
   tableViewsPage,
+  statTilePage,
   cellTypesPage,
   groupingPage,
   filteringSortingPage,
@@ -191,6 +207,7 @@ final List<PatternPage> allPages = [
   navRailPage,
   statusBarPage,
   taskViewPage,
+  siteNavPage,
   boxPage,
   brandBloomPage,
   fadeSlideInPage,
@@ -208,6 +225,7 @@ final List<PatternPage> allPages = [
   setupGuidePage,
   spotlightPage,
   tourCardPage,
+  introCardPage,
   additionalContextPage,
   redirectsPage,
 ];

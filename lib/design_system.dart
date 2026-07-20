@@ -25,6 +25,7 @@ export 'src/theme/ds_tokens_extension.dart';
 export 'src/util/ds_input_masks.dart';
 export 'src/util/ds_motion.dart';
 export 'src/util/ds_validators.dart';
+export 'src/util/ds_validators_za.dart';
 
 // Components, organised by Atomic Design layer.
 //
