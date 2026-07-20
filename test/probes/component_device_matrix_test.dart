@@ -220,6 +220,20 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
         ),
   ),
   ('DsSpinner', (_) => const DsSpinner()),
+  (
+    'DsKeyHint',
+    (_) => const DsKeyHint(keys: <String>['⌘', '↵']),
+  ),
+  (
+    'DsStatTile',
+    (_) => DsStatTile(
+          label: 'Open',
+          value: '1,284',
+          caption: 'up 12 this week',
+          selected: true,
+          onTap: () {},
+        ),
+  ),
   ('DsSparkline', (_) => const DsSparkline(values: <double>[3, 5, 4, 7, 6, 9, 8])),
   (
     'DsStepHeader',
@@ -469,6 +483,18 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
     'DsResendControl',
     (_) => DsResendControl(
           onResend: () async => const DsResendResult.sent(),
+        ),
+  ),
+  (
+    'DsPhoneField',
+    (_) => DsPhoneField(
+          label: 'Phone',
+          countries: const <DsDialCode>[
+            DsDialCode(code: 'ZA', dialCode: '+27', hintExample: '00 000 0000'),
+            DsDialCode(code: 'GB', dialCode: '+44', hintExample: '0000 000000'),
+          ],
+          value: const DsPhoneValue(code: 'ZA', number: '821234567'),
+          onChanged: (_) {},
         ),
   ),
   (

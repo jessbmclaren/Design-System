@@ -56,6 +56,7 @@ class DsAppShell extends StatelessWidget {
     this.trailing = const <Widget>[],
     this.navHeader,
     this.navTrailing,
+    this.notice,
     this.statusBar,
     this.railBreakpoint = DsBreakpoints.medium,
     this.sidebarBreakpoint = DsBreakpoints.large,
@@ -92,6 +93,13 @@ class DsAppShell extends StatelessWidget {
 
   /// Content pinned beneath the navigation items in the rail and sidebar.
   final Widget? navTrailing;
+
+  /// An optional full-bleed strip above the top bar, for a state that
+  /// applies to the whole session rather than the page: a test environment,
+  /// an impersonation notice, a service interruption. It spans the shell,
+  /// above both the bar and the navigation, because it qualifies everything
+  /// beneath it.
+  final Widget? notice;
 
   /// An optional strip closing the frame along the bottom edge, typically a
   /// `DsStatusBar`.
@@ -176,6 +184,7 @@ class DsAppShell extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              ?notice,
               topBar,
               Expanded(
                 child: Row(

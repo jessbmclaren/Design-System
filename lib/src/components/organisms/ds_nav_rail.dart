@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
+import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 import '../atoms/ds_icon.dart';
 
@@ -16,6 +17,8 @@ class DsNavItem {
     required this.label,
     required this.icon,
     required this.route,
+    this.section,
+    this.children = const <DsNavItem>[],
   });
 
   /// The destination's name, shown as the row label when the rail is
@@ -28,6 +31,18 @@ class DsNavItem {
   /// The stable identifier reported when the item is chosen and matched
   /// against the current selection.
   final String route;
+
+  /// The heading this item sits under in the extended sidebar. Consecutive
+  /// items sharing a section are grouped beneath one quiet heading; a null
+  /// section leaves the item in the unheaded run at the top. Headings are
+  /// dropped in the icon-only rail, which has no room for them.
+  final String? section;
+
+  /// The destinations nested under this one. A parent with children becomes
+  /// a disclosure in the extended sidebar: choosing it expands the group
+  /// rather than navigating, and the children indent beneath it. Ignored in
+  /// the icon-only rail, where nesting has nowhere to go.
+  final List<DsNavItem> children;
 }
 
 /// A vertical navigation rail: icon-only by default, a labelled sidebar when
@@ -55,7 +70,7 @@ class DsNavItem {
 ///   onNavigate: (route) => _go(route),
 /// )
 /// ```
-class DsNavRail extends StatelessWidget {
+class DsNavRail extends StatefulWidget {
   /// Creates a navigation rail.
   const DsNavRail({
     super.key,
@@ -101,34 +116,117 @@ class DsNavRail extends StatelessWidget {
   static const double extendedWidth = 236;
 
   @override
+  State<DsNavRail> createState() => _DsNavRailState();
+}
+
+class _DsNavRailState extends State<DsNavRail> {
+  /// Which groups the user has opened or closed, keyed by the parent's route.
+  /// A group absent from the map follows whether it holds the selection.
+  final Map<String, bool> _openGroups = <String, bool>{};
+
+  bool _isOpen(DsNavItem parent) =>
+      _openGroups[parent.route] ??
+      parent.children.any((DsNavItem c) => c.route == widget.selectedRoute);
+
+  /// Flattens the items into the rows to render: section headings, parents
+  /// and, for an open group, its indented children. The icon-only rail has
+  /// no room for headings or nesting, so it renders parents alone.
+  List<Widget> _rows(DsTokens tokens) {
+    final double unit = tokens.spacingUnit;
+    final bool extended = widget.extended;
+    final List<Widget> rows = <Widget>[];
+    String? currentSection;
+
+    Widget pad(Widget child, {double indent = 0}) => Padding(
+          padding: EdgeInsets.only(
+            left: indent,
+            bottom: extended ? unit / 4 : unit,
+          ),
+          child: child,
+        );
+
+    for (final DsNavItem item in widget.items) {
+      if (extended && item.section != null && item.section != currentSection) {
+        currentSection = item.section;
+        rows.add(
+          Padding(
+            padding: EdgeInsets.fromLTRB(unit * 1.25, unit * 1.5, 0, unit / 2),
+            child: Semantics(
+              header: true,
+              child: Text(
+                item.section!,
+                style: tokens.labelSm
+                    .toTextStyle(color: tokens.colorSecondaryText),
+              ),
+            ),
+          ),
+        );
+      } else if (item.section == null) {
+        currentSection = null;
+      }
+
+      final bool isGroup = extended && item.children.isNotEmpty;
+      final bool open = isGroup && _isOpen(item);
+
+      rows.add(
+        pad(
+          _DsNavRailItem(
+            tokens: tokens,
+            item: item,
+            selected: item.route == widget.selectedRoute,
+            extended: extended,
+            expanded: isGroup ? open : null,
+            onTap: widget.onNavigate == null
+                ? null
+                : isGroup
+                    // A parent is a disclosure, not a destination.
+                    ? () => setState(() => _openGroups[item.route] = !open)
+                    : () => widget.onNavigate!(item.route),
+          ),
+        ),
+      );
+
+      if (open) {
+        for (final DsNavItem child in item.children) {
+          rows.add(
+            pad(
+              _DsNavRailItem(
+                tokens: tokens,
+                item: child,
+                selected: child.route == widget.selectedRoute,
+                extended: extended,
+                onTap: widget.onNavigate == null
+                    ? null
+                    : () => widget.onNavigate!(child.route),
+              ),
+              indent: unit * 2.5,
+            ),
+          );
+        }
+      }
+    }
+    return rows;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final DsTokens tokens = DsTokens.of(context);
     final double unit = tokens.spacingUnit;
-    final double railWidth = width ?? (extended ? extendedWidth : unit * 7);
+    final bool extended = widget.extended;
+    final Widget? header = widget.header;
+    final Widget? trailing = widget.trailing;
+    final double railWidth =
+        widget.width ?? (extended ? DsNavRail.extendedWidth : unit * 7);
 
     final Widget list = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        for (final DsNavItem item in items)
-          Padding(
-            padding: EdgeInsets.only(bottom: extended ? unit / 4 : unit),
-            child: _DsNavRailItem(
-              tokens: tokens,
-              item: item,
-              selected: item.route == selectedRoute,
-              extended: extended,
-              onTap: onNavigate == null
-                  ? null
-                  : () => onNavigate!(item.route),
-            ),
-          ),
-      ],
+      children: _rows(tokens),
     );
 
     return Semantics(
       container: true,
-      label: semanticLabel,
+      label: widget.semanticLabel,
       child: Container(
         width: railWidth,
         decoration: BoxDecoration(
@@ -141,7 +239,7 @@ class DsNavRail extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (extended && header != null) header!,
+            if (extended && header != null) header,
             Expanded(
               child: SingleChildScrollView(
                 padding: extended
@@ -154,7 +252,7 @@ class DsNavRail extends StatelessWidget {
             if (trailing != null)
               Padding(
                 padding: EdgeInsets.all(extended ? unit * 1.5 : unit),
-                child: trailing!,
+                child: trailing,
               ),
           ],
         ),
@@ -171,6 +269,7 @@ class _DsNavRailItem extends StatefulWidget {
     required this.selected,
     required this.extended,
     required this.onTap,
+    this.expanded,
   });
 
   final DsTokens tokens;
@@ -178,6 +277,10 @@ class _DsNavRailItem extends StatefulWidget {
   final bool selected;
   final bool extended;
   final VoidCallback? onTap;
+
+  /// Whether this row is an open group, a closed group, or not a group at
+  /// all (null), which decides the trailing chevron and the announced state.
+  final bool? expanded;
 
   @override
   State<_DsNavRailItem> createState() => _DsNavRailItemState();
@@ -242,6 +345,15 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            // A group parent carries the disclosure chevron its state.
+            if (widget.expanded != null)
+              DsIcon(
+                icon: widget.expanded!
+                    ? DsIcons.expandLess
+                    : DsIcons.expandMore,
+                size: DsIconSize.sm,
+                color: tokens.colorSecondaryText,
+              ),
           ],
         ),
       );
@@ -301,7 +413,8 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
     return MergeSemantics(
       child: Semantics(
         button: true,
-        selected: widget.selected,
+        selected: widget.expanded == null ? widget.selected : null,
+        expanded: widget.expanded,
         label: widget.item.label,
         child: widget.extended
             ? interactive

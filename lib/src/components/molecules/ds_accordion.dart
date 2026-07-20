@@ -22,8 +22,18 @@ class DsAccordionItem {
     required this.title,
     required this.child,
     this.leading,
+    this.subtitle,
+    this.trailing,
     this.initiallyExpanded = false,
   });
+
+  /// A quiet line beneath the [title], such as a count or a summary of what
+  /// the section holds while it is closed.
+  final String? subtitle;
+
+  /// Content on the header's trailing edge, before the chevron: a badge, a
+  /// count, a small action.
+  final Widget? trailing;
 
   /// The header text. Ellipsizes to a single line so a header never overflows
   /// on narrow screens.
@@ -76,6 +86,7 @@ class DsAccordion extends StatefulWidget {
     super.key,
     required this.items,
     this.allowMultiple = false,
+    this.flat = false,
   });
 
   /// The sections to render, top to bottom.
@@ -86,6 +97,12 @@ class DsAccordion extends StatefulWidget {
   /// When `false` (the default) opening a section closes any other, so at most
   /// one body is visible. When `true` sections toggle independently.
   final bool allowMultiple;
+
+  /// Whether the accordion drops its container: no fill, no border and no
+  /// rounded corners, leaving the sections to sit directly on the surface
+  /// beneath. Use it for the collapsible sections of a form, where the
+  /// surrounding card already supplies the frame.
+  final bool flat;
 
   @override
   State<DsAccordion> createState() => _DsAccordionState();
@@ -148,13 +165,17 @@ class _DsAccordionState extends State<DsAccordion> {
     final radius = BorderRadius.circular(tokens.formBorderRadius);
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: tokens.formBackgroundColor,
-        border: Border.all(color: tokens.colorBorder),
-        borderRadius: radius,
-      ),
+      // Flat: no fill, border or corners, so the sections sit directly on
+      // the surface the caller already framed.
+      decoration: widget.flat
+          ? const BoxDecoration()
+          : BoxDecoration(
+              color: tokens.formBackgroundColor,
+              border: Border.all(color: tokens.colorBorder),
+              borderRadius: radius,
+            ),
       child: ClipRRect(
-        borderRadius: radius,
+        borderRadius: widget.flat ? BorderRadius.zero : radius,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -202,7 +223,9 @@ class _DsAccordionSection extends StatelessWidget {
     final header = Semantics(
       button: true,
       expanded: expanded,
-      label: item.title,
+      label: item.subtitle == null
+          ? item.title
+          : '${item.title}, ${item.subtitle}',
       child: InkWell(
         onTap: onToggle,
         child: ConstrainedBox(
@@ -226,13 +249,31 @@ class _DsAccordionSection extends StatelessWidget {
                   SizedBox(width: tokens.spacingUnit * 1.5),
                 ],
                 Expanded(
-                  child: Text(
-                    item.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: titleStyle,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: titleStyle,
+                      ),
+                      if (item.subtitle != null)
+                        Text(
+                          item.subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: tokens.bodySm
+                              .toTextStyle(color: tokens.colorSecondaryText),
+                        ),
+                    ],
                   ),
                 ),
+                if (item.trailing != null) ...[
+                  SizedBox(width: tokens.spacingUnit * 1.5),
+                  Flexible(child: item.trailing!),
+                ],
                 SizedBox(width: tokens.spacingUnit * 1.5),
                 ExcludeSemantics(
                   child: AnimatedRotation(

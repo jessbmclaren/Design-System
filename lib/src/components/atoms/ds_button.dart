@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import 'ds_key_hint.dart';
 import '../../util/ds_motion.dart';
 import 'ds_spinner.dart';
 
@@ -53,6 +54,7 @@ class DsButton extends StatefulWidget {
     this.variant = DsButtonVariant.primary,
     this.icon,
     this.trailingIcon,
+    this.keyHint,
     this.pending = false,
     this.fullWidth = false,
   });
@@ -96,6 +98,11 @@ class DsButton extends StatefulWidget {
 
   /// An optional trailing icon, such as a forward arrow on a continue action.
   final IconData? trailingIcon;
+
+  /// The keys shown as a trailing hint, teaching the shortcut that triggers
+  /// this action (`['N']`, `['⌘', '↵']`). The hint is decorative: the button
+  /// already carries the action and its name.
+  final List<String>? keyHint;
 
   /// Whether an action is in flight. Shows a spinner over the label (kept
   /// mounted at zero opacity so the width holds) and swallows presses while
@@ -260,6 +267,10 @@ class _DsButtonState extends State<DsButton>
         if (widget.trailingIcon != null) ...[
           SizedBox(width: tokens.spacingUnit),
           Icon(widget.trailingIcon, size: tokens.buttonIconSize),
+        ],
+        if (widget.keyHint != null) ...[
+          SizedBox(width: tokens.spacingUnit),
+          DsKeyHint(keys: widget.keyHint!, onSurface: true),
         ],
       ],
     );

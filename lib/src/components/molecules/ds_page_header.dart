@@ -29,8 +29,14 @@ class DsPageHeader extends StatelessWidget {
     this.subtitle,
     this.actions = const [],
     this.leading,
+    this.value,
     this.showDivider = true,
   });
+
+  /// A figure shown beside the [title] in the same line, for a page whose
+  /// headline is a number (a balance, a total). It reads as part of the
+  /// heading, so assistive technology announces the two together.
+  final String? value;
 
   /// The primary heading text. Rendered with the large heading token and
   /// truncated with an ellipsis if it cannot fit.
@@ -60,8 +66,21 @@ class DsPageHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          title,
+        // The heading and its figure read as one line to assistive
+        // technology, and the figure wraps with the title rather than
+        // pushing it off the edge.
+        Text.rich(
+          TextSpan(
+            children: <InlineSpan>[
+              TextSpan(text: title),
+              if (value != null)
+                TextSpan(
+                  text: '  $value',
+                  style: tokens.headingLg
+                      .toTextStyle(color: tokens.colorSecondaryText),
+                ),
+            ],
+          ),
           style: tokens.headingLg.toTextStyle(color: tokens.colorText),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
