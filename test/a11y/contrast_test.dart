@@ -84,6 +84,8 @@ void main() {
     'dark': DsTokens.dark(),
     'engen light': DsSkins.engenLight(),
     'engen dark': DsSkins.engenDark(),
+    'editorial light': DsSkins.editorialLight(),
+    'editorial dark': DsSkins.editorialDark(),
   };
   for (final entry in skinned.entries) {
     final t = entry.value;

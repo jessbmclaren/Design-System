@@ -253,6 +253,9 @@ MaterialApp(theme: DsTheme.light(tokens: brand));
 // Opt into a ready-made skin. This changes nothing about the defaults.
 MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
+// The editorial skin: ink on paper, square corners, letter-spaced labels.
+MaterialApp(theme: DsTheme.light(tokens: DsSkins.editorialLight()));
+
 // Read a token inside a widget.
 final tokens = DsTokens.of(context);
 final border = tokens.colorBorder;

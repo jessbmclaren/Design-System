@@ -334,4 +334,263 @@ abstract final class DsSkins {
       wordmarkAccentFontWeight: DsTypography.extraBold,
     );
   }
+
+  // --- Editorial ------------------------------------------------------------
+
+  // The editorial palette: ink on paper, with a single restrained accent.
+  static const Color _ink = Color(0xFF0A0A0A); // near-black body ink
+  static const Color _inkSoft = Color(0xFF5A5A5A); // secondary ink
+  static const Color _rule = Color(0xFFDCDCDC); // hairline rule
+  static const Color _ruleFaint = Color(0xFFEDEDED); // faint rule
+  static const Color _paper = Color(0xFFFFFFFF); // page
+  static const Color _paperTinted = Color(0xFFF4F2EF); // warm offset paper
+  static const Color _accent = Color(0xFF8A1C1C); // deep editorial red
+
+  /// A high-contrast editorial skin: ink on paper, sharp corners, letter-spaced
+  /// upper-case labels and a single deep-red accent.
+  ///
+  /// The look borrows from print rather than from software. Contrast does the
+  /// work colour usually does, so the palette is almost monochrome and the one
+  /// accent is spent only where an action must be found. Corners are square,
+  /// shadows are almost absent and rules are hairlines, because a page has no
+  /// depth; emphasis comes from scale and weight instead. Labels are set in
+  /// upper case with wide tracking, the way a masthead sets its furniture.
+  ///
+  /// It is a skin like any other: the neutral base is untouched, and a product
+  /// opts in with `DsTheme.light(tokens: DsSkins.editorialLight())`.
+  static DsTokens editorialLight() {
+    return DsTokens.light().copyWith(
+      // Ink and paper.
+      colorText: _ink,
+      colorSecondaryText: _inkSoft,
+      colorBorder: _rule,
+      colorBorderSubtle: _ruleFaint,
+      colorBackground: _paper,
+      offsetBackgroundColor: _paperTinted,
+      colorSurfaceMuted: _paperTinted,
+      formBackgroundColor: _paper,
+      formPlaceholderTextColor: const Color(0xFF767676),
+      colorIconMuted: _inkSoft,
+      // The accent is spent sparingly: actions, links, focus.
+      colorPrimary: _accent,
+      buttonPrimaryColorBackground: _ink,
+      buttonPrimaryColorBorder: _ink,
+      buttonPrimaryColorText: _paper,
+      colorOnPrimary: _paper,
+      actionPrimaryColorText: _accent,
+      actionPrimaryTextDecorationColor: _accent,
+      buttonTertiaryColorText: _accent,
+      formAccentColor: _ink,
+      formHighlightColorBorder: _ink,
+      brandTintColor: _paperTinted,
+      // Secondary and neutral actions are outlines, as a rule on a page.
+      buttonSecondaryColorBackground: _paper,
+      buttonSecondaryColorBorder: _ink,
+      buttonSecondaryColorText: _ink,
+      buttonNeutralColorBackground: _paper,
+      buttonNeutralColorBorder: _rule,
+      buttonNeutralColorText: _ink,
+      buttonPrimaryDisabledColorBackground: const Color(0xFFBDBDBD),
+      buttonPrimaryDisabledColorText: _paper,
+      // Badges are hairline-bordered marks rather than filled pills.
+      badgeNeutralColorBackground: _paper,
+      badgeNeutralColorText: _ink,
+      badgeNeutralColorBorder: _rule,
+      badgeInfoColorBackground: _paper,
+      badgeInfoColorText: _ink,
+      badgeInfoColorBorder: _ink,
+      badgeSuccessColorBackground: _paper,
+      badgeSuccessColorText: const Color(0xFF1F5130),
+      badgeSuccessColorBorder: const Color(0xFF1F5130),
+      badgeWarningColorBackground: _paper,
+      badgeWarningColorText: const Color(0xFF7A4A00),
+      badgeWarningColorBorder: const Color(0xFF7A4A00),
+      badgeDangerColorBackground: _paper,
+      badgeDangerColorText: _accent,
+      badgeDangerColorBorder: _accent,
+      // Shape: square, the way a column of type is square.
+      borderRadius: 0,
+      buttonBorderRadius: 0,
+      formBorderRadius: 0,
+      badgeBorderRadius: 0,
+      overlayBorderRadius: 0,
+      radiusControl: 0,
+      tooltipBorderRadius: 0,
+      // This skin has no pills: a chip is a rule-bordered mark like every
+      // other, so even the fully-rounded step squares off.
+      radiusFull: 0,
+      // Depth: a page has none. The rules carry the structure instead.
+      shadowLow: const <BoxShadow>[],
+      shadowMedium: const <BoxShadow>[
+        BoxShadow(color: Color(0x14000000), offset: Offset(0, 8), blurRadius: 24),
+      ],
+      shadowHigh: const <BoxShadow>[
+        BoxShadow(color: Color(0x1F000000), offset: Offset(0, 16), blurRadius: 40),
+      ],
+      // Type: a wide scale, tight display tracking, generous body leading.
+      display: const DsTypeToken(
+          fontSize: 72,
+          fontWeight: DsTypography.extraBold,
+          height: 0.95,
+          letterSpacing: -2.4),
+      headingXl: const DsTypeToken(
+          fontSize: 44,
+          fontWeight: DsTypography.bold,
+          height: 1.05,
+          letterSpacing: -1.2),
+      stepTitle: const DsTypeToken(
+          fontSize: 34,
+          fontWeight: DsTypography.bold,
+          height: 1.1,
+          letterSpacing: -0.8),
+      headingLg: const DsTypeToken(
+          fontSize: 30,
+          fontWeight: DsTypography.bold,
+          height: 1.1,
+          letterSpacing: -0.6),
+      headingMd: const DsTypeToken(
+          fontSize: 22,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.3),
+      headingSm: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.semiBold, height: 1.3),
+      // Section furniture is set small, upper case and widely tracked.
+      headingXs: const DsTypeToken(
+          fontSize: 11,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: 1.4),
+      bodyLg: const DsTypeToken(
+          fontSize: 18, fontWeight: DsTypography.regular, height: 1.6),
+      bodyMd: const DsTypeToken(
+          fontSize: 16, fontWeight: DsTypography.regular, height: 1.6),
+      bodySm: const DsTypeToken(
+          fontSize: 14, fontWeight: DsTypography.regular, height: 1.55),
+      labelMd: const DsTypeToken(
+          fontSize: 13,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: 0.4),
+      labelSm: const DsTypeToken(
+          fontSize: 11,
+          fontWeight: DsTypography.medium,
+          height: 1.3,
+          letterSpacing: 0.8),
+      // Labels read as masthead furniture: upper case, widely tracked.
+      buttonLabelTextTransform: DsTextTransform.uppercase,
+      badgeLabelTextTransform: DsTextTransform.uppercase,
+      buttonLabelFontSize: 12,
+      buttonLabelFontWeight: DsTypography.semiBold,
+      buttonPaddingX: 28,
+      buttonPaddingY: 18,
+      buttonIconSize: 14,
+      badgeLabelFontSize: 10,
+      badgeLabelFontWeight: DsTypography.semiBold,
+      badgePaddingX: 8,
+      badgePaddingY: 4,
+      // Room to breathe: a printed page is mostly margin.
+      cardPadding: 40,
+      // The auth wash is paper, warming towards the edge.
+      authWashGradient: const <Color>[_paper, _paperTinted],
+      bloomColor: const Color(0xFFE8DFD6),
+      bloomStops: const <Color>[
+        Color(0xFFF0E6DC),
+        Color(0xFFE8DFD6),
+        Color(0xFFDCD3CB),
+        Color(0xFFE8DFD6),
+        Color(0xFF8A1C1C),
+      ],
+      headlineGradient: const <Color>[_ink, _accent],
+      wordmarkPrimaryFontWeight: DsTypography.extraBold,
+      wordmarkAccentFontWeight: DsTypography.regular,
+      wordmarkLetterSpacing: -1.2,
+    );
+  }
+
+  /// The dark editorial skin: the same page, printed white on black.
+  static DsTokens editorialDark() {
+    return DsTokens.dark().copyWith(
+      colorText: const Color(0xFFF5F3F0),
+      colorSecondaryText: const Color(0xFFA8A29B),
+      colorBorder: const Color(0xFF3A3A3A),
+      colorBorderSubtle: const Color(0xFF242424),
+      colorBackground: const Color(0xFF0A0A0A),
+      offsetBackgroundColor: const Color(0xFF161513),
+      colorPrimary: const Color(0xFFD98484),
+      actionPrimaryColorText: const Color(0xFFD98484),
+      actionPrimaryTextDecorationColor: const Color(0xFFD98484),
+      buttonTertiaryColorText: const Color(0xFFD98484),
+      buttonPrimaryColorBackground: const Color(0xFFF5F3F0),
+      buttonPrimaryColorBorder: const Color(0xFFF5F3F0),
+      buttonPrimaryColorText: const Color(0xFF0A0A0A),
+      formAccentColor: const Color(0xFFF5F3F0),
+      formHighlightColorBorder: const Color(0xFFF5F3F0),
+      brandTintColor: const Color(0xFF221F1D),
+      // Outlines, as on the light page: a rule carries the mark, not a fill.
+      buttonSecondaryColorBackground: const Color(0x00000000),
+      buttonSecondaryColorBorder: const Color(0xFFF5F3F0),
+      buttonSecondaryColorText: const Color(0xFFF5F3F0),
+      buttonNeutralColorBackground: const Color(0x00000000),
+      buttonNeutralColorBorder: const Color(0xFF3A3A3A),
+      buttonNeutralColorText: const Color(0xFFF5F3F0),
+      badgeNeutralColorBackground: const Color(0x00000000),
+      badgeNeutralColorText: const Color(0xFFF5F3F0),
+      badgeNeutralColorBorder: const Color(0xFF3A3A3A),
+      badgeInfoColorBackground: const Color(0x00000000),
+      badgeInfoColorText: const Color(0xFFF5F3F0),
+      badgeInfoColorBorder: const Color(0xFFF5F3F0),
+      badgeSuccessColorBackground: const Color(0x00000000),
+      badgeSuccessColorText: const Color(0xFF7FBF95),
+      badgeSuccessColorBorder: const Color(0xFF7FBF95),
+      badgeWarningColorBackground: const Color(0x00000000),
+      badgeWarningColorText: const Color(0xFFE0B357),
+      badgeWarningColorBorder: const Color(0xFFE0B357),
+      badgeDangerColorBackground: const Color(0x00000000),
+      badgeDangerColorText: const Color(0xFFD98484),
+      badgeDangerColorBorder: const Color(0xFFD98484),
+      borderRadius: 0,
+      buttonBorderRadius: 0,
+      formBorderRadius: 0,
+      badgeBorderRadius: 0,
+      overlayBorderRadius: 0,
+      radiusControl: 0,
+      tooltipBorderRadius: 0,
+      radiusFull: 0,
+      buttonLabelTextTransform: DsTextTransform.uppercase,
+      badgeLabelTextTransform: DsTextTransform.uppercase,
+      buttonLabelFontSize: 12,
+      buttonLabelFontWeight: DsTypography.semiBold,
+      buttonPaddingX: 28,
+      buttonPaddingY: 18,
+      badgeLabelFontSize: 10,
+      badgePaddingX: 8,
+      badgePaddingY: 4,
+      cardPadding: 40,
+      headingXl: const DsTypeToken(
+          fontSize: 44,
+          fontWeight: DsTypography.bold,
+          height: 1.05,
+          letterSpacing: -1.2),
+      headingLg: const DsTypeToken(
+          fontSize: 30,
+          fontWeight: DsTypography.bold,
+          height: 1.1,
+          letterSpacing: -0.6),
+      headingXs: const DsTypeToken(
+          fontSize: 11,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: 1.4),
+      bodyMd: const DsTypeToken(
+          fontSize: 16, fontWeight: DsTypography.regular, height: 1.6),
+      bodySm: const DsTypeToken(
+          fontSize: 14, fontWeight: DsTypography.regular, height: 1.55),
+      labelSm: const DsTypeToken(
+          fontSize: 11,
+          fontWeight: DsTypography.medium,
+          height: 1.3,
+          letterSpacing: 0.8),
+    );
+  }
 }
