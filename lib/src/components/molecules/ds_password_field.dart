@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../tokens/ds_icon_size.dart';
+import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
 import 'ds_text_field.dart';
 
@@ -25,6 +27,7 @@ class DsPasswordField extends StatefulWidget {
     this.label,
     this.hintText,
     this.helperText,
+    this.showCapsLockHint = false,
     this.errorText,
     this.controller,
     this.onChanged,
@@ -74,6 +77,12 @@ class DsPasswordField extends StatefulWidget {
   /// An optional focus node controlling the field's focus.
   final FocusNode? focusNode;
 
+  /// Whether to warn while caps lock is on and the field has focus. A typed
+  /// password is masked, so the usual clue that the shift key is stuck is
+  /// missing; this restores it. The row appears only while both conditions
+  /// hold and announces itself once, rather than on every keystroke.
+  final bool showCapsLockHint;
+
   /// Validates the password inside a [Form], forwarded to [DsTextField].
   /// Pair it with the rules in `dsPasswordRules` so the form gate and the
   /// visible checklist agree.
@@ -100,11 +109,79 @@ class DsPasswordField extends StatefulWidget {
 class _DsPasswordFieldState extends State<DsPasswordField> {
   bool _obscured = true;
 
+  /// The field's own focus node, created only when the caller supplies none
+  /// and the caps-lock hint needs to know whether the field has focus.
+  FocusNode? _internalFocusNode;
+  bool _focused = false;
+  bool _capsLockOn = false;
+
+  FocusNode? get _focusNode => widget.focusNode ?? _internalFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showCapsLockHint) _attachCapsLock();
+  }
+
+  @override
+  void didUpdateWidget(DsPasswordField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.showCapsLockHint && !oldWidget.showCapsLockHint) {
+      _attachCapsLock();
+    } else if (!widget.showCapsLockHint && oldWidget.showCapsLockHint) {
+      _detachCapsLock();
+    }
+  }
+
+  @override
+  void dispose() {
+    _detachCapsLock();
+    _internalFocusNode?.dispose();
+    super.dispose();
+  }
+
+  void _attachCapsLock() {
+    _internalFocusNode ??= widget.focusNode == null ? FocusNode() : null;
+    _focusNode?.addListener(_onFocusChange);
+    HardwareKeyboard.instance.addHandler(_onKey);
+    _syncCapsLock();
+  }
+
+  void _detachCapsLock() {
+    _focusNode?.removeListener(_onFocusChange);
+    HardwareKeyboard.instance.removeHandler(_onKey);
+  }
+
+  void _onFocusChange() {
+    final bool focused = _focusNode?.hasFocus ?? false;
+    if (focused == _focused) return;
+    setState(() => _focused = focused);
+    if (focused) _syncCapsLock();
+  }
+
+  /// Reads the lock state directly, so the hint is right on focus rather
+  /// than waiting for the next keystroke.
+  void _syncCapsLock() {
+    final bool on = HardwareKeyboard.instance.lockModesEnabled
+        .contains(KeyboardLockMode.capsLock);
+    if (on != _capsLockOn) setState(() => _capsLockOn = on);
+  }
+
+  bool _onKey(KeyEvent event) {
+    _syncCapsLock();
+    // Never consume the key: this is an observer, not a handler.
+    return false;
+  }
+
   void _toggle() => setState(() => _obscured = !_obscured);
 
   @override
   Widget build(BuildContext context) {
-    return DsTextField(
+    final DsTokens tokens = DsTokens.of(context);
+    final bool showHint =
+        widget.showCapsLockHint && _focused && _capsLockOn;
+
+    final Widget field = DsTextField(
       label: widget.label,
       hintText: widget.hintText,
       helperText: widget.helperText,
@@ -115,7 +192,7 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
       textInputAction: widget.textInputAction,
       enabled: widget.enabled,
       autofocus: widget.autofocus,
-      focusNode: widget.focusNode,
+      focusNode: _focusNode,
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
       reserveErrorSpace: widget.reserveErrorSpace,
@@ -135,6 +212,39 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
         ),
         tooltip: _obscured ? 'Show password' : 'Hide password',
       ),
+    );
+
+    if (!widget.showCapsLockHint) return field;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        field,
+        if (showHint)
+          Padding(
+            padding: EdgeInsets.only(top: tokens.fieldLabelGap),
+            child: Semantics(
+              liveRegion: true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    DsIcons.warning,
+                    size: DsIconSize.xs,
+                    color: tokens.colorSecondaryText,
+                  ),
+                  SizedBox(width: tokens.spacingUnit / 2),
+                  Text(
+                    'Caps Lock is on',
+                    style: tokens.bodySm
+                        .toTextStyle(color: tokens.colorSecondaryText),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

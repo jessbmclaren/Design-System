@@ -242,6 +242,11 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
         ),
   ),
   ('DsSpinner', (_) => const DsSpinner()),
+  ('DsShake', (_) => const DsShake(trigger: 0, child: Text('Card'))),
+  (
+    'DsNavLink',
+    (_) => DsNavLink(label: 'Pricing', dropdown: true, onTap: () {}),
+  ),
   (
     'DsKeyHint',
     (_) => const DsKeyHint(keys: <String>['⌘', '↵']),
@@ -517,6 +522,31 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
           ],
           value: const DsPhoneValue(code: 'ZA', number: '821234567'),
           onChanged: (_) {},
+        ),
+  ),
+  (
+    'DsFloatingBar',
+    (_) => const DsFloatingBar(
+          floating: true,
+          child: SizedBox(height: 60),
+        ),
+  ),
+  (
+    'DsTopNav',
+    (_) => DsTopNav(
+          brand: const Text('acme'),
+          links: <DsTopNavLink>[
+            DsTopNavLink(label: 'Product', dropdown: true, onTap: () {}),
+            DsTopNavLink(label: 'Pricing', onTap: () {}),
+          ],
+          secondaryActions: <Widget>[
+            DsButton(
+              label: 'Log in',
+              variant: DsButtonVariant.tertiary,
+              onPressed: () {},
+            ),
+          ],
+          primaryAction: DsButton(label: 'Get started', onPressed: () {}),
         ),
   ),
   (

@@ -94,4 +94,34 @@ void main() {
       expect(field.autofillHints, <String>[AutofillHints.newPassword]);
     });
   });
+
+
+    testWidgets('the caps-lock hint appears only while focused and locked', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsPasswordField(label: 'Password', showCapsLockHint: true),
+        surfaceSize: const Size(400, 300),
+      );
+
+      // Not focused: no hint, whatever the lock state.
+      expect(find.text('Caps Lock is on'), findsNothing);
+
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+      // Focused but unlocked: still nothing.
+      expect(find.text('Caps Lock is on'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('without the flag the field is unchanged', (tester) async {
+      await pumpDs(
+        tester,
+        const DsPasswordField(label: 'Password'),
+        surfaceSize: const Size(400, 300),
+      );
+      expect(find.byType(Column), findsWidgets);
+      expect(find.text('Caps Lock is on'), findsNothing);
+    });
 }
