@@ -69,9 +69,13 @@ class DsFooterActions extends StatelessWidget {
     this.onPrimary,
     this.primaryPending = false,
     this.primaryTrailingIcon,
+    this.secondaryLabel,
+    this.onSecondary,
+    this.secondaryVariant = DsButtonVariant.secondary,
     this.backLabel,
     this.onBack,
     this.backVariant = DsButtonVariant.tertiary,
+    this.backIcon,
     this.tertiaryLabel,
     this.onTertiary,
     this.leading,
@@ -98,6 +102,18 @@ class DsFooterActions extends StatelessWidget {
   final IconData? primaryTrailingIcon;
 
   /// The label of the optional back action. When null no back button renders.
+  /// The label of an optional secondary action sitting beside the primary
+  /// one, for the second real choice a footer offers ("Save draft" beside
+  /// "Submit"). Null shows no secondary action.
+  final String? secondaryLabel;
+
+  /// Called when the secondary action is tapped. A null callback disables it.
+  final VoidCallback? onSecondary;
+
+  /// The variant of the secondary action. Defaults to
+  /// [DsButtonVariant.secondary].
+  final DsButtonVariant secondaryVariant;
+
   final String? backLabel;
 
   /// Called when the back action is tapped. A null callback disables it.
@@ -106,6 +122,10 @@ class DsFooterActions extends StatelessWidget {
   /// The emphasis of the back action. Defaults to [DsButtonVariant.tertiary],
   /// a quiet text button.
   final DsButtonVariant backVariant;
+
+  /// An optional leading glyph on the back action, typically
+  /// [DsIcons.arrowBack].
+  final IconData? backIcon;
 
   /// The label of the optional low-emphasis action rendered centred beneath
   /// the cluster, typically "Save and finish later". When null it is omitted.
@@ -138,6 +158,14 @@ class DsFooterActions extends StatelessWidget {
             label: backLabel!,
             onPressed: onBack,
             variant: backVariant,
+            icon: backIcon,
+          );
+    final Widget? secondary = secondaryLabel == null
+        ? null
+        : DsButton(
+            label: secondaryLabel!,
+            onPressed: onSecondary,
+            variant: secondaryVariant,
           );
     final Widget? tertiary = tertiaryLabel == null
         ? null
@@ -154,6 +182,7 @@ class DsFooterActions extends StatelessWidget {
       minRowWidth: minRowWidth,
       hasLeading: leading != null,
       hasBack: back != null,
+      hasSecondary: secondary != null,
       hasTertiary: tertiary != null,
       gap: tokens.spacingUnit * 1.5,
       stackGap: tokens.spacingUnit,
@@ -161,6 +190,7 @@ class DsFooterActions extends StatelessWidget {
       children: <Widget>[
         ?leading,
         ?back,
+        ?secondary,
         DsButton(
           label: primaryLabel,
           onPressed: onPrimary,
@@ -181,6 +211,7 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
     required this.minRowWidth,
     required this.hasLeading,
     required this.hasBack,
+    required this.hasSecondary,
     required this.hasTertiary,
     required this.gap,
     required this.stackGap,
@@ -191,6 +222,7 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
   final double minRowWidth;
   final bool hasLeading;
   final bool hasBack;
+  final bool hasSecondary;
   final bool hasTertiary;
 
   /// The gap between the back and primary actions in the row layout, and
@@ -208,6 +240,7 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
       minRowWidth: minRowWidth,
       hasLeading: hasLeading,
       hasBack: hasBack,
+      hasSecondary: hasSecondary,
       hasTertiary: hasTertiary,
       gap: gap,
       stackGap: stackGap,
@@ -224,6 +257,7 @@ class _FooterCluster extends MultiChildRenderObjectWidget {
       ..minRowWidth = minRowWidth
       ..hasLeading = hasLeading
       ..hasBack = hasBack
+      ..hasSecondary = hasSecondary
       ..hasTertiary = hasTertiary
       ..gap = gap
       ..stackGap = stackGap
@@ -238,12 +272,14 @@ class _FooterSlots {
   _FooterSlots({
     required this.leading,
     required this.back,
+    required this.secondary,
     required this.primary,
     required this.tertiary,
   });
 
   final RenderBox? leading;
   final RenderBox? back;
+  final RenderBox? secondary;
   final RenderBox primary;
   final RenderBox? tertiary;
 }
@@ -256,6 +292,7 @@ class _RenderFooterCluster extends RenderBox
     required double minRowWidth,
     required bool hasLeading,
     required bool hasBack,
+    required bool hasSecondary,
     required bool hasTertiary,
     required double gap,
     required double stackGap,
@@ -263,6 +300,7 @@ class _RenderFooterCluster extends RenderBox
   })  : _minRowWidth = minRowWidth,
         _hasLeading = hasLeading,
         _hasBack = hasBack,
+        _hasSecondary = hasSecondary,
         _hasTertiary = hasTertiary,
         _gap = gap,
         _stackGap = stackGap,
@@ -306,6 +344,13 @@ class _RenderFooterCluster extends RenderBox
     markNeedsLayout();
   }
 
+  bool _hasSecondary;
+  set hasSecondary(bool value) {
+    if (_hasSecondary == value) return;
+    _hasSecondary = value;
+    markNeedsLayout();
+  }
+
   bool _hasTertiary;
   set hasTertiary(bool value) {
     if (_hasTertiary == value) return;
@@ -340,6 +385,11 @@ class _RenderFooterCluster extends RenderBox
       back = child;
       child = childAfter(child!);
     }
+    RenderBox? secondary;
+    if (_hasSecondary) {
+      secondary = child;
+      child = childAfter(child!);
+    }
     final primary = child!;
     if (_hasTertiary) {
       tertiary = childAfter(primary);
@@ -347,6 +397,7 @@ class _RenderFooterCluster extends RenderBox
     return _FooterSlots(
       leading: leading,
       back: back,
+      secondary: secondary,
       primary: primary,
       tertiary: tertiary,
     );
@@ -356,6 +407,10 @@ class _RenderFooterCluster extends RenderBox
   /// the buttons at their intrinsic widths plus the caption's minimum.
   double _rowNeed(_FooterSlots slots) {
     var need = slots.primary.getMaxIntrinsicWidth(double.infinity);
+    final secondary = slots.secondary;
+    if (secondary != null) {
+      need += _gap + secondary.getMaxIntrinsicWidth(double.infinity);
+    }
     final back = slots.back;
     if (back != null) {
       need += _gap + back.getMaxIntrinsicWidth(double.infinity);
@@ -409,6 +464,7 @@ class _RenderFooterCluster extends RenderBox
               for (final child in [
                 slots.leading,
                 slots.back,
+                slots.secondary,
                 slots.primary,
                 slots.tertiary,
               ])
@@ -420,6 +476,13 @@ class _RenderFooterCluster extends RenderBox
       final primarySize = layoutChild(slots.primary, stretch);
       place(slots.primary, 0, 0, width);
       var height = primarySize.height;
+
+      final secondary = slots.secondary;
+      if (secondary != null) {
+        final secondarySize = layoutChild(secondary, stretch);
+        place(secondary, 0, height + _stackGap, width);
+        height += _stackGap + secondarySize.height;
+      }
 
       final back = slots.back;
       if (back != null) {
@@ -446,9 +509,13 @@ class _RenderFooterCluster extends RenderBox
     // whatever width remains at the start.
     final loose = BoxConstraints(maxWidth: bounded ? maxWidth : double.infinity);
     final primarySize = layoutChild(slots.primary, loose);
+    final secondary = slots.secondary;
+    final secondarySize =
+        secondary == null ? Size.zero : layoutChild(secondary, loose);
     final back = slots.back;
     final backSize = back == null ? Size.zero : layoutChild(back, loose);
     var actionsWidth = primarySize.width;
+    if (secondary != null) actionsWidth += _gap + secondarySize.width;
     if (back != null) actionsWidth += _gap + backSize.width;
 
     final leading = slots.leading;
@@ -464,7 +531,7 @@ class _RenderFooterCluster extends RenderBox
         ? maxWidth
         : actionsWidth + (leading == null ? 0 : _gap + leadingSize.width);
     final rowHeight = math.max(
-      primarySize.height,
+      math.max(primarySize.height, secondarySize.height),
       math.max(backSize.height, leadingSize.height),
     );
 
@@ -474,10 +541,22 @@ class _RenderFooterCluster extends RenderBox
       (rowHeight - primarySize.height) / 2,
       width,
     );
+    // The trailing cluster reads primary, then secondary, then back as it
+    // walks inward from the trailing edge.
+    var trailingEdge = width - primarySize.width;
+    if (secondary != null) {
+      trailingEdge -= _gap + secondarySize.width;
+      place(
+        secondary,
+        trailingEdge,
+        (rowHeight - secondarySize.height) / 2,
+        width,
+      );
+    }
     if (back != null) {
       place(
         back,
-        width - primarySize.width - _gap - backSize.width,
+        trailingEdge - _gap - backSize.width,
         (rowHeight - backSize.height) / 2,
         width,
       );

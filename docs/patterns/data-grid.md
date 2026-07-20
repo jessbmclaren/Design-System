@@ -18,6 +18,7 @@ Use the data grid when the job is scanning and comparing many records across man
 
 **Do**
 
+- Keep the row tap for the primary action and put the rest behind `rowActions`.
 - Freeze the column that identifies the record (a name, a plate, an id) so it stays visible while the rest scrolls sideways.
 - Match each column's `type` to its data so cells sort correctly and align by convention: numbers, currency and progress to the trailing edge.
 - Let the grid own sort and selection for simple tables; lift them to `onSort` and `onSelectionChanged` only when your data source needs to react.

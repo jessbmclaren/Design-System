@@ -79,6 +79,7 @@ class DsSignUpView extends StatelessWidget {
     this.aside,
     this.onClose,
     this.showBorder = true,
+    this.embedded = false,
   });
 
   /// The prominent heading, typically a short "Create your account" message.
@@ -149,6 +150,16 @@ class DsSignUpView extends StatelessWidget {
   /// card.
   final bool showBorder;
 
+  /// Whether the card frames its own page.
+  ///
+  /// When false (the default) the view centres and scrolls itself, so it can be
+  /// dropped straight into a `Scaffold` body. Set it true to render just the
+  /// constrained card, for a host that already owns the page framing — a
+  /// template that supplies the background, the centring and the scroll (an
+  /// auth shell). Nesting a self-framing view inside such a host would scroll
+  /// twice; embedded mode is how the same card lives in both places.
+  final bool embedded;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -158,11 +169,18 @@ class DsSignUpView extends StatelessWidget {
         final width = constraints.maxWidth;
         final showAsideBeside =
             aside != null && width.isFinite && width >= DsBreakpoints.expanded;
+        final content =
+            showAsideBeside ? _buildWide(tokens) : _buildStacked(tokens);
 
+        // Embedded: the host frames the page, so hand back just the card.
+        if (embedded) return content;
+
+        // Standalone: frame our own page — centred and scrollable for a
+        // Scaffold.
         return Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(tokens.spacingUnit * 3),
-            child: showAsideBeside ? _buildWide(tokens) : _buildStacked(tokens),
+            child: content,
           ),
         );
       },

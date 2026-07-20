@@ -542,6 +542,59 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  testWidgets('embedded hands the card back unframed', (tester) async {
+    for (final Widget view in <Widget>[
+      DsSignInView(
+        title: 'Sign in',
+        primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+        embedded: true,
+      ),
+      DsSignUpView(
+        title: 'Create account',
+        form: const SizedBox.shrink(),
+        primaryActionLabel: 'Continue',
+        onSubmit: () {},
+        embedded: true,
+      ),
+    ]) {
+      await pumpDs(tester, view, surfaceSize: const Size(800, 900));
+      // The host owns the framing: the view adds no scroll view of its own.
+      expect(find.byType(SingleChildScrollView), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('standalone still frames and scrolls itself', (tester) async {
+    await pumpDs(
+      tester,
+      DsSignInView(
+        title: 'Sign in',
+        primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+      ),
+      surfaceSize: const Size(400, 500),
+    );
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+  });
+
+  testWidgets('embedded inside an auth shell never double-scrolls', (
+    tester,
+  ) async {
+    await pumpDs(
+      tester,
+      DsAuthShell(
+        child: DsSignInView(
+          title: 'Sign in',
+          primaryAction: DsSignInAction(label: 'Continue', onPressed: () {}),
+          embedded: true,
+        ),
+      ),
+      surfaceSize: const Size(390, 700),
+    );
+    // Only the shell's own scroll view is present.
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 /// Matches the footer band by its structural signature, a container whose

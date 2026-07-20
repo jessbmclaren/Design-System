@@ -66,9 +66,9 @@ Components are organised into atomic design layers under
 | Layer | Components |
 | --- | --- |
 | **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsCheckDot`, `DsSegmentedControl`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom` |
-| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordRequirements`, `DsPasswordStrength`, `DsResendControl`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner`, `DsSearchField`, `DsMenuSheet` |
+| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordRequirements`, `DsPasswordStrength`, `DsResendControl`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner`, `DsSearchField`, `DsMenuSheet`, `DsDialog`, `DsModalSheet` |
 | **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsChoosePasswordView`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences`, `DsNavRail`, `DsStatusBar`, `DsSortPill` |
-| **Templates** | `DsPageScaffold`, `DsAuthShell`, `DsAppShell` |
+| **Templates** | `DsPageScaffold`, `DsAuthShell`, `DsAppShell`, `DsTaskView` |
 | **Pages** | the documentation demos in [`example/`](example/) |
 
 ## Documentation

@@ -40,6 +40,7 @@ final PatternPage dataGridPage = PatternPage(
     ),
   ],
   dos: const [
+    'Keep the row tap for the primary action and put the rest behind `rowActions`.',
     'Freeze the column that identifies the record (a name, a plate, an id) so it '
         'stays visible while the rest scrolls sideways.',
     'Match each column\'s `type` to its data so cells sort correctly and align by '

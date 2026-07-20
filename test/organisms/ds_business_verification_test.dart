@@ -567,4 +567,80 @@ void main() {
       expect(cancelled, 1);
     });
   });
+
+
+  group('rail progress', () {
+    testWidgets('renders the rail beside the step body on a wide page', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const SizedBox(
+          height: 800,
+          child: DsBusinessVerification(
+            progress: DsVerificationProgress.rail,
+          ),
+        ),
+        surfaceSize: const Size(1200, 900),
+      );
+
+      expect(find.byType(DsVerificationRail), findsOneWidget);
+      // The rail names every section, so the wizard drops its own stepper.
+      expect(find.byType(DsProgressStepper), findsNothing);
+      expect(find.text('Business type'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the rail tracks the step as the flow advances', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const SizedBox(
+          height: 800,
+          child: DsBusinessVerification(
+            progress: DsVerificationProgress.rail,
+          ),
+        ),
+        surfaceSize: const Size(1200, 900),
+      );
+
+      DsVerificationRail rail() =>
+          tester.widget<DsVerificationRail>(find.byType(DsVerificationRail));
+      expect(rail().sections.first.state, DsVerificationSectionState.active);
+
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle(const Duration(milliseconds: 400));
+
+      expect(rail().sections.first.state, DsVerificationSectionState.done);
+      expect(rail().sections[1].state, DsVerificationSectionState.active);
+    });
+
+    testWidgets('stacks the rail above the body on a narrow page', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const SizedBox(
+          height: 800,
+          child: DsBusinessVerification(
+            progress: DsVerificationProgress.rail,
+          ),
+        ),
+        surfaceSize: const Size(360, 900),
+      );
+      expect(find.byType(DsVerificationRail), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the stepper remains the default', (tester) async {
+      await pumpDs(
+        tester,
+        const SizedBox(height: 800, child: DsBusinessVerification()),
+        surfaceSize: const Size(1200, 900),
+      );
+      expect(find.byType(DsVerificationRail), findsNothing);
+      expect(find.byType(DsProgressStepper), findsOneWidget);
+    });
+  });
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_checkbox.dart';
@@ -16,6 +17,7 @@ import '../molecules/ds_form_field_group.dart';
 import '../molecules/ds_select.dart';
 import '../molecules/ds_text_field.dart';
 import '../molecules/ds_upload_field.dart';
+import '../molecules/ds_verification_rail.dart';
 import '../organisms/ds_onboarding_wizard.dart';
 
 /// Builds or decorates the body of one verification step.
@@ -166,6 +168,18 @@ class DsBusinessFieldCopy {
 /// The first frame is always step 0 with empty fields, and the widget starts no
 /// timers or indefinite animation, so it renders deterministically in
 /// screenshots.
+/// How a [DsBusinessVerification] presents its progress.
+enum DsVerificationProgress {
+  /// A horizontal stepper above the step body, the default.
+  stepper,
+
+  /// A `DsVerificationRail` on the leading side, listing the sections
+  /// vertically with the active one's sub-steps. Better for a takeover that
+  /// owns the whole page, and it collapses to the rail's own compact summary
+  /// on a narrow width.
+  rail,
+}
+
 class DsBusinessVerification extends StatefulWidget {
   /// Creates a business-verification flow.
   const DsBusinessVerification({
@@ -174,6 +188,7 @@ class DsBusinessVerification extends StatefulWidget {
     this.onCancel,
     this.onClose,
     this.stepBodyBuilder,
+    this.progress = DsVerificationProgress.stepper,
     this.canAdvance,
     this.uploadState,
     this.uploadProgress = 0,
@@ -241,6 +256,11 @@ class DsBusinessVerification extends StatefulWidget {
   /// deadlock behind the stock checkbox; use [canAdvance] to gate the custom
   /// body on your own state instead.
   final DsVerificationStepBuilder? stepBodyBuilder;
+
+  /// How the flow shows its progress. Defaults to
+  /// [DsVerificationProgress.stepper]; [DsVerificationProgress.rail] drives
+  /// the shipped `DsVerificationRail` from the same step state instead.
+  final DsVerificationProgress progress;
 
   /// Overrides whether the step at the given zero-based index may advance.
   ///
@@ -535,11 +555,15 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
       // The first step's back action backs out of the flow, so it only
       // appears when there is an onCancel to receive that.
       final showBack = _step > 0 || widget.onCancel != null;
-      content = DsOnboardingWizard(
+      final wizard = DsOnboardingWizard(
         // The takeover header carries the title when present, so the wizard
         // drops its own heading rather than saying it twice.
         title: hasHeader ? null : _title,
-        steps: _steps,
+        // The rail already names every section, so the wizard drops its own
+        // stepper rather than showing the same progress twice.
+        steps: widget.progress == DsVerificationProgress.rail
+            ? const <DsWizardStep>[]
+            : _steps,
         currentIndex: _step,
         onBack: showBack ? _handleBack : null,
         onNext: _handleNext,
@@ -547,6 +571,9 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
         nextEnabled: _canAdvance(identityBodyIsStock: identityBodyIsStock),
         child: Form(key: _stepFormKey, child: body),
       );
+      content = widget.progress == DsVerificationProgress.rail
+          ? _railFrame(tokens, wizard)
+          : wizard;
     }
 
     final Widget result = hasHeader
@@ -570,6 +597,82 @@ class _DsBusinessVerificationState extends State<DsBusinessVerification> {
         if (!didPop) _onSystemBack();
       },
       child: result,
+    );
+  }
+
+  /// The rail sections, derived from the same step state the stepper reads:
+  /// steps before the current one are done, the current one is active and
+  /// carries its sub-steps, the rest are upcoming.
+  List<DsVerificationSection> _railSections() {
+    return <DsVerificationSection>[
+      for (var i = 0; i < _steps.length; i++)
+        DsVerificationSection(
+          label: _steps[i].label,
+          state: i < _step
+              ? DsVerificationSectionState.done
+              : i == _step
+                  ? DsVerificationSectionState.active
+                  : DsVerificationSectionState.upcoming,
+          // The flow has no sub-steps of its own; a caller that groups
+          // fields expresses that through stepBodyBuilder.
+          subSteps: const <String>[],
+        ),
+    ];
+  }
+
+  /// Lays the rail beside the step body on a wide page and above it on a
+  /// narrow one, where the rail shows its own compact summary.
+  Widget _railFrame(DsTokens tokens, Widget wizard) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+        final bool wide = width >= DsBreakpoints.expanded;
+        final rail = DsVerificationRail(
+          sections: _railSections(),
+          // Only completed sections are selectable, and stepping back to one
+          // runs the same guarded back handler the footer uses.
+          onSectionSelected: (int index) {
+            while (_step > index) {
+              _handleBack();
+            }
+          },
+        );
+
+        if (!wide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  tokens.spacingUnit * 2,
+                  tokens.spacingUnit * 2,
+                  tokens.spacingUnit * 2,
+                  0,
+                ),
+                child: rail,
+              ),
+              Expanded(child: wizard),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            SizedBox(
+              width: tokens.spacingUnit * 30,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(tokens.spacingUnit * 3),
+                child: rail,
+              ),
+            ),
+            const VerticalDivider(width: 1, thickness: 1),
+            Expanded(child: wizard),
+          ],
+        );
+      },
     );
   }
 

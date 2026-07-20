@@ -56,6 +56,8 @@ import 'pages/nav_rail.dart';
 import 'pages/status_bar.dart';
 import 'pages/app_shell.dart';
 import 'pages/table_views.dart';
+import 'pages/task_view.dart';
+import 'pages/dialog.dart';
 import 'pages/lists.dart';
 import 'pages/filter_controls.dart';
 import 'pages/focus_view.dart';
@@ -158,6 +160,7 @@ final List<PatternPage> allPages = [
   // Overlays
   menuPage,
   menuSheetPage,
+  dialogPage,
   tooltipPage,
   coachmarkPage,
   focusViewPage,
@@ -187,6 +190,7 @@ final List<PatternPage> allPages = [
   authShellPage,
   navRailPage,
   statusBarPage,
+  taskViewPage,
   boxPage,
   brandBloomPage,
   fadeSlideInPage,

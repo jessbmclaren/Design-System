@@ -76,6 +76,7 @@ class DsSignInView extends StatefulWidget {
     this.additionalContext,
     this.onClose,
     this.showBorder = true,
+    this.embedded = false,
   });
 
   /// The prominent heading, typically a short welcome message.
@@ -128,6 +129,16 @@ class DsSignInView extends StatefulWidget {
   /// card.
   final bool showBorder;
 
+  /// Whether the card frames its own page.
+  ///
+  /// When false (the default) the view centres and scrolls itself, so it can be
+  /// dropped straight into a `Scaffold` body. Set it true to render just the
+  /// constrained card, for a host that already owns the page framing — a
+  /// template that supplies the background, the centring and the scroll (an
+  /// auth shell). Nesting a self-framing view inside such a host would scroll
+  /// twice; embedded mode is how the same card lives in both places.
+  final bool embedded;
+
   @override
   State<DsSignInView> createState() => _DsSignInViewState();
 }
@@ -139,43 +150,48 @@ class _DsSignInViewState extends State<DsSignInView> {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
 
+    final card = ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth: DsAuthCardLayout.signInMaxWidth,
+      ),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: tokens.formBackgroundColor,
+          border:
+              widget.showBorder ? Border.all(color: tokens.colorBorder) : null,
+          borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
+          boxShadow: tokens.shadowMedium,
+        ),
+        // The close affordance sits fully inside the Stack: hit-testing
+        // stops at the Stack's bounds, so a control hanging outside the
+        // padded body would paint whole but respond only in part.
+        child: Stack(
+          children: [
+            _buildCard(tokens),
+            if (widget.onClose != null)
+              Positioned(
+                top: tokens.spacingUnit,
+                right: tokens.spacingUnit,
+                child: DsIconButton(
+                  icon: DsIcons.close,
+                  semanticLabel: 'Close',
+                  onPressed: widget.onClose,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    // Embedded: the host frames the page, so hand back just the card.
+    if (widget.embedded) return card;
+
+    // Standalone: frame our own page — centred and scrollable for a Scaffold.
     return Center(
       child: SingleChildScrollView(
         padding: EdgeInsets.all(tokens.spacingUnit * 3),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: DsAuthCardLayout.signInMaxWidth,
-          ),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: tokens.formBackgroundColor,
-              border: widget.showBorder
-                  ? Border.all(color: tokens.colorBorder)
-                  : null,
-              borderRadius: BorderRadius.circular(tokens.overlayBorderRadius),
-              boxShadow: tokens.shadowMedium,
-            ),
-            // The close affordance sits fully inside the Stack: hit-testing
-            // stops at the Stack's bounds, so a control hanging outside the
-            // padded body would paint whole but respond only in part.
-            child: Stack(
-              children: [
-                _buildCard(tokens),
-                if (widget.onClose != null)
-                  Positioned(
-                    top: tokens.spacingUnit,
-                    right: tokens.spacingUnit,
-                    child: DsIconButton(
-                      icon: DsIcons.close,
-                      semanticLabel: 'Close',
-                      onPressed: widget.onClose,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
+        child: card,
       ),
     );
   }

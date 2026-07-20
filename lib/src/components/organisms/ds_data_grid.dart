@@ -17,6 +17,7 @@ import '../atoms/ds_badge.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_link.dart';
+import '../molecules/ds_menu.dart';
 
 /// The kind of value a [DsGridColumn] holds, which selects how each cell is
 /// rendered and compared when sorting.
@@ -194,6 +195,7 @@ class DsGridColumn {
     this.currencySymbol,
     this.editable = false,
     this.options,
+    this.statusTooltip,
   });
 
   /// The stable identifier used to read this column's value from each row and
@@ -244,6 +246,13 @@ class DsGridColumn {
   /// for other cell types.
   final List<DsGridOption>? options;
 
+  /// The tooltip shown on a [DsCellType.status] cell in this column, resolved
+  /// per row: the reason behind the state ("Missing licence expiry" on a
+  /// Needs review badge). Return null to leave a row's badge untipped. The
+  /// text is also announced to assistive technology, so the reason is never
+  /// pointer-only.
+  final String? Function(DsGridRow row)? statusTooltip;
+
   /// The alignment actually used, resolving the [type] default when [align] is
   /// null.
   DsColumnAlign get effectiveAlign =>
@@ -281,6 +290,34 @@ class DsGridRow {
   /// non-interactive (but it can still be selected when the grid is
   /// selectable).
   final VoidCallback? onTap;
+}
+
+/// One action offered on a [DsDataGrid] row's overflow menu.
+///
+/// Row actions are the secondary things a row can do: the primary action
+/// stays the row tap, and everything else lives behind the trailing overflow
+/// menu, so a dense table is not a wall of icon buttons.
+@immutable
+class DsRowAction {
+  /// Creates a row action.
+  const DsRowAction({
+    required this.label,
+    required this.icon,
+    required this.onSelected,
+    this.destructive = false,
+  });
+
+  /// The action's name, shown in the menu and announced.
+  final String label;
+
+  /// The action's glyph, from the `DsIcons` vocabulary.
+  final IconData icon;
+
+  /// Called after the menu closes when the action is chosen.
+  final VoidCallback? onSelected;
+
+  /// Whether the action is irreversible, rendering it in the danger colour.
+  final bool destructive;
 }
 
 /// A description of the grid's current sort: the [columnKey] and direction.
@@ -524,6 +561,7 @@ class DsDataGrid extends StatefulWidget {
     this.view,
     this.onViewChanged,
     this.enableCellNavigation = true,
+    this.rowActions,
   });
 
   /// The column definitions, in display order. Columns with
@@ -618,6 +656,12 @@ class DsDataGrid extends StatefulWidget {
   /// mutates the view itself; the caller stores it and passes it back.
   final ValueChanged<DsGridView>? onViewChanged;
 
+  /// The actions offered on each row's trailing overflow menu, resolved per
+  /// row so a row can offer only what applies to it. Returning an empty list
+  /// leaves the row's menu off while the column stays aligned. Null (the
+  /// default) renders no actions column at all.
+  final List<DsRowAction> Function(DsGridRow row)? rowActions;
+
   /// Whether the table body joins the focus order for spreadsheet-style
   /// keyboarding: arrow keys move a focused cell, Shift with the arrows
   /// grows a rectangular range, Ctrl or Cmd with C copies the cell or range
@@ -637,6 +681,7 @@ class _DsDataGridState extends State<DsDataGrid> {
   static const double _resizeHandleWidth = 6;
   static const double _checkboxSize = 18;
   static const double _addColumnWidth = 44;
+  static const double _actionsColumnWidth = 48;
 
   final ScrollController _verticalController = ScrollController();
   final ScrollController _headerHController = ScrollController();
@@ -878,6 +923,11 @@ class _DsDataGridState extends State<DsDataGrid> {
   /// add-column affordance, so the header and body scroll extents stay equal.
   double get _trailingAddWidth =>
       _viewManaged && _hiddenColumns.isNotEmpty ? _addColumnWidth : 0;
+
+  /// The width of the trailing row-actions column, or zero when the grid
+  /// offers no row actions.
+  double get _rowActionsWidth =>
+      widget.rowActions == null ? 0 : _actionsColumnWidth;
 
   List<DsGridColumn> get _pinnedColumns =>
       _displayColumns.where((c) => c.frozen).toList(growable: false);
@@ -2093,6 +2143,17 @@ class _DsDataGridState extends State<DsDataGrid> {
         ),
     ];
 
+    final cardActions = widget.rowActions?.call(row) ?? const <DsRowAction>[];
+    if (cardActions.isNotEmpty) {
+      fields.insert(
+        0,
+        Align(
+          alignment: AlignmentDirectional.centerEnd,
+          child: _rowActionsCell(tokens, row),
+        ),
+      );
+    }
+
     final container = Container(
       decoration: BoxDecoration(
         color: selected ? tokens.offsetBackgroundColor : null,
@@ -2295,7 +2356,7 @@ class _DsDataGridState extends State<DsDataGrid> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final width = math.max(
-                      scrollContentWidth + _trailingAddWidth,
+                      scrollContentWidth + _trailingAddWidth + _rowActionsWidth,
                       constraints.maxWidth,
                     );
                     return SingleChildScrollView(
@@ -2311,6 +2372,11 @@ class _DsDataGridState extends State<DsDataGrid> {
                               _headerCell(tokens, column),
                             if (_trailingAddWidth > 0)
                               _addColumnCell(tokens),
+                            if (_rowActionsWidth > 0)
+                              SizedBox(
+                                width: _actionsColumnWidth,
+                                height: _headerHeight,
+                              ),
                           ],
                         ),
                       ),
@@ -2365,7 +2431,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final width = math.max(
-                scrollContentWidth + _trailingAddWidth,
+                scrollContentWidth + _trailingAddWidth + _rowActionsWidth,
                 constraints.maxWidth,
               );
               return SingleChildScrollView(
@@ -2384,6 +2450,8 @@ class _DsDataGridState extends State<DsDataGrid> {
                             children: [
                               for (final column in scrollableColumns)
                                 _dataCell(tokens, column, row),
+                              if (_rowActionsWidth > 0)
+                                _rowActionsCell(tokens, row),
                             ],
                           ),
                         ),
@@ -2462,7 +2530,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final width = math.max(
-                scrollContentWidth + _trailingAddWidth,
+                scrollContentWidth + _trailingAddWidth + _rowActionsWidth,
                 constraints.maxWidth,
               );
               return SingleChildScrollView(
@@ -2489,6 +2557,8 @@ class _DsDataGridState extends State<DsDataGrid> {
                               children: [
                                 for (final column in scrollableColumns)
                                   _dataCell(tokens, column, segment.row!),
+                                if (_rowActionsWidth > 0)
+                                  _rowActionsCell(tokens, segment.row!),
                               ],
                             ),
                           ),
@@ -3217,6 +3287,40 @@ class _DsDataGridState extends State<DsDataGrid> {
     );
   }
 
+  /// The trailing per-row overflow menu. An empty action list leaves the slot
+  /// blank so every row stays aligned; the trigger is a labelled, keyboard
+  /// reachable button naming its row's actions.
+  Widget _rowActionsCell(DsTokens tokens, DsGridRow row) {
+    final actions = widget.rowActions?.call(row) ?? const <DsRowAction>[];
+    if (actions.isEmpty) {
+      return SizedBox(width: _actionsColumnWidth, height: widget.rowHeight);
+    }
+    return SizedBox(
+      width: _actionsColumnWidth,
+      height: widget.rowHeight,
+      child: Center(
+        child: DsMenu(
+          items: <DsMenuItem>[
+            for (final action in actions)
+              DsMenuItem(
+                label: action.label,
+                icon: action.icon,
+                destructive: action.destructive,
+                onSelected: action.onSelected,
+                enabled: action.onSelected != null,
+              ),
+          ],
+          trigger: DsIcon(
+            icon: DsIcons.moreHorizontal,
+            size: DsIconSize.sm,
+            color: tokens.colorSecondaryText,
+            semanticLabel: 'Row actions',
+          ),
+        ),
+      ),
+    );
+  }
+
   /// The calculations footer band: per-column aggregation slots aligned under
   /// the columns, mirroring the header's frozen/scrolling split. On a managed
   /// view every slot is a button opening the calculation picker.
@@ -3259,7 +3363,7 @@ class _DsDataGridState extends State<DsDataGrid> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final width = math.max(
-                      scrollContentWidth + _trailingAddWidth,
+                      scrollContentWidth + _trailingAddWidth + _rowActionsWidth,
                       constraints.maxWidth,
                     );
                     return SingleChildScrollView(
@@ -3454,8 +3558,14 @@ class _DsDataGridState extends State<DsDataGrid> {
     // whole-cell tap affordance.
     final Widget content = editable && column.type == DsCellType.rating
         ? _ratingRowInteractive(tokens, column, row, dense: true)
-        : _cellContent(tokens, column, row.cells[column.key],
-            dense: true, align: align);
+        : _cellContent(
+            tokens,
+            column,
+            row.cells[column.key],
+            dense: true,
+            align: align,
+            tooltip: column.statusTooltip?.call(row),
+          );
 
     final bool focused = _isCellFocused(row, column);
     final bool inRange = _anchorRow != null && _isCellInRange(row, column);
@@ -3516,6 +3626,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         row.cells[column.key],
         dense: false,
         align: DsColumnAlign.end,
+        tooltip: column.statusTooltip?.call(row),
       ),
     );
     if (!editable) return display;
@@ -3708,6 +3819,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     Object? value, {
     required bool dense,
     required DsColumnAlign align,
+    String? tooltip,
   }) {
     final emDash = Text(
       '—',
@@ -3748,14 +3860,25 @@ class _DsDataGridState extends State<DsDataGrid> {
       case DsCellType.singleSelect:
       case DsCellType.status:
         final string = _asString(value);
-        return string == null || string.isEmpty
-            ? emDash
-            : _optionBadge(
-                tokens,
-                column,
-                string,
-                fallbackVariant: _variantForStatus(string),
-              );
+        if (string == null || string.isEmpty) return emDash;
+        final badge = _optionBadge(
+          tokens,
+          column,
+          string,
+          fallbackVariant: _variantForStatus(string),
+        );
+        final tip = tooltip;
+        if (tip == null || tip.isEmpty) return badge;
+        // The reason behind the state is never pointer-only: the tooltip
+        // text also joins the cell's announced label.
+        return Tooltip(
+          message: tip,
+          child: Semantics(
+            label: '$string, $tip',
+            excludeSemantics: true,
+            child: badge,
+          ),
+        );
       case DsCellType.multiSelect:
         final list = _asStringList(value);
         if (list == null || list.isEmpty) return emDash;
