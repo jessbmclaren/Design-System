@@ -40,8 +40,14 @@ class DsWaitingScreen extends StatelessWidget {
     this.supportingText,
     this.header,
     this.showSpinner = true,
+    this.icon,
     this.backdrop = const DsAuthGradient(),
   });
+
+  /// A mark shown in place of the spinner, for the moment the wait ends
+  /// well: a check on the success tone, say. Supplying it also drops the
+  /// animated ellipsis, because nothing is in progress any more.
+  final Widget? icon;
 
   /// The short line naming the work in progress, such as "Signing you in".
   /// An animated ellipsis is appended automatically, so leave the trailing
@@ -71,10 +77,17 @@ class DsWaitingScreen extends StatelessWidget {
     final headlineStyle =
         tokens.headingLg.toTextStyle(color: tokens.colorText);
 
+    // An arrival is not a wait: the mark replaces the spinner and the
+    // headline stops trailing off.
+    final bool arrived = icon != null;
+
     final content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (showSpinner) ...[
+        if (arrived) ...[
+          icon!,
+          SizedBox(height: unit * 3),
+        ] else if (showSpinner) ...[
           // The headline announces the operation, so the spinner keeps its
           // plain label without a second live region.
           const DsSpinner(size: DsSpinnerSize.large),
@@ -83,16 +96,24 @@ class DsWaitingScreen extends StatelessWidget {
         Semantics(
           container: true,
           liveRegion: true,
-          child: Text.rich(
-            TextSpan(
-              text: headline,
-              children: [
-                WidgetSpan(child: DsAnimatedEllipsis(style: headlineStyle)),
-              ],
-            ),
-            style: headlineStyle,
-            textAlign: TextAlign.center,
-          ),
+          child: arrived
+              ? Text(
+                  headline,
+                  style: headlineStyle,
+                  textAlign: TextAlign.center,
+                )
+              : Text.rich(
+                  TextSpan(
+                    text: headline,
+                    children: [
+                      WidgetSpan(
+                        child: DsAnimatedEllipsis(style: headlineStyle),
+                      ),
+                    ],
+                  ),
+                  style: headlineStyle,
+                  textAlign: TextAlign.center,
+                ),
         ),
         if (supportingText != null) ...[
           SizedBox(height: unit),

@@ -525,6 +525,37 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
         ),
   ),
   (
+    'DsSummarySection',
+    (_) => DsSummarySection(
+          title: 'Business details',
+          onEdit: () {},
+          child: const Text('Northwind Traders, registered 2019'),
+        ),
+  ),
+  (
+    'DsTimeField',
+    (_) => DsTimeField(
+          label: 'Opens at',
+          value: const TimeOfDay(hour: 9, minute: 30),
+          onChanged: (_) {},
+        ),
+  ),
+  (
+    'DsIntroCard',
+    (_) => DsIntroCard(
+          eyebrow: 'New',
+          title: 'Track spend as it happens',
+          body: const Text('Every transaction lands here within a minute.'),
+          primaryAction: DsButton(label: 'Show me', onPressed: () {}),
+          secondaryAction: DsButton(
+            label: 'Not now',
+            variant: DsButtonVariant.tertiary,
+            onPressed: () {},
+          ),
+          onClose: () {},
+        ),
+  ),
+  (
     'DsFloatingBar',
     (_) => const DsFloatingBar(
           floating: true,

@@ -22,7 +22,9 @@ export 'src/theme/ds_theme.dart';
 export 'src/theme/ds_tokens_extension.dart';
 
 // Utilities
+export 'src/util/ds_input_masks.dart';
 export 'src/util/ds_motion.dart';
+export 'src/util/ds_validators.dart';
 
 // Components, organised by Atomic Design layer.
 //
@@ -91,8 +93,10 @@ export 'src/components/molecules/ds_resend_control.dart';
 export 'src/components/molecules/ds_phone_field.dart';
 export 'src/components/molecules/ds_search_field.dart';
 export 'src/components/molecules/ds_select.dart';
+export 'src/components/molecules/ds_summary_section.dart';
 export 'src/components/molecules/ds_tabs.dart';
 export 'src/components/molecules/ds_text_area.dart';
+export 'src/components/molecules/ds_time_field.dart';
 export 'src/components/molecules/ds_text_field.dart';
 export 'src/components/molecules/ds_toast.dart';
 export 'src/components/atoms/ds_tooltip.dart';
@@ -109,6 +113,7 @@ export 'src/components/organisms/ds_data_table.dart';
 export 'src/components/organisms/ds_filter_bar.dart';
 export 'src/components/organisms/ds_focus_view.dart';
 export 'src/components/organisms/ds_import_wizard.dart';
+export 'src/components/organisms/ds_intro_card.dart';
 export 'src/components/organisms/ds_line_chart.dart';
 export 'src/components/molecules/ds_list.dart';
 export 'src/components/molecules/ds_meter_chart.dart';

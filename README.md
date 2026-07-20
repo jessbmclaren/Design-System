@@ -65,9 +65,9 @@ Components are organised into atomic design layers under
 
 | Layer | Components |
 | --- | --- |
-| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsCheckDot`, `DsSegmentedControl`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom` |
-| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordRequirements`, `DsPasswordStrength`, `DsResendControl`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner`, `DsSearchField`, `DsMenuSheet`, `DsDialog`, `DsModalSheet` |
-| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsChoosePasswordView`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences`, `DsNavRail`, `DsStatusBar`, `DsSortPill` |
+| **Atoms** | `DsButton`, `DsBadge`, `DsSpinner`, `DsProgressBar`, `DsBackLink`, `DsChip`, `DsIconButton`, `DsWordmark`, `DsFieldLabel`, `DsStepHeader`, `DsIconBadge`, `DsCheckDot`, `DsSegmentedControl`, `DsAnimatedEllipsis`, `DsFadeSlideIn`, `DsAuthGradient`, `DsBrandBloom`, `DsKeyHint`, `DsStatTile`, `DsChoiceChip`, `DsNavLink`, `DsShake` |
+| **Molecules** | `DsFilterChip`, `DsListItem`, `DsToast`, `DsBanner`, `DsInlineNotice`, `DsEmptyState`, `DsTabs`, `DsPageHeader`, `DsPasswordField`, `DsPasswordRequirements`, `DsPasswordStrength`, `DsResendControl`, `DsLabeledDivider`, `DsFooterActions`, `DsVerificationRail`, `DsUploadField`, `DsAddressFieldGroup`, `DsCookieBanner`, `DsSearchField`, `DsMenuSheet`, `DsDialog`, `DsModalSheet`, `DsPhoneField`, `DsChipGroup`, `DsFloatingBar`, `DsSummarySection`, `DsTimeField` |
+| **Organisms** | `DsList`, `DsDataTable`, `DsProgressStepper`, `DsSetupGuide`, `DsSpotlight`, `DsTourCard`, `DsSignInView`, `DsVerifyEmailCard`, `DsChoosePasswordView`, `DsFocusView`, `DsWaitingScreen`, `DsTakeover`, `DsCookiePreferences`, `DsNavRail`, `DsStatusBar`, `DsSortPill`, `DsTopNav`, `DsIntroCard` |
 | **Templates** | `DsPageScaffold`, `DsAuthShell`, `DsAppShell`, `DsTaskView` |
 | **Pages** | the documentation demos in [`example/`](example/) |
 

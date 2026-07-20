@@ -50,6 +50,7 @@ class DsLink extends StatefulWidget {
     this.onPressed,
     this.variant = DsLinkVariant.primary,
     this.small = false,
+    this.semanticLabel,
     this.trailingIcon,
     this.external = false,
     this.maxLines = 1,
@@ -64,6 +65,11 @@ class DsLink extends StatefulWidget {
 
   /// The visual emphasis of the link.
   final DsLinkVariant variant;
+
+  /// The name assistive technology announces, when the visible label repeats
+  /// across a page and needs its context: several Edit links, each naming the
+  /// section it edits. Null announces the visible label.
+  final String? semanticLabel;
 
   /// Whether the link sets in the smaller body size, for a link inside dense
   /// content (a table row, a card footer) rather than running prose.
@@ -166,11 +172,16 @@ class _DsLinkState extends State<DsLink> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Flexible(
-          child: Text(
-            transform.apply(widget.label),
-            style: textStyle,
-            overflow: TextOverflow.ellipsis,
-            maxLines: widget.maxLines,
+          // A supplied accessible name replaces the visible one rather than
+          // adding to it, so the link is announced once.
+          child: ExcludeSemantics(
+            excluding: widget.semanticLabel != null,
+            child: Text(
+              transform.apply(widget.label),
+              style: textStyle,
+              overflow: TextOverflow.ellipsis,
+              maxLines: widget.maxLines,
+            ),
           ),
         ),
         if (widget.trailingIcon != null) ...[
@@ -213,6 +224,7 @@ class _DsLinkState extends State<DsLink> {
     return Semantics(
       link: true,
       enabled: enabled,
+      label: widget.semanticLabel,
       child: MouseRegion(
         cursor:
             enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
