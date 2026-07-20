@@ -158,6 +158,28 @@ final List<(String, WidgetBuilder)> specimens = <(String, WidgetBuilder)>[
         ),
   ),
   ('DsChip', (_) => DsChip(label: 'Design', onTap: () {})),
+  (
+    'DsChoiceChip',
+    (_) => DsChoiceChip(
+          label: 'Weekdays',
+          selected: true,
+          onSelected: (_) {},
+          onRemoved: () {},
+        ),
+  ),
+  (
+    'DsChipGroup',
+    (_) => DsChipGroup<String>(
+          options: const <DsChipOption<String>>[
+            DsChipOption<String>(value: 'mon', label: 'Monday'),
+            DsChipOption<String>(value: 'tue', label: 'Tuesday'),
+            DsChipOption<String>(value: 'wed', label: 'Wednesday'),
+          ],
+          selected: const <String>{'mon'},
+          onChanged: (_) {},
+          errorText: 'Choose at least one day',
+        ),
+  ),
   ('DsDivider', (_) => const DsDivider()),
   ('DsFadeSlideIn', (_) => const DsFadeSlideIn(child: Text('Welcome back'))),
   ('DsFieldLabel', (_) => const DsFieldLabel(label: 'Email address')),

@@ -7,6 +7,16 @@ import '../../util/ds_motion.dart';
 import 'ds_spinner.dart';
 
 /// The visual emphasis of a [DsButton].
+/// The scale of a [DsButton].
+enum DsButtonSize {
+  /// The everyday button: the standard padding, label and glyph.
+  md,
+
+  /// The marketing pill: a fully rounded shape with roomier padding and a
+  /// larger label, for a landing page's leading action.
+  lg,
+}
+
 enum DsButtonVariant {
   /// The single most important action on a screen. High emphasis.
   primary,
@@ -52,6 +62,8 @@ class DsButton extends StatefulWidget {
     required this.label,
     this.onPressed,
     this.variant = DsButtonVariant.primary,
+    this.size = DsButtonSize.md,
+    this.dense = false,
     this.icon,
     this.trailingIcon,
     this.keyHint,
@@ -98,6 +110,15 @@ class DsButton extends StatefulWidget {
 
   /// An optional trailing icon, such as a forward arrow on a continue action.
   final IconData? trailingIcon;
+
+  /// The button's scale. Defaults to [DsButtonSize.md]; [DsButtonSize.lg] is
+  /// the marketing pill.
+  final DsButtonSize size;
+
+  /// Whether the button uses the compact padding, for an action inside a
+  /// table row or a dense toolbar. Ignored at [DsButtonSize.lg], whose whole
+  /// point is the roomier scale.
+  final bool dense;
 
   /// The keys shown as a trailing hint, teaching the shortcut that triggers
   /// this action (`['N']`, `['⌘', '↵']`). The hint is decorative: the button
@@ -193,6 +214,27 @@ class _DsButtonState extends State<DsButton>
     }
   }
 
+  /// The glyph size for the button's scale.
+  double _iconSize(DsTokens tokens) => widget.size == DsButtonSize.lg
+      ? tokens.buttonLgIconSize
+      : tokens.buttonIconSize;
+
+  /// The horizontal padding: roomier when large, tighter when dense.
+  double _paddingX(DsTokens tokens) {
+    if (widget.size == DsButtonSize.lg) return tokens.buttonLgPaddingX;
+    return widget.dense
+        ? tokens.buttonCompactPaddingX
+        : tokens.buttonPaddingX;
+  }
+
+  /// The vertical padding, on the same rule as [_paddingX].
+  double _paddingY(DsTokens tokens) {
+    if (widget.size == DsButtonSize.lg) return tokens.buttonLgPaddingY;
+    return widget.dense
+        ? tokens.buttonCompactPaddingY
+        : tokens.buttonPaddingY;
+  }
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -251,7 +293,7 @@ class _DsButtonState extends State<DsButton>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.icon != null) ...[
-          Icon(widget.icon, size: tokens.buttonIconSize),
+          Icon(widget.icon, size: _iconSize(tokens)),
           SizedBox(width: tokens.spacingUnit),
         ],
         Flexible(
@@ -259,14 +301,16 @@ class _DsButtonState extends State<DsButton>
             label,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: tokens.buttonLabelFontSize,
+              fontSize: widget.size == DsButtonSize.lg
+                  ? tokens.buttonLgLabelFontSize
+                  : tokens.buttonLabelFontSize,
               fontWeight: tokens.buttonLabelFontWeight,
             ),
           ),
         ),
         if (widget.trailingIcon != null) ...[
           SizedBox(width: tokens.spacingUnit),
-          Icon(widget.trailingIcon, size: tokens.buttonIconSize),
+          Icon(widget.trailingIcon, size: _iconSize(tokens)),
         ],
         if (widget.keyHint != null) ...[
           SizedBox(width: tokens.spacingUnit),
@@ -340,11 +384,17 @@ class _DsButtonState extends State<DsButton>
               // visual fill and mouse density are unchanged.
               tapTargetSize: MaterialTapTargetSize.padded,
               padding: EdgeInsets.symmetric(
-                horizontal: tokens.buttonPaddingX,
-                vertical: tokens.buttonPaddingY,
+                horizontal: _paddingX(tokens),
+                vertical: _paddingY(tokens),
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(tokens.buttonBorderRadius),
+                // The large button is a pill; every other size keeps the
+                // theme's button radius.
+                borderRadius: BorderRadius.circular(
+                  widget.size == DsButtonSize.lg
+                      ? tokens.radiusFull
+                      : tokens.buttonBorderRadius,
+                ),
               ),
             ).copyWith(
               // Keyboard focus draws a ring in the variant's text colour,

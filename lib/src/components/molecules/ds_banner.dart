@@ -61,17 +61,32 @@ class DsBanner extends StatelessWidget {
   const DsBanner({
     super.key,
     required this.variant,
-    required this.title,
+    this.title,
     this.message,
     this.action,
+    this.actions = const <DsBannerAction>[],
+    this.icon,
     this.onDismiss,
-  });
+  }) : assert(
+          title != null || message != null,
+          'A banner needs a title, a message, or both.',
+        );
 
   /// The severity and tone of the banner.
   final DsBannerVariant variant;
 
-  /// The banner headline. Shown in bold using the variant text colour.
-  final String title;
+  /// Extra actions beside [action], for a banner offering more than one way
+  /// forward. They wrap onto further runs when the width is tight.
+  final List<DsBannerAction> actions;
+
+  /// Overrides the glyph the [variant] would choose, for a banner whose
+  /// meaning is more specific than its severity.
+  final IconData? icon;
+
+  /// The banner headline, shown in bold using the variant text colour. Null
+  /// makes the banner message-first, for a line of context that needs no
+  /// headline of its own.
+  final String? title;
 
   /// Optional supporting detail shown below the [title].
   final String? message;
@@ -93,7 +108,7 @@ class DsBanner extends StatelessWidget {
     // A banner is a flat container: its border always matches its fill, so
     // the badge border tokens are free to carry a stronger badge-only
     // treatment without re-bordering banners.
-    final (background, foreground, icon) = switch (variant) {
+    final (background, foreground, variantIcon) = switch (variant) {
       DsBannerVariant.info => (
           tokens.badgeInfoColorBackground,
           tokens.badgeInfoColorText,
@@ -116,17 +131,19 @@ class DsBanner extends StatelessWidget {
         ),
     };
     final border = background;
+    final IconData glyph = icon ?? variantIcon;
 
     final textColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          title,
-          style: tokens.headingSm.toTextStyle(color: foreground),
-        ),
+        if (title != null)
+          Text(
+            title!,
+            style: tokens.headingSm.toTextStyle(color: foreground),
+          ),
         if (message != null && message!.isNotEmpty) ...[
-          SizedBox(height: tokens.spacingUnit / 2),
+          if (title != null) SizedBox(height: tokens.spacingUnit / 2),
           Text(
             message!,
             style: tokens.bodySm.toTextStyle(
@@ -137,8 +154,20 @@ class DsBanner extends StatelessWidget {
       ],
     );
 
-    final actionButton =
-        action == null ? null : _buildAction(tokens, foreground);
+    final List<DsBannerAction> allActions = <DsBannerAction>[
+      ?action,
+      ...actions,
+    ];
+    final Widget? actionButton = allActions.isEmpty
+        ? null
+        : Wrap(
+            spacing: tokens.spacingUnit,
+            runSpacing: tokens.spacingUnit / 2,
+            children: <Widget>[
+              for (final DsBannerAction each in allActions)
+                _buildAction(tokens, foreground, each),
+            ],
+          );
     final closeButton = onDismiss == null ? null : _buildClose(foreground);
 
     return Semantics(
@@ -160,7 +189,7 @@ class DsBanner extends StatelessWidget {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(icon, size: 20, color: foreground),
+                  Icon(glyph, size: 20, color: foreground),
                   SizedBox(width: tokens.spacingUnit),
                   Expanded(
                     child: Column(
@@ -195,9 +224,13 @@ class DsBanner extends StatelessWidget {
     );
   }
 
-  Widget _buildAction(DsTokens tokens, Color foreground) {
+  Widget _buildAction(
+    DsTokens tokens,
+    Color foreground,
+    DsBannerAction action,
+  ) {
     return TextButton(
-      onPressed: action!.onPressed,
+      onPressed: action.onPressed,
       style: TextButton.styleFrom(
         foregroundColor: foreground,
         padding: EdgeInsets.symmetric(
@@ -211,7 +244,7 @@ class DsBanner extends StatelessWidget {
             ),
       ),
       child: Text(
-        action!.label,
+        action.label,
         overflow: TextOverflow.ellipsis,
       ),
     );

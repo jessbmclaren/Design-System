@@ -49,6 +49,7 @@ class DsLink extends StatefulWidget {
     required this.label,
     this.onPressed,
     this.variant = DsLinkVariant.primary,
+    this.small = false,
     this.trailingIcon,
     this.external = false,
     this.maxLines = 1,
@@ -63,6 +64,10 @@ class DsLink extends StatefulWidget {
 
   /// The visual emphasis of the link.
   final DsLinkVariant variant;
+
+  /// Whether the link sets in the smaller body size, for a link inside dense
+  /// content (a table row, a card footer) rather than running prose.
+  final bool small;
 
   /// An optional trailing glyph rendered after the label.
   final IconData? trailingIcon;
@@ -142,7 +147,14 @@ class _DsLinkState extends State<DsLink> {
           )
         : decorationLine;
 
-    final textStyle = tokens.bodyMd.toTextStyle(color: resolvedColor).copyWith(
+    // The primary link carries the emphasised weight, so it reads as the
+    // action in a paragraph without relying on colour alone.
+    final textStyle = (widget.small ? tokens.bodySm : tokens.bodyMd)
+        .toTextStyle(color: resolvedColor)
+        .copyWith(
+          fontWeight: widget.variant == DsLinkVariant.primary
+              ? tokens.mediumLabelFontWeight
+              : null,
           decoration: resolvedLine,
           decorationColor: resolvedDecorationColor,
           decorationStyle: decorationStyle,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_icons.dart';
 
 /// An optional trailing action shown inside a [DsToast].
 ///
@@ -41,12 +42,26 @@ class DsToastAction {
 ///   action: DsToastAction(label: 'Undo', onPressed: _undo),
 /// );
 /// ```
+/// The meaning a [DsToast] carries, which selects its leading glyph and the
+/// glyph's colour on the inverse surface.
+enum DsToastTone {
+  /// A plain acknowledgement, with no glyph unless the caller supplies one.
+  neutral,
+
+  /// Something completed, marked with a check in the bright signal colour.
+  success,
+
+  /// Something failed, marked with an alert in the danger-on-inverse colour.
+  error,
+}
+
 class DsToast extends StatelessWidget {
   const DsToast({
     super.key,
     required this.message,
     this.action,
     this.icon,
+    this.tone = DsToastTone.neutral,
   });
 
   /// The message to display. Keep it concise: a single short sentence.
@@ -55,8 +70,13 @@ class DsToast extends StatelessWidget {
   /// An optional trailing action, such as "Undo".
   final DsToastAction? action;
 
-  /// An optional leading icon that reinforces the message.
+  /// An optional leading icon that reinforces the message. When null the
+  /// [tone] supplies one, so a success or error toast is marked without the
+  /// caller naming a glyph.
   final IconData? icon;
+
+  /// What the toast means. Defaults to [DsToastTone.neutral].
+  final DsToastTone tone;
 
   /// The maximum width of the toast pill.
   static const double _maxWidth = 360;
@@ -72,6 +92,7 @@ class DsToast extends StatelessWidget {
     required String message,
     DsToastAction? action,
     IconData? icon,
+    DsToastTone tone = DsToastTone.neutral,
     Duration duration = const Duration(seconds: 3),
   }) {
     final overlay = Overlay.of(context);
@@ -100,6 +121,7 @@ class DsToast extends StatelessWidget {
                 child: DsToast(
                   message: message,
                   icon: icon,
+                  tone: tone,
                   action: action == null
                       ? null
                       : DsToastAction(
@@ -128,9 +150,20 @@ class DsToast extends StatelessWidget {
     // A high-contrast surface: the primary text colour becomes the background
     // and the form background becomes the foreground, so the pill reads clearly
     // against both light and dark app surfaces.
-    final background = tokens.colorText;
-    final foreground = tokens.formBackgroundColor;
+    final background = tokens.colorInverseSurface;
+    final foreground = tokens.colorOnInverse;
     final accent = tokens.actionPrimaryColorText;
+    // The tone supplies the glyph and its colour: a check in the bright
+    // signal green, an alert in the danger tuned for the inverse surface.
+    final (IconData? toneIcon, Color toneColor) = switch (tone) {
+      DsToastTone.neutral => (null, foreground),
+      DsToastTone.success => (DsIcons.success, tokens.colorSuccess),
+      DsToastTone.error => (DsIcons.error, tokens.colorDangerOnInverse),
+    };
+    final IconData? glyph = icon ?? toneIcon;
+    final Color glyphColor = icon != null && tone == DsToastTone.neutral
+        ? foreground
+        : toneColor;
 
     return Semantics(
       container: true,
@@ -151,8 +184,8 @@ class DsToast extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 20, color: foreground),
+                if (glyph != null) ...[
+                  Icon(glyph, size: 20, color: glyphColor),
                   const SizedBox(width: 12),
                 ],
                 Flexible(

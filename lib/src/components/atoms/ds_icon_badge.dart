@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../tokens/ds_icons.dart';
 
 /// The colour pairing of a [DsIconBadge].
 ///
@@ -125,12 +126,23 @@ class DsIconBadge extends StatelessWidget {
         color: backgroundColor ?? background,
         shape: BoxShape.circle,
       ),
-      child: Icon(
-        icon,
-        // 4/7 of the diameter: a 28dp circle carries a 16dp glyph, matching
-        // the marks the stepper and setup guide draw today.
-        size: iconSize ?? size * 4 / 7,
-        color: foregroundColor ?? foreground,
+      child: Transform.translate(
+        // The check glyph's ink sits right and low of its box, so a centred
+        // check reads off-centre in a circle. The nudge is proportional to
+        // the glyph, so it holds at every badge size.
+        offset: icon == DsIcons.check
+            ? Offset(
+                -2.5 / 28 * (iconSize ?? size * 4 / 7),
+                -1 / 28 * (iconSize ?? size * 4 / 7),
+              )
+            : Offset.zero,
+        child: Icon(
+          icon,
+          // 4/7 of the diameter: a 28dp circle carries a 16dp glyph, matching
+          // the marks the stepper and setup guide draw today.
+          size: iconSize ?? size * 4 / 7,
+          color: foregroundColor ?? foreground,
+        ),
       ),
     );
 

@@ -22,6 +22,7 @@ class DsMenuItem {
     this.icon,
     this.onSelected,
     this.destructive = false,
+    this.selected = false,
     this.enabled = true,
   });
 
@@ -38,6 +39,10 @@ class DsMenuItem {
   ///
   /// Destructive items render their label and icon in [DsTokens.colorDanger].
   final bool destructive;
+
+  /// Whether this row is the current choice, rendered on the brand tint with
+  /// the brand ink, the same treatment `DsMenuSheetItem` uses.
+  final bool selected;
 
   /// Whether the item can be chosen. A disabled item is dimmed and ignores
   /// taps.
@@ -90,11 +95,7 @@ class DsMenuItem {
 /// renders deterministically in a static demo.
 class DsMenu extends StatelessWidget {
   /// Creates an action menu.
-  const DsMenu({
-    super.key,
-    required this.trigger,
-    required this.items,
-  });
+  const DsMenu({super.key, required this.trigger, required this.items});
 
   /// The widget the user taps to open the menu.
   final Widget trigger;
@@ -112,9 +113,7 @@ class DsMenu extends StatelessWidget {
       // avoid double-painting or clipping the drop shadow.
       clipBehavior: Clip.none,
       style: MenuStyle(
-        backgroundColor: const WidgetStatePropertyAll<Color>(
-          Color(0x00000000),
-        ),
+        backgroundColor: const WidgetStatePropertyAll<Color>(Color(0x00000000)),
         surfaceTintColor: const WidgetStatePropertyAll<Color>(
           Color(0x00000000),
         ),
@@ -172,7 +171,9 @@ class _DsMenuSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BorderRadius radius = BorderRadius.circular(tokens.overlayBorderRadius);
+    final BorderRadius radius = BorderRadius.circular(
+      tokens.overlayBorderRadius,
+    );
 
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 200, maxWidth: 320),
@@ -212,12 +213,18 @@ class _DsMenuRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color base =
-        item.destructive ? tokens.colorDanger : tokens.colorText;
+    final Color base = item.destructive
+        ? tokens.colorDanger
+        : item.selected
+        ? tokens.actionPrimaryColorText
+        : tokens.colorText;
     final Color disabledColor = base.withValues(alpha: 0.38);
     final bool isEnabled = item.enabled;
 
     final ButtonStyle style = ButtonStyle(
+      backgroundColor: WidgetStatePropertyAll<Color?>(
+        item.selected ? tokens.brandTintColor : null,
+      ),
       minimumSize: const WidgetStatePropertyAll<Size>(Size(112, 48)),
       padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
         EdgeInsets.symmetric(horizontal: tokens.spacingUnit * 1.5),
@@ -246,20 +253,19 @@ class _DsMenuRow extends StatelessWidget {
       }),
     );
 
-    return MenuItemButton(
-      onPressed: isEnabled ? (item.onSelected ?? () {}) : null,
-      style: style,
-      leadingIcon: item.icon == null
-          ? null
-          : DsIcon(
-              icon: item.icon!,
-              size: DsIconSize.sm,
-              color: isEnabled ? base : disabledColor,
-            ),
-      child: Text(
-        item.label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+    return Semantics(
+      selected: item.selected,
+      child: MenuItemButton(
+        onPressed: isEnabled ? (item.onSelected ?? () {}) : null,
+        style: style,
+        leadingIcon: item.icon == null
+            ? null
+            : DsIcon(
+                icon: item.icon!,
+                size: DsIconSize.sm,
+                color: isEnabled ? base : disabledColor,
+              ),
+        child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
       ),
     );
   }
