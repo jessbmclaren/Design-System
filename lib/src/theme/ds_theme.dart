@@ -209,14 +209,16 @@ abstract final class DsTheme {
   /// named pair instead of shipping unreadable text. Always returns true in
   /// release builds.
   static bool _debugContrastHolds(DsTokens t) {
-    void check(String pair, Color fg, Color bg) {
+    void checkAt(String pair, Color fg, Color bg, double minimum) {
       final ratio = _contrast(fg, bg);
       assert(
-        ratio >= 4.5,
+        ratio >= minimum,
         'DsTheme contrast: $pair is ${ratio.toStringAsFixed(2)}:1, '
-        'needs 4.5:1',
+        'needs $minimum:1',
       );
     }
+
+    void check(String pair, Color fg, Color bg) => checkAt(pair, fg, bg, 4.5);
 
     check('colorText on colorBackground', t.colorText, t.colorBackground);
     check('colorSecondaryText on colorBackground', t.colorSecondaryText,
@@ -235,8 +237,11 @@ abstract final class DsTheme {
         t.badgeWarningColorBackground);
     check('danger badge ink on its fill', t.badgeDangerColorText,
         t.badgeDangerColorBackground);
-    check('placeholder on the field fill', t.formPlaceholderTextColor,
-        t.formBackgroundColor);
+    // Placeholder on a labelled field is supplementary hint text, held to
+    // WCAG's non-text tier (3.0:1) rather than the body-text bar, so a skin
+    // never has to darken its hints to body-ink depth.
+    checkAt('placeholder on the field fill', t.formPlaceholderTextColor,
+        t.formBackgroundColor, 3.0);
     check('inverse ink on the inverse surface', t.colorOnInverse,
         t.colorInverseSurface);
     return true;

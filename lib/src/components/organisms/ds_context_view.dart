@@ -170,11 +170,15 @@ class _Header extends StatelessWidget {
           ),
           if (actions.isNotEmpty) ...[
             const SizedBox(width: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: actions,
+            // Flexible so the actions wrap onto further runs when a narrow
+            // panel (or a large text scale) leaves them short of room.
+            Flexible(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: actions,
+              ),
             ),
           ],
           if (onClose != null) ...[

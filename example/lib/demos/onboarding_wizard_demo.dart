@@ -54,7 +54,7 @@ class _OnboardingWizardDemoState extends State<OnboardingWizardDemo> {
     ];
 
     return SizedBox(
-      height: 460,
+      height: 560,
       child: DsOnboardingWizard(
         steps: steps,
         currentIndex: _step,

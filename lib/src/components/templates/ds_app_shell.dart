@@ -224,7 +224,9 @@ class _DsAppShellTopBar extends StatelessWidget {
     final double unit = tokens.spacingUnit;
 
     return Container(
-      height: DsAppShell.topBarHeight,
+      // The design height is a minimum: the bar grows with the user's text
+      // scale (a scaled search field needs the room) instead of clipping.
+      constraints: const BoxConstraints(minHeight: DsAppShell.topBarHeight),
       padding: EdgeInsets.symmetric(horizontal: unit * 2),
       decoration: BoxDecoration(
         color: tokens.colorBackground,

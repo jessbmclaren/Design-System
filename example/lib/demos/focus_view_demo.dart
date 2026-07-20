@@ -13,15 +13,16 @@ class FocusViewDemo extends StatelessWidget {
       child: DsFocusView(
         title: 'Rename workspace',
         onClose: () {},
-        footer: Row(
-          mainAxisSize: MainAxisSize.min,
+        footer: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.end,
           children: [
             DsButton(
               label: 'Cancel',
               variant: DsButtonVariant.secondary,
               onPressed: () {},
             ),
-            const SizedBox(width: 8),
             DsButton(label: 'Save', onPressed: () {}),
           ],
         ),

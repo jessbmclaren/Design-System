@@ -39,14 +39,19 @@ class _ProgressSteppingDemoState extends State<ProgressSteppingDemo> {
       children: [
         DsProgressStepper(steps: _steps, currentIndex: _currentIndex),
         const SizedBox(height: 24),
-        Row(
+        // OverflowBar keeps the pair apart on one line and stacks them when a
+        // narrow width or a large text scale runs out of room.
+        OverflowBar(
+          alignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
+          overflowSpacing: 8,
+          overflowAlignment: OverflowBarAlignment.end,
           children: [
             DsButton(
               label: 'Back',
               variant: DsButtonVariant.secondary,
               onPressed: _currentIndex == 0 ? null : () => _goTo(_currentIndex - 1),
             ),
-            const Spacer(),
             DsButton(
               label: isLast ? 'Finish' : 'Continue',
               onPressed: isLast ? () {} : () => _goTo(_currentIndex + 1),

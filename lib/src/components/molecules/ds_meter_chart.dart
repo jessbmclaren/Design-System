@@ -324,9 +324,15 @@ class _LegendItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: tokens.labelMd.toTextStyle(color: tokens.colorText),
+            // Flexible so a long label (or a large text scale) ellipsizes
+            // instead of pushing the legend row past its bounds.
+            Flexible(
+              child: Text(
+                label,
+                style: tokens.labelMd.toTextStyle(color: tokens.colorText),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(width: 6),
             Text(

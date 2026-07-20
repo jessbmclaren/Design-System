@@ -53,7 +53,10 @@ class DsStatusBar extends StatelessWidget {
     final double unit = tokens.spacingUnit;
 
     return Container(
-      height: height,
+      // The design height is a minimum: the bar grows with the user's text
+      // scale instead of clipping its content.
+      constraints: const BoxConstraints(minHeight: height),
+      alignment: AlignmentDirectional.centerStart,
       padding: EdgeInsets.symmetric(horizontal: unit * 2),
       decoration: transparent
           ? null
@@ -85,9 +88,12 @@ class DsStatusBar extends StatelessWidget {
             )
           else
             const Spacer(),
+          // Flexible so the trailing run yields to the label and shrinks
+          // (its texts ellipsize) rather than overflowing the slim bar when
+          // a narrow width or a large text scale runs out of room.
           for (int i = 0; i < trailing.length; i++) ...<Widget>[
             if (i > 0) SizedBox(width: unit * 2),
-            trailing[i],
+            Flexible(child: trailing[i]),
           ],
         ],
       ),

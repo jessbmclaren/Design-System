@@ -16,7 +16,7 @@ class SignOutDemo extends StatelessWidget {
     return Row(
       children: [
         const DsAvatar(icon: DsIcons.user),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -39,7 +39,7 @@ class SignOutDemo extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         DsButton(
           label: 'Sign out',
           variant: DsButtonVariant.secondary,
