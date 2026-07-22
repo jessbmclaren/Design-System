@@ -22,6 +22,7 @@ import 'resend_control_demo.dart';
 import 'password_strength_demo.dart';
 import 'text_area_demo.dart';
 import 'selection_controls_demo.dart';
+import 'radio_group_demo.dart';
 import 'select_dropdown_demo.dart';
 import 'currency_field_demo.dart';
 import 'date_field_demo.dart';
@@ -99,6 +100,7 @@ final Map<String, Widget Function()> _demos = {
   'password-strength': () => const PasswordStrengthDemo(),
   'text-area': () => const TextAreaDemo(),
   'selection-controls': () => const SelectionControlsDemo(),
+  'radio-group': () => const RadioGroupDemo(),
   'select': () => const SelectDropdownDemo(),
   'currency-field': () => const CurrencyFieldDemo(),
   'date-field': () => const DateFieldDemo(),

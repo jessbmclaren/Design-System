@@ -25,6 +25,7 @@ import 'pages/text_fields.dart';
 import 'pages/text_area.dart';
 import 'pages/segmented_control.dart';
 import 'pages/selection_controls.dart';
+import 'pages/radio_group.dart';
 import 'pages/select_dropdown.dart';
 import 'pages/currency_field.dart';
 import 'pages/date_field.dart';
@@ -145,6 +146,7 @@ final List<PatternPage> allPages = [
   selectDropdownPage,
   segmentedControlPage,
   selectionControlsPage,
+  radioGroupPage,
   currencyFieldPage,
   dateFieldPage,
   formFieldGroupPage,

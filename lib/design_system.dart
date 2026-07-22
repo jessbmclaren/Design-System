@@ -72,6 +72,7 @@ export 'src/components/molecules/ds_button_group.dart';
 export 'src/components/molecules/ds_coachmark.dart';
 export 'src/components/molecules/ds_cookie_banner.dart';
 export 'src/components/molecules/ds_chip_group.dart';
+export 'src/components/molecules/ds_radio_group.dart';
 export 'src/components/molecules/ds_currency_field.dart';
 export 'src/components/molecules/ds_date_field.dart';
 export 'src/components/molecules/ds_dialog.dart';
