@@ -13,6 +13,8 @@ import 'pages/breakpoints.dart';
 import 'pages/accordion.dart';
 import 'pages/avatar.dart';
 import 'pages/divider.dart';
+import 'pages/expiry_date.dart';
+import 'pages/status_legend.dart';
 import 'pages/icon.dart';
 import 'pages/img.dart';
 import 'pages/inline.dart';
@@ -48,7 +50,10 @@ import 'pages/board_view.dart';
 import 'pages/group_hierarchy.dart';
 import 'pages/policies.dart';
 import 'pages/data_import.dart';
+import 'pages/import_guide.dart';
+import 'pages/pagination.dart';
 import 'pages/record_panel.dart';
+import 'pages/roster_view.dart';
 import 'pages/full_page_layouts.dart';
 import 'pages/search_field.dart';
 import 'pages/menu_sheet.dart';
@@ -155,11 +160,13 @@ final List<PatternPage> allPages = [
   avatarPage,
   dividerPage,
   labeledDividerPage,
+  expiryDatePage,
   iconPage,
   iconBadgePage,
   imgPage,
   inlinePage,
   listsPage,
+  statusLegendPage,
   stepHeaderPage,
   wordmarkPage,
   summarySectionPage,
@@ -190,11 +197,14 @@ final List<PatternPage> allPages = [
   cellTypesPage,
   groupingPage,
   filteringSortingPage,
+  paginationPage,
   boardViewPage,
   groupHierarchyPage,
   policiesPage,
   dataImportPage,
+  importGuidePage,
   recordPanelPage,
+  rosterViewPage,
   // Charts
   barChartPage,
   lineChartPage,

@@ -38,7 +38,12 @@ import 'board_view_demo.dart';
 import 'group_hierarchy_demo.dart';
 import 'policies_demo.dart';
 import 'data_import_demo.dart';
+import 'expiry_date_demo.dart';
+import 'import_guide_demo.dart';
+import 'pagination_demo.dart';
 import 'record_panel_demo.dart';
+import 'roster_view_demo.dart';
+import 'status_legend_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
@@ -111,6 +116,11 @@ final Map<String, Widget Function()> _demos = {
   'policies': () => const PoliciesDemo(),
   'data-import': () => const DataImportDemo(),
   'record-panel': () => const RecordPanelDemo(),
+  'expiry-date': () => const ExpiryDateDemo(),
+  'status-legend': () => const StatusLegendDemo(),
+  'pagination': () => const PaginationDemo(),
+  'import-guide': () => const ImportGuideDemo(),
+  'roster-view': () => const RosterViewDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),

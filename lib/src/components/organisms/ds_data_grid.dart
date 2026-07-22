@@ -162,6 +162,13 @@ class DsGridOption {
   String get effectiveLabel => label ?? value;
 }
 
+/// Builds a custom read-only cell for a [DsGridColumn], from the raw [value]
+/// stored in the row's [DsGridRow.cells] map.
+typedef DsGridCellBuilder = Widget Function(
+  BuildContext context,
+  Object? value,
+);
+
 /// The definition of a single column in a [DsDataGrid].
 ///
 /// A column binds a stable [key] (used to look up each row's value in
@@ -195,6 +202,7 @@ class DsGridColumn {
     this.currencySymbol,
     this.editable = false,
     this.options,
+    this.cellBuilder,
     this.statusTooltip,
   });
 
@@ -245,6 +253,14 @@ class DsGridColumn {
   /// colour and populate the menu shown while editing. Optional (and unused)
   /// for other cell types.
   final List<DsGridOption>? options;
+
+  /// An optional custom renderer for this column's read-only cells.
+  ///
+  /// When set it replaces the [type]-based cell renderer, receiving the raw
+  /// cell value for the row. Sorting, filtering and editing still operate on
+  /// the underlying value via [type], so a column can present richly (an
+  /// expiry date with a relative hint, say) while remaining sortable.
+  final DsGridCellBuilder? cellBuilder;
 
   /// The tooltip shown on a [DsCellType.status] cell in this column, resolved
   /// per row: the reason behind the state ("Missing licence expiry" on a
@@ -3836,6 +3852,12 @@ class _DsDataGridState extends State<DsDataGrid> {
           overflow: dense ? TextOverflow.ellipsis : TextOverflow.clip,
           textAlign: _textAlignOf(align),
         );
+
+    final cellBuilder = column.cellBuilder;
+    if (cellBuilder != null) {
+      final built = cellBuilder(context, value);
+      return dense ? _guarded(built) : built;
+    }
 
     switch (column.type) {
       case DsCellType.text:
