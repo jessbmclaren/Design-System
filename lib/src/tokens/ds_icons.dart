@@ -185,6 +185,9 @@ abstract final class DsIcons {
   /// Informational.
   static const IconData info = LucideIcons.info;
 
+  /// A tip or suggestion.
+  static const IconData lightbulb = LucideIcons.lightbulb;
+
   /// A caution.
   static const IconData warning = LucideIcons.triangle_alert;
 
