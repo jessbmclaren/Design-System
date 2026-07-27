@@ -30,3 +30,6 @@ migrate_working_dir/
 /build/
 /coverage/
 test/golden/failures/
+
+# Local snapshot archives — git is the backup.
+*.tar.gz
