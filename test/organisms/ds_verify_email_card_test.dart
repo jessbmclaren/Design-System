@@ -87,6 +87,55 @@ void main() {
       expect(resent, 0, reason: 'a pending button must not fire');
     });
 
+    testWidgets('the change-email link appears only with onChangeEmail', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsVerifyEmailCard(email: 'sam@example.com'),
+      );
+      expect(find.text('Wrong email? Change it'), findsNothing);
+
+      var changed = 0;
+      await pumpDs(
+        tester,
+        DsVerifyEmailCard(
+          email: 'sam@example.com',
+          onChangeEmail: () => changed++,
+        ),
+      );
+      expect(find.text('Wrong email? Change it'), findsOneWidget);
+      await tester.tap(find.text('Wrong email? Change it'));
+      expect(changed, 1);
+    });
+
+    testWidgets('the verified state never shows the change-email link', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsVerifyEmailCard(
+          email: 'sam@example.com',
+          verified: true,
+          onChangeEmail: () {},
+        ),
+      );
+      // A verified address is not in doubt.
+      expect(find.text('Wrong email? Change it'), findsNothing);
+    });
+
+    testWidgets('the change-email label is a parameter', (tester) async {
+      await pumpDs(
+        tester,
+        DsVerifyEmailCard(
+          email: 'sam@example.com',
+          onChangeEmail: () {},
+          changeEmailLabel: 'Nie jou e-pos nie?',
+        ),
+      );
+      expect(find.text('Nie jou e-pos nie?'), findsOneWidget);
+    });
+
     testWidgets('the inbox close affordance appears only with onClose', (
       tester,
     ) async {

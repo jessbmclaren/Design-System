@@ -4,6 +4,7 @@ import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon_button.dart';
+import '../atoms/ds_link.dart';
 
 /// A compact "verify your email" card, usually shown over a dimmed page in a
 /// [DsTakeover] as a reminder rather than a hard gate.
@@ -13,8 +14,9 @@ import '../atoms/ds_icon_button.dart';
 ///
 /// * **Check your inbox** ([verified] is false): a heading, a line pointing the
 ///   user at their inbox with their [email] emphasised, and a secondary resend
-///   action. An optional close affordance dismisses the reminder without
-///   verifying.
+///   action. An optional change-email link ([onChangeEmail]) sits beside the
+///   resend for the person who mistyped their address, and an optional close
+///   affordance dismisses the reminder without verifying.
 /// * **Email verified** ([verified] is true): a confirmation heading, a line
 ///   reading back the verified [email], and a primary continue action. The
 ///   corner close, when shown, completes rather than dismisses, so closing a
@@ -41,10 +43,12 @@ class DsVerifyEmailCard extends StatelessWidget {
     this.onContinue,
     this.onResend,
     this.resendPending = false,
+    this.onChangeEmail,
     this.onClose,
     this.title = 'Verify your email',
     this.verifiedTitle = 'Email verified',
     this.resendLabel = 'Resend email',
+    this.changeEmailLabel = 'Wrong email? Change it',
     this.continueLabel = 'Continue',
     this.closeSemanticLabel = 'Close',
     this.maxWidth = 460,
@@ -72,6 +76,12 @@ class DsVerifyEmailCard extends StatelessWidget {
   /// action. Defaults to false.
   final bool resendPending;
 
+  /// Called from the change-email link in the inbox state — the doorway for a
+  /// mistyped address, so a wrong email is a correction rather than a dead
+  /// account. When null (the default) the link is not shown. The verified
+  /// state never shows it: a verified address is not in doubt.
+  final VoidCallback? onChangeEmail;
+
   /// Called from the corner close in the inbox state, dismissing the reminder
   /// without verifying. When null (the default) the inbox state shows no close
   /// affordance; the verified state still shows one, routed to [onContinue].
@@ -86,6 +96,10 @@ class DsVerifyEmailCard extends StatelessWidget {
 
   /// The label of the resend action. Defaults to `'Resend email'`.
   final String resendLabel;
+
+  /// The label of the change-email link. Defaults to
+  /// `'Wrong email? Change it'`.
+  final String changeEmailLabel;
 
   /// The label of the continue action. Defaults to `'Continue'`.
   final String continueLabel;
@@ -168,6 +182,20 @@ class DsVerifyEmailCard extends StatelessWidget {
                       onPressed: onResend,
                     ),
             ),
+            // The mistyped-address doorway is the quiet aside beneath the
+            // resend action — its own line, so neither crowds the other at
+            // narrow widths.
+            if (!verified && onChangeEmail != null) ...<Widget>[
+              SizedBox(height: unit * 1.5),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: DsLink(
+                  label: changeEmailLabel,
+                  small: true,
+                  onPressed: onChangeEmail,
+                ),
+              ),
+            ],
           ],
         ),
       ),
