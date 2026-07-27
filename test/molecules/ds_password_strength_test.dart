@@ -91,11 +91,11 @@ void main() {
       expect(dsFirstUnmetPasswordRule(''), 'Password required');
       expect(
         dsFirstUnmetPasswordRule('Aa1!aaa'),
-        'Must be at least 8 characters long.',
+        'Please use at least 8 characters',
       );
       expect(
         dsFirstUnmetPasswordRule('aa1!aaaa'),
-        'Please use at least one capital letter',
+        'Please use at least one uppercase letter',
       );
       expect(
         dsFirstUnmetPasswordRule('AA1!AAAA'),
@@ -114,7 +114,7 @@ void main() {
       // length message first.
       expect(
         dsFirstUnmetPasswordRule('a'),
-        'Must be at least 8 characters long.',
+        'Please use at least 8 characters',
       );
     });
 

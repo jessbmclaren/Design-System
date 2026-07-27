@@ -148,14 +148,14 @@ void main() {
       // Documented behaviour: whitespace is a character like any other, so
       // eight spaces pass the length rule and the special character rule.
       // The gate still holds (only two rules met), and the caption asks for
-      // a capital letter rather than saying the password is required.
+      // an uppercase letter rather than saying the password is required.
       final rules = dsPasswordRules('        ');
       expect(rules[0].met, isTrue);
       expect(rules[4].met, isTrue);
       expect(dsPasswordTier('        '), DsPasswordTier.tooWeak);
       expect(
         dsFirstUnmetPasswordRule('        '),
-        'Please use at least one capital letter',
+        'Please use at least one uppercase letter',
       );
     });
   });

@@ -60,9 +60,15 @@ bool dsPasswordMeetsAll(String value) =>
 
 /// The messages for [dsFirstUnmetPasswordRule], one per rule in
 /// [dsPasswordRules] and in the same order.
+///
+/// Each names its rule with the same word the rule's own label uses — a
+/// checklist row reading "One uppercase letter" beside a caption asking for a
+/// "capital letter" reads as two requirements rather than one, and a form is
+/// free to show both at once. One voice, and no trailing full stops, so the
+/// five sit together as a set.
 const List<String> _unmetRuleMessages = <String>[
-  'Must be at least 8 characters long.',
-  'Please use at least one capital letter',
+  'Please use at least 8 characters',
+  'Please use at least one uppercase letter',
   'Please use at least one lowercase letter',
   'Please use at least one number',
   'Please use at least one special character',
