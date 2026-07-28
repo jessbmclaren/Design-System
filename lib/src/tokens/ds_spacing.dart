@@ -56,4 +56,13 @@ abstract final class DsSpacing {
 
   /// The vertical padding for table rows.
   static const double tableRowPaddingY = 8;
+
+  /// The height of a loosely packed table row, for tables read at a glance.
+  static const double tableRowComfortable = 56;
+
+  /// The default table row height, with room for badges and avatars.
+  static const double tableRowCosy = 44;
+
+  /// The height of a tightly packed table row, for scanning many numbers.
+  static const double tableRowCompact = 32;
 }
