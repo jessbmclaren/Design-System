@@ -69,6 +69,8 @@ export 'src/components/molecules/ds_accordion.dart';
 export 'src/components/molecules/ds_address_field_group.dart';
 export 'src/components/molecules/ds_banner.dart';
 export 'src/components/molecules/ds_button_group.dart';
+export 'src/components/molecules/ds_check_list.dart';
+export 'src/components/molecules/ds_check_menu.dart';
 export 'src/components/molecules/ds_coachmark.dart';
 export 'src/components/molecules/ds_cookie_banner.dart';
 export 'src/components/molecules/ds_chip_group.dart';
