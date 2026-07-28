@@ -16,6 +16,7 @@ import '../atoms/ds_badge.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_link.dart';
+import '../molecules/ds_check_list.dart';
 import '../molecules/ds_menu.dart';
 
 /// The kind of value a [DsGridColumn] holds, which selects how each cell is
@@ -4415,7 +4416,15 @@ Widget _colorBadge(DsTokens tokens, String label, Color color) {
 /// The themed floating surface shared by the select and multi-select menus,
 /// mirroring [DsMenu]'s panel: a form-background fill, a 1px border, the overlay
 /// corner radius and a medium drop shadow.
-Widget _overlaySurface(DsTokens tokens, Widget child) {
+/// The themed panel every anchored overlay in the grid sits on.
+///
+/// Pass [scrollable] `false` when [child] already scrolls and pads itself (a
+/// `DsCheckList` does), so the two do not nest one scroll view inside another.
+Widget _overlaySurface(
+  DsTokens tokens,
+  Widget child, {
+  bool scrollable = true,
+}) {
   final radius = BorderRadius.circular(tokens.overlayBorderRadius);
   return Material(
     type: MaterialType.transparency,
@@ -4428,12 +4437,14 @@ Widget _overlaySurface(DsTokens tokens, Widget child) {
       ),
       child: ClipRRect(
         borderRadius: radius,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
-            child: child,
-          ),
-        ),
+        child: scrollable
+            ? SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+                  child: child,
+                ),
+              )
+            : child,
       ),
     ),
   );
@@ -4717,12 +4728,6 @@ class _MultiSelectOverlayPanel extends StatefulWidget {
 class _MultiSelectOverlayPanelState extends State<_MultiSelectOverlayPanel> {
   late final Set<String> _selected = <String>{...widget.initialSelected};
 
-  void _toggle(String value) {
-    setState(() {
-      if (!_selected.add(value)) _selected.remove(value);
-    });
-  }
-
   List<String> _ordered() {
     final known = {for (final option in widget.options) option.value};
     return [
@@ -4738,70 +4743,24 @@ class _MultiSelectOverlayPanelState extends State<_MultiSelectOverlayPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = widget.tokens;
     return _overlaySurface(
-      tokens,
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < widget.options.length; i++)
-            _row(tokens, widget.options[i], autofocus: i == 0),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: tokens.colorBorder)),
-            ),
-            child: InkWell(
-              onTap: () => widget.onCommit(_ordered()),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 44),
-                child: Center(
-                  child: Text(
-                    'Done',
-                    style: tokens.labelMd.toTextStyle(
-                      color: tokens.actionPrimaryColorText,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+      widget.tokens,
+      DsCheckList(
+        options: <DsCheckOption>[
+          for (final DsGridOption option in widget.options)
+            DsCheckOption(value: option.value, label: option.effectiveLabel),
         ],
+        selected: _selected,
+        onChanged: (Set<String> next) => setState(() {
+          _selected
+            ..clear()
+            ..addAll(next);
+        }),
+        actionLabel: 'Done',
+        onAction: () => widget.onCommit(_ordered()),
       ),
-    );
-  }
-
-  Widget _row(DsTokens tokens, DsGridOption option, {required bool autofocus}) {
-    final selected = _selected.contains(option.value);
-    return InkWell(
-      onTap: () => _toggle(option.value),
-      autofocus: autofocus,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 40),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DsSpacing.md,
-            vertical: DsSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              _GridCheck(
-                value: selected,
-                size: _DsDataGridState._checkboxSize,
-              ),
-              const SizedBox(width: DsSpacing.sm),
-              Expanded(
-                child: Text(
-                  option.effectiveLabel,
-                  style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // The list scrolls and pads itself.
+      scrollable: false,
     );
   }
 }
