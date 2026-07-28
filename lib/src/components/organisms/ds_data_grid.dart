@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
@@ -4425,7 +4424,7 @@ Widget _overlaySurface(DsTokens tokens, Widget child) {
         color: tokens.formBackgroundColor,
         borderRadius: radius,
         border: Border.all(color: tokens.colorBorder),
-        boxShadow: DsElevation.medium,
+        boxShadow: tokens.shadowMedium,
       ),
       child: ClipRRect(
         borderRadius: radius,
