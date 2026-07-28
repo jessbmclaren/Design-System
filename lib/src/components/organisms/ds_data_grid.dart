@@ -162,11 +162,17 @@ class DsGridOption {
   String get effectiveLabel => label ?? value;
 }
 
-/// Builds a custom read-only cell for a [DsGridColumn], from the raw [value]
-/// stored in the row's [DsGridRow.cells] map.
+/// Builds a custom cell for a [DsGridColumn], from the raw [value] stored in
+/// the row's [DsGridRow.cells] map and the [row] it came from.
+///
+/// The [row] is passed so a custom cell can be interactive and still report
+/// *which* record it acted on — a switch that toggles a campaign, say, needs
+/// [DsGridRow.id] to send back. Anything returned here is laid out inside the
+/// cell's padding and receives pointer events normally.
 typedef DsGridCellBuilder = Widget Function(
   BuildContext context,
   Object? value,
+  DsGridRow row,
 );
 
 /// The definition of a single column in a [DsDataGrid].
@@ -254,12 +260,17 @@ class DsGridColumn {
   /// for other cell types.
   final List<DsGridOption>? options;
 
-  /// An optional custom renderer for this column's read-only cells.
+  /// An optional custom renderer for this column's cells.
   ///
   /// When set it replaces the [type]-based cell renderer, receiving the raw
-  /// cell value for the row. Sorting, filtering and editing still operate on
-  /// the underlying value via [type], so a column can present richly (an
-  /// expiry date with a relative hint, say) while remaining sortable.
+  /// cell value and the row it belongs to. Sorting, filtering and grouping
+  /// still operate on the underlying value via [type], so a column can present
+  /// richly — an expiry date with a relative hint, a switch that toggles the
+  /// record — while remaining sortable.
+  ///
+  /// A custom cell may be interactive. It is exempt from inline [editable]
+  /// editing (the builder owns the whole cell, including how it changes), so
+  /// set one or the other, not both.
   final DsGridCellBuilder? cellBuilder;
 
   /// The tooltip shown on a [DsCellType.status] cell in this column, resolved
@@ -1087,8 +1098,18 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   /// Whether a cell in [column] can be edited given the grid's master switch,
   /// the column opt-in and the cell type.
+  /// Whether [column]'s cells offer inline editing.
+  ///
+  /// A column with a [DsGridColumn.cellBuilder] never does: the builder owns
+  /// the whole cell, so wrapping it in a tap-to-edit affordance would swallow
+  /// the pointer events its own controls need. This is the single gate for
+  /// every edit entry point — the tap wrapper, Enter on a focused cell and
+  /// paste — so a custom cell stays the builder's to drive.
   bool _isCellEditable(DsGridColumn column) =>
-      widget.editable && column.editable && _supportsEditing(column.type);
+      widget.editable &&
+      column.editable &&
+      column.cellBuilder == null &&
+      _supportsEditing(column.type);
 
   /// Whether the cell at [row]/[column] is currently showing an inline editor.
   bool _isEditingCell(DsGridRow row, DsGridColumn column) =>
@@ -3577,7 +3598,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         : _cellContent(
             tokens,
             column,
-            row.cells[column.key],
+            row,
             dense: true,
             align: align,
             tooltip: column.statusTooltip?.call(row),
@@ -3639,7 +3660,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       child: _cellContent(
         tokens,
         column,
-        row.cells[column.key],
+        row,
         dense: false,
         align: DsColumnAlign.end,
         tooltip: column.statusTooltip?.call(row),
@@ -3832,11 +3853,12 @@ class _DsDataGridState extends State<DsDataGrid> {
   Widget _cellContent(
     DsTokens tokens,
     DsGridColumn column,
-    Object? value, {
+    DsGridRow row, {
     required bool dense,
     required DsColumnAlign align,
     String? tooltip,
   }) {
+    final Object? value = row.cells[column.key];
     final emDash = Text(
       '—',
       style: (dense ? tokens.bodySm : tokens.bodyMd)
@@ -3855,7 +3877,10 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     final cellBuilder = column.cellBuilder;
     if (cellBuilder != null) {
-      final built = cellBuilder(context, value);
+      final built = cellBuilder(context, value, row);
+      // The dense (table) layout clips overflow rather than letting a tall or
+      // wide custom cell break row alignment. The scroll view is inert, so it
+      // does not steal drags from a control inside the cell.
       return dense ? _guarded(built) : built;
     }
 
