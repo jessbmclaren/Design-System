@@ -91,7 +91,6 @@ class DsCheckbox extends StatefulWidget {
   /// Reserves one line; a wrapping, multi-line error still grows past it.
   final bool reserveErrorSpace;
 
-  static const double _boxSize = 18;
   static const double _labelGap = 8;
 
   /// Focus ring geometry: an accent ring of this width, held off the box by a
@@ -143,8 +142,8 @@ class _DsCheckboxState extends State<DsCheckbox> {
     final box = AnimatedContainer(
       duration: DsMotion.durationOf(context, const Duration(milliseconds: 150)),
       curve: DsMotion.curveOf(context, Curves.easeOut),
-      width: DsCheckbox._boxSize,
-      height: DsCheckbox._boxSize,
+      width: tokens.checkboxSize,
+      height: tokens.checkboxSize,
       decoration: BoxDecoration(
         color: widget.value
             ? tokens.formAccentColor
@@ -176,7 +175,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
           tokens.bodyMd.fontSize * (tokens.bodyMd.height ?? 1);
       final double boxTopPadding = math.max(
         0,
-        (lineHeight - DsCheckbox._boxSize) / 2,
+        (lineHeight - tokens.checkboxSize) / 2,
       );
       content = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +299,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
             child: Padding(
               padding: EdgeInsets.only(
                 left: labelChild != null
-                    ? DsCheckbox._boxSize + DsCheckbox._labelGap
+                    ? tokens.checkboxSize + DsCheckbox._labelGap
                     : 0,
               ),
               child: Text(
@@ -316,7 +315,7 @@ class _DsCheckboxState extends State<DsCheckbox> {
             child: Padding(
               padding: EdgeInsets.only(
                 left: labelChild != null
-                    ? DsCheckbox._boxSize + DsCheckbox._labelGap
+                    ? tokens.checkboxSize + DsCheckbox._labelGap
                     : 0,
               ),
               child: Text(

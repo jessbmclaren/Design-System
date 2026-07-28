@@ -178,6 +178,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.cardPadding,
     // Table
     required this.tableRowPaddingY,
+    required this.checkboxSize,
     required this.tableRowHeightComfortable,
     required this.tableRowHeightCosy,
     required this.tableRowHeightCompact,
@@ -377,6 +378,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: 1.5,
       cardPadding: 24,
       tableRowPaddingY: DsSpacing.tableRowPaddingY,
+      checkboxSize: 18,
       tableRowHeightComfortable: DsSpacing.tableRowComfortable,
       tableRowHeightCosy: DsSpacing.tableRowCosy,
       tableRowHeightCompact: DsSpacing.tableRowCompact,
@@ -1039,6 +1041,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The vertical padding for table rows.
   final double tableRowPaddingY;
 
+  /// The side of a checkbox's box. Read by the `DsCheckbox` atom and by
+  /// every dense checkbox the data grid draws, so the two can never drift.
+  final double checkboxSize;
+
   /// The row height for each `DsGridDensity`. A brand that reads denser
   /// or airier than the base restyles its tables by overriding these,
   /// rather than every table passing its own `rowHeight`.
@@ -1303,6 +1309,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? markerBorderWidth,
     double? cardPadding,
     double? tableRowPaddingY,
+    double? checkboxSize,
     double? tableRowHeightComfortable,
     double? tableRowHeightCosy,
     double? tableRowHeightCompact,
@@ -1535,6 +1542,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: markerBorderWidth ?? this.markerBorderWidth,
       cardPadding: cardPadding ?? this.cardPadding,
       tableRowPaddingY: tableRowPaddingY ?? this.tableRowPaddingY,
+      checkboxSize: checkboxSize ?? this.checkboxSize,
       tableRowHeightComfortable: tableRowHeightComfortable ?? this.tableRowHeightComfortable,
       tableRowHeightCosy: tableRowHeightCosy ?? this.tableRowHeightCosy,
       tableRowHeightCompact: tableRowHeightCompact ?? this.tableRowHeightCompact,
@@ -1794,6 +1802,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: d(markerBorderWidth, other.markerBorderWidth),
       cardPadding: d(cardPadding, other.cardPadding),
       tableRowPaddingY: d(tableRowPaddingY, other.tableRowPaddingY),
+      checkboxSize: d(checkboxSize, other.checkboxSize),
       tableRowHeightComfortable: d(tableRowHeightComfortable, other.tableRowHeightComfortable),
       tableRowHeightCosy: d(tableRowHeightCosy, other.tableRowHeightCosy),
       tableRowHeightCompact: d(tableRowHeightCompact, other.tableRowHeightCompact),
@@ -1980,6 +1989,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           markerBorderWidth == other.markerBorderWidth &&
           cardPadding == other.cardPadding &&
           tableRowPaddingY == other.tableRowPaddingY &&
+          checkboxSize == other.checkboxSize &&
           tableRowHeightComfortable == other.tableRowHeightComfortable &&
           tableRowHeightCosy == other.tableRowHeightCosy &&
           tableRowHeightCompact == other.tableRowHeightCompact &&
@@ -2151,6 +2161,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         markerBorderWidth,
         cardPadding,
         tableRowPaddingY,
+        checkboxSize,
         tableRowHeightComfortable,
         tableRowHeightCosy,
         tableRowHeightCompact,
