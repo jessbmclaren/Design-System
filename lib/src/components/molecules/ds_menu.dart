@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon.dart';
+import 'menu_shell.dart';
 
 /// A single selectable row within a [DsMenu].
 ///
@@ -107,57 +108,9 @@ class DsMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final DsTokens tokens = DsTokens.of(context);
 
-    return MenuAnchor(
-      // The custom surface below draws its own fill, border and shadow, so the
-      // anchor's built-in Material panel is made transparent and un-clipped to
-      // avoid double-painting or clipping the drop shadow.
-      clipBehavior: Clip.none,
-      style: MenuStyle(
-        backgroundColor: const WidgetStatePropertyAll<Color>(Color(0x00000000)),
-        surfaceTintColor: const WidgetStatePropertyAll<Color>(
-          Color(0x00000000),
-        ),
-        shadowColor: const WidgetStatePropertyAll<Color>(Color(0x00000000)),
-        elevation: const WidgetStatePropertyAll<double>(0),
-        padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-          EdgeInsets.zero,
-        ),
-      ),
-      menuChildren: <Widget>[_DsMenuSurface(tokens: tokens, items: items)],
-      builder: (BuildContext context, MenuController controller, Widget? child) {
-        void toggle() {
-          if (controller.isOpen) {
-            controller.close();
-          } else {
-            controller.open();
-          }
-        }
-
-        return Semantics(
-          button: true,
-          expanded: controller.isOpen,
-          onTap: toggle,
-          // FocusableActionDetector makes the trigger reachable by Tab and
-          // activatable by Enter/Space (via the ambient ActivateIntent), so the
-          // menu is fully keyboard-operable, not pointer-only.
-          child: FocusableActionDetector(
-            actions: <Type, Action<Intent>>{
-              ActivateIntent: CallbackAction<ActivateIntent>(
-                onInvoke: (_) {
-                  toggle();
-                  return null;
-                },
-              ),
-            },
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: toggle,
-              child: child,
-            ),
-          ),
-        );
-      },
-      child: trigger,
+    return MenuShell(
+      trigger: trigger,
+      panel: _DsMenuSurface(tokens: tokens, items: items),
     );
   }
 }
