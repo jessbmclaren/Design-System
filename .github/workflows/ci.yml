@@ -1,0 +1,93 @@
+# Runs the definition of done from CLAUDE.md on every push and pull request.
+#
+# Those gates already existed as prose — analyze clean, tests green, the
+# markdown twins regenerated, every copyable snippet still compiling — but
+# nothing enforced them, so `main` could and did go red on a stale twin
+# without anyone noticing.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push to a branch supersedes the run already in flight for it, so a
+# busy branch does not queue up work nobody will read. This matters more than
+# usual here: see the note on runner cost below.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    # macOS, deliberately, and it is the expensive choice — private-repo macOS
+    # minutes bill at 10x Linux, and a run takes ~10 minutes wall clock.
+    #
+    # It is not a preference. This suite does not pass on Linux, on identical
+    # code, for two independent reasons:
+    #
+    #   * The goldens are generated on macOS. Linux rasterises fonts
+    #     differently, so a runner reports a ~6% pixel diff across the icon
+    #     registry and every atom.
+    #   * The layout probes measure real text. Font metrics differ, so
+    #     assertions like "no overflow at 320dp under a 2x text scale" and
+    #     "the title stays clear of the close button" tip over on a runner.
+    #
+    # Excluding what fails would have meant dropping precisely the checks that
+    # protect small screens and large text — the ones this kit exists to get
+    # right. Matching the platform the goldens were generated on keeps the full
+    # suite meaningful. Moving to Linux is possible, but it is a project:
+    # loading real fonts in the test harness and re-baselining every golden.
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Pinned to the toolchain this was developed against. Bump
+          # deliberately: a Flutter upgrade can change layout by a pixel, and
+          # the goldens and device-matrix sweep are sensitive to exactly that.
+          flutter-version: 3.44.6
+          cache: true
+
+      # --- the package ----------------------------------------------------
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      # Includes the goldens across light, dark and a skin.
+      - name: Test
+        run: flutter test
+
+      # --- the docs app ---------------------------------------------------
+      - name: Get dependencies (example)
+        working-directory: example
+        run: flutter pub get
+
+      - name: Analyze (example)
+        working-directory: example
+        run: flutter analyze
+
+      # Sweeps every page's demo from 320dp to 1920dp, in light, dark and a
+      # skin, so a component that overflows on a phone fails here.
+      - name: Test (example)
+        working-directory: example
+        run: flutter test
+
+      # --- the generated documentation ------------------------------------
+      # docs/patterns/*.md are generated from the content model. This is the
+      # check that was missing when main went red.
+      - name: Markdown twins are current
+        working-directory: example
+        run: dart run tool/generate_markdown.dart --check
+
+      # Resolves every page's copyable `code:` snippet against the real API,
+      # so a renamed parameter breaks the build instead of the docs.
+      - name: Copyable snippets still compile
+        working-directory: example
+        run: dart run tool/check_snippets.dart
