@@ -48,10 +48,7 @@ List<DsPasswordRule> dsPasswordRules(String value) => <DsPasswordRule>[
   DsPasswordRule('One uppercase letter', _upperCaseLetter.hasMatch(value)),
   DsPasswordRule('One lowercase letter', _lowerCaseLetter.hasMatch(value)),
   DsPasswordRule('One number', _digit.hasMatch(value)),
-  DsPasswordRule(
-    'One special character',
-    _specialCharacter.hasMatch(value),
-  ),
+  DsPasswordRule('One special character', _specialCharacter.hasMatch(value)),
 ];
 
 /// Whether [value] satisfies every rule in [dsPasswordRules].
@@ -151,6 +148,40 @@ final RegExp _wordNumberSymbol = RegExp(
   r'^[A-Za-z]{1,24}[0-9]{1,4}[^A-Za-z0-9]{0,3}$',
 );
 
+/// Whether [value] is predictable enough to refuse outright.
+///
+/// True for a common word, a word from [brandWords], the "word then a few
+/// digits then a symbol" shape (Bridge2024!), three or more of the same
+/// character in a row, and a deliberate keyboard or alphabet run of four or
+/// more (abcd, 1234, asdf).
+///
+/// This is the boolean gate a form needs when length and a breach check are
+/// doing the rest of the work — the arrangement current guidance points at,
+/// where character-class rules give way to refusing the guessable.
+/// [dsPasswordTier] weighs the same signals differently: a five-level grade can
+/// afford to treat a keyboard run as a deduction, where a gate cannot. Both
+/// read the same underlying checks, so neither can drift from the other's idea
+/// of what is guessable.
+///
+/// Pass [brandWords] to refuse a password built on the product's own name,
+/// which is as guessable as any dictionary word and the first thing anyone
+/// tries. Matching lowercases both sides, so list locale-specific spelling
+/// variants (straße and strasse) separately.
+bool dsPasswordIsPredictable(
+  String value, {
+  Set<String> brandWords = const <String>{},
+}) {
+  if (value.isEmpty) return false;
+  final lower = value.toLowerCase();
+  return _commonWords.any(lower.contains) ||
+      brandWords.any(
+        (word) => word.isNotEmpty && lower.contains(word.toLowerCase()),
+      ) ||
+      _wordNumberSymbol.hasMatch(value) ||
+      _hasRepeat(value) ||
+      _hasSequence(value);
+}
+
 /// Grades [value] into a [DsPasswordTier].
 ///
 /// A value that fails the gate (fewer than three rules met, or under 8
@@ -229,10 +260,7 @@ DsPasswordTier dsPasswordTier(
     DsPasswordTier.weak => (label: 'Weak', color: tokens.colorDanger),
     DsPasswordTier.fair => (label: 'Fair', color: tokens.colorWarning),
     DsPasswordTier.good => (label: 'Good', color: tokens.colorSuccess),
-    DsPasswordTier.strong => (
-      label: 'Strong',
-      color: tokens.colorSuccess,
-    ),
+    DsPasswordTier.strong => (label: 'Strong', color: tokens.colorSuccess),
   };
 }
 
@@ -387,8 +415,6 @@ class _Checklist extends StatelessWidget {
   }
 }
 
-
-
 /// An inline warning shown while the password still needs work.
 ///
 /// While one of the basic rules is unmet it restates the requirements in one
@@ -444,11 +470,7 @@ class DsPasswordStrengthHint extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Icon(
-              DsIcons.error,
-              size: DsIconSize.sm,
-              color: tokens.colorDanger,
-            ),
+            Icon(DsIcons.error, size: DsIconSize.sm, color: tokens.colorDanger),
             SizedBox(width: tokens.spacingUnit / 2),
             Expanded(
               child: Text(

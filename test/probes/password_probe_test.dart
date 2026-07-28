@@ -92,39 +92,33 @@ final String longGermanWord =
 
 void main() {
   group('model: unicode and whitespace', () {
-    test(
-      'Cyrillic capitals are recognised as uppercase and letters never '
-      'count as special characters',
-      () {
-        // 'Пароль12' has a capital П, lowercase 'ароль' and two digits. The
-        // unicode-aware classes recognise both letter cases, and the special
-        // character rule (neither letter nor number) rejects every letter.
-        final rules = dsPasswordRules('Пароль12');
-        expect(rules[0].met, isTrue, reason: '8 characters');
-        expect(rules[1].met, isTrue, reason: 'П is an uppercase letter');
-        expect(rules[2].met, isTrue, reason: "'ароль' is lowercase");
-        expect(rules[3].met, isTrue, reason: 'digits');
-        expect(
-          rules[4].met,
-          isFalse,
-          reason: 'letters and digits are not special characters',
-        );
-      },
-    );
+    test('Cyrillic capitals are recognised as uppercase and letters never '
+        'count as special characters', () {
+      // 'Пароль12' has a capital П, lowercase 'ароль' and two digits. The
+      // unicode-aware classes recognise both letter cases, and the special
+      // character rule (neither letter nor number) rejects every letter.
+      final rules = dsPasswordRules('Пароль12');
+      expect(rules[0].met, isTrue, reason: '8 characters');
+      expect(rules[1].met, isTrue, reason: 'П is an uppercase letter');
+      expect(rules[2].met, isTrue, reason: "'ароль' is lowercase");
+      expect(rules[3].met, isTrue, reason: 'digits');
+      expect(
+        rules[4].met,
+        isFalse,
+        reason: 'letters and digits are not special characters',
+      );
+    });
 
-    test(
-      'the model is consistent for an all-Cyrillic password',
-      () {
-        // Four rules met (length, uppercase, lowercase, number) clears the
-        // gate, and the caption agrees with the checklist: the one missing
-        // class is a special character.
-        expect(dsPasswordTier('Пароль12'), DsPasswordTier.weak);
-        expect(
-          dsFirstUnmetPasswordRule('Пароль12'),
-          'Please use at least one special character',
-        );
-      },
-    );
+    test('the model is consistent for an all-Cyrillic password', () {
+      // Four rules met (length, uppercase, lowercase, number) clears the
+      // gate, and the caption agrees with the checklist: the one missing
+      // class is a special character.
+      expect(dsPasswordTier('Пароль12'), DsPasswordTier.weak);
+      expect(
+        dsFirstUnmetPasswordRule('Пароль12'),
+        'Please use at least one special character',
+      );
+    });
 
     test('length rule counts grapheme clusters, not UTF-16 code units', () {
       // Four emoji are eight code units but four user-perceived characters,
@@ -186,35 +180,31 @@ void main() {
       );
     });
 
-    test(
-      'brand words need spelling variants listed for locale case-folding '
-      'pairs such as straße and STRASSE',
-      () {
-        // Documented behaviour: matching lowercases both sides, which cannot
-        // round-trip locale-specific uppercasings. 'STRASSE' lowercases to
-        // 'strasse', which does not contain 'straße', so brands are told to
-        // list both spellings as separate entries.
-        expect(
-          dsPasswordTier('xSTRASSE19!ab', brandWords: {'straße'}),
-          DsPasswordTier.good,
-        );
-        // The variant spelt with ss is caught.
-        expect(
-          dsPasswordTier('xSTRASSE19!ab', brandWords: {'strasse'}),
-          DsPasswordTier.tooWeak,
-        );
-        // Listing both variants covers either way the user types it.
-        expect(
-          dsPasswordTier('xSTRASSE19!ab', brandWords: {'straße', 'strasse'}),
-          DsPasswordTier.tooWeak,
-        );
-      },
-    );
+    test('brand words need spelling variants listed for locale case-folding '
+        'pairs such as straße and STRASSE', () {
+      // Documented behaviour: matching lowercases both sides, which cannot
+      // round-trip locale-specific uppercasings. 'STRASSE' lowercases to
+      // 'strasse', which does not contain 'straße', so brands are told to
+      // list both spellings as separate entries.
+      expect(
+        dsPasswordTier('xSTRASSE19!ab', brandWords: {'straße'}),
+        DsPasswordTier.good,
+      );
+      // The variant spelt with ss is caught.
+      expect(
+        dsPasswordTier('xSTRASSE19!ab', brandWords: {'strasse'}),
+        DsPasswordTier.tooWeak,
+      );
+      // Listing both variants covers either way the user types it.
+      expect(
+        dsPasswordTier('xSTRASSE19!ab', brandWords: {'straße', 'strasse'}),
+        DsPasswordTier.tooWeak,
+      );
+    });
   });
 
   group('model: performance', () {
-    test('10k-character input grades quickly enough for per-keystroke use',
-        () {
+    test('10k-character input grades quickly enough for per-keystroke use', () {
       final long = 'Aa1!' * 2500; // 10,000 characters
       // Warm up.
       dsPasswordTier(long);
@@ -230,8 +220,7 @@ void main() {
       expect(sw.elapsedMilliseconds, lessThan(4000));
     });
 
-    test('10k letters with no digit does not trigger regex backtracking',
-        () {
+    test('10k letters with no digit does not trigger regex backtracking', () {
       final letters = 'aB' * 5000;
       final sw = Stopwatch()..start();
       dsPasswordTier(letters);
@@ -310,9 +299,7 @@ void main() {
       },
     );
 
-    testWidgets('checklist rows survive below 64dp of width', (
-      tester,
-    ) async {
+    testWidgets('checklist rows survive below 64dp of width', (tester) async {
       // At 60dp a two-column item would be narrower than the dot and gap
       // alone, so the checklist collapses to one column and each label wraps
       // within its row instead of overflowing it. The heavily wrapped labels
@@ -431,79 +418,76 @@ void main() {
       },
     );
 
-    testWidgets(
-      'checklist rows expose their met state as a checked flag',
-      (tester) async {
-        final handle = tester.ensureSemantics();
-        await pumpProbe(tester, const DsPasswordStrength(value: ''));
-        final unmet = tester.getSemantics(find.text('One number'));
-        final unmetLabel = unmet.label;
-        expect(unmet.flagsCollection.isChecked, ui.CheckedState.isFalse);
+    testWidgets('checklist rows expose their met state as a checked flag', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpProbe(tester, const DsPasswordStrength(value: ''));
+      final unmet = tester.getSemantics(find.text('One number'));
+      final unmetLabel = unmet.label;
+      expect(unmet.flagsCollection.isChecked, ui.CheckedState.isFalse);
 
-        await pumpProbe(tester, const DsPasswordStrength(value: 'Aa1!aaaa'));
-        final met = tester.getSemantics(find.text('One number'));
-        // The label stays the same; the met state is carried by the checked
-        // flag, so assistive technology can tell the rows apart.
-        expect(met.label, unmetLabel);
-        expect(met.flagsCollection.isChecked, ui.CheckedState.isTrue);
-        handle.dispose();
-      },
-    );
+      await pumpProbe(tester, const DsPasswordStrength(value: 'Aa1!aaaa'));
+      final met = tester.getSemantics(find.text('One number'));
+      // The label stays the same; the met state is carried by the checked
+      // flag, so assistive technology can tell the rows apart.
+      expect(met.label, unmetLabel);
+      expect(met.flagsCollection.isChecked, ui.CheckedState.isTrue);
+      handle.dispose();
+    });
 
-    testWidgets(
-      'hint is a live region and resizes through AnimatedSize',
-      (tester) async {
-        final handle = tester.ensureSemantics();
-        await pumpProbe(
-          tester,
-          const DsPasswordStrengthHint(value: 'Password1!'),
-        );
-        final visible = tester.getSize(find.byType(DsPasswordStrengthHint));
-        expect(visible.height, greaterThan(0));
-        final node = tester.getSemantics(
-          find.textContaining("isn't strong enough"),
-        );
-        // An inline warning that swaps in as the user types is announced
-        // without stealing focus.
-        expect(node.flagsCollection.isLiveRegion, isTrue);
-        expect(find.byType(AnimatedSize), findsOneWidget);
+    testWidgets('hint is a live region and resizes through AnimatedSize', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpProbe(
+        tester,
+        const DsPasswordStrengthHint(value: 'Password1!'),
+      );
+      final visible = tester.getSize(find.byType(DsPasswordStrengthHint));
+      expect(visible.height, greaterThan(0));
+      final node = tester.getSemantics(
+        find.textContaining("isn't strong enough"),
+      );
+      // An inline warning that swaps in as the user types is announced
+      // without stealing focus.
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      expect(find.byType(AnimatedSize), findsOneWidget);
 
-        await pumpProbe(
-          tester,
-          const DsPasswordStrengthHint(value: 'Axcr1935!kdz'),
-        );
-        // The collapse is animated, so the form below does not jump within a
-        // single frame; once settled the hint takes no space.
-        await tester.pumpAndSettle();
-        final hidden = tester.getSize(find.byType(DsPasswordStrengthHint));
-        expect(hidden.height, 0);
-        handle.dispose();
-      },
-    );
+      await pumpProbe(
+        tester,
+        const DsPasswordStrengthHint(value: 'Axcr1935!kdz'),
+      );
+      // The collapse is animated, so the form below does not jump within a
+      // single frame; once settled the hint takes no space.
+      await tester.pumpAndSettle();
+      final hidden = tester.getSize(find.byType(DsPasswordStrengthHint));
+      expect(hidden.height, 0);
+      handle.dispose();
+    });
 
-    testWidgets(
-      'hint collapses in a single frame under reduced motion',
-      (tester) async {
-        await pumpProbe(
-          tester,
-          const DsPasswordStrengthHint(value: 'Password1!'),
-          disableAnimations: true,
-        );
-        expect(
-          tester.getSize(find.byType(DsPasswordStrengthHint)).height,
-          greaterThan(0),
-        );
-        // Reduced motion skips the AnimatedSize wrapper entirely, so the
-        // resize is immediate.
-        expect(find.byType(AnimatedSize), findsNothing);
-        await pumpProbe(
-          tester,
-          const DsPasswordStrengthHint(value: 'Axcr1935!kdz'),
-          disableAnimations: true,
-        );
-        expect(tester.getSize(find.byType(DsPasswordStrengthHint)).height, 0);
-      },
-    );
+    testWidgets('hint collapses in a single frame under reduced motion', (
+      tester,
+    ) async {
+      await pumpProbe(
+        tester,
+        const DsPasswordStrengthHint(value: 'Password1!'),
+        disableAnimations: true,
+      );
+      expect(
+        tester.getSize(find.byType(DsPasswordStrengthHint)).height,
+        greaterThan(0),
+      );
+      // Reduced motion skips the AnimatedSize wrapper entirely, so the
+      // resize is immediate.
+      expect(find.byType(AnimatedSize), findsNothing);
+      await pumpProbe(
+        tester,
+        const DsPasswordStrengthHint(value: 'Axcr1935!kdz'),
+        disableAnimations: true,
+      );
+      expect(tester.getSize(find.byType(DsPasswordStrengthHint)).height, 0);
+    });
   });
 
   group('DsPasswordField: toggle behaviour', () {
@@ -570,10 +554,7 @@ void main() {
     ) async {
       await pumpProbe(
         tester,
-        const DsPasswordField(
-          label: 'Password',
-          errorText: 'Wrong password',
-        ),
+        const DsPasswordField(label: 'Password', errorText: 'Wrong password'),
       );
       expect(find.text('Wrong password'), findsOneWidget);
       await tester.tap(find.byIcon(DsIcons.visibility));
@@ -623,17 +604,16 @@ void main() {
       },
     );
 
-    testWidgets(
-      'newPassword switches the autofill hint for sign-up flows',
-      (tester) async {
-        await pumpProbe(
-          tester,
-          const DsPasswordField(label: 'Password', newPassword: true),
-        );
-        final field = tester.widget<TextField>(find.byType(TextField));
-        expect(field.autofillHints, <String>[AutofillHints.newPassword]);
-      },
-    );
+    testWidgets('newPassword switches the autofill hint for sign-up flows', (
+      tester,
+    ) async {
+      await pumpProbe(
+        tester,
+        const DsPasswordField(label: 'Password', newPassword: true),
+      );
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.autofillHints, <String>[AutofillHints.newPassword]);
+    });
 
     testWidgets('accepts and reveals a 300-character value', (tester) async {
       final controller = TextEditingController();
@@ -659,7 +639,8 @@ void main() {
         tester,
         const DsPasswordField(
           label: 'Password',
-          errorText: 'Use at least 8 characters with upper- and lower-case '
+          errorText:
+              'Use at least 8 characters with upper- and lower-case '
               'letters, a number and a symbol.',
         ),
         surfaceSize: const Size(320, 640),
@@ -747,10 +728,7 @@ void main() {
           focusNode: fieldFocus,
         ),
       );
-      await tester.tap(
-        find.byIcon(DsIcons.visibility),
-        warnIfMissed: false,
-      );
+      await tester.tap(find.byIcon(DsIcons.visibility), warnIfMissed: false);
       await tester.pump();
       expect(find.byIcon(DsIcons.visibility), findsOneWidget);
       expect(find.byIcon(DsIcons.visibilityOff), findsNothing);
@@ -789,6 +767,40 @@ void main() {
         isFalse,
       );
       handle.dispose();
+    });
+  });
+
+  group('dsPasswordIsPredictable', () {
+    test('refuses the shapes that make even a long password guessable', () {
+      for (final v in const <String>[
+        'password', // a common word, anywhere in the value
+        'MyPassword2026', // ...including buried in something longer
+        'Bridge2024!', // word, digits, symbol
+        'aaabcdefgh', // three of the same character in a row
+        'Xy!qwertyuu', // a keyboard run of four or more
+        'Zk!12345678', // a digit run
+      ]) {
+        expect(dsPasswordIsPredictable(v), isTrue, reason: v);
+      }
+    });
+
+    test('leaves an unpatterned value alone, however it is composed', () {
+      for (final v in const <String>['7xQ!ropVma2z', 'vlqm-thurst-oxbow']) {
+        expect(dsPasswordIsPredictable(v), isFalse, reason: v);
+      }
+    });
+
+    test('an empty value is not predictable - it is simply absent', () {
+      expect(dsPasswordIsPredictable(''), isFalse);
+    });
+
+    test('brand words are refused, so the product name is no password', () {
+      expect(
+        dsPasswordIsPredictable('Kilomita-ledger-77', brandWords: {'kilomita'}),
+        isTrue,
+      );
+      // The same value with no brand list: nothing else about it is patterned.
+      expect(dsPasswordIsPredictable('Kilomita-ledger-77'), isFalse);
     });
   });
 }
