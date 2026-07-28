@@ -53,7 +53,11 @@ class _RosterViewDemoState extends State<RosterViewDemo> {
 
   /// Renders a date cell as a `DsExpiryDate` against the fixed clock; a null
   /// (or mistyped) value renders as an em dash, mirroring the grid's default.
-  static Widget _expiryCell(BuildContext context, Object? value) {
+  static Widget _expiryCell(
+    BuildContext context,
+    Object? value,
+    DsGridRow row,
+  ) {
     if (value is! DateTime) {
       final tokens = DsTokens.of(context);
       return Text(
