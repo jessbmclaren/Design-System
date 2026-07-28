@@ -67,6 +67,9 @@ class DsRosterView extends StatelessWidget {
     this.onSelectionChanged,
     this.sort,
     this.onSort,
+    this.density = DsGridDensity.cosy,
+    this.view,
+    this.onViewChanged,
     this.emptyState,
     this.pagination,
     this.footer,
@@ -132,6 +135,21 @@ class DsRosterView extends StatelessWidget {
   /// Called when a sortable header is tapped.
   final ValueChanged<DsGridSort?>? onSort;
 
+  /// How tightly the grid packs its rows. Drive it from a density control in
+  /// [toolbarActions], so the toolbar the user reaches for actually reaches
+  /// the grid.
+  final DsGridDensity density;
+
+  /// The grid's table view — which columns show, in what order, under what
+  /// labels, with which column-bottom calculations. Pair it with a column
+  /// picker in [toolbarActions] (a `DsCheckMenu` over
+  /// [DsGridView.visibleColumns]).
+  final DsGridView? view;
+
+  /// Called with the next [DsGridView] whenever the user changes it from the
+  /// grid's own header menus. Providing it enables that management surface.
+  final ValueChanged<DsGridView>? onViewChanged;
+
   /// Shown inside the grid area when [rows] is empty.
   final Widget? emptyState;
 
@@ -189,6 +207,9 @@ class DsRosterView extends StatelessWidget {
                 onSelectionChanged: onSelectionChanged,
                 sort: sort,
                 onSort: onSort,
+                density: density,
+                view: view,
+                onViewChanged: onViewChanged,
                 emptyState: emptyState,
               ),
             ),

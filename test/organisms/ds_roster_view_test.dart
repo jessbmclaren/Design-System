@@ -306,5 +306,61 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('forwards density to the grid, so a toolbar control reaches it',
+        (tester) async {
+      double pitch() =>
+          tester.getTopLeft(find.text('Ben Nkosi')).dy -
+          tester.getTopLeft(find.text('Amara Okafor')).dy;
+
+      for (final DsGridDensity density in DsGridDensity.values) {
+        await pumpDs(
+          tester,
+          SizedBox(
+            width: 1400,
+            child: DsRosterView(
+              title: 'Drivers',
+              columns: _columns,
+              rows: _rows(),
+              density: density,
+              tableHeight: 320,
+            ),
+          ),
+          surfaceSize: const Size(1440, 900),
+        );
+        expect(
+          pitch(),
+          density.rowHeightFrom(DsTokens.light()),
+          reason: 'row pitch for $density',
+        );
+        expect(tester.takeException(), isNull);
+      }
+    });
+
+    testWidgets('forwards the view, so a column picker reaches the grid',
+        (tester) async {
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 1400,
+          child: DsRosterView(
+            title: 'Drivers',
+            columns: _columns,
+            rows: _rows(),
+            view: const DsGridView(visibleColumns: <String>['name', 'status']),
+            tableHeight: 320,
+          ),
+        ),
+        surfaceSize: const Size(1440, 900),
+      );
+
+      // The view's column list is honoured: the phone column is dropped while
+      // the two it names still render their values.
+      expect(find.text('Amara Okafor'), findsOneWidget);
+      expect(find.text('Active'), findsOneWidget);
+      expect(find.text('082 555 0101'), findsNothing);
+      expect(find.text('083 555 0102'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
