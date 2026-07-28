@@ -752,7 +752,6 @@ class _DsDataGridState extends State<DsDataGrid> {
   static const double _selectionColumnWidth = 48;
   static const double _seamWidth = 6;
   static const double _resizeHandleWidth = 6;
-  static const double _checkboxSize = 18;
   static const double _addColumnWidth = 44;
   static const double _actionsColumnWidth = 48;
 
@@ -1148,6 +1147,10 @@ class _DsDataGridState extends State<DsDataGrid> {
   /// [DsDataGrid.rowHeight] when one is given and from [DsDataGrid.density]
   /// otherwise. Read through this everywhere, so the frozen and scrolling
   /// panes never disagree about a row's height.
+  /// The side of a checkbox drawn in a cell or a selection column, taken
+  /// from the same token the `DsCheckbox` atom reads so the two match.
+  double get _checkboxSize => DsTokens.of(context).checkboxSize;
+
   double get _rowHeight =>
       widget.rowHeight ?? widget.density.rowHeightFrom(DsTokens.of(context));
 
