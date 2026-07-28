@@ -158,6 +158,15 @@ abstract final class DsIcons {
   /// Switch a collection to its grid view.
   static const IconData gridView = LucideIcons.layout_grid;
 
+  /// Loosen a table's rows — the `DsGridDensity.comfortable` choice.
+  static const IconData densityComfortable = LucideIcons.rows_2;
+
+  /// The middle row density — the `DsGridDensity.cosy` choice.
+  static const IconData densityCosy = LucideIcons.rows_3;
+
+  /// Tighten a table's rows — the `DsGridDensity.compact` choice.
+  static const IconData densityCompact = LucideIcons.rows_4;
+
   /// Start or run a job.
   static const IconData play = LucideIcons.play;
 
