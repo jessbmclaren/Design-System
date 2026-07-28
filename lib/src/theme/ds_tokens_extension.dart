@@ -178,6 +178,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.cardPadding,
     // Table
     required this.tableRowPaddingY,
+    required this.checkboxSize,
+    required this.tableRowHeightComfortable,
+    required this.tableRowHeightCosy,
+    required this.tableRowHeightCompact,
     // Overlays
     required this.overlayBorderRadius,
     required this.overlayBackdropColor,
@@ -374,6 +378,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: 1.5,
       cardPadding: 24,
       tableRowPaddingY: DsSpacing.tableRowPaddingY,
+      checkboxSize: 18,
+      tableRowHeightComfortable: DsSpacing.tableRowComfortable,
+      tableRowHeightCosy: DsSpacing.tableRowCosy,
+      tableRowHeightCompact: DsSpacing.tableRowCompact,
       overlayBorderRadius: DsRadii.overlay,
       overlayBackdropColor: DsColors.overlayBackdrop,
       overlays: DsOverlayStyle.dialog,
@@ -1033,6 +1041,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The vertical padding for table rows.
   final double tableRowPaddingY;
 
+  /// The side of a checkbox's box. Read by the `DsCheckbox` atom and by
+  /// every dense checkbox the data grid draws, so the two can never drift.
+  final double checkboxSize;
+
+  /// The row height for each `DsGridDensity`. A brand that reads denser
+  /// or airier than the base restyles its tables by overriding these,
+  /// rather than every table passing its own `rowHeight`.
+  final double tableRowHeightComfortable;
+  final double tableRowHeightCosy;
+  final double tableRowHeightCompact;
+
   // Overlays ------------------------------------------------------------
 
   /// The border radius used for overlays.
@@ -1290,6 +1309,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? markerBorderWidth,
     double? cardPadding,
     double? tableRowPaddingY,
+    double? checkboxSize,
+    double? tableRowHeightComfortable,
+    double? tableRowHeightCosy,
+    double? tableRowHeightCompact,
     double? overlayBorderRadius,
     Color? overlayBackdropColor,
     DsOverlayStyle? overlays,
@@ -1519,6 +1542,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: markerBorderWidth ?? this.markerBorderWidth,
       cardPadding: cardPadding ?? this.cardPadding,
       tableRowPaddingY: tableRowPaddingY ?? this.tableRowPaddingY,
+      checkboxSize: checkboxSize ?? this.checkboxSize,
+      tableRowHeightComfortable: tableRowHeightComfortable ?? this.tableRowHeightComfortable,
+      tableRowHeightCosy: tableRowHeightCosy ?? this.tableRowHeightCosy,
+      tableRowHeightCompact: tableRowHeightCompact ?? this.tableRowHeightCompact,
       overlayBorderRadius: overlayBorderRadius ?? this.overlayBorderRadius,
       overlayBackdropColor: overlayBackdropColor ?? this.overlayBackdropColor,
       overlays: overlays ?? this.overlays,
@@ -1775,6 +1802,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       markerBorderWidth: d(markerBorderWidth, other.markerBorderWidth),
       cardPadding: d(cardPadding, other.cardPadding),
       tableRowPaddingY: d(tableRowPaddingY, other.tableRowPaddingY),
+      checkboxSize: d(checkboxSize, other.checkboxSize),
+      tableRowHeightComfortable: d(tableRowHeightComfortable, other.tableRowHeightComfortable),
+      tableRowHeightCosy: d(tableRowHeightCosy, other.tableRowHeightCosy),
+      tableRowHeightCompact: d(tableRowHeightCompact, other.tableRowHeightCompact),
       overlayBorderRadius: d(overlayBorderRadius, other.overlayBorderRadius),
       overlayBackdropColor: c(overlayBackdropColor, other.overlayBackdropColor),
       overlays: t < 0.5 ? overlays : other.overlays,
@@ -1958,6 +1989,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           markerBorderWidth == other.markerBorderWidth &&
           cardPadding == other.cardPadding &&
           tableRowPaddingY == other.tableRowPaddingY &&
+          checkboxSize == other.checkboxSize &&
+          tableRowHeightComfortable == other.tableRowHeightComfortable &&
+          tableRowHeightCosy == other.tableRowHeightCosy &&
+          tableRowHeightCompact == other.tableRowHeightCompact &&
           overlayBorderRadius == other.overlayBorderRadius &&
           overlayBackdropColor == other.overlayBackdropColor &&
           overlays == other.overlays &&
@@ -2126,6 +2161,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
         markerBorderWidth,
         cardPadding,
         tableRowPaddingY,
+        checkboxSize,
+        tableRowHeightComfortable,
+        tableRowHeightCosy,
+        tableRowHeightCompact,
         overlayBorderRadius,
         overlayBackdropColor,
         overlays,

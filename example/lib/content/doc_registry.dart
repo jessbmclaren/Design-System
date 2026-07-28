@@ -19,6 +19,8 @@ import 'pages/icon.dart';
 import 'pages/img.dart';
 import 'pages/inline.dart';
 import 'pages/link.dart';
+import 'pages/check_list.dart';
+import 'pages/check_menu.dart';
 import 'pages/menu.dart';
 import 'pages/tooltip.dart';
 import 'pages/text_fields.dart';
@@ -44,6 +46,7 @@ import 'pages/bar_chart.dart';
 import 'pages/line_chart.dart';
 import 'pages/meter_chart.dart';
 import 'pages/data_grid.dart';
+import 'pages/data_table.dart';
 import 'pages/cell_types.dart';
 import 'pages/grouping.dart';
 import 'pages/filtering_sorting.dart';
@@ -62,6 +65,7 @@ import 'pages/nav_rail.dart';
 import 'pages/status_bar.dart';
 import 'pages/app_shell.dart';
 import 'pages/table_views.dart';
+import 'pages/table_workbench.dart';
 import 'pages/task_view.dart';
 import 'pages/dialog.dart';
 import 'pages/key_hint.dart';
@@ -146,6 +150,7 @@ final List<PatternPage> allPages = [
   selectDropdownPage,
   segmentedControlPage,
   selectionControlsPage,
+  checkListPage,
   radioGroupPage,
   currencyFieldPage,
   dateFieldPage,
@@ -183,6 +188,7 @@ final List<PatternPage> allPages = [
   waitingScreensPage,
   // Overlays
   menuPage,
+  checkMenuPage,
   menuSheetPage,
   dialogPage,
   tooltipPage,
@@ -194,6 +200,7 @@ final List<PatternPage> allPages = [
   cookiePreferencesPage,
   // Data
   dataGridPage,
+  dataTablePage,
   tableViewsPage,
   statTilePage,
   cellTypesPage,
@@ -207,6 +214,7 @@ final List<PatternPage> allPages = [
   importGuidePage,
   recordPanelPage,
   rosterViewPage,
+  tableWorkbenchPage,
   // Charts
   barChartPage,
   lineChartPage,

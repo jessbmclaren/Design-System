@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_elevation.dart';
 import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
@@ -17,6 +16,7 @@ import '../atoms/ds_badge.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_link.dart';
+import '../molecules/ds_check_list.dart';
 import '../molecules/ds_menu.dart';
 
 /// The kind of value a [DsGridColumn] holds, which selects how each cell is
@@ -75,6 +75,46 @@ enum DsCellType {
 
   /// A completion ratio in the range `0..1`.
   progress,
+}
+
+/// How tightly a [DsDataGrid] packs its rows.
+///
+/// Density is a systematic choice rather than three hand-picked numbers, so a
+/// density switcher (a `DsSegmentedControl` over these values) reads the same
+/// in every table:
+///
+/// * [comfortable] — for tables read at a glance or on touch.
+/// * [cosy] — the default, and what a table with badges and avatars needs to
+///   breathe.
+/// * [compact] — for scanning many rows of numbers on a pointer-first desktop.
+///
+/// The enum is the vocabulary; the heights themselves are tokens
+/// ([DsTokens.tableRowHeightComfortable] and its pair), so a brand that reads
+/// denser or airier than the base restyles every table at once through its
+/// skin. Resolve one with [rowHeightFrom]. Pass [DsDataGrid.rowHeight] only for
+/// a table whose cells genuinely need a size no density describes.
+///
+/// The default heights sit below the 48dp touch-target guidance that applies
+/// to standalone controls: a grid row is a scanning surface, not a button, and
+/// below [DsDataGrid.compactBreakpoint] the grid switches to a stacked-card
+/// layout whose controls are full size.
+enum DsGridDensity {
+  /// Loosely packed rows.
+  comfortable,
+
+  /// The default row packing.
+  cosy,
+
+  /// Tightly packed rows.
+  compact;
+
+  /// The row height this density stands for, read from [tokens] so a skin can
+  /// restyle it.
+  double rowHeightFrom(DsTokens tokens) => switch (this) {
+        DsGridDensity.comfortable => tokens.tableRowHeightComfortable,
+        DsGridDensity.cosy => tokens.tableRowHeightCosy,
+        DsGridDensity.compact => tokens.tableRowHeightCompact,
+      };
 }
 
 /// How a [DsGridColumn]'s content is aligned within its cell.
@@ -162,11 +202,17 @@ class DsGridOption {
   String get effectiveLabel => label ?? value;
 }
 
-/// Builds a custom read-only cell for a [DsGridColumn], from the raw [value]
-/// stored in the row's [DsGridRow.cells] map.
+/// Builds a custom cell for a [DsGridColumn], from the raw [value] stored in
+/// the row's [DsGridRow.cells] map and the [row] it came from.
+///
+/// The [row] is passed so a custom cell can be interactive and still report
+/// *which* record it acted on — a switch that toggles a campaign, say, needs
+/// [DsGridRow.id] to send back. Anything returned here is laid out inside the
+/// cell's padding and receives pointer events normally.
 typedef DsGridCellBuilder = Widget Function(
   BuildContext context,
   Object? value,
+  DsGridRow row,
 );
 
 /// The definition of a single column in a [DsDataGrid].
@@ -254,12 +300,17 @@ class DsGridColumn {
   /// for other cell types.
   final List<DsGridOption>? options;
 
-  /// An optional custom renderer for this column's read-only cells.
+  /// An optional custom renderer for this column's cells.
   ///
   /// When set it replaces the [type]-based cell renderer, receiving the raw
-  /// cell value for the row. Sorting, filtering and editing still operate on
-  /// the underlying value via [type], so a column can present richly (an
-  /// expiry date with a relative hint, say) while remaining sortable.
+  /// cell value and the row it belongs to. Sorting, filtering and grouping
+  /// still operate on the underlying value via [type], so a column can present
+  /// richly — an expiry date with a relative hint, a switch that toggles the
+  /// record — while remaining sortable.
+  ///
+  /// A custom cell may be interactive. It is exempt from inline [editable]
+  /// editing (the builder owns the whole cell, including how it changes), so
+  /// set one or the other, not both.
   final DsGridCellBuilder? cellBuilder;
 
   /// The tooltip shown on a [DsCellType.status] cell in this column, resolved
@@ -469,6 +520,14 @@ class DsGridView {
 /// from [DsTokens], so the grid re-brands automatically with the active
 /// white-label theme.
 ///
+/// ## This or `DsDataTable`?
+///
+/// Reach for [DsDataGrid] when the table *is* the task — scanning, comparing,
+/// sorting and editing many records. Reach for `DsDataTable` when a handful of
+/// already-formatted rows simply need displaying inside a larger page; its
+/// cells are plain strings and there is nothing to configure. They are not
+/// variants of one another, and neither is a lighter mode of the other.
+///
 /// ## Responsiveness
 ///
 /// The grid measures the available width with a [LayoutBuilder] (falling back
@@ -565,7 +624,8 @@ class DsDataGrid extends StatefulWidget {
     this.sort,
     this.onSort,
     this.resizableColumns = true,
-    this.rowHeight = 44,
+    this.density = DsGridDensity.cosy,
+    this.rowHeight,
     this.compactBreakpoint = 640,
     this.emptyState,
     this.caption,
@@ -611,9 +671,14 @@ class DsDataGrid extends StatefulWidget {
   /// columns can still opt out via [DsGridColumn.resizable].
   final bool resizableColumns;
 
-  /// The height of each data row, in logical pixels. Also used as the header
-  /// height so the frozen and scrolling panes stay aligned.
-  final double rowHeight;
+  /// How tightly rows are packed. Defaults to [DsGridDensity.cosy]. Ignored
+  /// when [rowHeight] is set.
+  final DsGridDensity density;
+
+  /// An explicit height for each data row, in logical pixels, overriding
+  /// [density]. Also used as the header height so the frozen and scrolling
+  /// panes stay aligned. Null (the default) takes the height from [density].
+  final double? rowHeight;
 
   /// The width, in logical pixels, below which the stacked-card layout is used
   /// instead of the table.
@@ -695,7 +760,6 @@ class _DsDataGridState extends State<DsDataGrid> {
   static const double _selectionColumnWidth = 48;
   static const double _seamWidth = 6;
   static const double _resizeHandleWidth = 6;
-  static const double _checkboxSize = 18;
   static const double _addColumnWidth = 44;
   static const double _actionsColumnWidth = 48;
 
@@ -974,7 +1038,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     ));
   }
 
-  double get _headerHeight => widget.rowHeight;
+  double get _headerHeight => _rowHeight;
 
   DsGridColumn? _columnForKey(String key) {
     for (final column in widget.columns) {
@@ -1087,8 +1151,29 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   /// Whether a cell in [column] can be edited given the grid's master switch,
   /// the column opt-in and the cell type.
+  /// The height of a data row and of the header, resolved from the explicit
+  /// [DsDataGrid.rowHeight] when one is given and from [DsDataGrid.density]
+  /// otherwise. Read through this everywhere, so the frozen and scrolling
+  /// panes never disagree about a row's height.
+  /// The side of a checkbox drawn in a cell or a selection column, taken
+  /// from the same token the `DsCheckbox` atom reads so the two match.
+  double get _checkboxSize => DsTokens.of(context).checkboxSize;
+
+  double get _rowHeight =>
+      widget.rowHeight ?? widget.density.rowHeightFrom(DsTokens.of(context));
+
+  /// Whether [column]'s cells offer inline editing.
+  ///
+  /// A column with a [DsGridColumn.cellBuilder] never does: the builder owns
+  /// the whole cell, so wrapping it in a tap-to-edit affordance would swallow
+  /// the pointer events its own controls need. This is the single gate for
+  /// every edit entry point — the tap wrapper, Enter on a focused cell and
+  /// paste — so a custom cell stays the builder's to drive.
   bool _isCellEditable(DsGridColumn column) =>
-      widget.editable && column.editable && _supportsEditing(column.type);
+      widget.editable &&
+      column.editable &&
+      column.cellBuilder == null &&
+      _supportsEditing(column.type);
 
   /// Whether the cell at [row]/[column] is currently showing an inline editor.
   bool _isEditingCell(DsGridRow row, DsGridColumn column) =>
@@ -1398,8 +1483,8 @@ class _DsDataGridState extends State<DsDataGrid> {
       if (line == -1) return;
     }
     final position = _verticalController.position;
-    final top = line * widget.rowHeight;
-    final bottom = top + widget.rowHeight;
+    final top = line * _rowHeight;
+    final bottom = top + _rowHeight;
     if (top < position.pixels) {
       _verticalController.jumpTo(
         top.toDouble().clamp(0, position.maxScrollExtent),
@@ -2236,13 +2321,13 @@ class _DsDataGridState extends State<DsDataGrid> {
         grouped ? _visibleSegments(rows) : const <_GridSegment>[];
     final lineCount = grouped ? segments.length : rows.length;
 
-    final contentHeight = lineCount * widget.rowHeight;
+    final contentHeight = lineCount * _rowHeight;
     final headerHeight = _headerHeight;
     // The calculations footer renders whenever a view carries calculations,
     // and always on a managed view so its add affordances are reachable.
     final hasFooter = widget.view != null &&
         (widget.view!.calculations.isNotEmpty || _viewManaged);
-    final footerHeight = hasFooter ? widget.rowHeight + 1 : 0.0;
+    final footerHeight = hasFooter ? _rowHeight + 1 : 0.0;
     final availableBody = height != null
         ? math.max(0.0, height - headerHeight - footerHeight - 1)
         : contentHeight;
@@ -2608,7 +2693,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     final expanded = _isExpanded(node.path);
     final indent = DsSpacing.sm + node.depth * DsSpacing.lg;
     final band = Container(
-      height: widget.rowHeight,
+      height: _rowHeight,
       decoration: BoxDecoration(
         color: tokens.offsetBackgroundColor,
         border: Border(bottom: BorderSide(color: tokens.colorBorder)),
@@ -2663,7 +2748,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       inner = aggRow;
     }
     final band = Container(
-      height: widget.rowHeight,
+      height: _rowHeight,
       decoration: BoxDecoration(
         color: tokens.offsetBackgroundColor,
         border: Border(bottom: BorderSide(color: tokens.colorBorder)),
@@ -2749,7 +2834,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         : _aggregationLabel(column, aggregation, node.rows);
     return SizedBox(
       width: _columnWidth(column),
-      height: widget.rowHeight,
+      height: _rowHeight,
       child: text == null
           ? null
           : Padding(
@@ -3309,11 +3394,11 @@ class _DsDataGridState extends State<DsDataGrid> {
   Widget _rowActionsCell(DsTokens tokens, DsGridRow row) {
     final actions = widget.rowActions?.call(row) ?? const <DsRowAction>[];
     if (actions.isEmpty) {
-      return SizedBox(width: _actionsColumnWidth, height: widget.rowHeight);
+      return SizedBox(width: _actionsColumnWidth, height: _rowHeight);
     }
     return SizedBox(
       width: _actionsColumnWidth,
-      height: widget.rowHeight,
+      height: _rowHeight,
       child: Center(
         child: DsMenu(
           items: <DsMenuItem>[
@@ -3357,7 +3442,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       child: Material(
         type: MaterialType.transparency,
         child: SizedBox(
-          height: widget.rowHeight,
+          height: _rowHeight,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -3421,6 +3506,10 @@ class _DsDataGridState extends State<DsDataGrid> {
       final value = _aggregationLabel(column, aggregation, rows) ?? '—';
       final name = _aggregationName(aggregation);
       semanticsLabel = '$name of $title: $value';
+      // Both parts flex, so a wide total ("SUM $1,284,900.00") ellipsizes
+      // inside a narrow column instead of overflowing it. The value keeps the
+      // larger share: the number is the point, the aggregation's name is the
+      // hint, so "SUM" gives way before the figure does.
       content = Row(
         mainAxisAlignment: _mainAxisOf(column.effectiveAlign),
         children: [
@@ -3434,11 +3523,14 @@ class _DsDataGridState extends State<DsDataGrid> {
             ),
           ),
           const SizedBox(width: DsSpacing.xs),
-          Text(
-            value,
-            style: tokens.labelSm.toTextStyle(color: tokens.colorText),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Flexible(
+            flex: 3,
+            child: Text(
+              value,
+              style: tokens.labelSm.toTextStyle(color: tokens.colorText),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       );
@@ -3454,7 +3546,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         ),
       );
     } else {
-      return SizedBox(width: _columnWidth(column), height: widget.rowHeight);
+      return SizedBox(width: _columnWidth(column), height: _rowHeight);
     }
 
     final cell = Padding(
@@ -3464,7 +3556,7 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     return SizedBox(
       width: _columnWidth(column),
-      height: widget.rowHeight,
+      height: _rowHeight,
       child: managed
           ? Semantics(
               button: true,
@@ -3513,7 +3605,7 @@ class _DsDataGridState extends State<DsDataGrid> {
   Widget _rowSegment(DsTokens tokens, DsGridRow row, Widget child) {
     final selected = _isSelected(row.id);
     final content = Container(
-      height: widget.rowHeight,
+      height: _rowHeight,
       decoration: BoxDecoration(
         color: selected ? tokens.offsetBackgroundColor : null,
         border: Border(bottom: BorderSide(color: tokens.colorBorder)),
@@ -3540,7 +3632,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         excludeSemantics: true,
         child: SizedBox(
           width: _selectionColumnWidth,
-          height: widget.rowHeight,
+          height: _rowHeight,
           child: Center(
             child: _GridCheck(value: selected, size: _checkboxSize),
           ),
@@ -3557,7 +3649,7 @@ class _DsDataGridState extends State<DsDataGrid> {
     if (_isEditingCell(row, column)) {
       return SizedBox(
         width: width,
-        height: widget.rowHeight,
+        height: _rowHeight,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: _cellPaddingX,
@@ -3577,7 +3669,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         : _cellContent(
             tokens,
             column,
-            row.cells[column.key],
+            row,
             dense: true,
             align: align,
             tooltip: column.statusTooltip?.call(row),
@@ -3588,7 +3680,7 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     Widget cell = SizedBox(
       width: width,
-      height: widget.rowHeight,
+      height: _rowHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: inRange ? tokens.brandTintColor : null,
@@ -3639,7 +3731,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       child: _cellContent(
         tokens,
         column,
-        row.cells[column.key],
+        row,
         dense: false,
         align: DsColumnAlign.end,
         tooltip: column.statusTooltip?.call(row),
@@ -3832,11 +3924,12 @@ class _DsDataGridState extends State<DsDataGrid> {
   Widget _cellContent(
     DsTokens tokens,
     DsGridColumn column,
-    Object? value, {
+    DsGridRow row, {
     required bool dense,
     required DsColumnAlign align,
     String? tooltip,
   }) {
+    final Object? value = row.cells[column.key];
     final emDash = Text(
       '—',
       style: (dense ? tokens.bodySm : tokens.bodyMd)
@@ -3855,7 +3948,10 @@ class _DsDataGridState extends State<DsDataGrid> {
 
     final cellBuilder = column.cellBuilder;
     if (cellBuilder != null) {
-      final built = cellBuilder(context, value);
+      final built = cellBuilder(context, value, row);
+      // The dense (table) layout clips overflow rather than letting a tall or
+      // wide custom cell break row alignment. The scroll view is inert, so it
+      // does not steal drags from a control inside the cell.
       return dense ? _guarded(built) : built;
     }
 
@@ -4331,7 +4427,15 @@ Widget _colorBadge(DsTokens tokens, String label, Color color) {
 /// The themed floating surface shared by the select and multi-select menus,
 /// mirroring [DsMenu]'s panel: a form-background fill, a 1px border, the overlay
 /// corner radius and a medium drop shadow.
-Widget _overlaySurface(DsTokens tokens, Widget child) {
+/// The themed panel every anchored overlay in the grid sits on.
+///
+/// Pass [scrollable] `false` when [child] already scrolls and pads itself (a
+/// `DsCheckList` does), so the two do not nest one scroll view inside another.
+Widget _overlaySurface(
+  DsTokens tokens,
+  Widget child, {
+  bool scrollable = true,
+}) {
   final radius = BorderRadius.circular(tokens.overlayBorderRadius);
   return Material(
     type: MaterialType.transparency,
@@ -4340,16 +4444,18 @@ Widget _overlaySurface(DsTokens tokens, Widget child) {
         color: tokens.formBackgroundColor,
         borderRadius: radius,
         border: Border.all(color: tokens.colorBorder),
-        boxShadow: DsElevation.medium,
+        boxShadow: tokens.shadowMedium,
       ),
       child: ClipRRect(
         borderRadius: radius,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
-            child: child,
-          ),
-        ),
+        child: scrollable
+            ? SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: DsSpacing.xs),
+                  child: child,
+                ),
+              )
+            : child,
       ),
     ),
   );
@@ -4633,12 +4739,6 @@ class _MultiSelectOverlayPanel extends StatefulWidget {
 class _MultiSelectOverlayPanelState extends State<_MultiSelectOverlayPanel> {
   late final Set<String> _selected = <String>{...widget.initialSelected};
 
-  void _toggle(String value) {
-    setState(() {
-      if (!_selected.add(value)) _selected.remove(value);
-    });
-  }
-
   List<String> _ordered() {
     final known = {for (final option in widget.options) option.value};
     return [
@@ -4654,70 +4754,24 @@ class _MultiSelectOverlayPanelState extends State<_MultiSelectOverlayPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = widget.tokens;
     return _overlaySurface(
-      tokens,
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < widget.options.length; i++)
-            _row(tokens, widget.options[i], autofocus: i == 0),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: tokens.colorBorder)),
-            ),
-            child: InkWell(
-              onTap: () => widget.onCommit(_ordered()),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 44),
-                child: Center(
-                  child: Text(
-                    'Done',
-                    style: tokens.labelMd.toTextStyle(
-                      color: tokens.actionPrimaryColorText,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+      widget.tokens,
+      DsCheckList(
+        options: <DsCheckOption>[
+          for (final DsGridOption option in widget.options)
+            DsCheckOption(value: option.value, label: option.effectiveLabel),
         ],
+        selected: _selected,
+        onChanged: (Set<String> next) => setState(() {
+          _selected
+            ..clear()
+            ..addAll(next);
+        }),
+        actionLabel: 'Done',
+        onAction: () => widget.onCommit(_ordered()),
       ),
-    );
-  }
-
-  Widget _row(DsTokens tokens, DsGridOption option, {required bool autofocus}) {
-    final selected = _selected.contains(option.value);
-    return InkWell(
-      onTap: () => _toggle(option.value),
-      autofocus: autofocus,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 40),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DsSpacing.md,
-            vertical: DsSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              _GridCheck(
-                value: selected,
-                size: _DsDataGridState._checkboxSize,
-              ),
-              const SizedBox(width: DsSpacing.sm),
-              Expanded(
-                child: Text(
-                  option.effectiveLabel,
-                  style: tokens.bodyMd.toTextStyle(color: tokens.colorText),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // The list scrolls and pads itself.
+      scrollable: false,
     );
   }
 }
