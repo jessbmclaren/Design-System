@@ -61,6 +61,23 @@ class DsDataRow {
 /// `selected` state. This widget renders statically. It runs no timers or
 /// animations, so it is safe to capture in screenshots.
 ///
+/// ## This or `DsDataGrid`?
+///
+/// The two are not variants of one another; they answer different questions.
+///
+/// [DsDataTable] **displays** a handful of rows that are already formatted.
+/// Cells are plain strings, there is nothing to configure, and it is the right
+/// answer for a summary block inside a larger page — a few line items under a
+/// filter bar, an invoice breakdown, a comparison.
+///
+/// `DsDataGrid` is for **working through** records: typed cells that sort and
+/// align by convention, frozen columns, selection, grouping, inline editing,
+/// keyboard navigation and a calculations footer. Reach for it the moment the
+/// table is the task rather than an illustration of it.
+///
+/// Moving between them is a rewrite of the data, not of the layout: strings
+/// become a `Map` keyed by column, and each column declares a `DsCellType`.
+///
 /// Every [DsDataRow.cells] list is assumed to have the same length as
 /// [columns].
 class DsDataTable extends StatelessWidget {

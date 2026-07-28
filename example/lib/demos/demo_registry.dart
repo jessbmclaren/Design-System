@@ -13,6 +13,8 @@ import 'img_demo.dart';
 import 'inline_demo.dart';
 import 'link_demo.dart';
 import 'menu_demo.dart';
+import 'check_list_demo.dart';
+import 'check_menu_demo.dart';
 import 'tooltip_demo.dart';
 import 'text_fields_demo.dart';
 import 'password_field_demo.dart';
@@ -32,6 +34,7 @@ import 'bar_chart_demo.dart';
 import 'line_chart_demo.dart';
 import 'meter_chart_demo.dart';
 import 'data_grid_demo.dart';
+import 'data_table_demo.dart';
 import 'cell_types_demo.dart';
 import 'grouping_demo.dart';
 import 'filtering_sorting_demo.dart';
@@ -44,6 +47,7 @@ import 'import_guide_demo.dart';
 import 'pagination_demo.dart';
 import 'record_panel_demo.dart';
 import 'roster_view_demo.dart';
+import 'table_workbench_demo.dart';
 import 'status_legend_demo.dart';
 import 'full_page_layouts_demo.dart';
 import 'lists_demo.dart';
@@ -91,6 +95,8 @@ final Map<String, Widget Function()> _demos = {
   'inline': () => const InlineDemo(),
   'link': () => const LinkDemo(),
   'menu': () => const MenuDemo(),
+  'check-menu': () => const CheckMenuDemo(),
+  'check-list': () => const CheckListDemo(),
   'tooltip': () => const TooltipDemo(),
   'text-fields': () => const TextFieldsDemo(),
   'password-field': () => const PasswordFieldDemo(),
@@ -110,6 +116,7 @@ final Map<String, Widget Function()> _demos = {
   'line-chart': () => const LineChartDemo(),
   'meter-chart': () => const MeterChartDemo(),
   'data-grid': () => const DataGridDemo(),
+  'data-table': () => const DataTableDemo(),
   'cell-types': () => const CellTypesDemo(),
   'grouping': () => const GroupingDemo(),
   'filtering-sorting': () => const FilteringSortingDemo(),
@@ -123,6 +130,7 @@ final Map<String, Widget Function()> _demos = {
   'pagination': () => const PaginationDemo(),
   'import-guide': () => const ImportGuideDemo(),
   'roster-view': () => const RosterViewDemo(),
+  'table-workbench': () => const TableWorkbenchDemo(),
   'full-page-layouts': () => const FullPageLayoutsDemo(),
   'lists': () => const ListsDemo(),
   'filter-controls': () => const FilterControlsDemo(),

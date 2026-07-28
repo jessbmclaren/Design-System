@@ -520,6 +520,14 @@ class DsGridView {
 /// from [DsTokens], so the grid re-brands automatically with the active
 /// white-label theme.
 ///
+/// ## This or `DsDataTable`?
+///
+/// Reach for [DsDataGrid] when the table *is* the task — scanning, comparing,
+/// sorting and editing many records. Reach for `DsDataTable` when a handful of
+/// already-formatted rows simply need displaying inside a larger page; its
+/// cells are plain strings and there is nothing to configure. They are not
+/// variants of one another, and neither is a lighter mode of the other.
+///
 /// ## Responsiveness
 ///
 /// The grid measures the available width with a [LayoutBuilder] (falling back
