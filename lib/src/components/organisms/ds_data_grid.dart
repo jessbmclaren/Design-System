@@ -3495,6 +3495,10 @@ class _DsDataGridState extends State<DsDataGrid> {
       final value = _aggregationLabel(column, aggregation, rows) ?? '—';
       final name = _aggregationName(aggregation);
       semanticsLabel = '$name of $title: $value';
+      // Both parts flex, so a wide total ("SUM $1,284,900.00") ellipsizes
+      // inside a narrow column instead of overflowing it. The value keeps the
+      // larger share: the number is the point, the aggregation's name is the
+      // hint, so "SUM" gives way before the figure does.
       content = Row(
         mainAxisAlignment: _mainAxisOf(column.effectiveAlign),
         children: [
@@ -3508,11 +3512,14 @@ class _DsDataGridState extends State<DsDataGrid> {
             ),
           ),
           const SizedBox(width: DsSpacing.xs),
-          Text(
-            value,
-            style: tokens.labelSm.toTextStyle(color: tokens.colorText),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Flexible(
+            flex: 3,
+            child: Text(
+              value,
+              style: tokens.labelSm.toTextStyle(color: tokens.colorText),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       );
