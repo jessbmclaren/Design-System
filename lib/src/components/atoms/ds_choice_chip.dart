@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 import 'ds_icon.dart';
@@ -111,7 +110,7 @@ class _DsChoiceChipState extends State<DsChoiceChip> {
           if (selected) ...<Widget>[
             DsIcon(
               icon: DsIcons.check,
-              size: DsIconSize.xs,
+              size: tokens.iconSizeXs,
               color: enabled ? ink : ink.withValues(alpha: disabled),
             ),
             SizedBox(width: unit / 2),
@@ -142,7 +141,7 @@ class _DsChoiceChipState extends State<DsChoiceChip> {
                   padding: EdgeInsets.all(unit / 4),
                   child: DsIcon(
                     icon: DsIcons.close,
-                    size: DsIconSize.xs,
+                    size: tokens.iconSizeXs,
                     color: enabled
                         ? tokens.colorSecondaryText
                         : tokens.colorSecondaryText.withValues(alpha: disabled),
@@ -156,9 +155,19 @@ class _DsChoiceChipState extends State<DsChoiceChip> {
     );
 
     Widget chip = ConstrainedBox(
-      // The pill stays visually compact while its target meets the minimum.
+      // The pill stays visually compact while its target meets the minimum:
+      // the box grows to the tap target and the pill centres inside it.
       constraints: BoxConstraints(minHeight: tokens.minTapTarget),
-      child: Align(alignment: Alignment.center, child: body),
+      child: Align(
+        alignment: Alignment.center,
+        // Hug the label horizontally. Without a width factor an Align expands
+        // to the widest its constraints allow, which makes every chip as wide
+        // as its container: a row of chips becomes one chip per line with the
+        // label floating in the middle. The height is left to expand, which is
+        // what lifts the pill to the tap-target minimum.
+        widthFactor: 1,
+        child: body,
+      ),
     );
 
     if (enabled) {
