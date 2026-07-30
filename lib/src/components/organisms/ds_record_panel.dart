@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_avatar.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_button.dart';
@@ -457,7 +456,7 @@ class DsRecordPanel extends StatelessWidget {
                     padding: EdgeInsets.all(tokens.spacingUnit / 2),
                     child: DsIcon(
                       icon: star <= filled ? DsIcons.star : DsIcons.starOutline,
-                      size: DsIconSize.lg,
+                      size: tokens.iconSizeLg,
                       color: star <= filled
                           ? tokens.colorPrimary
                           : tokens.colorBorder,
@@ -501,7 +500,7 @@ class DsRecordPanel extends StatelessWidget {
           children: [
             DsIcon(
               icon: on ? DsIcons.checkboxChecked : DsIcons.checkboxBlank,
-              size: DsIconSize.md,
+              size: tokens.iconSizeMd,
               color: on ? tokens.colorPrimary : tokens.colorSecondaryText,
             ),
             SizedBox(width: tokens.spacingUnit),
@@ -552,7 +551,7 @@ class DsRecordPanel extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 1),
                 child: DsIcon(
                   icon: i < filled ? DsIcons.star : DsIcons.starOutline,
-                  size: DsIconSize.sm,
+                  size: tokens.iconSizeSm,
                   color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
                 ),
               ),
@@ -644,7 +643,7 @@ class _Header extends StatelessWidget {
               icon: DsIcons.close,
               onPressed: onClose,
               semanticLabel: 'Close',
-              iconSize: DsIconSize.lg,
+              iconSize: tokens.iconSizeLg,
               color: tokens.colorSecondaryText,
             ),
           ],

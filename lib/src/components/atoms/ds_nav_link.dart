@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import 'ds_icon.dart';
 
@@ -108,7 +107,7 @@ class _DsNavLinkState extends State<DsNavLink> {
                     SizedBox(width: unit / 2),
                     DsIcon(
                       icon: DsIcons.expandMore,
-                      size: DsIconSize.sm,
+                      size: tokens.iconSizeSm,
                       color: enabled
                           ? tokens.colorSecondaryText
                           : tokens.colorTextDisabled,

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 
 /// Lays out a set of related actions in a single row and collapses the ones
@@ -182,7 +181,7 @@ class _DsOverflowMenu extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     DsIcons.moreHorizontal,
-                    size: DsIconSize.lg,
+                    size: tokens.iconSizeLg,
                     color: tokens.colorText,
                   ),
                 ),
@@ -212,7 +211,7 @@ class _DsOverflowMenu extends StatelessWidget {
           ? null
           : Icon(
               icon,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: enabled
                   ? tokens.colorText
                   : tokens.colorSecondaryText,

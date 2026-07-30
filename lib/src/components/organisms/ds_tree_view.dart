@@ -5,7 +5,6 @@ import '../../tokens/ds_icons.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_icon.dart';
 
@@ -457,7 +456,7 @@ class _DsTreeViewState extends State<DsTreeView> {
                 if (node.icon != null) ...[
                   DsIcon(
                     icon: node.icon!,
-                    size: DsIconSize.sm,
+                    size: tokens.iconSizeSm,
                     color: tokens.colorSecondaryText,
                   ),
                   SizedBox(width: tokens.spacingUnit),
@@ -572,7 +571,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
                     icon: widget.expanded
                         ? DsIcons.expandMore
                         : DsIcons.chevronRight,
-                    size: DsIconSize.sm,
+                    size: tokens.iconSizeSm,
                     color: tokens.colorSecondaryText,
                   ),
                 ),
@@ -610,7 +609,7 @@ class _DsTreeRowState extends State<_DsTreeRow> {
         if (node.icon != null) ...[
           DsIcon(
             icon: node.icon!,
-            size: DsIconSize.sm,
+            size: tokens.iconSizeSm,
             color: widget.selected
                 ? tokens.colorText
                 : tokens.colorSecondaryText,

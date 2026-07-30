@@ -108,13 +108,12 @@ class DsLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final brightness = Theme.of(context).brightness;
 
     // Resolve a concrete colour for every series once, so the painter and the
     // legend agree exactly.
     final colors = <Color>[
       for (var i = 0; i < series.length; i++)
-        series[i].color ?? DsChartPalette.colorAt(i, brightness),
+        series[i].color ?? tokens.chartColorAt(i),
     ];
 
     final hasData = _allValues.isNotEmpty;

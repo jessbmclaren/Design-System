@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 
 /// Displays an image with theme-aware loading and error states.
 ///
@@ -161,7 +160,7 @@ class DsImg extends StatelessWidget {
       child: Center(
         child: Icon(
           DsIcons.brokenImage,
-          size: DsIconSize.xl,
+          size: tokens.iconSizeXl,
           color: tokens.colorSecondaryText,
         ),
       ),
@@ -185,6 +184,7 @@ class _Box extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     return SizedBox(
       width: width,
       height: height,
@@ -195,7 +195,7 @@ class _Box extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minWidth: width ?? 0,
-            minHeight: height ?? DsIconSize.xl * 2,
+            minHeight: height ?? tokens.iconSizeXl * 2,
           ),
           child: child,
         ),

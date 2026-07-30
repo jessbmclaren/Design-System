@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 
 /// An onboarding coachmark: a small spotlight callout that points a first-time
@@ -352,6 +351,7 @@ class _CloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = DsTokens.of(context);
     return Semantics(
       button: true,
       label: 'Dismiss',
@@ -365,7 +365,7 @@ class _CloseButton extends StatelessWidget {
             child: Center(
               child: Icon(
                 DsIcons.close,
-                size: DsIconSize.md,
+                size: tokens.iconSizeMd,
                 color: color,
               ),
             ),

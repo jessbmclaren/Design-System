@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 
 /// How an unmet [DsCheckDot] reads.
@@ -42,7 +41,7 @@ class DsCheckDot extends StatelessWidget {
     super.key,
     required this.met,
     this.unmetTone = DsCheckDotTone.neutral,
-    this.size = DsIconSize.md,
+    this.size,
   });
 
   /// Whether the item this dot marks is satisfied.
@@ -51,17 +50,20 @@ class DsCheckDot extends StatelessWidget {
   /// How the dot reads while [met] is false. Ignored once it is true.
   final DsCheckDotTone unmetTone;
 
-  /// The dot's diameter. Defaults to [DsIconSize.md].
-  final double size;
-
-  /// The check glyph's size relative to the dot, kept as the ratio the icon
-  /// scale already sets between [DsIconSize.xxs] and [DsIconSize.md]. A resized
-  /// dot keeps its proportions rather than needing a second measurement.
-  static const double _glyphRatio = DsIconSize.xxs / DsIconSize.md;
+  /// The dot's diameter. When null, resolves to [DsTokens.iconSizeMd].
+  final double? size;
 
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
+    final double diameter = size ?? tokens.iconSizeMd;
+
+    // The check glyph is sized by the ratio the icon scale itself sets between
+    // its smallest and its row step, so a resized dot keeps its proportions
+    // rather than needing a second measurement, and a skin that re-scales the
+    // glyph steps carries the dot's interior with it.
+    final double glyphRatio = tokens.iconSizeXxs / tokens.iconSizeMd;
+
     final Color unmetColor = switch (unmetTone) {
       DsCheckDotTone.neutral => tokens.colorBorder,
       DsCheckDotTone.danger => tokens.colorDanger,
@@ -69,8 +71,8 @@ class DsCheckDot extends StatelessWidget {
 
     return ExcludeSemantics(
       child: SizedBox(
-        width: size,
-        height: size,
+        width: diameter,
+        height: diameter,
         child: DecoratedBox(
           decoration: met
               ? BoxDecoration(
@@ -86,7 +88,7 @@ class DsCheckDot extends StatelessWidget {
               ? Center(
                   child: Icon(
                     DsIcons.check,
-                    size: size * _glyphRatio,
+                    size: diameter * glyphRatio,
                     color: tokens.badgeSuccessColorText,
                   ),
                 )

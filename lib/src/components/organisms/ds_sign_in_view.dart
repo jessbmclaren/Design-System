@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_divider.dart';
@@ -370,7 +369,7 @@ class _RevealControl extends StatelessWidget {
                   SizedBox(width: tokens.spacingUnit / 2),
                   DsIcon(
                     icon: expanded ? DsIcons.expandLess : DsIcons.expandMore,
-                    size: DsIconSize.lg,
+                    size: tokens.iconSizeLg,
                     color: tokens.actionSecondaryColorText,
                   ),
                 ],

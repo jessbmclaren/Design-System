@@ -31,6 +31,7 @@ final PatternPage motionPage = PatternPage(
     VariablesBlock(rows: [
       VariableRow(name: 'DsMotion.instant', type: 'Duration', example: '0ms', description: 'No motion: an immediate change. What every other duration collapses to under reduced motion.'),
       VariableRow(name: 'DsMotion.fast', type: 'Duration', example: '120ms', description: 'Micro-interactions: hover, press, a toggle flipping.'),
+      VariableRow(name: 'DsMotion.control', type: 'Duration', example: '150ms', description: 'The control tier: a tickbox filling, a radio dot landing, a switch thumb travelling, a segment sliding. Longer than fast because it carries a state change, shorter than base because the control is small and close to the pointer.'),
       VariableRow(name: 'DsMotion.base', type: 'Duration', example: '200ms', description: 'The standard transition for most state changes.'),
       VariableRow(name: 'DsMotion.slow', type: 'Duration', example: '320ms', description: 'Larger surfaces (sheets, dialogs, an accordion) where time reads as weight.'),
       VariableRow(name: 'DsMotion.expressive', type: 'Duration', example: '500ms', description: 'Choreographed, hero moments. Use sparingly; it is a spotlight.'),
@@ -38,9 +39,21 @@ final PatternPage motionPage = PatternPage(
       VariableRow(name: 'DsMotion.scene', type: 'Duration', example: '1400ms', description: 'The scene scale\'s standard beat.'),
       VariableRow(name: 'DsMotion.sceneLong', type: 'Duration', example: '1900ms', description: 'The scene scale\'s long beat, for a closing or emphasised frame.'),
     ]),
+    SubheadingBlock('Delays and dwells'),
+    ProseBlock(
+      'Not transition lengths: these are how long the system waits before it '
+      'speaks, and how long it stays. They shape how an interface feels as '
+      'much as any easing does, so they sit on the scale rather than buried '
+      'in whichever component happened to need them first.',
+    ),
+    VariablesBlock(rows: [
+      VariableRow(name: 'DsMotion.hoverDelay', type: 'Duration', example: '500ms', description: 'How long a pointer must rest before a hover-triggered surface appears, so a tooltip does not fire at everything the pointer crosses on its way somewhere else.'),
+      VariableRow(name: 'DsMotion.dwell', type: 'Duration', example: '3s', description: 'How long a self-dismissing surface stays before it leaves: a toast, a transient confirmation. Long enough to read a short line twice.'),
+    ]),
     SubheadingBlock('Curves'),
     VariablesBlock(rows: [
       VariableRow(name: 'DsMotion.standard', type: 'Curve', example: 'easeOutCubic', description: 'The everyday gentle decelerate into place.'),
+      VariableRow(name: 'DsMotion.smooth', type: 'Curve', example: 'easeInOut', description: 'The symmetric curve, for motion that happens in place and reverses: a section expanding and collapsing, a chevron rotating, a switch thumb travelling back. The rest of the vocabulary is arrival-shaped, which reads wrong when the same motion runs backwards a moment later.'),
       VariableRow(name: 'DsMotion.emphasized', type: 'Curve', example: 'cubic(0.2, 0, 0, 1)', description: 'A strong decelerate for entrances: fast off the mark, softly landing.'),
       VariableRow(name: 'DsMotion.decelerate', type: 'Curve', example: 'cubic(0.05, 0.7, 0.1, 1)', description: 'Pure decelerate for elements arriving from off-screen.'),
       VariableRow(name: 'DsMotion.accelerate', type: 'Curve', example: 'cubic(0.3, 0, 0.8, 0.15)', description: 'Accelerate for elements leaving the screen entirely.'),
@@ -65,7 +78,9 @@ final PatternPage motionPage = PatternPage(
     VariablesBlock(rows: [
       VariableRow(name: 'DsMotion.durationOf(context, full)', type: 'Duration', example: 'base → 0ms', description: 'Returns full when motion is allowed and Duration.zero under reduce-motion.'),
       VariableRow(name: 'DsMotion.curveOf(context, full)', type: 'Curve', example: 'settle → linear', description: 'Returns full when motion is allowed and Curves.linear under reduce-motion; there is no easing to perceive across a zero-length animation.'),
-      VariableRow(name: 'DsMotion.stagger(context, index)', type: 'Duration', example: '60ms × index', description: 'The delay before the item at index begins in a choreographed group, stepped 60ms apart and capped at 300ms. Zero under reduce-motion so the group arrives together.'),
+      VariableRow(name: 'DsMotion.stagger(context, index)', type: 'Duration', example: '60ms × index', description: 'The delay before the item at index begins in a choreographed group, stepped by staggerStep and capped at staggerMax. Zero under reduce-motion so the group arrives together.'),
+      VariableRow(name: 'DsMotion.staggerStep', type: 'Duration', example: '60ms', description: 'The gap between successive items in a staggered group: the beat a sequence is counted in. Named so a bespoke choreography can march in step with stagger rather than guessing at its rhythm.'),
+      VariableRow(name: 'DsMotion.staggerMax', type: 'Duration', example: '300ms', description: 'The ceiling on a staggered group\'s total offset, so a long list still finishes arriving promptly instead of crawling item by item.'),
       VariableRow(name: 'DsMotion.reduced(context)', type: 'bool', example: 'false', description: 'Whether the platform asks for reduced motion. Gate any bespoke animation behind it.'),
     ]),
     ProseBlock(

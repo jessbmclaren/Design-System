@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
-import '../../tokens/ds_icon_size.dart';
 
 /// The tone of a [DsInlineNotice], which picks its icon and colour from the
 /// tokens.
@@ -144,7 +143,7 @@ class _DsInlineNoticeState extends State<DsInlineNotice> {
             ),
             child: Icon(
               widget.icon ?? toneIcon,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: toneColor,
             ),
           ),

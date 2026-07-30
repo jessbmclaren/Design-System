@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../tokens/ds_icon_size.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
 import 'ds_text_field.dart';
@@ -208,7 +207,7 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
         onPressed: widget.enabled ? _toggle : null,
         icon: Icon(
           _obscured ? DsIcons.visibility : DsIcons.visibilityOff,
-          size: DsIconSize.sm,
+          size: tokens.iconSizeSm,
         ),
         tooltip: _obscured ? 'Show password' : 'Hide password',
       ),
@@ -231,7 +230,7 @@ class _DsPasswordFieldState extends State<DsPasswordField> {
                 children: <Widget>[
                   Icon(
                     DsIcons.warning,
-                    size: DsIconSize.xs,
+                    size: tokens.iconSizeXs,
                     color: tokens.colorSecondaryText,
                   ),
                   SizedBox(width: tokens.spacingUnit / 2),

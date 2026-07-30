@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 import 'ds_password_requirements.dart';
@@ -470,7 +469,7 @@ class DsPasswordStrengthHint extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Icon(DsIcons.error, size: DsIconSize.sm, color: tokens.colorDanger),
+            Icon(DsIcons.error, size: tokens.iconSizeSm, color: tokens.colorDanger),
             SizedBox(width: tokens.spacingUnit / 2),
             Expanded(
               child: Text(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 
 /// A flat, circular icon button.
 ///
@@ -38,7 +37,7 @@ class DsIconButton extends StatelessWidget {
     required this.onPressed,
     required this.semanticLabel,
     this.size = 40,
-    this.iconSize = DsIconSize.md,
+    this.iconSize,
     this.color,
   });
 
@@ -57,8 +56,9 @@ class DsIconButton extends StatelessWidget {
   /// The control diameter, in logical pixels.
   final double size;
 
-  /// The glyph size, in logical pixels.
-  final double iconSize;
+  /// The glyph size, in logical pixels. When null, resolves to
+  /// [DsTokens.iconSizeMd].
+  final double? iconSize;
 
   /// Overrides the glyph and interaction-tint colour. Defaults to
   /// [DsTokens.colorText]; set it when the button sits on a tinted surface
@@ -91,7 +91,7 @@ class DsIconButton extends StatelessWidget {
       if (states.contains(WidgetState.focused)) {
         return CircleBorder(
           side: BorderSide(
-            color: tokens.formAccentColor,
+            color: tokens.focusRingColor,
             width: tokens.focusRingWidth,
           ),
         );
@@ -101,7 +101,7 @@ class DsIconButton extends StatelessWidget {
 
     return IconButton(
       onPressed: onPressed,
-      icon: Icon(icon, size: iconSize),
+      icon: Icon(icon, size: iconSize ?? tokens.iconSizeMd),
       tooltip: semanticLabel,
       padding: EdgeInsets.zero,
       constraints: BoxConstraints.tightFor(width: size, height: size),

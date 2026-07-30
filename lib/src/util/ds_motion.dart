@@ -9,8 +9,9 @@ import 'package:flutter/widgets.dart';
 /// law: it collapses to a still frame when the user has asked for reduced
 /// motion.
 ///
-/// Use the **duration scale** ([fast]/[base]/[slow]/[expressive]) and the
-/// **curves** ([standard]/[emphasized]/[decelerate]/[accelerate]/[settle])
+/// Use the **duration scale** ([fast]/[control]/[base]/[slow]/[expressive])
+/// and the **curves**
+/// ([standard]/[smooth]/[emphasized]/[decelerate]/[accelerate]/[settle])
 /// rather than hand-picking millisecond values, and resolve them through
 /// [durationOf] / [curveOf] so a single call site both animates normally and
 /// settles instantly under the reduce-motion setting.
@@ -31,6 +32,12 @@ abstract final class DsMotion {
   /// Micro-interactions: hover, press, a toggle flipping. Quick enough to feel
   /// instantaneous but still eased.
   static const Duration fast = Duration(milliseconds: 120);
+
+  /// The control tier: a tickbox filling, a radio's dot landing, a switch
+  /// thumb travelling, a segment sliding. A beat longer than [fast], because
+  /// these carry a state change the eye should register, and a beat shorter
+  /// than [base], because the control is small and close to the pointer.
+  static const Duration control = Duration(milliseconds: 150);
 
   /// The standard transition for most state changes (selection, reveal, colour
   /// and position shifts).
@@ -54,10 +61,33 @@ abstract final class DsMotion {
   /// The scene scale's long beat, for a closing or emphasised frame.
   static const Duration sceneLong = Duration(milliseconds: 1900);
 
+  // --- Delays and dwells ----------------------------------------------------
+  //
+  // Not transition lengths: these are how long the system waits before it
+  // speaks, and how long it stays. They are as much a part of how the
+  // interface feels as any easing, so they belong on the scale rather than
+  // buried in the component that happens to need them first.
+
+  /// How long a pointer must rest before a hover-triggered surface appears, so
+  /// a tooltip does not fire at everything the pointer crosses on its way
+  /// somewhere else.
+  static const Duration hoverDelay = Duration(milliseconds: 500);
+
+  /// How long a self-dismissing surface stays before it leaves: a toast, a
+  /// transient confirmation. Long enough to read a short line twice.
+  static const Duration dwell = Duration(seconds: 3);
+
   // --- Curves ---------------------------------------------------------------
 
   /// The everyday curve: a gentle decelerate into place.
   static const Curve standard = Curves.easeOutCubic;
+
+  /// The symmetric curve, easing in and out evenly. For motion that happens
+  /// *in place* and reverses: a section expanding and collapsing, a chevron
+  /// rotating, a switch thumb travelling and travelling back. The rest of the
+  /// vocabulary is arrival-shaped, which reads wrong when the same motion has
+  /// to run backwards a moment later.
+  static const Curve smooth = Curves.easeInOut;
 
   /// A strong decelerate for entrances: fast off the mark, softly landing.
   static const Curve emphasized = Cubic(0.2, 0.0, 0.0, 1.0);
@@ -97,6 +127,15 @@ abstract final class DsMotion {
 
   // --- Choreography ---------------------------------------------------------
 
+  /// The gap between successive items in a staggered group: the beat a
+  /// sequence is counted in. Named so a bespoke choreography can march in
+  /// step with [stagger] rather than guessing at its rhythm.
+  static const Duration staggerStep = Duration(milliseconds: 60);
+
+  /// The ceiling on a staggered group's total offset, so a long list still
+  /// finishes arriving promptly instead of crawling item by item.
+  static const Duration staggerMax = Duration(milliseconds: 300);
+
   /// The delay before the item at [index] in a staggered sequence begins, so a
   /// group reveals a beat apart instead of all at once. [step] is the gap
   /// between successive items; the total is clamped by [max] so a long list
@@ -104,8 +143,8 @@ abstract final class DsMotion {
   static Duration stagger(
     BuildContext context,
     int index, {
-    Duration step = const Duration(milliseconds: 60),
-    Duration max = const Duration(milliseconds: 300),
+    Duration step = staggerStep,
+    Duration max = staggerMax,
   }) {
     if (reduced(context) || index <= 0) return Duration.zero;
     final total = step * index;

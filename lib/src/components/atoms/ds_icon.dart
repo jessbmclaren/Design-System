@@ -16,7 +16,7 @@ import '../../tokens/ds_icon_size.dart';
 ///
 /// DsIcon(
 ///   icon: DsIcons.warning,
-///   size: DsIconSize.lg,
+///   size: tokens.iconSizeLg,
 ///   color: DsTokens.of(context).colorDanger,
 ///   semanticLabel: 'Warning',
 /// )
@@ -40,11 +40,11 @@ import '../../tokens/ds_icon_size.dart';
 class DsIcon extends StatelessWidget {
   /// Creates a themed icon.
   ///
-  /// [icon] is required. [size] defaults to [DsIconSize.md]; [color] defaults
-  /// to [DsTokens.colorText] resolved from the active theme.
+  /// [icon] is required. [size] defaults to [DsTokens.iconSizeMd]; [color]
+  /// defaults to [DsTokens.colorText] resolved from the active theme.
   const DsIcon({
     required this.icon,
-    this.size = DsIconSize.md,
+    this.size,
     this.color,
     this.semanticLabel,
     super.key,
@@ -53,8 +53,10 @@ class DsIcon extends StatelessWidget {
   /// The glyph to render, e.g. `DsIcons.check`.
   final IconData icon;
 
-  /// The rendered size in logical pixels. Prefer a [DsIconSize] step.
-  final double size;
+  /// The rendered size in logical pixels. When null, resolves to
+  /// [DsTokens.iconSizeMd]. Prefer a step from the token scale over an ad-hoc
+  /// value, so the glyph stays aligned with the type ramp around it.
+  final double? size;
 
   /// The glyph colour. When null, resolves to [DsTokens.colorText].
   final Color? color;
@@ -70,7 +72,7 @@ class DsIcon extends StatelessWidget {
     final DsTokens tokens = DsTokens.of(context);
     return Icon(
       icon,
-      size: size,
+      size: size ?? tokens.iconSizeMd,
       color: color ?? tokens.colorText,
       semanticLabel: semanticLabel,
     );

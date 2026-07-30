@@ -91,7 +91,6 @@ class DsMeterChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final brightness = Theme.of(context).brightness;
 
     // Resolve each segment's effective colour and clamp negative values.
     final values = <double>[
@@ -100,7 +99,7 @@ class DsMeterChart extends StatelessWidget {
     final total = values.fold<double>(0, (sum, v) => sum + v);
     final colors = <Color>[
       for (var i = 0; i < segments.length; i++)
-        segments[i].color ?? DsChartPalette.colorAt(i, brightness),
+        segments[i].color ?? tokens.chartColorAt(i),
     ];
 
     final semanticsLabel = _buildSemanticsLabel(values, total);

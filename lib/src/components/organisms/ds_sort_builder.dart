@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
 import '../atoms/ds_segmented_control.dart';
@@ -302,7 +301,7 @@ class _IconAction extends StatelessWidget {
               width: 40,
               height: 48,
               child: Center(
-                child: DsIcon(icon: icon, size: DsIconSize.md, color: color),
+                child: DsIcon(icon: icon, size: tokens.iconSizeMd, color: color),
               ),
             ),
           ),

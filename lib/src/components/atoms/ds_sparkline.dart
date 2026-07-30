@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../tokens/ds_chart_palette.dart';
+import '../../theme/ds_tokens_extension.dart';
 
 /// A tiny inline line chart with no axes, labels or gridlines.
 ///
@@ -62,8 +62,8 @@ class DsSparkline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final lineColor = color ?? DsChartPalette.colorAt(0, brightness);
+    final tokens = DsTokens.of(context);
+    final lineColor = color ?? tokens.chartColorAt(0);
 
     return Semantics(
       label: 'Sparkline',

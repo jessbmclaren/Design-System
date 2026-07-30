@@ -3,8 +3,10 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../tokens/ds_chart_palette.dart';
 import '../tokens/ds_colors.dart';
 import '../tokens/ds_elevation.dart';
+import '../tokens/ds_icon_size.dart';
 import '../tokens/ds_radii.dart';
 import '../tokens/ds_spacing.dart';
 import '../tokens/ds_typography.dart';
@@ -48,6 +50,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.colorAttention,
     required this.radiusXxs,
     required this.radiusControl,
+    required this.radiusLg,
     required this.radiusFull,
     // Typography ramp
     required this.headingXl,
@@ -64,6 +67,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.display,
     required this.strongLabelFontWeight,
     required this.mediumLabelFontWeight,
+    // Icon scale
+    required this.iconSizeXxs,
+    required this.iconSizeXs,
+    required this.iconSizeSm,
+    required this.iconSizeMd,
+    required this.iconSizeLg,
+    required this.iconSizeXl,
     // Text
     required this.colorText,
     required this.colorSecondaryText,
@@ -94,6 +104,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.stateDisabledTextOpacity,
     required this.stateDisabledIconOpacity,
     required this.focusRingWidth,
+    required this.focusRingColor,
+    required this.focusRingGap,
     required this.minTapTarget,
     required this.statePressedTintColor,
     required this.stateInkColor,
@@ -133,6 +145,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.buttonCompactPaddingY,
     required this.buttonIconGap,
     required this.buttonMinWidth,
+    required this.buttonPressedScale,
     // Badges
     required this.badgeNeutralColorBackground,
     required this.badgeNeutralColorText,
@@ -191,6 +204,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.dialogMaxWidthMd,
     required this.dialogMaxWidthLg,
     required this.dialogMinHeight,
+    // Charts
+    required this.chartCategorical,
+    required this.chartOther,
+    required this.chartSequential,
+    required this.chartDiverging,
     // Chrome
     required this.authWashGradient,
     required this.authWashStops,
@@ -230,6 +248,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorAttention: const Color(0xFFFFA800),
       radiusXxs: 2,
       radiusControl: 6,
+      radiusLg: 12,
       radiusFull: 1000,
       headingXl: DsTypography.headingXl,
       headingLg: DsTypography.headingLg,
@@ -254,6 +273,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           letterSpacing: -1.8),
       strongLabelFontWeight: DsTypography.semiBold,
       mediumLabelFontWeight: DsTypography.medium,
+      iconSizeXxs: DsIconSize.xxs,
+      iconSizeXs: DsIconSize.xs,
+      iconSizeSm: DsIconSize.sm,
+      iconSizeMd: DsIconSize.md,
+      iconSizeLg: DsIconSize.lg,
+      iconSizeXl: DsIconSize.xl,
       colorText: DsColors.textPrimary,
       colorSecondaryText: DsColors.textSecondary,
       colorBorder: DsColors.border,
@@ -281,6 +306,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledTextOpacity: 0.9,
       stateDisabledIconOpacity: 0.38,
       focusRingWidth: 2,
+      // The accent the tickbox and switch already ring themselves with,
+      // named so every control can agree on it.
+      focusRingColor: DsColors.formAccent,
+      focusRingGap: 1,
       minTapTarget: kMinInteractiveDimension,
       // The primary flattened onto white, a solid press tint.
       statePressedTintColor: const Color(0xFFB3D5F2),
@@ -326,6 +355,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       buttonCompactPaddingY: 8,
       buttonIconGap: 8,
       buttonMinWidth: 64,
+      buttonPressedScale: 0.96,
       badgeNeutralColorBackground: DsColors.badgeNeutralBackground,
       badgeNeutralColorText: DsColors.badgeNeutralText,
       badgeNeutralColorBorder: DsColors.badgeNeutralBorder,
@@ -386,6 +416,14 @@ class DsTokens extends ThemeExtension<DsTokens> {
       dialogMaxWidthMd: 560,
       dialogMaxWidthLg: 620,
       dialogMinHeight: 240,
+      chartCategorical: DsChartPalette.categoricalLight,
+      chartOther: DsChartPalette.otherLight,
+      chartSequential: DsChartPalette.sequential,
+      chartDiverging: const <Color>[
+        DsChartPalette.divergingNegative,
+        DsChartPalette.divergingNeutral,
+        DsChartPalette.divergingPositive,
+      ],
       authWashGradient: DsColors.authWash,
       // Null spaces the wash colours evenly, the spread the gradient has
       // always painted.
@@ -482,6 +520,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
       formBackgroundColor: const Color(0xFF17181C),
       formHighlightColorBorder: const Color(0xFF4B4E56),
       formAccentColor: DsColors.brandPrimaryDark,
+      // Follows the dark accent, so the ring keeps matching the control
+      // it surrounds.
+      focusRingColor: DsColors.brandPrimaryDark,
+      // The dark surface has its own validated ramp, not a flip of the
+      // light one.
+      chartCategorical: DsChartPalette.categoricalDark,
+      chartOther: DsChartPalette.otherDark,
       // Clears AA contrast (4.5:1) on the dark field fill while staying
       // clearly dimmer than the value ink.
       formPlaceholderTextColor: const Color(0xFF8A93A6),
@@ -505,6 +550,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
       'DsTheme.light() or DsTheme.dark().',
     );
     return tokens!;
+  }
+
+  /// The categorical chart colour for the series at [index].
+  ///
+  /// The order is fixed and assigned by series identity, never cycled: a
+  /// series past the end of [chartCategorical] folds into the neutral
+  /// [chartOther] bucket rather than repeating a hue that already means
+  /// something else on the same chart.
+  Color chartColorAt(int index) {
+    if (index >= 0 && index < chartCategorical.length) {
+      return chartCategorical[index];
+    }
+    return chartOther;
   }
 
   /// Sentinel marking a nullable [copyWith] parameter as not supplied, so
@@ -570,6 +628,15 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// inputs.
   final double radiusControl;
 
+  /// The corner radius for card-sized surfaces: a board lane, a panel, a
+  /// raised tile. The step above [DsTokens.overlayBorderRadius], for
+  /// containers large enough that a tighter corner reads as sharp.
+  ///
+  /// Nested surfaces derive from this rather than declaring their own: an
+  /// inner card inset by *n* from its container takes `radiusLg - n`, so
+  /// the two curves stay concentric when a skin retunes the outer one.
+  final double radiusLg;
+
   /// The stadium radius: large enough that any control it is applied to
   /// renders fully rounded ends.
   final double radiusFull;
@@ -627,6 +694,34 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// a selected row. One step below [strongLabelFontWeight]. Defaults to
   /// [DsTypography.medium].
   final FontWeight mediumLabelFontWeight;
+
+  // Icon scale -----------------------------------------------------------
+  //
+  // The glyph sizes components draw at, defaulting to [DsIconSize]. They sit
+  // in the token layer for the same reason the type ramp does: a brand that
+  // re-scales its text without re-scaling the glyphs beside it ends up with
+  // icons that no longer sit on the line.
+
+  /// Tiny marker glyphs. Defaults to [DsIconSize.xxs].
+  final double iconSizeXxs;
+
+  /// Glyphs set inline with small text. Defaults to [DsIconSize.xs].
+  final double iconSizeXs;
+
+  /// The default control glyph, for buttons, inputs and chips. Defaults to
+  /// [DsIconSize.sm].
+  final double iconSizeSm;
+
+  /// Glyphs in list rows and toolbars. Defaults to [DsIconSize.md].
+  final double iconSizeMd;
+
+  /// Glyphs on prominent actions and status readouts. Defaults to
+  /// [DsIconSize.lg].
+  final double iconSizeLg;
+
+  /// Header and empty-state glyphs, the largest step. Defaults to
+  /// [DsIconSize.xl].
+  final double iconSizeXl;
 
   // Text ----------------------------------------------------------------
 
@@ -731,6 +826,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The stroke width of the keyboard focus ring on buttons and icon
   /// buttons.
   final double focusRingWidth;
+
+  /// The colour of the keyboard focus ring. Defaults to [formAccentColor],
+  /// the accent the tickbox and switch already ring themselves with.
+  ///
+  /// A control whose own foreground carries the focus state instead (a
+  /// filled button rings itself in its label colour, so the ring stays
+  /// legible on any variant fill) is the deliberate exception.
+  final Color focusRingColor;
+
+  /// The gap held between a control's edge and its focus ring, so the ring
+  /// stays visible against a filled control rather than merging with it.
+  final double focusRingGap;
 
   /// The minimum size of an interactive control's tap target, in logical
   /// pixels. Defaults to `kMinInteractiveDimension` (48), the accessible floor;
@@ -875,6 +982,11 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The minimum width of a button, so a short label still renders a
   /// balanced control.
   final double buttonMinWidth;
+
+  /// How far a button shrinks while pressed, as a scale factor. Just under
+  /// 1, so the press reads as the surface giving under the finger rather
+  /// than as the control changing size.
+  final double buttonPressedScale;
 
   // Badges --------------------------------------------------------------
 
@@ -1076,6 +1188,27 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// settled surface.
   final double dialogMinHeight;
 
+  // Charts ---------------------------------------------------------------
+  //
+  // The data-visualisation ramps, defaulting to [DsChartPalette]. A chart is
+  // the one surface where colour carries data rather than decoration, so the
+  // defaults are validated for colour-vision separation, chroma and contrast
+  // against their surface. A skin that replaces them owes the same check.
+
+  /// The fixed categorical order, assigned by series identity and never
+  /// cycled. Defaults to the [DsChartPalette] ramp for the active surface.
+  final List<Color> chartCategorical;
+
+  /// The neutral bucket for series past the end of [chartCategorical].
+  final Color chartOther;
+
+  /// The sequential ramp carrying magnitude: a single hue, light to dark.
+  final List<Color> chartSequential;
+
+  /// The diverging ramp carrying polarity, as negative pole, neutral
+  /// midpoint and positive pole.
+  final List<Color> chartDiverging;
+
   // Chrome ----------------------------------------------------------------
 
   /// The colour stops of the auth wash, painted top to bottom by
@@ -1168,6 +1301,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? colorAttention,
     double? radiusXxs,
     double? radiusControl,
+    double? radiusLg,
     double? radiusFull,
     DsTypeToken? headingXl,
     DsTypeToken? headingLg,
@@ -1183,6 +1317,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
     DsTypeToken? display,
     FontWeight? strongLabelFontWeight,
     FontWeight? mediumLabelFontWeight,
+    double? iconSizeXxs,
+    double? iconSizeXs,
+    double? iconSizeSm,
+    double? iconSizeMd,
+    double? iconSizeLg,
+    double? iconSizeXl,
     Color? colorText,
     Color? colorSecondaryText,
     Color? colorBorder,
@@ -1210,6 +1350,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? stateDisabledTextOpacity,
     double? stateDisabledIconOpacity,
     double? focusRingWidth,
+    Color? focusRingColor,
+    double? focusRingGap,
     double? minTapTarget,
     Color? statePressedTintColor,
     Color? stateInkColor,
@@ -1248,6 +1390,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? buttonCompactPaddingY,
     double? buttonIconGap,
     double? buttonMinWidth,
+    double? buttonPressedScale,
     Color? badgeNeutralColorBackground,
     Color? badgeNeutralColorText,
     Color? badgeNeutralColorBorder,
@@ -1302,6 +1445,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
     double? dialogMaxWidthMd,
     double? dialogMaxWidthLg,
     double? dialogMinHeight,
+    List<Color>? chartCategorical,
+    Color? chartOther,
+    List<Color>? chartSequential,
+    List<Color>? chartDiverging,
     List<Color>? authWashGradient,
     Object? authWashStops = _unset,
     AlignmentGeometry? authWashBegin,
@@ -1335,6 +1482,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorAttention: colorAttention ?? this.colorAttention,
       radiusXxs: radiusXxs ?? this.radiusXxs,
       radiusControl: radiusControl ?? this.radiusControl,
+      radiusLg: radiusLg ?? this.radiusLg,
       radiusFull: radiusFull ?? this.radiusFull,
       headingXl: headingXl ?? this.headingXl,
       headingLg: headingLg ?? this.headingLg,
@@ -1352,6 +1500,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           strongLabelFontWeight ?? this.strongLabelFontWeight,
       mediumLabelFontWeight:
           mediumLabelFontWeight ?? this.mediumLabelFontWeight,
+      iconSizeXxs: iconSizeXxs ?? this.iconSizeXxs,
+      iconSizeXs: iconSizeXs ?? this.iconSizeXs,
+      iconSizeSm: iconSizeSm ?? this.iconSizeSm,
+      iconSizeMd: iconSizeMd ?? this.iconSizeMd,
+      iconSizeLg: iconSizeLg ?? this.iconSizeLg,
+      iconSizeXl: iconSizeXl ?? this.iconSizeXl,
       colorText: colorText ?? this.colorText,
       colorSecondaryText: colorSecondaryText ?? this.colorSecondaryText,
       colorBorder: colorBorder ?? this.colorBorder,
@@ -1396,6 +1550,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledIconOpacity:
           stateDisabledIconOpacity ?? this.stateDisabledIconOpacity,
       focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
       minTapTarget: minTapTarget ?? this.minTapTarget,
       statePressedTintColor:
           statePressedTintColor ?? this.statePressedTintColor,
@@ -1459,6 +1615,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonCompactPaddingY ?? this.buttonCompactPaddingY,
       buttonIconGap: buttonIconGap ?? this.buttonIconGap,
       buttonMinWidth: buttonMinWidth ?? this.buttonMinWidth,
+      buttonPressedScale: buttonPressedScale ?? this.buttonPressedScale,
       badgeNeutralColorBackground:
           badgeNeutralColorBackground ?? this.badgeNeutralColorBackground,
       badgeNeutralColorText:
@@ -1532,6 +1689,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       dialogMaxWidthMd: dialogMaxWidthMd ?? this.dialogMaxWidthMd,
       dialogMaxWidthLg: dialogMaxWidthLg ?? this.dialogMaxWidthLg,
       dialogMinHeight: dialogMinHeight ?? this.dialogMinHeight,
+      chartCategorical: chartCategorical ?? this.chartCategorical,
+      chartOther: chartOther ?? this.chartOther,
+      chartSequential: chartSequential ?? this.chartSequential,
+      chartDiverging: chartDiverging ?? this.chartDiverging,
       authWashGradient: authWashGradient ?? this.authWashGradient,
       authWashStops: identical(authWashStops, _unset)
           ? this.authWashStops
@@ -1582,6 +1743,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorAttention: c(colorAttention, other.colorAttention),
       radiusXxs: d(radiusXxs, other.radiusXxs),
       radiusControl: d(radiusControl, other.radiusControl),
+      radiusLg: d(radiusLg, other.radiusLg),
       radiusFull: d(radiusFull, other.radiusFull),
       headingXl: t < 0.5 ? headingXl : other.headingXl,
       headingLg: t < 0.5 ? headingLg : other.headingLg,
@@ -1599,6 +1761,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           strongLabelFontWeight, other.strongLabelFontWeight, t)!,
       mediumLabelFontWeight: FontWeight.lerp(
           mediumLabelFontWeight, other.mediumLabelFontWeight, t)!,
+      iconSizeXxs: d(iconSizeXxs, other.iconSizeXxs),
+      iconSizeXs: d(iconSizeXs, other.iconSizeXs),
+      iconSizeSm: d(iconSizeSm, other.iconSizeSm),
+      iconSizeMd: d(iconSizeMd, other.iconSizeMd),
+      iconSizeLg: d(iconSizeLg, other.iconSizeLg),
+      iconSizeXl: d(iconSizeXl, other.iconSizeXl),
       colorText: c(colorText, other.colorText),
       colorSecondaryText: c(colorSecondaryText, other.colorSecondaryText),
       colorBorder: c(colorBorder, other.colorBorder),
@@ -1650,6 +1818,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       stateDisabledIconOpacity:
           d(stateDisabledIconOpacity, other.stateDisabledIconOpacity),
       focusRingWidth: d(focusRingWidth, other.focusRingWidth),
+      focusRingColor: c(focusRingColor, other.focusRingColor),
+      focusRingGap: d(focusRingGap, other.focusRingGap),
       minTapTarget: d(minTapTarget, other.minTapTarget),
       statePressedTintColor:
           c(statePressedTintColor, other.statePressedTintColor),
@@ -1713,6 +1883,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           d(buttonCompactPaddingY, other.buttonCompactPaddingY),
       buttonIconGap: d(buttonIconGap, other.buttonIconGap),
       buttonMinWidth: d(buttonMinWidth, other.buttonMinWidth),
+      buttonPressedScale: d(buttonPressedScale, other.buttonPressedScale),
       badgeNeutralColorBackground:
           c(badgeNeutralColorBackground, other.badgeNeutralColorBackground),
       badgeNeutralColorText:
@@ -1791,6 +1962,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
       dialogMaxWidthMd: d(dialogMaxWidthMd, other.dialogMaxWidthMd),
       dialogMaxWidthLg: d(dialogMaxWidthLg, other.dialogMaxWidthLg),
       dialogMinHeight: d(dialogMinHeight, other.dialogMinHeight),
+      chartCategorical: cs(chartCategorical, other.chartCategorical),
+      chartOther: c(chartOther, other.chartOther),
+      chartSequential: cs(chartSequential, other.chartSequential),
+      chartDiverging: cs(chartDiverging, other.chartDiverging),
       authWashGradient: cs(authWashGradient, other.authWashGradient),
       authWashStops: t < 0.5 ? authWashStops : other.authWashStops,
       authWashBegin: t < 0.5 ? authWashBegin : other.authWashBegin,
@@ -1833,6 +2008,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           colorAttention == other.colorAttention &&
           radiusXxs == other.radiusXxs &&
           radiusControl == other.radiusControl &&
+          radiusLg == other.radiusLg &&
           radiusFull == other.radiusFull &&
           headingXl == other.headingXl &&
           headingLg == other.headingLg &&
@@ -1848,6 +2024,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
           display == other.display &&
           strongLabelFontWeight == other.strongLabelFontWeight &&
           mediumLabelFontWeight == other.mediumLabelFontWeight &&
+          iconSizeXxs == other.iconSizeXxs &&
+          iconSizeXs == other.iconSizeXs &&
+          iconSizeSm == other.iconSizeSm &&
+          iconSizeMd == other.iconSizeMd &&
+          iconSizeLg == other.iconSizeLg &&
+          iconSizeXl == other.iconSizeXl &&
           colorText == other.colorText &&
           colorSecondaryText == other.colorSecondaryText &&
           colorBorder == other.colorBorder &&
@@ -1875,6 +2057,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
           stateDisabledTextOpacity == other.stateDisabledTextOpacity &&
           stateDisabledIconOpacity == other.stateDisabledIconOpacity &&
           focusRingWidth == other.focusRingWidth &&
+          focusRingColor == other.focusRingColor &&
+          focusRingGap == other.focusRingGap &&
           minTapTarget == other.minTapTarget &&
           statePressedTintColor == other.statePressedTintColor &&
           stateInkColor == other.stateInkColor &&
@@ -1916,6 +2100,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           buttonCompactPaddingY == other.buttonCompactPaddingY &&
           buttonIconGap == other.buttonIconGap &&
           buttonMinWidth == other.buttonMinWidth &&
+          buttonPressedScale == other.buttonPressedScale &&
           badgeNeutralColorBackground == other.badgeNeutralColorBackground &&
           badgeNeutralColorText == other.badgeNeutralColorText &&
           badgeNeutralColorBorder == other.badgeNeutralColorBorder &&
@@ -1970,6 +2155,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           dialogMaxWidthMd == other.dialogMaxWidthMd &&
           dialogMaxWidthLg == other.dialogMaxWidthLg &&
           dialogMinHeight == other.dialogMinHeight &&
+          listEquals(chartCategorical, other.chartCategorical) &&
+          chartOther == other.chartOther &&
+          listEquals(chartSequential, other.chartSequential) &&
+          listEquals(chartDiverging, other.chartDiverging) &&
           listEquals(authWashGradient, other.authWashGradient) &&
           listEquals(authWashStops, other.authWashStops) &&
           authWashBegin == other.authWashBegin &&
@@ -2004,6 +2193,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         colorAttention,
         radiusXxs,
         radiusControl,
+        radiusLg,
         radiusFull,
         headingXl,
         headingLg,
@@ -2019,6 +2209,12 @@ class DsTokens extends ThemeExtension<DsTokens> {
         display,
         strongLabelFontWeight,
         mediumLabelFontWeight,
+        iconSizeXxs,
+        iconSizeXs,
+        iconSizeSm,
+        iconSizeMd,
+        iconSizeLg,
+        iconSizeXl,
         colorText,
         colorSecondaryText,
         colorBorder,
@@ -2046,6 +2242,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
         stateDisabledTextOpacity,
         stateDisabledIconOpacity,
         focusRingWidth,
+        focusRingColor,
+        focusRingGap,
         minTapTarget,
         statePressedTintColor,
         stateInkColor,
@@ -2084,6 +2282,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         buttonCompactPaddingY,
         buttonIconGap,
         buttonMinWidth,
+        buttonPressedScale,
         badgeNeutralColorBackground,
         badgeNeutralColorText,
         badgeNeutralColorBorder,
@@ -2138,6 +2337,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
         dialogMaxWidthMd,
         dialogMaxWidthLg,
         dialogMinHeight,
+        Object.hashAll(chartCategorical),
+        chartOther,
+        Object.hashAll(chartSequential),
+        Object.hashAll(chartDiverging),
         Object.hashAll(authWashGradient),
         authWashStops == null ? null : Object.hashAll(authWashStops!),
         authWashBegin,

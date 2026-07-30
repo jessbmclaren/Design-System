@@ -4,7 +4,6 @@ import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_checkbox.dart';
 import '../atoms/ds_divider.dart';
@@ -1015,7 +1014,7 @@ class _SuccessState extends StatelessWidget {
                 ),
                 child: DsIcon(
                   icon: DsIcons.check,
-                  size: DsIconSize.xl,
+                  size: tokens.iconSizeXl,
                   color: tokens.badgeSuccessColorText,
                   semanticLabel: 'Success',
                 ),

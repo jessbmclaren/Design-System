@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_avatar.dart';
 import '../atoms/ds_badge.dart';
 import '../atoms/ds_icon.dart';
@@ -141,8 +140,14 @@ class DsBoardView extends StatefulWidget {
 }
 
 class _DsBoardViewState extends State<DsBoardView> {
-  static const double _cardRadius = 10;
-  static const double _laneRadius = 12;
+  /// How far a card sits inside its lane. Its corner is the lane's corner
+  /// less this inset, so the two curves stay concentric rather than the inner
+  /// one looking slack, and both follow a skin that retunes
+  /// [DsTokens.radiusLg].
+  static const double _cardInset = 2;
+
+  static double _cardRadius(DsTokens tokens) => tokens.radiusLg - _cardInset;
+
   static const double _emptyLaneHeight = 64;
   static const double _menuTrigger = 36;
 
@@ -425,7 +430,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         return DecoratedBox(
           decoration: BoxDecoration(
             color: tokens.offsetBackgroundColor,
-            borderRadius: BorderRadius.circular(_laneRadius),
+            borderRadius: BorderRadius.circular(tokens.radiusLg),
             border: Border.all(
               color: active ? tokens.formHighlightColorBorder : tokens.colorBorder,
               width: active ? 2 : 1,
@@ -466,7 +471,7 @@ class _DsBoardViewState extends State<DsBoardView> {
                 padding: EdgeInsets.all(tokens.spacingUnit / 2),
                 child: DsIcon(
                   icon: collapsed ? DsIcons.expandMore : DsIcons.expandLess,
-                  size: DsIconSize.md,
+                  size: tokens.iconSizeMd,
                   color: tokens.colorSecondaryText,
                 ),
               ),
@@ -522,7 +527,7 @@ class _DsBoardViewState extends State<DsBoardView> {
       height: _emptyLaneHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(_cardRadius),
+        borderRadius: BorderRadius.circular(_cardRadius(tokens)),
         border: Border.all(color: tokens.colorBorder),
       ),
       child: Text(
@@ -539,7 +544,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     final surface = DecoratedBox(
       decoration: BoxDecoration(
         color: tokens.formBackgroundColor,
-        borderRadius: BorderRadius.circular(_cardRadius),
+        borderRadius: BorderRadius.circular(_cardRadius(tokens)),
         border: Border.all(color: tokens.colorBorder),
       ),
       child: Stack(
@@ -557,7 +562,7 @@ class _DsBoardViewState extends State<DsBoardView> {
     final onTap = widget.onCardTap;
     final interactive = Material(
       type: MaterialType.transparency,
-      borderRadius: BorderRadius.circular(_cardRadius),
+      borderRadius: BorderRadius.circular(_cardRadius(tokens)),
       clipBehavior: Clip.antiAlias,
       child: onTap == null
           ? surface
@@ -587,7 +592,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         width: widget.laneWidth - tokens.spacingUnit * 1.5,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(_cardRadius),
+            borderRadius: BorderRadius.circular(_cardRadius(tokens)),
             boxShadow: tokens.shadowMedium,
           ),
           child: surface,
@@ -618,7 +623,7 @@ class _DsBoardViewState extends State<DsBoardView> {
         child: Center(
           child: DsIcon(
             icon: DsIcons.moreVertical,
-            size: DsIconSize.md,
+            size: tokens.iconSizeMd,
             color: tokens.colorSecondaryText,
             semanticLabel: 'Move $title',
           ),
@@ -743,7 +748,7 @@ class _DsBoardViewState extends State<DsBoardView> {
           children: [
             DsIcon(
               icon: b ? DsIcons.checkboxChecked : DsIcons.checkboxBlank,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: b ? tokens.formAccentColor : tokens.colorSecondaryText,
             ),
             SizedBox(width: tokens.spacingUnit / 2),
@@ -790,7 +795,7 @@ class _DsBoardViewState extends State<DsBoardView> {
             padding: const EdgeInsets.only(right: 1),
             child: DsIcon(
               icon: i < filled ? DsIcons.star : DsIcons.starOutline,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
             ),
           ),

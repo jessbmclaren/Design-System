@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon.dart';
 
 /// A slim status strip along an app's bottom edge.
@@ -71,7 +70,7 @@ class DsStatusBar extends StatelessWidget {
           if (icon != null) ...<Widget>[
             DsIcon(
               icon: icon!,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: tokens.colorSecondaryText,
             ),
             SizedBox(width: unit),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 import '../atoms/ds_icon.dart';
@@ -331,7 +330,7 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
           children: <Widget>[
             DsIcon(
               icon: widget.item.icon,
-              size: DsIconSize.md,
+              size: tokens.iconSizeMd,
               color: iconColor,
             ),
             SizedBox(width: unit * 1.5),
@@ -351,7 +350,7 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
                 icon: widget.expanded!
                     ? DsIcons.expandLess
                     : DsIcons.expandMore,
-                size: DsIconSize.sm,
+                size: tokens.iconSizeSm,
                 color: tokens.colorSecondaryText,
               ),
           ],
@@ -361,7 +360,7 @@ class _DsNavRailItemState extends State<_DsNavRailItem> {
       content = Center(
         child: DsIcon(
           icon: widget.item.icon,
-          size: DsIconSize.lg,
+          size: tokens.iconSizeLg,
           color: iconColor,
         ),
       );

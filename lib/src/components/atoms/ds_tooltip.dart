@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
+import '../../util/ds_motion.dart';
 
 /// A small text label that surfaces contextual help for its [child].
 ///
@@ -59,7 +60,7 @@ class DsTooltip extends StatelessWidget {
     return Tooltip(
       message: message,
       preferBelow: preferBelow,
-      waitDuration: const Duration(milliseconds: 500),
+      waitDuration: DsMotion.hoverDelay,
       // Cap the width so long copy wraps onto multiple lines instead of
       // overflowing on narrow (320dp) screens.
       constraints: const BoxConstraints(maxWidth: 280),

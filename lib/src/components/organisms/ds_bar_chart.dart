@@ -102,8 +102,7 @@ class DsBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final brightness = Theme.of(context).brightness;
-    final defaultBarColor = DsChartPalette.colorAt(0, brightness);
+    final defaultBarColor = tokens.chartColorAt(0);
 
     // TextPainter (unlike Text) does not inherit the theme font, so resolve
     // the family from the theme and stamp it onto the painted label styles.

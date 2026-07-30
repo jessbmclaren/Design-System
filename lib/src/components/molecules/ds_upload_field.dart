@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_icon_button.dart';
 import '../atoms/ds_progress_bar.dart';
@@ -184,7 +183,7 @@ class DsUploadField extends StatelessWidget {
         ),
         child: Row(
           children: <Widget>[
-            Icon(icon, size: DsIconSize.lg, color: iconColor),
+            Icon(icon, size: tokens.iconSizeLg, color: iconColor),
             SizedBox(width: tokens.spacingUnit * 1.5),
             Expanded(
               child: Column(
@@ -229,7 +228,7 @@ class DsUploadField extends StatelessWidget {
                 semanticLabel: 'Remove file',
                 onPressed: onRemove,
                 size: 32,
-                iconSize: DsIconSize.sm,
+                iconSize: tokens.iconSizeSm,
               ),
             ],
           ],

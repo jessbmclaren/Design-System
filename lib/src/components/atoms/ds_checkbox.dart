@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 
@@ -94,12 +93,6 @@ class DsCheckbox extends StatefulWidget {
   static const double _boxSize = 18;
   static const double _labelGap = 8;
 
-  /// Focus ring geometry: an accent ring of this width, held off the box by a
-  /// surface-coloured gap. There is no dedicated focus-ring token yet, so the
-  /// widths are fixed here and the colours come from existing tokens.
-  static const double _focusRingWidth = 2;
-  static const double _focusRingGap = 1;
-
   @override
   State<DsCheckbox> createState() => _DsCheckboxState();
 }
@@ -123,26 +116,25 @@ class _DsCheckboxState extends State<DsCheckbox> {
       borderColor = tokens.colorBorder;
     }
 
-    // Keyboard focus draws an accent ring around the box, separated by a thin
+    // Keyboard focus draws the ring around the box, separated by a thin
     // surface-coloured gap so it stays visible on a checked, accent-filled
     // box. Shadows take no layout space, so the ring never shifts the row.
     final List<BoxShadow>? focusRing = _focused
         ? <BoxShadow>[
             BoxShadow(
-              color: tokens.formAccentColor,
-              spreadRadius:
-                  DsCheckbox._focusRingWidth + DsCheckbox._focusRingGap,
+              color: tokens.focusRingColor,
+              spreadRadius: tokens.focusRingWidth + tokens.focusRingGap,
             ),
             BoxShadow(
               color: tokens.colorBackground,
-              spreadRadius: DsCheckbox._focusRingGap,
+              spreadRadius: tokens.focusRingGap,
             ),
           ]
         : null;
 
     final box = AnimatedContainer(
-      duration: DsMotion.durationOf(context, const Duration(milliseconds: 150)),
-      curve: DsMotion.curveOf(context, Curves.easeOut),
+      duration: DsMotion.durationOf(context, DsMotion.control),
+      curve: DsMotion.curveOf(context, DsMotion.standard),
       width: DsCheckbox._boxSize,
       height: DsCheckbox._boxSize,
       decoration: BoxDecoration(
@@ -154,7 +146,8 @@ class _DsCheckboxState extends State<DsCheckbox> {
         boxShadow: focusRing,
       ),
       child: widget.value
-          ? const Icon(DsIcons.check, size: DsIconSize.xs, color: Colors.white)
+          ? Icon(DsIcons.check,
+              size: tokens.iconSizeXs, color: Colors.white)
           : null,
     );
 

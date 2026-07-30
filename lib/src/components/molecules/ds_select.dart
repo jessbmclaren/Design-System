@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_field_label.dart';
 
 /// A single choice within a [DsSelect].
@@ -228,7 +227,7 @@ class DsSelect<T> extends StatelessWidget {
         borderRadius: radius,
         icon: Icon(
           DsIcons.expandMore,
-          size: DsIconSize.md,
+          size: tokens.iconSizeMd,
           color: tokens.colorSecondaryText,
         ),
         onChanged: isEnabled ? onChanged : null,

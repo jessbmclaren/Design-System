@@ -69,12 +69,6 @@ class DsSwitch extends StatefulWidget {
   static const double _thumbInset = 2;
   static const double _thumbDiameter = _trackHeight - (_thumbInset * 2);
 
-  /// Focus ring geometry: an accent ring of this width, held off the track by
-  /// a surface-coloured gap. There is no dedicated focus-ring token yet, so
-  /// the widths are fixed here and the colours come from existing tokens.
-  static const double _focusRingWidth = 2;
-  static const double _focusRingGap = 1;
-
   @override
   State<DsSwitch> createState() => _DsSwitchState();
 }
@@ -90,22 +84,21 @@ class _DsSwitchState extends State<DsSwitch> {
 
     final trackColor = value ? tokens.formAccentColor : tokens.colorBorder;
 
-    final duration =
-        DsMotion.durationOf(context, const Duration(milliseconds: 150));
-    final curve = DsMotion.curveOf(context, Curves.easeInOut);
+    final duration = DsMotion.durationOf(context, DsMotion.control);
+    final curve = DsMotion.curveOf(context, DsMotion.smooth);
 
-    // Keyboard focus draws an accent ring around the pill, separated by a
-    // thin surface-coloured gap so it stays visible on the accent-filled
-    // track. Shadows take no layout space, so the ring never shifts the row.
+    // Keyboard focus draws the ring around the pill, separated by a thin
+    // surface-coloured gap so it stays visible on the accent-filled track.
+    // Shadows take no layout space, so the ring never shifts the row.
     final List<BoxShadow>? focusRing = _focused
         ? <BoxShadow>[
             BoxShadow(
-              color: tokens.formAccentColor,
-              spreadRadius: DsSwitch._focusRingWidth + DsSwitch._focusRingGap,
+              color: tokens.focusRingColor,
+              spreadRadius: tokens.focusRingWidth + tokens.focusRingGap,
             ),
             BoxShadow(
               color: tokens.colorBackground,
-              spreadRadius: DsSwitch._focusRingGap,
+              spreadRadius: tokens.focusRingGap,
             ),
           ]
         : null;

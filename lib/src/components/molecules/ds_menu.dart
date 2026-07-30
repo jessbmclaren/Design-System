@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon.dart';
 
 /// A single selectable row within a [DsMenu].
@@ -29,7 +28,7 @@ class DsMenuItem {
   /// The visible text for the row.
   final String label;
 
-  /// An optional leading glyph rendered at [DsIconSize.sm].
+  /// An optional leading glyph rendered at [tokens.iconSizeSm].
   final IconData? icon;
 
   /// Called when the row is chosen. The menu closes automatically first.
@@ -262,7 +261,7 @@ class _DsMenuRow extends StatelessWidget {
             ? null
             : DsIcon(
                 icon: item.icon!,
-                size: DsIconSize.sm,
+                size: tokens.iconSizeSm,
                 color: isEnabled ? base : disabledColor,
               ),
         child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),

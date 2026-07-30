@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_icon_button.dart';
 import '../atoms/ds_nav_link.dart';
@@ -195,7 +194,7 @@ class DsTopNav extends StatelessWidget {
                     Builder(
                       builder: (BuildContext context) => DsIconButton(
                         icon: DsIcons.menu,
-                        iconSize: DsIconSize.md,
+                        iconSize: tokens.iconSizeMd,
                         semanticLabel: menuSemanticLabel,
                         onPressed: () =>
                             _openMenu(context, includeActions: !showActions),

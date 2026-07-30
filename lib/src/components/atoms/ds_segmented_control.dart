@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../util/ds_motion.dart';
 import 'ds_icon.dart';
 
@@ -128,7 +127,7 @@ class _Segment<T> extends StatelessWidget {
 
     final content = <Widget>[
       if (segment.icon != null) ...<Widget>[
-        DsIcon(icon: segment.icon!, size: DsIconSize.xs, color: foreground),
+        DsIcon(icon: segment.icon!, size: tokens.iconSizeXs, color: foreground),
         if (segment.label != null) SizedBox(width: tokens.spacingUnit / 2),
       ],
       if (segment.label != null)
@@ -147,8 +146,8 @@ class _Segment<T> extends StatelessWidget {
             child: ExcludeSemantics(
               child: AnimatedContainer(
                 duration:
-                    DsMotion.durationOf(context, const Duration(milliseconds: 150)),
-                curve: DsMotion.curveOf(context, Curves.easeInOut),
+                    DsMotion.durationOf(context, DsMotion.control),
+                curve: DsMotion.curveOf(context, DsMotion.smooth),
                 // A 48dp minimum on both axes keeps every segment an accessible
                 // touch target.
                 constraints: const BoxConstraints(minHeight: 48, minWidth: 48),

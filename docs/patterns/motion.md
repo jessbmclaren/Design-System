@@ -10,6 +10,7 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | --- | --- | --- | --- |
 | `DsMotion.instant` | `Duration` | `0ms` | No motion: an immediate change. What every other duration collapses to under reduced motion. |
 | `DsMotion.fast` | `Duration` | `120ms` | Micro-interactions: hover, press, a toggle flipping. |
+| `DsMotion.control` | `Duration` | `150ms` | The control tier: a tickbox filling, a radio dot landing, a switch thumb travelling, a segment sliding. Longer than fast because it carries a state change, shorter than base because the control is small and close to the pointer. |
 | `DsMotion.base` | `Duration` | `200ms` | The standard transition for most state changes. |
 | `DsMotion.slow` | `Duration` | `320ms` | Larger surfaces (sheets, dialogs, an accordion) where time reads as weight. |
 | `DsMotion.expressive` | `Duration` | `500ms` | Choreographed, hero moments. Use sparingly; it is a spotlight. |
@@ -17,11 +18,21 @@ Three ideas run through all of it. **Purposeful.** Motion earns its place by exp
 | `DsMotion.scene` | `Duration` | `1400ms` | The scene scale's standard beat. |
 | `DsMotion.sceneLong` | `Duration` | `1900ms` | The scene scale's long beat, for a closing or emphasised frame. |
 
+## Delays and dwells
+
+Not transition lengths: these are how long the system waits before it speaks, and how long it stays. They shape how an interface feels as much as any easing does, so they sit on the scale rather than buried in whichever component happened to need them first.
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `DsMotion.hoverDelay` | `Duration` | `500ms` | How long a pointer must rest before a hover-triggered surface appears, so a tooltip does not fire at everything the pointer crosses on its way somewhere else. |
+| `DsMotion.dwell` | `Duration` | `3s` | How long a self-dismissing surface stays before it leaves: a toast, a transient confirmation. Long enough to read a short line twice. |
+
 ## Curves
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
 | `DsMotion.standard` | `Curve` | `easeOutCubic` | The everyday gentle decelerate into place. |
+| `DsMotion.smooth` | `Curve` | `easeInOut` | The symmetric curve, for motion that happens in place and reverses: a section expanding and collapsing, a chevron rotating, a switch thumb travelling back. The rest of the vocabulary is arrival-shaped, which reads wrong when the same motion runs backwards a moment later. |
 | `DsMotion.emphasized` | `Curve` | `cubic(0.2, 0, 0, 1)` | A strong decelerate for entrances: fast off the mark, softly landing. |
 | `DsMotion.decelerate` | `Curve` | `cubic(0.05, 0.7, 0.1, 1)` | Pure decelerate for elements arriving from off-screen. |
 | `DsMotion.accelerate` | `Curve` | `cubic(0.3, 0, 0.8, 0.15)` | Accelerate for elements leaving the screen entirely. |
@@ -44,7 +55,9 @@ Never read the raw tokens in an animating widget; resolve them through the helpe
 | --- | --- | --- | --- |
 | `DsMotion.durationOf(context, full)` | `Duration` | `base → 0ms` | Returns full when motion is allowed and Duration.zero under reduce-motion. |
 | `DsMotion.curveOf(context, full)` | `Curve` | `settle → linear` | Returns full when motion is allowed and Curves.linear under reduce-motion; there is no easing to perceive across a zero-length animation. |
-| `DsMotion.stagger(context, index)` | `Duration` | `60ms × index` | The delay before the item at index begins in a choreographed group, stepped 60ms apart and capped at 300ms. Zero under reduce-motion so the group arrives together. |
+| `DsMotion.stagger(context, index)` | `Duration` | `60ms × index` | The delay before the item at index begins in a choreographed group, stepped by staggerStep and capped at staggerMax. Zero under reduce-motion so the group arrives together. |
+| `DsMotion.staggerStep` | `Duration` | `60ms` | The gap between successive items in a staggered group: the beat a sequence is counted in. Named so a bespoke choreography can march in step with stagger rather than guessing at its rhythm. |
+| `DsMotion.staggerMax` | `Duration` | `300ms` | The ceiling on a staggered group's total offset, so a long list still finishes arriving promptly instead of crawling item by item. |
 | `DsMotion.reduced(context)` | `bool` | `false` | Whether the platform asks for reduced motion. Gate any bespoke animation behind it. |
 
 One law above all: **respect reduced motion.** When a person has asked their platform for less motion, animation is not softened. It is removed. Resolve every duration and curve through `DsMotion.durationOf` and `DsMotion.curveOf`, which collapse to a still, instant change under the setting, and gate any bespoke animation behind `DsMotion.reduced`. The live demo obeys this: press Replay with reduce-motion on and it stays put.

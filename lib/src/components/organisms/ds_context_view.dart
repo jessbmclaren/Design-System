@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon_button.dart';
 
 /// A contextual side panel that renders beside primary content.
@@ -187,7 +186,7 @@ class _Header extends StatelessWidget {
               icon: DsIcons.close,
               onPressed: onClose,
               semanticLabel: 'Close',
-              iconSize: DsIconSize.lg,
+              iconSize: tokens.iconSizeLg,
               color: tokens.colorSecondaryText,
             ),
           ],

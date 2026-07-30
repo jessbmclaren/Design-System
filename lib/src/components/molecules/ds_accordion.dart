@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon.dart';
 import '../../util/ds_motion.dart';
 
@@ -213,8 +212,8 @@ class _DsAccordionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
-    final motion = DsMotion.durationOf(context, const Duration(milliseconds: 200));
-    final curve = DsMotion.curveOf(context, Curves.easeInOut);
+    final motion = DsMotion.durationOf(context, DsMotion.base);
+    final curve = DsMotion.curveOf(context, DsMotion.smooth);
 
     final titleStyle = tokens.labelMd.toTextStyle(color: tokens.colorText).copyWith(
           fontWeight: tokens.strongLabelFontWeight,
@@ -242,7 +241,7 @@ class _DsAccordionSection extends StatelessWidget {
                   IconTheme.merge(
                     data: IconThemeData(
                       color: tokens.colorSecondaryText,
-                      size: DsIconSize.sm,
+                      size: tokens.iconSizeSm,
                     ),
                     child: item.leading!,
                   ),
@@ -282,7 +281,7 @@ class _DsAccordionSection extends StatelessWidget {
                     curve: curve,
                     child: DsIcon(
                       icon: DsIcons.expandMore,
-                      size: DsIconSize.md,
+                      size: tokens.iconSizeMd,
                       color: tokens.colorSecondaryText,
                     ),
                   ),

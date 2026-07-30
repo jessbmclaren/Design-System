@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_field_label.dart';
 import '../atoms/ds_icon.dart';
 
@@ -199,7 +198,7 @@ class DsDateField extends StatelessWidget {
                       SizedBox(width: tokens.spacingUnit),
                       DsIcon(
                         icon: DsIcons.calendar,
-                        size: DsIconSize.sm,
+                        size: tokens.iconSizeSm,
                         color: tokens.colorSecondaryText,
                       ),
                     ],

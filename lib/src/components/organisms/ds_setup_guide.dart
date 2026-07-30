@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../util/ds_motion.dart';
 import '../atoms/ds_badge.dart';
@@ -232,7 +231,7 @@ class _DsSetupGuideState extends State<DsSetupGuide> {
                   // grabber); floating, it points down to open downward.
                   child: Icon(
                     widget.fullWidth ? DsIcons.expandLess : DsIcons.expandMore,
-                    size: DsIconSize.sm,
+                    size: tokens.iconSizeSm,
                     color: tokens.colorSecondaryText,
                   ),
                 ),
@@ -375,11 +374,11 @@ class _CrossOffTaskRowState extends State<_CrossOffTaskRow>
     );
     _strike = CurvedAnimation(
       parent: _crossOff,
-      curve: const Interval(0.0, 0.35, curve: Curves.easeInOut),
+      curve: const Interval(0.0, 0.35, curve: DsMotion.smooth),
     );
     _collapse = CurvedAnimation(
       parent: _crossOff,
-      curve: const Interval(0.65, 1.0, curve: Curves.easeInOut),
+      curve: const Interval(0.65, 1.0, curve: DsMotion.smooth),
     );
     // Mounted already done: render collapsed, no replay.
     if (widget.task.done) _crossOff.value = 1;
@@ -480,7 +479,7 @@ class _TaskRow extends StatelessWidget {
             const DsBadge(label: 'Pending', variant: DsBadgeVariant.warning),
           ],
           if (task.locked)
-            Icon(DsIcons.lock, size: DsIconSize.xs, color: color),
+            Icon(DsIcons.lock, size: tokens.iconSizeXs, color: color),
         ],
       ),
     );
@@ -601,7 +600,7 @@ class _Marker extends StatelessWidget {
         ),
         child: Icon(
           DsIcons.check,
-          size: DsIconSize.xxs,
+          size: tokens.iconSizeXxs,
           color: tokens.buttonPrimaryColorText,
         ),
       );

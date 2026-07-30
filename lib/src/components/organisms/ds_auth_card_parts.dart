@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_icon.dart';
 
 /// Layout constants and helpers shared by the auth-card organisms.
@@ -71,7 +70,7 @@ class DsAuthBrandMark extends StatelessWidget {
         ),
         child: DsIcon(
           icon: icon,
-          size: DsIconSize.xl,
+          size: tokens.iconSizeXl,
           color: tokens.buttonPrimaryColorText,
         ),
       ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_icon_button.dart';
 import '../molecules/ds_menu_sheet.dart';
@@ -169,7 +168,7 @@ class DsAppShell extends StatelessWidget {
           menuTrigger: showSheet
               ? DsIconButton(
                   icon: DsIcons.menu,
-                  iconSize: DsIconSize.md,
+                  iconSize: tokens.iconSizeMd,
                   semanticLabel: menuSemanticLabel,
                   onPressed: () => _openMenuSheet(context),
                 )

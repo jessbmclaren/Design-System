@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 
 /// The visual emphasis of a [DsLink].
@@ -186,11 +185,11 @@ class _DsLinkState extends State<DsLink> {
         ),
         if (widget.trailingIcon != null) ...[
           SizedBox(width: tokens.spacingUnit / 2),
-          Icon(widget.trailingIcon, size: DsIconSize.xs, color: resolvedColor),
+          Icon(widget.trailingIcon, size: tokens.iconSizeXs, color: resolvedColor),
         ],
         if (widget.external) ...[
           SizedBox(width: tokens.spacingUnit / 2),
-          Icon(DsIcons.externalLink, size: DsIconSize.xs, color: resolvedColor),
+          Icon(DsIcons.externalLink, size: tokens.iconSizeXs, color: resolvedColor),
         ],
       ],
     );

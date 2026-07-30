@@ -141,9 +141,6 @@ class DsButton extends StatefulWidget {
 
 class _DsButtonState extends State<DsButton>
     with SingleTickerProviderStateMixin {
-  /// How far the button scales down while held: a subtle physical push.
-  static const double _pressedScale = 0.96;
-
   final WidgetStatesController _states = WidgetStatesController();
 
   /// Drives the scale. Unbounded so the spring can overshoot slightly past 1.0
@@ -201,7 +198,7 @@ class _DsButtonState extends State<DsButton>
     if (pressed) {
       // Quick, decisive push down.
       _scale.animateTo(
-        _pressedScale,
+        DsTokens.of(context).buttonPressedScale,
         duration: DsMotion.fast,
         curve: DsMotion.emphasized,
       );

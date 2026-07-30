@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../atoms/ds_button.dart';
 import '../atoms/ds_icon.dart';
 
@@ -90,7 +89,7 @@ class DsDropzone extends StatelessWidget {
         children: [
           DsIcon(
             icon: DsIcons.upload,
-            size: DsIconSize.xl,
+            size: tokens.iconSizeXl,
             color: tokens.colorSecondaryText,
           ),
           SizedBox(height: tokens.spacingUnit * 1.5),
@@ -195,7 +194,7 @@ class _FileChip extends StatelessWidget {
           children: [
             DsIcon(
               icon: DsIcons.file,
-              size: DsIconSize.sm,
+              size: tokens.iconSizeSm,
               color: tokens.colorSecondaryText,
             ),
             SizedBox(width: tokens.spacingUnit),
@@ -220,9 +219,9 @@ class _FileChip extends StatelessWidget {
                   onTap: onClear,
                   child: Padding(
                     padding: EdgeInsets.all(tokens.spacingUnit / 2),
-                    child: const DsIcon(
+                    child: DsIcon(
                       icon: DsIcons.close,
-                      size: DsIconSize.sm,
+                      size: tokens.iconSizeSm,
                     ),
                   ),
                 ),

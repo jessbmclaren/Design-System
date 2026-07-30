@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_breakpoints.dart';
 import '../../tokens/ds_elevation.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_spacing.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_avatar.dart';
@@ -1702,7 +1701,7 @@ class _DsDataGridState extends State<DsDataGrid> {
               if (icon != null) ...[
                 DsIcon(
                   icon: icon,
-                  size: DsIconSize.sm,
+                  size: tokens.iconSizeSm,
                   color: enabled
                       ? tokens.colorSecondaryText
                       : tokens.colorSecondaryText
@@ -1722,7 +1721,7 @@ class _DsDataGridState extends State<DsDataGrid> {
                 const SizedBox(width: DsSpacing.sm),
                 DsIcon(
                   icon: DsIcons.check,
-                  size: DsIconSize.sm,
+                  size: tokens.iconSizeSm,
                   color: tokens.formAccentColor,
                 ),
               ],
@@ -2718,7 +2717,7 @@ class _DsDataGridState extends State<DsDataGrid> {
       children: [
         DsIcon(
           icon: expanded ? DsIcons.expandMore : DsIcons.chevronRight,
-          size: DsIconSize.sm,
+          size: tokens.iconSizeSm,
           color: tokens.colorSecondaryText,
         ),
         const SizedBox(width: DsSpacing.xs),
@@ -2807,7 +2806,7 @@ class _DsDataGridState extends State<DsDataGrid> {
             children: [
               DsIcon(
                 icon: expanded ? DsIcons.expandMore : DsIcons.chevronRight,
-                size: DsIconSize.sm,
+                size: tokens.iconSizeSm,
                 color: tokens.colorSecondaryText,
               ),
               const SizedBox(width: DsSpacing.xs),
@@ -3126,7 +3125,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         if (column.icon != null) ...[
           DsIcon(
             icon: column.icon!,
-            size: DsIconSize.xs,
+            size: tokens.iconSizeXs,
             color: tokens.colorSecondaryText,
           ),
           const SizedBox(width: DsSpacing.xs),
@@ -3146,7 +3145,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           const SizedBox(width: DsSpacing.xs),
           DsIcon(
             icon: active.ascending ? DsIcons.arrowUp : DsIcons.arrowDown,
-            size: DsIconSize.xs,
+            size: tokens.iconSizeXs,
             color: tokens.colorSecondaryText,
           ),
           // A tie-break rule shows its precedence beside the arrow.
@@ -3214,7 +3213,7 @@ class _DsDataGridState extends State<DsDataGrid> {
                         padding: const EdgeInsets.all(DsSpacing.xxs),
                         child: DsIcon(
                           icon: DsIcons.expandMore,
-                          size: DsIconSize.xs,
+                          size: tokens.iconSizeXs,
                           color: tokens.colorSecondaryText,
                         ),
                       ),
@@ -3293,7 +3292,7 @@ class _DsDataGridState extends State<DsDataGrid> {
             child: Center(
               child: DsIcon(
                 icon: DsIcons.add,
-                size: DsIconSize.sm,
+                size: tokens.iconSizeSm,
                 color: tokens.colorSecondaryText,
               ),
             ),
@@ -3328,7 +3327,7 @@ class _DsDataGridState extends State<DsDataGrid> {
           ],
           trigger: DsIcon(
             icon: DsIcons.moreHorizontal,
-            size: DsIconSize.sm,
+            size: tokens.iconSizeSm,
             color: tokens.colorSecondaryText,
             semanticLabel: 'Row actions',
           ),
@@ -3448,7 +3447,7 @@ class _DsDataGridState extends State<DsDataGrid> {
         alignment: _alignmentOf(column.effectiveAlign),
         child: DsIcon(
           icon: DsIcons.add,
-          size: DsIconSize.xs,
+          size: tokens.iconSizeXs,
           color: tokens.colorSecondaryText
               .withValues(alpha: tokens.stateDisabledIconOpacity),
         ),
@@ -3735,27 +3734,36 @@ class _DsDataGridState extends State<DsDataGrid> {
     required bool dense,
   }) {
     final current = (_asNum(row.cells[column.key]) ?? 0).clamp(0, 5).round();
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < 5; i++)
-          Semantics(
-            button: true,
-            label: 'Set ${column.title} to ${i + 1}',
-            child: InkWell(
-              onTap: () => _emit(row, column, current == i + 1 ? i : i + 1),
-              borderRadius: BorderRadius.circular(999),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
-                child: DsIcon(
-                  icon: i < current ? DsIcons.star : DsIcons.starOutline,
-                  size: DsIconSize.sm,
-                  color: i < current ? tokens.colorPrimary : tokens.colorBorder,
+    // Five fixed glyphs in a fixed-width cell: scale the row down rather than
+    // overflow it when the glyph scale is large enough that they no longer
+    // fit. At the default icon steps nothing scales, so this only engages
+    // where the alternative is content that cannot be seen.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < 5; i++)
+            Semantics(
+              button: true,
+              label: 'Set ${column.title} to ${i + 1}',
+              child: InkWell(
+                onTap: () => _emit(row, column, current == i + 1 ? i : i + 1),
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
+                  child: DsIcon(
+                    icon: i < current ? DsIcons.star : DsIcons.starOutline,
+                    size: tokens.iconSizeSm,
+                    color:
+                        i < current ? tokens.colorPrimary : tokens.colorBorder,
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -3802,7 +3810,7 @@ class _DsDataGridState extends State<DsDataGrid> {
                 const SizedBox(width: DsSpacing.sm),
                 DsIcon(
                   icon: DsIcons.check,
-                  size: DsIconSize.sm,
+                  size: tokens.iconSizeSm,
                   color: tokens.formAccentColor,
                 ),
               ],
@@ -3979,19 +3987,24 @@ class _DsDataGridState extends State<DsDataGrid> {
 
   Widget _ratingRow(DsTokens tokens, num value) {
     final filled = value.clamp(0, 5).round();
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < 5; i++)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            child: DsIcon(
-              icon: i < filled ? DsIcons.star : DsIcons.starOutline,
-              size: DsIconSize.sm,
-              color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
+    // Scales down rather than overflowing a narrow cell; see the interactive
+    // rating row for the reasoning.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < 5; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: DsIcon(
+                icon: i < filled ? DsIcons.star : DsIcons.starOutline,
+                size: tokens.iconSizeSm,
+                color: i < filled ? tokens.colorPrimary : tokens.colorBorder,
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -4384,11 +4397,12 @@ class _GridCheck extends StatelessWidget {
         ),
       ),
       child: checked
-          ? const Icon(DsIcons.check, size: DsIconSize.xs, color: Colors.white)
+          ? Icon(DsIcons.check,
+              size: tokens.iconSizeXs, color: Colors.white)
           : indeterminate
-              ? const Icon(
+              ? Icon(
                   DsIcons.remove,
-                  size: DsIconSize.xs,
+                  size: tokens.iconSizeXs,
                   color: Colors.white,
                 )
               : null,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../tokens/ds_icons.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
+import '../../util/ds_motion.dart';
 import '../atoms/ds_icon_button.dart';
 
 /// A focused overlay surface for additional context or multi-step flows.
@@ -81,7 +81,7 @@ class DsFocusView extends StatelessWidget {
                   icon: DsIcons.close,
                   onPressed: onClose,
                   semanticLabel: 'Close',
-                  iconSize: DsIconSize.lg,
+                  iconSize: tokens.iconSizeLg,
                   color: tokens.colorSecondaryText,
                 ),
               ],
@@ -204,7 +204,7 @@ class DsFocusView extends StatelessWidget {
               begin: const Offset(1, 0),
               end: Offset.zero,
             ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              CurvedAnimation(parent: animation, curve: DsMotion.standard),
             ),
             child: child,
           );

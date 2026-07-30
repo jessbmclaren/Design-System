@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
+import '../../util/ds_motion.dart';
 
 /// An optional trailing action shown inside a [DsToast].
 ///
@@ -93,7 +94,7 @@ class DsToast extends StatelessWidget {
     DsToastAction? action,
     IconData? icon,
     DsToastTone tone = DsToastTone.neutral,
-    Duration duration = const Duration(seconds: 3),
+    Duration duration = DsMotion.dwell,
   }) {
     final overlay = Overlay.of(context);
     late final OverlayEntry entry;

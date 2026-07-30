@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_typography.dart';
 import '../atoms/ds_icon.dart';
 
@@ -26,7 +25,7 @@ class DsMenuSheetItem {
   /// The visible text for the row.
   final String label;
 
-  /// An optional leading glyph rendered at [DsIconSize.md].
+  /// An optional leading glyph rendered at [tokens.iconSizeMd].
   final IconData? icon;
 
   /// Called after the sheet closes when the row is chosen.
@@ -210,7 +209,7 @@ class _DsMenuSheetRow extends StatelessWidget {
                       if (item.icon != null) ...<Widget>[
                         DsIcon(
                           icon: item.icon!,
-                          size: DsIconSize.md,
+                          size: tokens.iconSizeMd,
                           color: enabled
                               ? iconColor
                               : iconColor.withValues(alpha: disabledOpacity),

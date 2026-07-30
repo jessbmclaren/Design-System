@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
-import '../../tokens/ds_icon_size.dart';
 import '../../tokens/ds_icons.dart';
 import '../../tokens/ds_spacing.dart';
 import '../atoms/ds_icon.dart';
@@ -110,7 +109,7 @@ class DsExpiryDate extends StatelessWidget {
                 const SizedBox(width: DsSpacing.xs),
                 DsIcon(
                   icon: DsIcons.calendar,
-                  size: DsIconSize.sm,
+                  size: tokens.iconSizeSm,
                   color: tokens.colorSecondaryText,
                 ),
               ],
