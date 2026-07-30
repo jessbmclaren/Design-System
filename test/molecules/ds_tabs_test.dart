@@ -72,5 +72,74 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
       expect(find.text('Section 0'), findsOneWidget);
     });
+
+    group('the overflowing edge fades', () {
+      // The mask's key names the edges it is softening.
+      Finder fade(String edges) =>
+          find.byKey(ValueKey<String>('ds-scroll-fade:$edges'));
+
+      final manyTabs = [
+        for (var i = 0; i < 12; i++) DsTab(label: 'Section $i'),
+      ];
+
+      testWidgets('tabs that fit are not faded, and pay no mask', (
+        tester,
+      ) async {
+        await pumpDs(
+          tester,
+          DsTabs(tabs: tabs, selectedIndex: 0, onChanged: (_) {}),
+          surfaceSize: const Size(800, 640),
+        );
+        await tester.pump();
+
+        expect(find.byType(ShaderMask), findsNothing);
+      });
+
+      testWidgets('at rest the far edge fades, because that is where the '
+          'hidden tabs are', (tester) async {
+        await pumpDs(
+          tester,
+          DsTabs(tabs: manyTabs, selectedIndex: 0, onChanged: (_) {}),
+          surfaceSize: const Size(320, 640),
+        );
+        await tester.pump();
+
+        expect(fade('trailing'), findsOneWidget);
+      });
+
+      testWidgets('scrolled to the end, the fade moves to the edge the tabs '
+          'are now behind', (tester) async {
+        await pumpDs(
+          tester,
+          DsTabs(tabs: manyTabs, selectedIndex: 0, onChanged: (_) {}),
+          surfaceSize: const Size(320, 640),
+        );
+        await tester.pump();
+
+        // Dragged part of the way along by hand: hidden tabs in both
+        // directions now, so both ends say so. The drag also pins that the
+        // scroll position survives the mask appearing above it.
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byType(DsTabs)),
+        );
+        await gesture.moveBy(const Offset(-40, 0));
+        await tester.pump();
+        await gesture.moveBy(const Offset(-260, 0));
+        await tester.pump();
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(fade('leading+trailing'), findsOneWidget);
+
+        final position = tester
+            .state<ScrollableState>(find.byType(Scrollable))
+            .position;
+        expect(position.pixels, greaterThan(0));
+
+        position.jumpTo(position.maxScrollExtent);
+        await tester.pumpAndSettle();
+        expect(fade('leading'), findsOneWidget);
+        expect(find.text('Section 11'), findsOneWidget);
+      });
+    });
   });
 }

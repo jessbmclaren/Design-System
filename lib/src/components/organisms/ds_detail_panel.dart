@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/ds_tokens_extension.dart';
 import '../../tokens/ds_icons.dart';
 import '../atoms/ds_icon_button.dart';
+import '../atoms/ds_scroll_fade.dart';
 
 /// One tab on a [DsDetailPanel].
 @immutable
@@ -255,60 +256,68 @@ class _TabStrip extends StatelessWidget {
     final DsTokens tokens = DsTokens.of(context);
     final double unit = tokens.spacingUnit;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: unit * 2.5),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (int i = 0; i < tabs.length; i++)
-            Semantics(
-              button: true,
-              selected: i == selectedIndex,
-              child: InkWell(
-                onTap: onSelected == null ? null : () => onSelected!(i),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: unit * 1.5,
-                    vertical: unit * 1.5,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        width: 2,
-                        color: i == selectedIndex
-                            ? tokens.colorPrimary
-                            : Colors.transparent,
+    // Five tabs do not fit a 440dp panel, let alone a phone, so the strip
+    // scrolls — and the edge it scrolls past fades, because a tab sliced by a
+    // hard edge is indistinguishable from a tab that is not there.
+    return DsScrollFade(
+      extent: unit * 3,
+      builder: (BuildContext context, ScrollController controller) =>
+          SingleChildScrollView(
+            controller: controller,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: unit * 2.5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                for (int i = 0; i < tabs.length; i++)
+                  Semantics(
+                    button: true,
+                    selected: i == selectedIndex,
+                    child: InkWell(
+                      onTap: onSelected == null ? null : () => onSelected!(i),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: unit * 1.5,
+                          vertical: unit * 1.5,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              width: 2,
+                              color: i == selectedIndex
+                                  ? tokens.colorPrimary
+                                  : Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              tabs[i].label,
+                              style: tokens.labelSm.toTextStyle(
+                                color: i == selectedIndex
+                                    ? tokens.colorText
+                                    : tokens.colorSecondaryText,
+                              ),
+                            ),
+                            if (tabs[i].count != null) ...<Widget>[
+                              SizedBox(width: unit * 0.75),
+                              Text(
+                                '${tabs[i].count}',
+                                style: tokens.bodySm.toTextStyle(
+                                  color: tokens.colorSecondaryText,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        tabs[i].label,
-                        style: tokens.labelSm.toTextStyle(
-                          color: i == selectedIndex
-                              ? tokens.colorText
-                              : tokens.colorSecondaryText,
-                        ),
-                      ),
-                      if (tabs[i].count != null) ...<Widget>[
-                        SizedBox(width: unit * 0.75),
-                        Text(
-                          '${tabs[i].count}',
-                          style: tokens.bodySm.toTextStyle(
-                            color: tokens.colorSecondaryText,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
+              ],
             ),
-        ],
-      ),
+          ),
     );
   }
 }

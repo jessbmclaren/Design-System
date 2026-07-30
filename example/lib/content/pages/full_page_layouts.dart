@@ -24,6 +24,14 @@ final PatternPage fullPageLayoutsPage = PatternPage(
       'place. Switching tabs should never reset the reader\'s scroll position '
       'or their earlier selections.',
     ),
+    ProseBlock(
+      'On a narrow screen the strip scrolls sideways rather than wrapping, '
+      'because a wrapped strip pushes the page itself below the fold. The end '
+      'it has more tabs past is faded, so a label dissolving at the edge reads '
+      'as "there is more this way"; a strip whose tabs all fit is not faded at '
+      'all. Keep labels short, and never put something people must do behind '
+      'a tab that only exists after a sideways scroll.',
+    ),
   ],
   dos: const [
     'Organise content into a small set of clearly labelled tabs.',

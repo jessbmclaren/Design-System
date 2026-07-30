@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/ds_tokens_extension.dart';
 import '../atoms/ds_icon.dart';
+import '../atoms/ds_scroll_fade.dart';
 
 /// A single entry in a [DsTabs] bar.
 ///
@@ -26,7 +27,10 @@ class DsTab {
 /// The selected tab is tinted with the primary action colour and marked by a
 /// 2px underline; unselected tabs use the secondary text colour. A 1px baseline
 /// runs beneath the whole bar. When the tabs are wider than the available
-/// space the bar scrolls horizontally, so it never overflows, even at 320dp.
+/// space the bar scrolls horizontally, so it never overflows, even at 320dp,
+/// and the edge it has more content past is faded — a label dissolving at the
+/// edge says the strip scrolls, where a label sliced by it says nothing at all.
+/// Tabs that fit are not faded.
 class DsTabs extends StatelessWidget {
   const DsTabs({
     super.key,
@@ -51,26 +55,31 @@ class DsTabs extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: tokens.colorBorder),
-        ),
+        border: Border(bottom: BorderSide(color: tokens.colorBorder)),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            for (var index = 0; index < tabs.length; index++)
-              _DsTabItem(
-                tab: tabs[index],
-                selected: index == selectedIndex,
-                indicatorHeight: indicatorHeight,
-                selectedColor: tokens.actionPrimaryColorText,
-                unselectedColor: tokens.colorSecondaryText,
-                onTap: () => onChanged(index),
-              ),
-          ],
+      // The strip scrolls when the tabs outgrow it, and the overflowing edge
+      // fades so that a sliced label reads as "there is more this way" rather
+      // than as a rendering fault. Tabs that fit are not faded at all.
+      child: DsScrollFade(
+        extent: tokens.spacingUnit * 3,
+        builder: (context, controller) => SingleChildScrollView(
+          controller: controller,
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (var index = 0; index < tabs.length; index++)
+                _DsTabItem(
+                  tab: tabs[index],
+                  selected: index == selectedIndex,
+                  indicatorHeight: indicatorHeight,
+                  selectedColor: tokens.actionPrimaryColorText,
+                  unselectedColor: tokens.colorSecondaryText,
+                  onTap: () => onChanged(index),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -98,9 +107,9 @@ class _DsTabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     final color = selected ? selectedColor : unselectedColor;
-    final labelStyle = tokens.labelMd.toTextStyle(color: color).copyWith(
-          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-        );
+    final labelStyle = tokens.labelMd
+        .toTextStyle(color: color)
+        .copyWith(fontWeight: selected ? FontWeight.w600 : FontWeight.w500);
 
     return Semantics(
       button: true,

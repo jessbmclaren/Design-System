@@ -4,6 +4,8 @@ A full page opens with a `DsPageHeader`: a clear title, a short subtitle for con
 
 Lead with the information most people need on arrival and move supporting detail into later tabs. Give each section a stable, deep-linkable route so a tab can be bookmarked, shared and reopened in place. Switching tabs should never reset the reader's scroll position or their earlier selections.
 
+On a narrow screen the strip scrolls sideways rather than wrapping, because a wrapped strip pushes the page itself below the fold. The end it has more tabs past is faded, so a label dissolving at the edge reads as "there is more this way"; a strip whose tabs all fit is not faded at all. Keep labels short, and never put something people must do behind a tab that only exists after a sideways scroll.
+
 ![Desktop (1120dp)](img/full-page-layouts_desktop.png)
 
 *Desktop (1120dp)*

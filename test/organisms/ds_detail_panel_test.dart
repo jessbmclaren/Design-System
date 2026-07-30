@@ -177,5 +177,27 @@ void main() {
     );
     expect(tester.takeException(), isNull);
     expect(find.text('Toyota Hilux'), findsOneWidget);
+
+    // …and it says so. The tab past the edge is invisible either way; the
+    // fade is the only thing telling anyone it is there. It lands the frame
+    // after layout, because that is when the strip first knows its metrics.
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey<String>('ds-scroll-fade:trailing')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a strip whose tabs fit is not faded', (tester) async {
+    await pumpPanel(
+      tester,
+      tabs: const <DsDetailTab>[
+        DsDetailTab(label: 'Overview'),
+        DsDetailTab(label: 'Activity'),
+      ],
+    );
+    await tester.pump();
+
+    expect(find.byType(ShaderMask), findsNothing);
   });
 }
