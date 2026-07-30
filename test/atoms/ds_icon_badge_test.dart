@@ -155,5 +155,67 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    BoxDecoration decorationOf(WidgetTester tester) =>
+        tester.widget<Container>(find.byType(Container)).decoration!
+            as BoxDecoration;
+
+    testWidgets('is a circle by default', (tester) async {
+      await pumpDs(tester, const DsIconBadge(icon: DsIcons.check));
+      final BoxDecoration decoration = decorationOf(tester);
+      expect(decoration.shape, BoxShape.circle);
+      expect(decoration.borderRadius, isNull);
+    });
+
+    testWidgets('the rounded shape takes the control radius', (tester) async {
+      // The mark follows the theme's controls, so a skin that softens or
+      // sharpens its controls carries the mark with them.
+      late DsTokens tokens;
+      await pumpDs(
+        tester,
+        Builder(
+          builder: (BuildContext context) {
+            tokens = DsTokens.of(context);
+            return const DsIconBadge(
+              icon: DsIcons.fuel,
+              shape: DsIconBadgeShape.rounded,
+              size: 44,
+            );
+          },
+        ),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+
+      final BoxDecoration decoration = decorationOf(tester);
+      expect(decoration.shape, BoxShape.rectangle);
+      expect(
+        decoration.borderRadius,
+        BorderRadius.circular(tokens.radiusControl),
+      );
+    });
+
+    testWidgets('the rounded mark holds its side and 320dp, every theme', (
+      tester,
+    ) async {
+      for (final ThemeData theme in <ThemeData>[
+        DsTheme.light(),
+        DsTheme.dark(),
+        DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      ]) {
+        await pumpDs(
+          tester,
+          const DsIconBadge(
+            icon: DsIcons.fuel,
+            shape: DsIconBadgeShape.rounded,
+            size: 44,
+          ),
+          theme: theme,
+          surfaceSize: const Size(320, 640),
+        );
+
+        expect(tester.getSize(find.byType(Container)), const Size(44, 44));
+        expect(tester.takeException(), isNull);
+      }
+    });
   });
 }

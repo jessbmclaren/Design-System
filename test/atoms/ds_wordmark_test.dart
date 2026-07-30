@@ -107,5 +107,50 @@ void main() {
 
       expect(_spanColors(tester), everyElement(const Color(0xFF336699)));
     });
+
+    testWidgets('the accent takes its own colour when one is given', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsWordmark(
+          primary: 'acme',
+          accent: 'id',
+          color: Color(0xFF111111),
+          accentColor: Color(0xFFE2231A),
+        ),
+      );
+
+      expect(_spanColors(tester),
+          <Color>[const Color(0xFF111111), const Color(0xFFE2231A)]);
+    });
+
+    testWidgets('a skin can colour the accent through its token', (
+      tester,
+    ) async {
+      // The mobile skin sets its suffix in the second brand colour, so the
+      // mark is two-tone under that skin without the caller saying so.
+      await pumpDs(
+        tester,
+        const DsWordmark(primary: 'acme', accent: 'id'),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+
+      final DsTokens tokens = DsSkins.engenMobileLight();
+      expect(_spanColors(tester),
+          <Color?>[tokens.colorText, tokens.wordmarkAccentColor]);
+      expect(tokens.wordmarkAccentColor, tokens.colorBrandSecondary);
+    });
+
+    testWidgets('without an accent colour both runs share the mark ink', (
+      tester,
+    ) async {
+      // The default must not change: a mark that separates its runs by weight
+      // alone keeps one ink.
+      await pumpDs(tester, const DsWordmark(primary: 'acme', accent: 'id'));
+      final DsTokens tokens = DsTokens.light();
+      expect(tokens.wordmarkAccentColor, isNull);
+      expect(_spanColors(tester), everyElement(tokens.colorText));
+    });
   });
 }

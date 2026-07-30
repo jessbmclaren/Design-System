@@ -204,5 +204,113 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('carries no indicator by default', (tester) async {
+      await pumpDs(
+        tester,
+        DsIconButton(
+          icon: DsIcons.notifications,
+          semanticLabel: 'Notifications',
+          onPressed: () {},
+        ),
+      );
+
+      expect(find.byTooltip('Notifications'), findsOneWidget);
+      // No dot means no Stack wrapping the glyph.
+      expect(
+        find.descendant(
+          of: find.byType(IconButton),
+          matching: find.byType(Stack),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('the indicator is spoken with the control name', (
+      tester,
+    ) async {
+      // A dot nobody can hear is a state change left silent, so the meaning
+      // rides on the label.
+      await pumpDs(
+        tester,
+        DsIconButton(
+          icon: DsIcons.notifications,
+          semanticLabel: 'Notifications',
+          showIndicator: true,
+          indicatorSemanticLabel: '3 unread',
+          onPressed: () {},
+        ),
+      );
+
+      expect(find.byTooltip('Notifications, 3 unread'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(IconButton),
+          matching: find.byType(Stack),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the indicator takes the danger signal by default', (
+      tester,
+    ) async {
+      late DsTokens tokens;
+      await pumpDs(
+        tester,
+        Builder(
+          builder: (BuildContext context) {
+            tokens = DsTokens.of(context);
+            return DsIconButton(
+              icon: DsIcons.notifications,
+              semanticLabel: 'Notifications',
+              showIndicator: true,
+              indicatorSemanticLabel: 'unread',
+              onPressed: () {},
+            );
+          },
+        ),
+      );
+
+      final BoxDecoration dot = tester
+          .widget<Container>(
+            find.descendant(
+              of: find.byType(IconButton),
+              matching: find.byType(Container),
+            ).first,
+          )
+          .decoration! as BoxDecoration;
+
+      expect(dot.color, tokens.colorDanger);
+      expect(dot.shape, BoxShape.circle);
+    });
+
+    testWidgets('the indicator holds the tap target at 320dp, every theme', (
+      tester,
+    ) async {
+      for (final ThemeData theme in <ThemeData>[
+        DsTheme.light(),
+        DsTheme.dark(),
+        DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      ]) {
+        await pumpDs(
+          tester,
+          DsIconButton(
+            icon: DsIcons.notifications,
+            semanticLabel: 'Notifications',
+            showIndicator: true,
+            indicatorSemanticLabel: 'unread',
+            onPressed: () {},
+          ),
+          theme: theme,
+          surfaceSize: const Size(320, 640),
+        );
+
+        final Size size = tester.getSize(find.byType(IconButton));
+        expect(size.width, greaterThanOrEqualTo(48));
+        expect(size.height, greaterThanOrEqualTo(48));
+        expect(tester.takeException(), isNull);
+      }
+    });
   });
 }

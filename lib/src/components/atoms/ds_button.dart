@@ -285,6 +285,26 @@ class _DsButtonState extends State<DsButton>
     final hasAction = widget.onPressed != null;
     final label = tokens.buttonLabelTextTransform.apply(widget.label);
 
+    // A gradient fill, when the skin supplies one for the primary variant. A
+    // single stop is a flat fill and stays in buttonPrimaryColorBackground, and
+    // a disabled button keeps its solid disabled tint, because a gradient reads
+    // as available. Pending keeps the resting fill, as the flat path does.
+    final List<Color>? gradientStops =
+        widget.variant == DsButtonVariant.primary &&
+                tokens.buttonPrimaryGradient.length >= 2 &&
+                hasAction
+            ? tokens.buttonPrimaryGradient
+            : null;
+
+    // The large button is a pill; every other size keeps the theme's button
+    // radius. Held in one place because the gradient has to match the shape it
+    // is painted inside.
+    final BorderRadius shapeRadius = BorderRadius.circular(
+      widget.size == DsButtonSize.lg
+          ? tokens.radiusFull
+          : tokens.buttonBorderRadius,
+    );
+
     final Widget content = Row(
       mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -363,7 +383,10 @@ class _DsButtonState extends State<DsButton>
                     : widget.onPressed,
             statesController: _states,
             style: FilledButton.styleFrom(
-              backgroundColor: background,
+              // A gradient fill is painted by backgroundBuilder below, so the
+              // flat fill steps aside rather than covering it.
+              backgroundColor:
+                  gradientStops == null ? background : Colors.transparent,
               foregroundColor: foreground,
               // Pending is busy, not disabled: the enabled fill stays, so the
               // spinner (drawn in the variant's text colour) keeps the 3:1
@@ -384,16 +407,28 @@ class _DsButtonState extends State<DsButton>
                 horizontal: _paddingX(tokens),
                 vertical: _paddingY(tokens),
               ),
-              shape: RoundedRectangleBorder(
-                // The large button is a pill; every other size keeps the
-                // theme's button radius.
-                borderRadius: BorderRadius.circular(
-                  widget.size == DsButtonSize.lg
-                      ? tokens.radiusFull
-                      : tokens.buttonBorderRadius,
-                ),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: shapeRadius),
             ).copyWith(
+              // The gradient is drawn as the button's own background layer, so
+              // it fills the button exactly, inside its shape and beneath the
+              // hover, press and focus treatments, whatever the tap-target
+              // padding does to the outer box.
+              backgroundBuilder: gradientStops == null
+                  ? null
+                  : (BuildContext context, Set<WidgetState> states,
+                      Widget? child) {
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: gradientStops,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: shapeRadius,
+                        ),
+                        child: child,
+                      );
+                    },
               // Keyboard focus draws a ring in the variant's text colour,
               // which is guaranteed to contrast with the fill, so focus reads
               // distinctly from the hover wash.

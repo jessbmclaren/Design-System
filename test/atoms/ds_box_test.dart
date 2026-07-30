@@ -220,5 +220,96 @@ void main() {
       expect(find.text('Responsive'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('paints a gradient from two or more stops', (tester) async {
+      await pumpDs(
+        tester,
+        const DsBox(
+          gradient: <Color>[Color(0xFF1650B8), Color(0xFF0D3A8A)],
+          borderRadius: 16,
+          padding: EdgeInsets.all(16),
+          child: Text('Branded'),
+        ),
+      );
+
+      final BoxDecoration decoration = tester
+          .widget<Container>(
+            find.ancestor(
+              of: find.text('Branded'),
+              matching: find.byType(Container),
+            ).first,
+          )
+          .decoration! as BoxDecoration;
+
+      expect(decoration.gradient, isA<LinearGradient>());
+      final LinearGradient gradient = decoration.gradient! as LinearGradient;
+      expect(gradient.colors,
+          <Color>[const Color(0xFF1650B8), const Color(0xFF0D3A8A)]);
+      expect(gradient.begin, Alignment.topLeft);
+      expect(gradient.end, Alignment.bottomRight);
+      // A gradient and a flat colour cannot both be set, so the fill is
+      // dropped rather than fighting the stops.
+      expect(decoration.color, isNull);
+    });
+
+    testWidgets('a single stop is not a gradient and leaves the fill alone', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        const DsBox(
+          background: Color(0xFF223344),
+          gradient: <Color>[Color(0xFF1650B8)],
+          borderRadius: 16,
+          padding: EdgeInsets.all(16),
+          child: Text('Flat'),
+        ),
+      );
+
+      final BoxDecoration decoration = tester
+          .widget<Container>(
+            find.ancestor(
+              of: find.text('Flat'),
+              matching: find.byType(Container),
+            ).first,
+          )
+          .decoration! as BoxDecoration;
+
+      expect(decoration.gradient, isNull);
+      expect(decoration.color, const Color(0xFF223344));
+    });
+
+    testWidgets('the skin supplies the brand gradient', (tester) async {
+      // The point of the token: a brand panel takes its stops from the theme,
+      // so a skin retunes every branded surface at once.
+      late DsTokens tokens;
+      await pumpDs(
+        tester,
+        Builder(
+          builder: (BuildContext context) {
+            tokens = DsTokens.of(context);
+            return DsBox(
+              gradient: tokens.brandGradient,
+              borderRadius: 16,
+              padding: const EdgeInsets.all(16),
+              child: const Text('Skinned'),
+            );
+          },
+        ),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+
+      expect(tokens.brandGradient.length, greaterThanOrEqualTo(2));
+      expect(find.text('Skinned'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the neutral base leaves the brand gradient empty', (
+      tester,
+    ) async {
+      // Empty stops mean a plain box: the white-label default stays flat.
+      expect(DsTokens.light().brandGradient, isEmpty);
+      expect(DsTokens.dark().brandGradient, isEmpty);
+    });
   });
 }

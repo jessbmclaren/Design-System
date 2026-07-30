@@ -4,6 +4,8 @@ An icon badge is a small tinted circle holding a single icon: a tick beside a fi
 
 The badge is decorative by default and hidden from assistive technology, on the expectation that the neighbouring label carries the meaning. When the mark stands alone, pass a semantic label so it is announced. The tones are primary, success, warning, danger and neutral; explicit colour overrides exist for the rare pairing the tones do not cover.
 
+The mark is a circle by default, which reads as a status: a step's tick, a warning dot beside a row. Pass `DsIconBadgeShape.rounded` for the rounded square that reads as a launcher tile instead, which is what a shortcut a thumb aims at wants. The rounded mark takes the theme's `radiusControl`, so a skin that softens or sharpens its controls carries the mark with them.
+
 ## Guidelines
 
 **Do**

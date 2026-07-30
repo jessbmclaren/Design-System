@@ -22,9 +22,18 @@ import '../../tokens/ds_icons.dart';
 ///   connotation.
 enum DsIconBadgeTone { primary, brandSoft, success, warning, danger, neutral }
 
-/// A circular mark holding a single icon on a token-tinted background.
+/// The outline a [DsIconBadge] draws around its glyph.
 ///
-/// [DsIconBadge] is the shared circle-plus-glyph mark used for step ticks,
+/// * [circle]: a round mark, the default. Reads as a status dot or a tick, so
+///   it suits a step's state or a decoration beside a row.
+/// * [rounded]: a rounded square, taking the theme's [DsTokens.radiusControl].
+///   Reads as an app tile or a launcher icon, so it suits a shortcut a thumb
+///   aims at rather than a status beside a label.
+enum DsIconBadgeShape { circle, rounded }
+
+/// A mark holding a single icon on a token-tinted background.
+///
+/// [DsIconBadge] is the shared mark-plus-glyph used for step ticks,
 /// task states and list decorations: a completed step's check, a warning dot
 /// beside a pending task, a lock ahead of a security row. The circle and the
 /// glyph take their colours from the token pair named by [tone], so the mark
@@ -48,6 +57,7 @@ class DsIconBadge extends StatelessWidget {
     super.key,
     required this.icon,
     this.tone = DsIconBadgeTone.primary,
+    this.shape = DsIconBadgeShape.circle,
     this.size = 28,
     this.iconSize,
     this.backgroundColor,
@@ -63,7 +73,14 @@ class DsIconBadge extends StatelessWidget {
   /// Defaults to [DsIconBadgeTone.primary].
   final DsIconBadgeTone tone;
 
-  /// The circle's diameter in logical pixels. Defaults to 28.
+  /// Whether the mark is a circle or a rounded square.
+  ///
+  /// Defaults to [DsIconBadgeShape.circle], the status-dot reading every
+  /// existing use expects.
+  final DsIconBadgeShape shape;
+
+  /// The mark's diameter (or side, when [shape] is rounded) in logical pixels.
+  /// Defaults to 28.
   final double size;
 
   /// The glyph size in logical pixels.
@@ -124,7 +141,14 @@ class DsIconBadge extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: backgroundColor ?? background,
-        shape: BoxShape.circle,
+        shape: shape == DsIconBadgeShape.circle
+            ? BoxShape.circle
+            : BoxShape.rectangle,
+        // The rounded mark takes the control radius, so a skin that softens or
+        // sharpens its controls carries the mark with them.
+        borderRadius: shape == DsIconBadgeShape.rounded
+            ? BorderRadius.circular(tokens.radiusControl)
+            : null,
       ),
       child: Transform.translate(
         // The check glyph's ink sits right and low of its box, so a centred

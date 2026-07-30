@@ -23,6 +23,14 @@ final PatternPage iconBadgePage = PatternPage(
       'neutral; explicit colour overrides exist for the rare pairing the '
       'tones do not cover.',
     ),
+    ProseBlock(
+      'The mark is a circle by default, which reads as a status: a step\'s '
+      'tick, a warning dot beside a row. Pass `DsIconBadgeShape.rounded` for '
+      'the rounded square that reads as a launcher tile instead, which is what '
+      'a shortcut a thumb aims at wants. The rounded mark takes the theme\'s '
+      '`radiusControl`, so a skin that softens or sharpens its controls '
+      'carries the mark with them.',
+    ),
   ],
   dos: const [
     'Pick the tone that matches the state: success for done, danger for '

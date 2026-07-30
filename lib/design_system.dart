@@ -66,6 +66,7 @@ export 'src/components/atoms/ds_switch.dart';
 export 'src/components/atoms/ds_wordmark.dart';
 // Molecules
 export 'src/components/molecules/ds_accordion.dart';
+export 'src/components/molecules/ds_action_tile.dart';
 export 'src/components/molecules/ds_address_field_group.dart';
 export 'src/components/molecules/ds_banner.dart';
 export 'src/components/molecules/ds_button_group.dart';
@@ -112,6 +113,7 @@ export 'src/components/molecules/ds_upload_field.dart';
 export 'src/components/molecules/ds_verification_rail.dart';
 // Organisms
 export 'src/components/organisms/ds_bar_chart.dart';
+export 'src/components/organisms/ds_bottom_nav.dart';
 export 'src/components/organisms/ds_board_view.dart';
 export 'src/components/organisms/ds_business_verification.dart';
 export 'src/components/organisms/ds_context_view.dart';

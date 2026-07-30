@@ -62,6 +62,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.bodySm,
     required this.labelMd,
     required this.labelSm,
+    required this.labelEyebrow,
     required this.bodyLg,
     required this.stepTitle,
     required this.display,
@@ -80,6 +81,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.colorBorder,
     required this.colorBorderSubtle,
     required this.colorIconMuted,
+    required this.colorTextMuted,
     required this.colorTextDisabled,
     required this.colorInverseSurface,
     required this.colorOnInverse,
@@ -112,6 +114,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.surfaceHoverColor,
     // Buttons
     required this.buttonPrimaryColorBackground,
+    required this.buttonPrimaryGradient,
     required this.buttonPrimaryColorBorder,
     required this.buttonPrimaryColorText,
     required this.buttonPrimaryDisabledColorBackground,
@@ -215,15 +218,19 @@ class DsTokens extends ThemeExtension<DsTokens> {
     required this.authWashBegin,
     required this.authWashEnd,
     required this.headlineGradient,
+    required this.brandGradient,
     required this.bloomColor,
     required this.bloomStops,
     required this.brandTintColor,
+    required this.colorBrandSecondary,
+    required this.colorBrandSecondaryTint,
     // Wordmark
     required this.wordmarkFontSize,
     required this.wordmarkLetterSpacing,
     required this.wordmarkHeight,
     required this.wordmarkPrimaryFontWeight,
     required this.wordmarkAccentFontWeight,
+    required this.wordmarkAccentColor,
     required this.wordmarkPrimaryText,
     required this.wordmarkAccentText,
   });
@@ -259,6 +266,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: DsTypography.bodySm,
       labelMd: DsTypography.labelMd,
       labelSm: DsTypography.labelSm,
+      // The small label, opened up. This reproduces the tracking DsIntroCard
+      // used to apply to its eyebrow by hand.
+      labelEyebrow: DsTypography.labelSm.copyWith(letterSpacing: 0.6),
       bodyLg: const DsTypeToken(
           fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
       stepTitle: const DsTypeToken(
@@ -284,6 +294,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorBorder: DsColors.border,
       colorBorderSubtle: DsColors.borderSubtle,
       colorIconMuted: const Color(0xFF717171),
+      // Defaults to the muted glyph tier, so text and icons sit at one level
+      // until a skin separates them.
+      colorTextMuted: const Color(0xFF717171),
       colorTextDisabled: const Color(0xFFBCBCBC),
       colorInverseSurface: const Color(0xFF101828),
       colorOnInverse: const Color(0xFFFFFFFF),
@@ -317,6 +330,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // The state ink at roughly the hover alpha, ready mixed.
       surfaceHoverColor: const Color(0x0F000000),
       buttonPrimaryColorBackground: DsColors.buttonPrimaryBackground,
+      // Empty: the white-label primary button is a flat fill.
+      buttonPrimaryGradient: const <Color>[],
       buttonPrimaryColorBorder: DsColors.buttonPrimaryBorder,
       buttonPrimaryColorText: DsColors.buttonPrimaryText,
       buttonPrimaryDisabledColorBackground:
@@ -433,6 +448,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // Empty keeps headline text on its plain ink until a skin supplies
       // gradient stops.
       headlineGradient: const <Color>[],
+      // Empty, so a brand panel stays a flat colorPrimary fill until a skin
+      // supplies stops.
+      brandGradient: const <Color>[],
       bloomColor: DsColors.bloom,
       // No branded pools on the neutral base: the multi-pool bloom falls back
       // to a soft spread of [bloomColor], so white-label output is unchanged
@@ -441,11 +459,17 @@ class DsTokens extends ThemeExtension<DsTokens> {
       // A soft wash of the primary, so a brand-soft mark is legible on the
       // base; a skin supplies its own tint.
       brandTintColor: const Color(0xFFE6F5F2),
+      // The neutral base is a single-brand system: the second mark defaults to
+      // the primary, so only a skin with a genuine second colour parts them.
+      colorBrandSecondary: DsColors.actionPrimary,
+      colorBrandSecondaryTint: const Color(0xFFE6F5F2),
       wordmarkFontSize: 22,
       wordmarkLetterSpacing: -0.2,
       wordmarkHeight: 1,
       wordmarkPrimaryFontWeight: DsTypography.semiBold,
       wordmarkAccentFontWeight: DsTypography.bold,
+      // Null, so the accent is told apart by its weight alone.
+      wordmarkAccentColor: null,
       wordmarkPrimaryText: '',
       wordmarkAccentText: null,
     );
@@ -462,6 +486,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorBorderSubtle: const Color(0xFF3F4147),
       // One step dimmer than the dark secondary text.
       colorIconMuted: const Color(0xFF8A93A6),
+      colorTextMuted: const Color(0xFF8A93A6),
       colorTextDisabled: const Color(0xFF5A6170),
       // The inverse pair flips against the dark theme.
       colorInverseSurface: const Color(0xFFF5F6F8),
@@ -538,6 +563,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bloomColor: const Color(0xFF2A2C33),
       // A dark wash toward the primary, one step above the page.
       brandTintColor: const Color(0xFF123330),
+      // The second mark keeps following the primary on the dark page.
+      colorBrandSecondary: DsColors.brandPrimaryDark,
+      colorBrandSecondaryTint: const Color(0xFF123330),
     );
   }
 
@@ -675,6 +703,16 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// Small label typography.
   final DsTypeToken labelSm;
 
+  /// The eyebrow above a heading: the small, tracked-out kicker that names the
+  /// section a headline belongs to ("GOOD MORNING", "QUICK ACCESS", "New").
+  ///
+  /// Tracked wider than [labelSm] rather than smaller, because a short line
+  /// set in caps needs air between the letters to stay readable. Defaults to
+  /// [labelSm] opened up to 0.6 tracking with no transform, the treatment
+  /// [DsIntroCard] used to hardcode; a skin that sets its eyebrows in caps
+  /// supplies `DsTextTransform.uppercase` and its own tracking.
+  final DsTypeToken labelEyebrow;
+
   /// Large body typography, one step up from [bodyMd] for lead
   /// paragraphs.
   final DsTypeToken bodyLg;
@@ -743,6 +781,14 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The colour for muted, non-interactive icons such as a field's
   /// leading glyph. One step dimmer than [colorSecondaryText].
   final Color colorIconMuted;
+
+  /// The quiet text tier beneath [colorSecondaryText]: a timestamp, a unit
+  /// suffix, a caption that supports the line above it rather than competing
+  /// with it. Dimmer than [colorSecondaryText] but not the disabled
+  /// treatment, so it still reads as live text. Defaults to
+  /// [colorIconMuted], the matching tier for glyphs. Reserve it for short
+  /// supporting runs, never for a paragraph.
+  final Color colorTextMuted;
 
   /// The colour for disabled text, dimmer than [colorSecondaryText] while
   /// staying legible against [colorBackground].
@@ -862,6 +908,20 @@ class DsTokens extends ThemeExtension<DsTokens> {
 
   /// The colour used as a background for primary buttons.
   final Color buttonPrimaryColorBackground;
+
+  /// The colour stops of a gradient fill for the primary button, painted
+  /// instead of [buttonPrimaryColorBackground].
+  ///
+  /// Empty by default, so the primary button stays a flat fill until a skin
+  /// supplies stops. The stops run corner to corner, from the top-left to the
+  /// bottom-right, and only the resting and pending fills take them: a disabled
+  /// button keeps [buttonPrimaryDisabledColorBackground], because a gradient
+  /// would read as available.
+  ///
+  /// Give it at least two colours; a single stop is a flat fill and belongs in
+  /// [buttonPrimaryColorBackground]. Every stop has to clear AA against
+  /// [buttonPrimaryColorText], since the label crosses all of them.
+  final List<Color> buttonPrimaryGradient;
 
   /// The border colour used for primary buttons.
   final Color buttonPrimaryColorBorder;
@@ -1235,6 +1295,16 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// ink until a skin supplies stops.
   final List<Color> headlineGradient;
 
+  /// The colour stops of the brand's gradient surface, painted across a raised
+  /// brand panel such as a promoted call-to-action card.
+  ///
+  /// Empty by default, so a surface keeps its flat [colorPrimary] fill until a
+  /// skin supplies stops. Where a component paints it, the stops run from the
+  /// top-left to the bottom-right corner. Give it at least two colours; a
+  /// single stop reads as a flat fill and is better expressed as one. Pair it
+  /// with [colorOnPrimary] as the ink on top.
+  final List<Color> brandGradient;
+
   /// The peak colour of the soft radial brand glow painted by [DsBrandBloom].
   /// The default is a neutral one step deeper than the wash, so the glow is
   /// present without carrying a hue; a skin supplies its brand tint.
@@ -1253,6 +1323,21 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// on the base; a skin supplies its own tint. Pair it with
   /// [actionPrimaryColorText] as the ink on top.
   final Color brandTintColor;
+
+  /// The brand's second mark, for a brand that runs two colours rather than
+  /// one: the accent that carries a promotional call to action or a
+  /// brand-owned highlight, distinct from [colorPrimary] and from the
+  /// [colorDanger] signal even when both happen to be red. Defaults to
+  /// [colorPrimary], so the neutral base stays a single-brand system and only
+  /// a skin that genuinely has a second colour sets it. Pair it with
+  /// [colorOnPrimary] as the ink on top.
+  final Color colorBrandSecondary;
+
+  /// A soft wash of [colorBrandSecondary]: the quiet surface behind a
+  /// secondary-brand badge or banner, the counterpart to [brandTintColor] for
+  /// the second mark. Defaults to [brandTintColor]. Pair it with
+  /// [colorBrandSecondary] as the ink on top.
+  final Color colorBrandSecondaryTint;
 
   // Wordmark ---------------------------------------------------------------
 
@@ -1274,6 +1359,14 @@ class DsTokens extends ThemeExtension<DsTokens> {
   /// The font weight of the wordmark's optional accent part. Defaults to
   /// [DsTypography.bold], one step heavier than the primary.
   final FontWeight wordmarkAccentFontWeight;
+
+  /// The colour of the wordmark's accent run, for a mark whose suffix is set
+  /// in a second colour rather than only a second weight.
+  ///
+  /// Null by default, so the accent takes the same ink as the rest of the mark
+  /// and is told apart by [wordmarkAccentFontWeight] alone. A brand whose mark
+  /// carries a coloured suffix sets it, usually to [colorBrandSecondary].
+  final Color? wordmarkAccentColor;
 
   /// The wordmark's primary text, such as a brand name. Empty by
   /// default, so the white-label chrome shows no mark until a skin
@@ -1312,6 +1405,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     DsTypeToken? bodySm,
     DsTypeToken? labelMd,
     DsTypeToken? labelSm,
+    DsTypeToken? labelEyebrow,
     DsTypeToken? bodyLg,
     DsTypeToken? stepTitle,
     DsTypeToken? display,
@@ -1328,6 +1422,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? colorBorder,
     Color? colorBorderSubtle,
     Color? colorIconMuted,
+    Color? colorTextMuted,
     Color? colorTextDisabled,
     Color? colorInverseSurface,
     Color? colorOnInverse,
@@ -1357,6 +1452,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
     Color? stateInkColor,
     Color? surfaceHoverColor,
     Color? buttonPrimaryColorBackground,
+    List<Color>? buttonPrimaryGradient,
     Color? buttonPrimaryColorBorder,
     Color? buttonPrimaryColorText,
     Color? buttonPrimaryDisabledColorBackground,
@@ -1454,14 +1550,20 @@ class DsTokens extends ThemeExtension<DsTokens> {
     AlignmentGeometry? authWashBegin,
     AlignmentGeometry? authWashEnd,
     List<Color>? headlineGradient,
+    List<Color>? brandGradient,
     Color? bloomColor,
     List<Color>? bloomStops,
     Color? brandTintColor,
+    Color? colorBrandSecondary,
+    Color? colorBrandSecondaryTint,
     double? wordmarkFontSize,
     double? wordmarkLetterSpacing,
     double? wordmarkHeight,
     FontWeight? wordmarkPrimaryFontWeight,
     FontWeight? wordmarkAccentFontWeight,
+    // Nullable, so it takes the sentinel: passing null must be able to clear a
+    // skin's accent colour back to the wordmark's own ink.
+    Object? wordmarkAccentColor = _unset,
     String? wordmarkPrimaryText,
     Object? wordmarkAccentText = _unset,
   }) {
@@ -1493,6 +1595,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: bodySm ?? this.bodySm,
       labelMd: labelMd ?? this.labelMd,
       labelSm: labelSm ?? this.labelSm,
+      labelEyebrow: labelEyebrow ?? this.labelEyebrow,
       bodyLg: bodyLg ?? this.bodyLg,
       stepTitle: stepTitle ?? this.stepTitle,
       display: display ?? this.display,
@@ -1511,6 +1614,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorBorder: colorBorder ?? this.colorBorder,
       colorBorderSubtle: colorBorderSubtle ?? this.colorBorderSubtle,
       colorIconMuted: colorIconMuted ?? this.colorIconMuted,
+      colorTextMuted: colorTextMuted ?? this.colorTextMuted,
       colorTextDisabled: colorTextDisabled ?? this.colorTextDisabled,
       colorInverseSurface: colorInverseSurface ?? this.colorInverseSurface,
       colorOnInverse: colorOnInverse ?? this.colorOnInverse,
@@ -1559,6 +1663,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       surfaceHoverColor: surfaceHoverColor ?? this.surfaceHoverColor,
       buttonPrimaryColorBackground:
           buttonPrimaryColorBackground ?? this.buttonPrimaryColorBackground,
+      buttonPrimaryGradient:
+          buttonPrimaryGradient ?? this.buttonPrimaryGradient,
       buttonPrimaryColorBorder:
           buttonPrimaryColorBorder ?? this.buttonPrimaryColorBorder,
       buttonPrimaryColorText:
@@ -1700,9 +1806,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
       authWashBegin: authWashBegin ?? this.authWashBegin,
       authWashEnd: authWashEnd ?? this.authWashEnd,
       headlineGradient: headlineGradient ?? this.headlineGradient,
+      brandGradient: brandGradient ?? this.brandGradient,
       bloomColor: bloomColor ?? this.bloomColor,
       bloomStops: bloomStops ?? this.bloomStops,
       brandTintColor: brandTintColor ?? this.brandTintColor,
+      colorBrandSecondary: colorBrandSecondary ?? this.colorBrandSecondary,
+      colorBrandSecondaryTint:
+          colorBrandSecondaryTint ?? this.colorBrandSecondaryTint,
       wordmarkFontSize: wordmarkFontSize ?? this.wordmarkFontSize,
       wordmarkLetterSpacing:
           wordmarkLetterSpacing ?? this.wordmarkLetterSpacing,
@@ -1711,6 +1821,9 @@ class DsTokens extends ThemeExtension<DsTokens> {
           wordmarkPrimaryFontWeight ?? this.wordmarkPrimaryFontWeight,
       wordmarkAccentFontWeight:
           wordmarkAccentFontWeight ?? this.wordmarkAccentFontWeight,
+      wordmarkAccentColor: identical(wordmarkAccentColor, _unset)
+          ? this.wordmarkAccentColor
+          : wordmarkAccentColor as Color?,
       wordmarkPrimaryText: wordmarkPrimaryText ?? this.wordmarkPrimaryText,
       wordmarkAccentText: identical(wordmarkAccentText, _unset)
           ? this.wordmarkAccentText
@@ -1754,6 +1867,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       bodySm: t < 0.5 ? bodySm : other.bodySm,
       labelMd: t < 0.5 ? labelMd : other.labelMd,
       labelSm: t < 0.5 ? labelSm : other.labelSm,
+      labelEyebrow: t < 0.5 ? labelEyebrow : other.labelEyebrow,
       bodyLg: t < 0.5 ? bodyLg : other.bodyLg,
       stepTitle: t < 0.5 ? stepTitle : other.stepTitle,
       display: t < 0.5 ? display : other.display,
@@ -1772,6 +1886,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
       colorBorder: c(colorBorder, other.colorBorder),
       colorBorderSubtle: c(colorBorderSubtle, other.colorBorderSubtle),
       colorIconMuted: c(colorIconMuted, other.colorIconMuted),
+      colorTextMuted: c(colorTextMuted, other.colorTextMuted),
       colorTextDisabled: c(colorTextDisabled, other.colorTextDisabled),
       colorInverseSurface: c(colorInverseSurface, other.colorInverseSurface),
       colorOnInverse: c(colorOnInverse, other.colorOnInverse),
@@ -1827,6 +1942,8 @@ class DsTokens extends ThemeExtension<DsTokens> {
       surfaceHoverColor: c(surfaceHoverColor, other.surfaceHoverColor),
       buttonPrimaryColorBackground:
           c(buttonPrimaryColorBackground, other.buttonPrimaryColorBackground),
+      buttonPrimaryGradient:
+          cs(buttonPrimaryGradient, other.buttonPrimaryGradient),
       buttonPrimaryColorBorder:
           c(buttonPrimaryColorBorder, other.buttonPrimaryColorBorder),
       buttonPrimaryColorText:
@@ -1971,9 +2088,13 @@ class DsTokens extends ThemeExtension<DsTokens> {
       authWashBegin: t < 0.5 ? authWashBegin : other.authWashBegin,
       authWashEnd: t < 0.5 ? authWashEnd : other.authWashEnd,
       headlineGradient: cs(headlineGradient, other.headlineGradient),
+      brandGradient: cs(brandGradient, other.brandGradient),
       bloomColor: c(bloomColor, other.bloomColor),
       bloomStops: cs(bloomStops, other.bloomStops),
       brandTintColor: c(brandTintColor, other.brandTintColor),
+      colorBrandSecondary: c(colorBrandSecondary, other.colorBrandSecondary),
+      colorBrandSecondaryTint:
+          c(colorBrandSecondaryTint, other.colorBrandSecondaryTint),
       wordmarkFontSize: d(wordmarkFontSize, other.wordmarkFontSize),
       wordmarkLetterSpacing:
           d(wordmarkLetterSpacing, other.wordmarkLetterSpacing),
@@ -1982,6 +2103,10 @@ class DsTokens extends ThemeExtension<DsTokens> {
           wordmarkPrimaryFontWeight, other.wordmarkPrimaryFontWeight, t)!,
       wordmarkAccentFontWeight: FontWeight.lerp(
           wordmarkAccentFontWeight, other.wordmarkAccentFontWeight, t)!,
+      // Nullable, so Color.lerp is used directly: it fades to and from a null
+      // accent rather than snapping at the midpoint.
+      wordmarkAccentColor:
+          Color.lerp(wordmarkAccentColor, other.wordmarkAccentColor, t),
       wordmarkPrimaryText:
           t < 0.5 ? wordmarkPrimaryText : other.wordmarkPrimaryText,
       wordmarkAccentText:
@@ -2019,6 +2144,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           bodySm == other.bodySm &&
           labelMd == other.labelMd &&
           labelSm == other.labelSm &&
+          labelEyebrow == other.labelEyebrow &&
           bodyLg == other.bodyLg &&
           stepTitle == other.stepTitle &&
           display == other.display &&
@@ -2035,6 +2161,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           colorBorder == other.colorBorder &&
           colorBorderSubtle == other.colorBorderSubtle &&
           colorIconMuted == other.colorIconMuted &&
+          colorTextMuted == other.colorTextMuted &&
           colorTextDisabled == other.colorTextDisabled &&
           colorInverseSurface == other.colorInverseSurface &&
           colorOnInverse == other.colorOnInverse &&
@@ -2064,6 +2191,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
           stateInkColor == other.stateInkColor &&
           surfaceHoverColor == other.surfaceHoverColor &&
           buttonPrimaryColorBackground == other.buttonPrimaryColorBackground &&
+          listEquals(buttonPrimaryGradient, other.buttonPrimaryGradient) &&
           buttonPrimaryColorBorder == other.buttonPrimaryColorBorder &&
           buttonPrimaryColorText == other.buttonPrimaryColorText &&
           buttonPrimaryDisabledColorBackground ==
@@ -2164,14 +2292,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
           authWashBegin == other.authWashBegin &&
           authWashEnd == other.authWashEnd &&
           listEquals(headlineGradient, other.headlineGradient) &&
+          listEquals(brandGradient, other.brandGradient) &&
           bloomColor == other.bloomColor &&
           listEquals(bloomStops, other.bloomStops) &&
           brandTintColor == other.brandTintColor &&
+          colorBrandSecondary == other.colorBrandSecondary &&
+          colorBrandSecondaryTint == other.colorBrandSecondaryTint &&
           wordmarkFontSize == other.wordmarkFontSize &&
           wordmarkLetterSpacing == other.wordmarkLetterSpacing &&
           wordmarkHeight == other.wordmarkHeight &&
           wordmarkPrimaryFontWeight == other.wordmarkPrimaryFontWeight &&
           wordmarkAccentFontWeight == other.wordmarkAccentFontWeight &&
+          wordmarkAccentColor == other.wordmarkAccentColor &&
           wordmarkPrimaryText == other.wordmarkPrimaryText &&
           wordmarkAccentText == other.wordmarkAccentText;
   }
@@ -2204,6 +2336,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         bodySm,
         labelMd,
         labelSm,
+        labelEyebrow,
         bodyLg,
         stepTitle,
         display,
@@ -2220,6 +2353,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         colorBorder,
         colorBorderSubtle,
         colorIconMuted,
+        colorTextMuted,
         colorTextDisabled,
         colorInverseSurface,
         colorOnInverse,
@@ -2249,6 +2383,7 @@ class DsTokens extends ThemeExtension<DsTokens> {
         stateInkColor,
         surfaceHoverColor,
         buttonPrimaryColorBackground,
+        Object.hashAll(buttonPrimaryGradient),
         buttonPrimaryColorBorder,
         buttonPrimaryColorText,
         buttonPrimaryDisabledColorBackground,
@@ -2346,14 +2481,18 @@ class DsTokens extends ThemeExtension<DsTokens> {
         authWashBegin,
         authWashEnd,
         Object.hashAll(headlineGradient),
+        Object.hashAll(brandGradient),
         bloomColor,
         Object.hashAll(bloomStops),
         brandTintColor,
+        colorBrandSecondary,
+        colorBrandSecondaryTint,
         wordmarkFontSize,
         wordmarkLetterSpacing,
         wordmarkHeight,
         wordmarkPrimaryFontWeight,
         wordmarkAccentFontWeight,
+        wordmarkAccentColor,
         wordmarkPrimaryText,
         wordmarkAccentText,
       ]);

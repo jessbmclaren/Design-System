@@ -225,6 +225,12 @@ abstract final class DsTheme {
         t.colorBackground);
     check('primary button label on its fill', t.buttonPrimaryColorText,
         t.buttonPrimaryColorBackground);
+    // A gradient fill replaces that flat colour, so every stop carries the
+    // label and every stop has to clear AA. The label crosses all of them.
+    for (int i = 0; i < t.buttonPrimaryGradient.length; i++) {
+      check('primary button label on gradient stop $i',
+          t.buttonPrimaryColorText, t.buttonPrimaryGradient[i]);
+    }
     check('danger button label on its fill', t.buttonDangerColorText,
         t.buttonDangerColorBackground);
     check('neutral badge ink on its fill', t.badgeNeutralColorText,

@@ -469,4 +469,121 @@ void main() {
       expect(taps, 1);
     });
   });
+
+  group('DsButton gradient fill', () {
+    /// The gradient the button paints, or null when it is a flat fill.
+    LinearGradient? gradientOf(WidgetTester tester) {
+      final Finder decorated = find.descendant(
+        of: find.byType(FilledButton),
+        matching: find.byType(DecoratedBox),
+      );
+      for (final DecoratedBox box
+          in tester.widgetList<DecoratedBox>(decorated)) {
+        final Decoration decoration = box.decoration;
+        if (decoration is BoxDecoration && decoration.gradient != null) {
+          return decoration.gradient! as LinearGradient;
+        }
+      }
+      return null;
+    }
+
+    testWidgets('the neutral base paints a flat primary fill', (tester) async {
+      // Empty stops mean nothing changes for the white-label default.
+      expect(DsTokens.light().buttonPrimaryGradient, isEmpty);
+      expect(DsTokens.dark().buttonPrimaryGradient, isEmpty);
+
+      await pumpDs(tester, DsButton(label: 'Save', onPressed: () {}));
+      expect(gradientOf(tester), isNull);
+    });
+
+    testWidgets('a skin with stops paints them corner to corner', (
+      tester,
+    ) async {
+      await pumpDs(
+        tester,
+        DsButton(label: 'Approve all', onPressed: () {}),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+
+      final LinearGradient? gradient = gradientOf(tester);
+      expect(gradient, isNotNull);
+      expect(gradient!.colors, DsSkins.engenMobileLight().buttonPrimaryGradient);
+      expect(gradient.begin, Alignment.topLeft);
+      expect(gradient.end, Alignment.bottomRight);
+    });
+
+    testWidgets('only the primary variant takes the gradient', (tester) async {
+      for (final DsButtonVariant variant in <DsButtonVariant>[
+        DsButtonVariant.secondary,
+        DsButtonVariant.tertiary,
+        DsButtonVariant.neutral,
+        DsButtonVariant.danger,
+      ]) {
+        await pumpDs(
+          tester,
+          DsButton(label: 'Act', variant: variant, onPressed: () {}),
+          theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+        );
+        expect(gradientOf(tester), isNull, reason: '$variant took a gradient');
+      }
+    });
+
+    testWidgets('a disabled button drops the gradient for its solid tint', (
+      tester,
+    ) async {
+      // A gradient reads as available, so the disabled treatment stays flat.
+      await pumpDs(
+        tester,
+        const DsButton(label: 'Approve all', onPressed: null),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+      expect(gradientOf(tester), isNull);
+    });
+
+    testWidgets('a pending button keeps the gradient', (tester) async {
+      // Pending is busy, not disabled: the resting fill stays so the spinner
+      // holds its contrast.
+      await pumpDs(
+        tester,
+        DsButton(label: 'Approve all', pending: true, onPressed: () {}),
+        theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+      );
+      expect(gradientOf(tester), isNotNull);
+    });
+
+    testWidgets('a single stop stays a flat fill', (tester) async {
+      await pumpDs(
+        tester,
+        DsButton(label: 'Save', onPressed: () {}),
+        theme: DsTheme.light(
+          tokens: DsTokens.light()
+              .copyWith(buttonPrimaryGradient: const <Color>[Color(0xFF1650B8)]),
+        ),
+      );
+      expect(gradientOf(tester), isNull);
+    });
+
+    testWidgets('holds the label and 320dp with a gradient, both modes', (
+      tester,
+    ) async {
+      for (final ThemeData theme in <ThemeData>[
+        DsTheme.light(tokens: DsSkins.engenMobileLight()),
+        DsTheme.dark(tokens: DsSkins.engenMobileDark()),
+      ]) {
+        await pumpDs(
+          tester,
+          DsButton(
+            label: 'A remarkably long call to action that will not fit',
+            fullWidth: true,
+            onPressed: () {},
+          ),
+          theme: theme,
+          surfaceSize: const Size(320, 480),
+        );
+        expect(find.byType(DsButton), findsOneWidget);
+        expect(gradientOf(tester), isNotNull);
+        expect(tester.takeException(), isNull);
+      }
+    });
+  });
 }

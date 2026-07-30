@@ -44,6 +44,9 @@ class DsBox extends StatelessWidget {
     this.padding,
     this.margin,
     this.background,
+    this.gradient,
+    this.gradientBegin = Alignment.topLeft,
+    this.gradientEnd = Alignment.bottomRight,
     this.borderColor,
     this.borderRadius = 0,
     this.borderWidth,
@@ -66,6 +69,21 @@ class DsBox extends StatelessWidget {
   ///
   /// Pass a theme token such as `DsTokens.of(context).colorBackground`.
   final Color? background;
+
+  /// The colour stops of a gradient fill, painted instead of [background].
+  ///
+  /// Pass a theme token such as `DsTokens.of(context).brandGradient`, so a skin
+  /// that re-tints its brand surface restyles the box too. The stops run from
+  /// [gradientBegin] to [gradientEnd]. A list with fewer than two colours is
+  /// ignored and the box falls back to [background], because a single stop is a
+  /// flat fill and belongs there.
+  final List<Color>? gradient;
+
+  /// Where the [gradient] starts. Defaults to the top-left corner.
+  final AlignmentGeometry gradientBegin;
+
+  /// Where the [gradient] ends. Defaults to the bottom-right corner.
+  final AlignmentGeometry gradientEnd;
 
   /// The border colour. When `null` no border is drawn.
   ///
@@ -106,8 +124,15 @@ class DsBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasBorder = borderColor != null;
-    final bool hasDecoration =
-        background != null || hasBorder || borderRadius != 0 || shadow != null;
+    // A single stop is a flat fill, not a gradient, so it is left to
+    // [background] rather than painted as a one-colour ramp.
+    final List<Color>? stops =
+        (gradient != null && gradient!.length >= 2) ? gradient : null;
+    final bool hasDecoration = background != null ||
+        stops != null ||
+        hasBorder ||
+        borderRadius != 0 ||
+        shadow != null;
 
     final BorderRadius radius = BorderRadius.circular(borderRadius);
 
@@ -115,7 +140,16 @@ class DsBox extends StatelessWidget {
     // otherwise-plain box stays as cheap as a Padding/Align.
     final Decoration? decoration = hasDecoration
         ? BoxDecoration(
-            color: background,
+            // A gradient and a colour cannot both be set on a BoxDecoration,
+            // so the stops win and the flat fill is dropped.
+            color: stops == null ? background : null,
+            gradient: stops == null
+                ? null
+                : LinearGradient(
+                    colors: stops,
+                    begin: gradientBegin,
+                    end: gradientEnd,
+                  ),
             borderRadius: borderRadius != 0 ? radius : null,
             border: hasBorder
                 ? Border.all(

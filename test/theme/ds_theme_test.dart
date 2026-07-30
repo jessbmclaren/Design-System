@@ -339,6 +339,55 @@ void main() {
       }
     });
 
+    test(
+        'the second brand mark and the muted text tier thread through '
+        'copyWith, lerp and equality', () {
+      const probe = Color(0xFF123456);
+      final base = DsTokens.light();
+
+      final copied = base.copyWith(
+        colorBrandSecondary: probe,
+        colorBrandSecondaryTint: probe,
+        colorTextMuted: probe,
+      );
+      expect(copied.colorBrandSecondary, probe);
+      expect(copied.colorBrandSecondaryTint, probe);
+      expect(copied.colorTextMuted, probe);
+
+      // Endpoints of a lerp resolve to each side's values.
+      expect(
+          base.lerp(copied, 0).colorBrandSecondary, base.colorBrandSecondary);
+      expect(base.lerp(copied, 1).colorBrandSecondary, probe);
+      expect(base.lerp(copied, 1).colorBrandSecondaryTint, probe);
+      expect(base.lerp(copied, 1).colorTextMuted, probe);
+
+      // Equality is structural: an unchanged copy restores it.
+      final same = copied.copyWith();
+      expect(same, copied);
+      expect(same.hashCode, copied.hashCode);
+
+      // And each one breaks equality on its own, so none is missing from the
+      // equality or hashCode contract.
+      for (final variant in <DsTokens>[
+        base.copyWith(colorBrandSecondary: probe),
+        base.copyWith(colorBrandSecondaryTint: probe),
+        base.copyWith(colorTextMuted: probe),
+      ]) {
+        expect(variant, isNot(equals(base)));
+      }
+    });
+
+    test('the second mark and the muted tier default to their neighbours', () {
+      // The neutral base stays a single-brand system: the second mark follows
+      // the primary and its wash follows the brand tint until a skin parts
+      // them, and muted text sits level with the muted glyph.
+      for (final t in <DsTokens>[DsTokens.light(), DsTokens.dark()]) {
+        expect(t.colorBrandSecondary, t.colorPrimary);
+        expect(t.colorBrandSecondaryTint, t.brandTintColor);
+        expect(t.colorTextMuted, t.colorIconMuted);
+      }
+    });
+
     test('the auth chrome tokens thread through copyWith, lerp and equality',
         () {
       const probeWash = [Color(0xFF111111), Color(0xFF222222)];

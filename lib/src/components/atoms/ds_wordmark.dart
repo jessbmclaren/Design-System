@@ -26,6 +26,7 @@ class DsWordmark extends StatelessWidget {
     this.accent,
     this.fontSize,
     this.color,
+    this.accentColor,
   });
 
   /// The main part of the name, shown in the lighter of the two weights.
@@ -41,6 +42,13 @@ class DsWordmark extends StatelessWidget {
 
   /// The wordmark colour. Defaults to [DsTokens.colorText].
   final Color? color;
+
+  /// The colour of the [accent] run, for a mark whose suffix is set in a second
+  /// colour as well as a second weight.
+  ///
+  /// Defaults to [DsTokens.wordmarkAccentColor], and when that is null too the
+  /// accent takes the same ink as the rest of the mark.
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +81,12 @@ class DsWordmark extends StatelessWidget {
           if (accentText != null)
             TextSpan(
               text: accentText,
-              style: base.copyWith(fontWeight: tokens.wordmarkAccentFontWeight),
+              style: base.copyWith(
+                fontWeight: tokens.wordmarkAccentFontWeight,
+                // Null leaves the base ink in place, so a mark that separates
+                // its runs by weight alone is untouched.
+                color: accentColor ?? tokens.wordmarkAccentColor,
+              ),
             ),
         ],
       ),

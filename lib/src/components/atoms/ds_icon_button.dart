@@ -39,6 +39,9 @@ class DsIconButton extends StatelessWidget {
     this.size = 40,
     this.iconSize,
     this.color,
+    this.showIndicator = false,
+    this.indicatorColor,
+    this.indicatorSemanticLabel,
   });
 
   /// The glyph shown in the centre of the button.
@@ -65,10 +68,26 @@ class DsIconButton extends StatelessWidget {
   /// (a status banner, a toast) and must match that surface's foreground.
   final Color? color;
 
+  /// Whether to ride a small dot on the glyph's top corner, marking something
+  /// waiting behind the control: an unread notification, a pending item.
+  ///
+  /// The dot is decoration on its own, so pass [indicatorSemanticLabel] to say
+  /// what it means. A dot nobody can hear is a state change left silent.
+  final bool showIndicator;
+
+  /// The dot's colour. Defaults to [DsTokens.colorDanger], the signal a waiting
+  /// item usually carries.
+  final Color? indicatorColor;
+
+  /// What the dot means, announced after [semanticLabel] ("Notifications, 3
+  /// unread"). Ignored when [showIndicator] is false.
+  final String? indicatorSemanticLabel;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
     final Color foreground = color ?? tokens.colorText;
+    final double resolvedIconSize = iconSize ?? tokens.iconSizeMd;
 
     // A flat control with a soft fill that only appears on interaction, tinted
     // from the text colour so it reads on any surface in light or dark.
@@ -99,10 +118,50 @@ class DsIconButton extends StatelessWidget {
       return const CircleBorder();
     });
 
+    Widget glyph = Icon(icon, size: resolvedIconSize);
+    if (showIndicator) {
+      // The dot is a third of the glyph, so it stays in proportion when a
+      // caller sizes the button up for a denser or airier slot. It rides
+      // outside the glyph box and the button's padded tap target leaves room,
+      // so the geometry a thumb aims at does not move.
+      final double diameter = resolvedIconSize / 3;
+      glyph = Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          glyph,
+          Positioned(
+            top: -diameter / 4,
+            right: -diameter / 4,
+            child: Container(
+              width: diameter,
+              height: diameter,
+              decoration: BoxDecoration(
+                color: indicatorColor ?? tokens.colorDanger,
+                shape: BoxShape.circle,
+                // A ring in the page colour, so the dot still reads as a dot
+                // where it overlaps the glyph or an interaction fill.
+                border: Border.all(
+                  color: tokens.colorBackground,
+                  width: tokens.boxBorderWidth,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // The dot carries meaning, so it is spoken with the control's name rather
+    // than left as decoration.
+    final String? indicatorNote =
+        showIndicator ? indicatorSemanticLabel : null;
+    final String label =
+        indicatorNote == null ? semanticLabel : '$semanticLabel, $indicatorNote';
+
     return IconButton(
       onPressed: onPressed,
-      icon: Icon(icon, size: iconSize ?? tokens.iconSizeMd),
-      tooltip: semanticLabel,
+      icon: glyph,
+      tooltip: label,
       padding: EdgeInsets.zero,
       constraints: BoxConstraints.tightFor(width: size, height: size),
       style: IconButton.styleFrom(

@@ -21,6 +21,15 @@ final PatternPage actionButtonsPage = PatternPage(
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
+      'The primary fill can be a gradient rather than a flat colour: a skin '
+      'that sets `buttonPrimaryGradient` has its calls to action filled corner '
+      'to corner, and a skin that leaves it empty keeps the flat fill. Only '
+      'the resting and pending fills take the ramp. A disabled button falls '
+      'back to its solid tint, because a gradient reads as available, and the '
+      'theme refuses to build if any stop fails AA against the label, since '
+      'the label crosses all of them.',
+    ),
+    ProseBlock(
       'Emphasis comes from the `variant`, not the position. Reserve the '
       '`danger` variant for destructive, hard-to-undo actions such as deleting '
       'a record or voiding a document, and pair it with a confirmation step. '

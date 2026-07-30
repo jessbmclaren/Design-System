@@ -17,6 +17,8 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | `spacingUnit` | `double` | `8` | The base spacing unit, in logical pixels, that layout spacing derives from. |
 | `borderRadius` | `double` | `6` | The general border radius used as the default for components. |
 | `colorPrimary` | `Color` | `#0F766E` | The primary brand colour used for primary actions and accents. |
+| `colorBrandSecondary` | `Color` | `#0F766E` | The brand's second mark, for a brand that runs two colours rather than one: the accent that carries a promotional call to action or a brand-owned highlight, distinct from colorPrimary and from the colorDanger signal even when both happen to be red. Defaults to colorPrimary, so the neutral base stays a single-brand system. |
+| `colorBrandSecondaryTint` | `Color` | `#E6F5F2` | A soft wash of colorBrandSecondary: the quiet surface behind a secondary-brand badge or banner, the counterpart to brandTintColor for the second mark. Defaults to brandTintColor. |
 | `colorBackground` | `Color` | `#FFFFFF` | The background colour for components, including overlays and surfaces. |
 | `colorText` | `Color` | `#1A1B25` | The colour used for primary text. |
 | `colorDanger` | `Color` | `#E61947` | The colour used to indicate errors or destructive actions. |
@@ -30,6 +32,7 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | `actionPrimaryColorText` | `Color` | `#0F766E` | The colour used for primary actions and links. |
 | `actionSecondaryColorText` | `Color` | `#444444` | The colour used for secondary actions and links. |
 | `buttonPrimaryColorBackground` | `Color` | `#0F766E` | The colour used as a background for primary buttons. |
+| `buttonPrimaryGradient` | `List<Color>` | `[]` | The colour stops of a gradient fill for the primary button, painted instead of buttonPrimaryColorBackground and running from the top-left to the bottom-right corner. Empty by default, so the button stays a flat fill until a skin supplies stops. Only the resting and pending fills take them: a disabled button keeps its solid tint, because a gradient reads as available. Every stop has to clear AA against buttonPrimaryColorText, since the label crosses all of them. |
 | `buttonPrimaryColorBorder` | `Color` | `#0F766E` | The border colour used for primary buttons. |
 | `buttonPrimaryColorText` | `Color` | `#FFFFFF` | The text colour used for primary buttons. |
 | `buttonPrimaryDisabledColorBackground` | `Color` | `#800F766E` | The background colour for disabled primary buttons (ARGB). Defaults to the primary background at 50% opacity; a skin can supply a solid tint instead. |
@@ -52,6 +55,7 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
 | `colorSecondaryText` | `Color` | `#717171` | The colour used for secondary text. |
+| `colorTextMuted` | `Color` | `#717171` | The quiet text tier beneath colorSecondaryText: a timestamp, a unit suffix, a caption that supports the line above it. Dimmer than colorSecondaryText but not the disabled treatment, so it still reads as live text. Defaults to colorIconMuted, the matching tier for glyphs. Reserve it for short supporting runs, never for a paragraph. |
 | `colorBorder` | `Color` | `#D7D7D7` | The colour used for borders throughout components. |
 | `colorBorderSubtle` | `Color` | `#D7D7D7` | The hairline tier beneath colorBorder: the quietest rule the system draws, used by dividers and decorative hairlines. Defaults to the border colour. |
 | `formBackgroundColor` | `Color` | `#FFFFFF` | The background colour used for form items. |

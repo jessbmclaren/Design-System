@@ -50,6 +50,7 @@ import 'lists_demo.dart';
 import 'filter_controls_demo.dart';
 import 'focus_view_demo.dart';
 import 'box_demo.dart';
+import 'engenxt_home_demo.dart';
 import 'button_group_demo.dart';
 import 'context_view_demo.dart';
 import 'settings_view_demo.dart';
@@ -128,6 +129,7 @@ final Map<String, Widget Function()> _demos = {
   'filter-controls': () => const FilterControlsDemo(),
   'focus-view': () => const FocusViewDemo(),
   'box': () => const BoxDemo(),
+  'engenxt-home': () => const EngenxtHomeDemo(),
   'button-group': () => const ButtonGroupDemo(),
   'context-view': () => const ContextViewDemo(),
   'settings-view': () => const SettingsViewDemo(),

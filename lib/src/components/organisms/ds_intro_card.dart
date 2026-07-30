@@ -99,10 +99,9 @@ class DsIntroCard extends StatelessWidget {
                   ],
                   if (eyebrow != null) ...<Widget>[
                     Text(
-                      eyebrow!,
-                      style: tokens.labelSm
-                          .toTextStyle(color: tokens.actionPrimaryColorText)
-                          .copyWith(letterSpacing: 0.6),
+                      tokens.labelEyebrow.textTransform.apply(eyebrow!),
+                      style: tokens.labelEyebrow
+                          .toTextStyle(color: tokens.actionPrimaryColorText),
                     ),
                     SizedBox(height: unit),
                   ],

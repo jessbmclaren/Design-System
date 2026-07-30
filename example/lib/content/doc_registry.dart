@@ -11,6 +11,7 @@ import 'pages/motion.dart';
 import 'pages/iconography.dart';
 import 'pages/breakpoints.dart';
 import 'pages/accordion.dart';
+import 'pages/action_tile.dart';
 import 'pages/avatar.dart';
 import 'pages/divider.dart';
 import 'pages/expiry_date.dart';
@@ -41,6 +42,7 @@ import 'pages/wordmark.dart';
 import 'pages/labeled_divider.dart';
 import 'pages/sparkline.dart';
 import 'pages/bar_chart.dart';
+import 'pages/bottom_nav.dart';
 import 'pages/line_chart.dart';
 import 'pages/meter_chart.dart';
 import 'pages/data_grid.dart';
@@ -95,6 +97,7 @@ import 'pages/back_link.dart';
 import 'pages/action_buttons.dart';
 import 'pages/communicating_state.dart';
 import 'pages/empty_state.dart';
+import 'pages/engenxt_home.dart';
 import 'pages/loading.dart';
 import 'pages/progress_bar.dart';
 import 'pages/progress_stepping.dart';
@@ -159,6 +162,7 @@ final List<PatternPage> allPages = [
   timeFieldPage,
   // Display
   accordionPage,
+  actionTilePage,
   avatarPage,
   dividerPage,
   labeledDividerPage,
@@ -176,6 +180,7 @@ final List<PatternPage> allPages = [
   animatedEllipsisPage,
   communicatingStatePage,
   emptyStatePage,
+  engenxtHomePage,
   loadingPage,
   progressBarPage,
   progressSteppingPage,
@@ -209,6 +214,7 @@ final List<PatternPage> allPages = [
   rosterViewPage,
   // Charts
   barChartPage,
+  bottomNavPage,
   lineChartPage,
   meterChartPage,
   sparklinePage,

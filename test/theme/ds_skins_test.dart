@@ -14,6 +14,76 @@ void main() {
       expect(theme.colorScheme.primary, const Color(0xFF15259B));
     });
 
+    test('the Engen Mobile skin carries the mobile design values', () {
+      final mobile = DsSkins.engenMobileLight();
+      // Brand: a blue, with the brand's red as the second mark. The red is
+      // both the second mark and the danger signal for this brand.
+      expect(mobile.colorPrimary, const Color(0xFF1650B8));
+      expect(mobile.colorBrandSecondary, const Color(0xFFE2231A));
+      expect(mobile.colorBrandSecondaryTint, const Color(0xFFFDEEEE));
+      expect(mobile.colorDanger, mobile.colorBrandSecondary);
+      // Ink: three live tiers on white before the disabled treatment.
+      expect(mobile.colorText, const Color(0xFF0D1E2A));
+      expect(mobile.colorSecondaryText, const Color(0xFF5A6A8A));
+      expect(mobile.colorTextMuted, const Color(0xFFB0BCD0));
+      // Type: running text at 15, the large tiers stepping 28 / 34 / 48, and
+      // the negative tracking the design gives big type.
+      expect(mobile.bodyMd.fontSize, 15);
+      expect(mobile.bodyMd.letterSpacing, -0.2);
+      expect(mobile.headingXl.fontSize, 28);
+      expect(mobile.stepTitle.fontSize, 34);
+      expect(mobile.display.fontSize, 48);
+      expect(mobile.display.letterSpacing, -2);
+      // Shape: a pill for anything pressed, a 16dp card, a 10dp chip, a 28dp
+      // sheet.
+      expect(mobile.buttonBorderRadius, 999);
+      expect(mobile.badgeBorderRadius, 999);
+      expect(mobile.radiusLg, 16);
+      expect(mobile.radiusControl, 10);
+      expect(mobile.radiusXxs, 4);
+      expect(mobile.overlayBorderRadius, 28);
+      // The mark: Engen in the ink, XT in the second brand colour.
+      expect(mobile.wordmarkPrimaryText, 'Engen');
+      expect(mobile.wordmarkAccentText, 'XT');
+      expect(mobile.wordmarkAccentColor, mobile.colorBrandSecondary);
+      // The eyebrow is set in caps and tracked out.
+      expect(mobile.labelEyebrow.textTransform, DsTextTransform.uppercase);
+      expect(mobile.labelEyebrow.letterSpacing, 1.04);
+      // The brand panel deepens from the blue to its dark step, and the primary
+      // button takes the same ramp, which is how the design fills a CTA.
+      expect(mobile.brandGradient,
+          <Color>[const Color(0xFF1650B8), const Color(0xFF0D3A8A)]);
+      expect(mobile.buttonPrimaryGradient, mobile.brandGradient);
+      // The design stands its calls to action at 56dp.
+      expect(mobile.buttonMinHeight, 56);
+      expect(DsSkins.engenMobileDark().buttonMinHeight, 56);
+      expect(DsSkins.engenMobileDark().buttonPrimaryGradient.length, 2);
+      // Each status pill carries a visible outline rather than a border
+      // matched to its fill.
+      expect(mobile.badgeSuccessColorBorder,
+          isNot(mobile.badgeSuccessColorBackground));
+      expect(mobile.badgeWarningColorBorder,
+          isNot(mobile.badgeWarningColorBackground));
+      expect(mobile.badgeDangerColorBorder,
+          isNot(mobile.badgeDangerColorBackground));
+    });
+
+    test('the Engen Mobile skins keep the touch geometry across both modes',
+        () {
+      // The two modes are the same object in different light: the geometry a
+      // thumb aims at must not move when the page darkens.
+      final light = DsSkins.engenMobileLight();
+      final dark = DsSkins.engenMobileDark();
+      expect(dark.buttonMinHeight, light.buttonMinHeight);
+      expect(dark.buttonBorderRadius, light.buttonBorderRadius);
+      expect(dark.radiusLg, light.radiusLg);
+      expect(dark.radiusControl, light.radiusControl);
+      expect(dark.overlayBorderRadius, light.overlayBorderRadius);
+      expect(dark.bodyMd.fontSize, light.bodyMd.fontSize);
+      expect(dark.display.fontSize, light.display.fontSize);
+      expect(dark.focusRingWidth, light.focusRingWidth);
+    });
+
     test('opting into a skin does NOT change the core defaults', () {
       // The default token set must remain the neutral teal identity: a skin
       // is data you pass in, never a mutation of the defaults.

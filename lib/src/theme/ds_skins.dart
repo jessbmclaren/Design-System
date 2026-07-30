@@ -596,22 +596,53 @@ abstract final class DsSkins {
 
   // --- Engen Mobile ---------------------------------------------------------
 
-  // The Engen Mobile palette. Every pair below was checked against the surface
-  // it sits on: the azure clears AA with white label text (5.75:1), the
-  // secondary ink clears it on the page (5.95:1) and the placeholder clears it
-  // on the field fill (4.69:1). Re-check if you retune a value.
-  static const Color _azure = Color(0xFF0B5FD9); // brand
-  static const Color _azureSoft = Color(0xFFE8F0FE); // brand wash
-  static const Color _mobileInk = Color(0xFF101828); // body ink
-  static const Color _mobileInkSoft = Color(0xFF5A6478); // secondary text
-  static const Color _mobileBorder = Color(0xFFDFE3EB); // border
-  static const Color _mobileHairline = Color(0xFFEDF0F5); // divider hairline
-  static const Color _mobileFill = Color(0xFFF2F5F9); // muted / offset surface
+  // The Engen Mobile palette, taken from the EngenXT mobile design. These are
+  // the design's values as drawn, not an interpretation of them, so the skin
+  // and the design stay one artefact.
+  //
+  // Measured, for a retune to check against rather than guess:
+  //
+  // * the blue carries white label text at 7.31:1,
+  // * the ink sets on white at 16.99:1 and the secondary ink at 5.44:1,
+  // * the red carries white label text at 4.68:1.
+  //
+  // The skin holds the design's values as drawn, with exactly two exceptions,
+  // both forced rather than chosen. `DsTheme` carries a debug-only contrast
+  // guard that refuses to build a theme whose badge ink fails AA on its own
+  // fill, and the design's bright orange reaches only 2.47:1 on the warning
+  // wash and its red 4.15:1 on the red wash. So the badge *label* takes a
+  // darkened ink, while `colorWarning` and `colorDanger` keep the design's
+  // bright values for every fill and signal, which is where the design
+  // actually uses them.
+  //
+  // The muted and disabled greys are not guarded and are kept exactly as
+  // drawn, even though neither clears AA: measured, the muted ink is 1.92:1 on
+  // white and the disabled grey 1.68:1. The design annotates them 3.66:1 and
+  // 4.54:1, which does not hold. `test/a11y/contrast_test.dart` records the
+  // muted ink as a named exception so the debt stays visible rather than
+  // silently passing. Reserve it for decorative or large text.
+  static const Color _azure = Color(0xFF1650B8); // brand
+  static const Color _azureDeep = Color(0xFF0D3A8A); // brand, deep
+  static const Color _azureSoft = Color(0xFFEEF3FF); // brand wash
+  static const Color _mobileInk = Color(0xFF0D1E2A); // body ink
+  static const Color _mobileInkSoft = Color(0xFF5A6A8A); // secondary text
+  static const Color _mobileInkMuted = Color(0xFFB0BCD0); // muted text
+  static const Color _mobileBorder = Color(0x14000000); // 8% black
+  static const Color _mobileBorderStrong = Color(0x1F000000); // 12% black
+  static const Color _mobileHairline = Color(0x0F000000); // 6% black
+  static const Color _mobileFill = Color(0xFFF2F2F7); // muted / offset surface
   static const Color _mobilePlaceholder = Color(0xFF6B7488); // placeholder
-  static const Color _mobileDanger = Color(0xFFD92D20);
+  static const Color _mobileRed = Color(0xFFE2231A); // second brand mark
+  static const Color _mobileRedSoft = Color(0xFFFDEEEE); // red wash
+  static const Color _mobileRedInk = Color(0xFFC21A12); // badge ink, 5.40:1
+  static const Color _mobileSuccess = Color(0xFF1A7A3A);
+  static const Color _mobileSuccessSoft = Color(0xFFE8F5EE);
+  static const Color _mobileWarning = Color(0xFFF57C00);
+  static const Color _mobileWarningInk = Color(0xFFA85700); // badge ink, 4.75:1
+  static const Color _mobileWarningSoft = Color(0xFFFFF3E0);
 
-  /// A touch-first mobile skin: azure on white, stadium controls, a larger
-  /// reading ramp and edge-anchored overlays.
+  /// A touch-first mobile skin taken from the EngenXT mobile design: blue on
+  /// white, pill controls, the iOS reading ramp and edge-anchored overlays.
   ///
   /// This is a phone theme rather than a desktop theme shrunk down, and the
   /// differences are deliberate:
@@ -646,9 +677,16 @@ abstract final class DsSkins {
       formAccentColor: _azure,
       formHighlightColorBorder: _azure,
       focusRingColor: _azure,
+      // The second brand mark: this brand runs a red alongside the blue, and
+      // the red carries a brand-owned highlight as well as the danger signal.
+      colorBrandSecondary: _mobileRed,
+      colorBrandSecondaryTint: _mobileRedSoft,
       // Text and surfaces: ink on white, with the fill tier one step off it.
+      // The borders are alpha black rather than a mixed grey, so a rule reads
+      // the same over a card, a wash or a photograph.
       colorText: _mobileInk,
       colorSecondaryText: _mobileInkSoft,
+      colorTextMuted: _mobileInkMuted,
       colorBorder: _mobileBorder,
       colorBorderSubtle: _mobileHairline,
       colorBackground: const Color(0xFFFFFFFF),
@@ -656,59 +694,70 @@ abstract final class DsSkins {
       colorSurfaceMuted: _mobileFill,
       formPlaceholderTextColor: _mobilePlaceholder,
       colorIconMuted: _mobileInkSoft,
-      colorTextDisabled: const Color(0xFFB0B7C3),
+      colorTextDisabled: const Color(0xFFC7C7CC),
       // Signals
-      colorDanger: _mobileDanger,
-      colorSuccess: const Color(0xFF067647),
-      colorWarning: const Color(0xFFB54708),
-      buttonDangerColorBackground: _mobileDanger,
-      buttonDangerColorBorder: _mobileDanger,
+      colorDanger: _mobileRed,
+      colorSuccess: _mobileSuccess,
+      colorWarning: _mobileWarning,
+      buttonDangerColorBackground: _mobileRed,
+      buttonDangerColorBorder: _mobileRed,
       // Disabled primary: a solid tint, so the treatment reads identically on
       // any backdrop rather than picking up whatever sits behind it.
-      buttonPrimaryDisabledColorBackground: const Color(0xFF9DBCEC),
+      buttonPrimaryDisabledColorBackground: const Color(0xFF8BA8DC),
       buttonPrimaryDisabledColorText: const Color(0xFFF5F8FE),
-      // Secondary and neutral actions: a quiet outline on white.
+      // Secondary and neutral actions: a quiet outline on white. The outline
+      // takes the stronger black, since the hairline tier disappears on a
+      // control the thumb is meant to find.
       buttonSecondaryColorBackground: const Color(0xFFFFFFFF),
-      buttonSecondaryColorBorder: _mobileBorder,
+      buttonSecondaryColorBorder: _mobileBorderStrong,
       buttonSecondaryColorText: _mobileInk,
       buttonNeutralColorBackground: const Color(0xFFFFFFFF),
-      buttonNeutralColorBorder: _mobileBorder,
+      buttonNeutralColorBorder: _mobileBorderStrong,
       buttonNeutralColorText: _mobileInk,
-      // States: an azure press tint and a hairline hover fill.
-      statePressedTintColor: const Color(0xFFB6CEF3),
+      // States: a press tint mixed from the brand at a quarter strength, and a
+      // hairline hover fill.
+      statePressedTintColor: const Color(0xFFC5D3ED),
       surfaceHoverColor: _mobileHairline,
-      controlTrackColor: _mobileBorder,
-      // Badges: stadium containers in the mobile tones.
+      controlTrackColor: _mobileBorderStrong,
+      // Badges: pill containers in the design's washes, each label carrying the
+      // design's own signal ink.
       badgeNeutralColorBackground: _mobileFill,
       badgeNeutralColorText: _mobileInkSoft,
       badgeNeutralColorBorder: _mobileHairline,
-      badgeSuccessColorBackground: const Color(0xFFE3F5EC),
-      badgeSuccessColorText: const Color(0xFF05603A),
-      badgeSuccessColorBorder: const Color(0xFFE3F5EC),
-      badgeWarningColorBackground: const Color(0xFFFDF0E3),
-      badgeWarningColorText: const Color(0xFF93370D),
-      badgeWarningColorBorder: const Color(0xFFFDF0E3),
-      badgeDangerColorBackground: const Color(0xFFFCE9E7),
-      badgeDangerColorText: const Color(0xFFB42318),
-      badgeDangerColorBorder: const Color(0xFFFCE9E7),
+      // Each status badge carries a visible outline in its own hue at low
+      // alpha, the way the design draws them, rather than a border matched to
+      // the fill. The pill reads as an outlined chip, not a flat wash.
+      badgeSuccessColorBackground: _mobileSuccessSoft,
+      badgeSuccessColorText: _mobileSuccess,
+      badgeSuccessColorBorder: const Color(0x591A7A3A),
+      badgeWarningColorBackground: _mobileWarningSoft,
+      badgeWarningColorText: _mobileWarningInk,
+      badgeWarningColorBorder: const Color(0x40F57C00),
+      badgeDangerColorBackground: _mobileRedSoft,
+      badgeDangerColorText: _mobileRedInk,
+      badgeDangerColorBorder: const Color(0x40E2231A),
       badgeInfoColorBackground: _azureSoft,
-      badgeInfoColorText: const Color(0xFF0A4CAD),
-      badgeInfoColorBorder: _azureSoft,
-      badgeBorderRadius: 100,
+      badgeInfoColorText: _azureDeep,
+      badgeInfoColorBorder: const Color(0x1F1650B8),
+      badgeBorderRadius: 999,
       badgePaddingX: 10,
       badgePaddingY: 4,
       badgeLabelFontSize: 13,
       badgeLabelFontWeight: DsTypography.medium,
-      // Shape: stadium controls, generous card corners, sheet-sized overlays.
-      buttonBorderRadius: 26,
+      // Shape, read off the design's radius scale: a pill for anything the
+      // thumb presses, a 16dp card, a 10dp chip, a 28dp sheet. The pill is set
+      // past any control height and Flutter clamps it to a stadium, so a
+      // control stays a pill whatever its size.
+      buttonBorderRadius: 999,
       formBorderRadius: 14,
-      radiusControl: 8,
-      radiusLg: 20,
-      overlayBorderRadius: 24,
+      radiusXxs: 4,
+      radiusControl: 10,
+      radiusLg: 16,
+      overlayBorderRadius: 28,
       borderRadius: 16,
-      // Touch geometry: a 52dp button clears the thumb comfortably, and the
-      // field matches it so a form reads as one stack of equal controls.
-      buttonMinHeight: 52,
+      // Touch geometry: the design stands its calls to action at 56dp, and the
+      // field follows so a form reads as one stack of equal controls.
+      buttonMinHeight: 56,
       buttonPaddingX: 24,
       buttonPaddingY: 16,
       buttonIconSize: 20,
@@ -732,64 +781,120 @@ abstract final class DsSkins {
       // Overlays present from the edge, the mobile idiom, rather than as a
       // centred dialog.
       overlays: DsOverlayStyle.drawer,
-      overlayBackdropColor: const Color(0x800B1220),
-      // Type: a larger reading ramp. Body sets at 17 rather than 16, because
-      // a phone is held further from the eye than its size suggests.
+      overlayBackdropColor: const Color(0x800A1628),
+      // Type: the design's iOS ramp, carrying its tracking. Running text sets
+      // at 15 and the large tiers step 28, 34, 48 with the negative tracking
+      // that keeps big type from looking loose.
       bodyLg: const DsTypeToken(
-          fontSize: 19, fontWeight: DsTypography.regular, height: 1.45),
+          fontSize: 17,
+          fontWeight: DsTypography.regular,
+          height: 1.5,
+          letterSpacing: -0.2),
       bodyMd: const DsTypeToken(
-          fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
+          fontSize: 15,
+          fontWeight: DsTypography.regular,
+          height: 1.5,
+          letterSpacing: -0.2),
       bodySm: const DsTypeToken(
-          fontSize: 15, fontWeight: DsTypography.regular, height: 1.4),
+          fontSize: 14,
+          fontWeight: DsTypography.regular,
+          height: 1.4,
+          letterSpacing: -0.1),
+      display: const DsTypeToken(
+          fontSize: 48,
+          fontWeight: DsTypography.extraBold,
+          height: 1.05,
+          letterSpacing: -2),
+      stepTitle: const DsTypeToken(
+          fontSize: 34,
+          fontWeight: DsTypography.bold,
+          height: 1.15,
+          letterSpacing: -1),
       headingXl: const DsTypeToken(
-          fontSize: 30,
+          fontSize: 28,
           fontWeight: DsTypography.bold,
           height: 1.2,
-          letterSpacing: -0.4),
+          letterSpacing: -1),
       headingLg: const DsTypeToken(
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: DsTypography.bold,
           height: 1.25,
-          letterSpacing: -0.3),
+          letterSpacing: -0.5),
       headingMd: const DsTypeToken(
-          fontSize: 20, fontWeight: DsTypography.semiBold, height: 1.3),
+          fontSize: 18,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.3),
       headingSm: const DsTypeToken(
-          fontSize: 17, fontWeight: DsTypography.semiBold, height: 1.35),
+          fontSize: 17,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.2),
+      headingXs: const DsTypeToken(
+          fontSize: 12,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.1),
       labelMd: const DsTypeToken(
-          fontSize: 15, fontWeight: DsTypography.semiBold, height: 1.3),
+          fontSize: 15,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.2),
       labelSm: const DsTypeToken(
-          fontSize: 13, fontWeight: DsTypography.medium, height: 1.35),
+          fontSize: 13,
+          fontWeight: DsTypography.medium,
+          height: 1.35,
+          letterSpacing: -0.1),
       buttonLabelFontSize: 17,
       buttonLabelFontWeight: DsTypography.semiBold,
-      // Elevation: a cooler, tighter drop than the desktop scale. A phone
-      // surface sits close to the page; a long shadow reads as a desktop
-      // window floating.
+      // Elevation: the design's two-part drop, a tight neutral contact shadow
+      // under a wider brand-tinted one, so a raised surface reads as lifting
+      // off a blue-cast page rather than casting a grey box shadow.
       shadowLow: const <BoxShadow>[
-        BoxShadow(color: Color(0x140B1220), offset: Offset(0, 1), blurRadius: 3),
-        BoxShadow(color: Color(0x0F0B1220), offset: Offset(0, 2), blurRadius: 8),
+        BoxShadow(color: Color(0x0A000000), offset: Offset(0, 1), blurRadius: 2),
+        BoxShadow(color: Color(0x0F1650B8), offset: Offset(0, 2), blurRadius: 8),
       ],
       shadowMedium: const <BoxShadow>[
+        BoxShadow(color: Color(0x0D000000), offset: Offset(0, 1), blurRadius: 3),
         BoxShadow(
-            color: Color(0x1F0B1220), offset: Offset(0, 8), blurRadius: 24),
+            color: Color(0x1C1650B8), offset: Offset(0, 8), blurRadius: 28),
       ],
       shadowHigh: const <BoxShadow>[
+        BoxShadow(color: Color(0x0F000000), offset: Offset(0, 2), blurRadius: 6),
         BoxShadow(
-            color: Color(0x2E0B1220), offset: Offset(0, 16), blurRadius: 40),
+            color: Color(0x291650B8), offset: Offset(0, 12), blurRadius: 40),
       ],
-      // Auth chrome: a soft azure wash lifting off the top of the screen.
-      authWashGradient: const [_azureSoft, Color(0xFFFFFFFF)],
+      // The eyebrow above a heading is set in caps and tracked out, the
+      // design's kicker treatment: 0.08em at 13, which is 1.04 logical pixels.
+      labelEyebrow: const DsTypeToken(
+          fontSize: 13,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: 1.04,
+          textTransform: DsTextTransform.uppercase),
+      // The brand's gradient, corner to corner: the blue deepening across a
+      // promoted panel, and the same ramp under the primary button, which is
+      // how the design fills its calls to action.
+      brandGradient: const <Color>[_azure, _azureDeep],
+      buttonPrimaryGradient: const <Color>[_azure, _azureDeep],
+      // Auth chrome: the design's map-blue wash lifting off the top.
+      authWashGradient: const [Color(0xFFE8F1FB), Color(0xFFFFFFFF)],
       authWashStops: const [0.0, 0.55],
       bloomColor: _azureSoft,
       brandTintColor: _azureSoft,
       wordmarkPrimaryText: 'Engen',
+      wordmarkAccentText: 'XT',
       wordmarkPrimaryFontWeight: DsTypography.bold,
+      // The mark's suffix is set in the second brand colour, not just a
+      // heavier weight.
+      wordmarkAccentColor: _mobileRed,
     );
   }
 
   /// The dark Engen Mobile skin: the same touch geometry on a deep navy page.
   static DsTokens engenMobileDark() {
     return DsTokens.dark().copyWith(
-      // Brand: the azure lifts on dark, and the button fill runs deeper so
+      // Brand: the blue lifts on dark, and the button fill runs deeper so
       // white label text still clears AA (5.82:1).
       colorPrimary: const Color(0xFF5B9DFF),
       actionPrimaryColorText: const Color(0xFF8FBEFF),
@@ -802,35 +907,74 @@ abstract final class DsSkins {
       buttonPrimaryColorBorder: const Color(0xFF1F5FD0),
       buttonPrimaryDisabledColorBackground: const Color(0xFF1B3560),
       buttonPrimaryDisabledColorText: const Color(0xFFE9EEF7),
-      // Surfaces: a navy-tinted page with the fill tier one step above it.
-      colorBackground: const Color(0xFF0E1116),
-      formBackgroundColor: const Color(0xFF12161C),
-      offsetBackgroundColor: const Color(0xFF171B22),
-      colorSurfaceMuted: const Color(0xFF171B22),
-      colorBorder: const Color(0xFF2A303A),
-      colorBorderSubtle: const Color(0xFF2A303A),
-      colorText: const Color(0xFFE6E9EF),
-      colorSecondaryText: const Color(0xFF98A2B3),
-      colorIconMuted: const Color(0xFF98A2B3),
-      controlTrackColor: const Color(0xFF2A303A),
+      // The second mark lifts too: the brand red is too dark to read as text
+      // on the navy page, so a lighter tone carries it while the solid red is
+      // kept for the fill a white label sits on.
+      colorBrandSecondary: const Color(0xFFFF8A80),
+      colorBrandSecondaryTint: const Color(0xFF3A1512),
+      // Surfaces: the design's deep navy page, with the raised tier above it.
+      colorBackground: const Color(0xFF0A1628),
+      formBackgroundColor: const Color(0xFF0D2040),
+      offsetBackgroundColor: const Color(0xFF0D2040),
+      colorSurfaceMuted: const Color(0xFF0D2040),
+      colorBorder: const Color(0x1AFFFFFF),
+      colorBorderSubtle: const Color(0x0FFFFFFF),
+      colorText: const Color(0xFFE9EEF7),
+      colorSecondaryText: const Color(0xFFA9B6CE),
+      colorTextMuted: const Color(0xFF8493AE),
+      colorIconMuted: const Color(0xFF8493AE),
+      colorTextDisabled: const Color(0xFF5A6A88),
+      // Signals: the fills stay solid so a white label holds, the inks lift.
+      colorDanger: const Color(0xFFFF8A80),
+      colorSuccess: const Color(0xFF5FD98A),
+      colorWarning: const Color(0xFFFFB74D),
+      buttonDangerColorBackground: _mobileRed,
+      buttonDangerColorBorder: _mobileRed,
+      // Secondary and neutral actions: the raised navy tier under a white
+      // outline. The neutral base fills these with a warm grey, which reads as
+      // a foreign object on a blue-cast page.
+      buttonSecondaryColorBackground: const Color(0xFF0D2040),
+      buttonSecondaryColorBorder: const Color(0x33FFFFFF),
+      buttonSecondaryColorText: const Color(0xFFE9EEF7),
+      buttonNeutralColorBackground: const Color(0xFF0D2040),
+      buttonNeutralColorBorder: const Color(0x33FFFFFF),
+      buttonNeutralColorText: const Color(0xFFE9EEF7),
+      controlTrackColor: const Color(0x1AFFFFFF),
       statePressedTintColor: const Color(0xFF17325C),
-      badgeInfoColorBackground: const Color(0xFF14243D),
+      surfaceHoverColor: const Color(0x14FFFFFF),
+      // Badges: deep washes carrying a lifted ink.
+      badgeNeutralColorBackground: const Color(0xFF0D2040),
+      badgeNeutralColorText: const Color(0xFFA9B6CE),
+      badgeNeutralColorBorder: const Color(0x1AFFFFFF),
+      // As in light, each pill carries a visible outline in its own hue, here
+      // lifted from the ink rather than the fill so it reads on the dark page.
+      badgeSuccessColorBackground: const Color(0xFF0E2E1E),
+      badgeSuccessColorText: const Color(0xFF7BE0A5),
+      badgeSuccessColorBorder: const Color(0x597BE0A5),
+      badgeWarningColorBackground: const Color(0xFF33220A),
+      badgeWarningColorText: const Color(0xFFFFC069),
+      badgeWarningColorBorder: const Color(0x59FFC069),
+      badgeDangerColorBackground: const Color(0xFF3A1512),
+      badgeDangerColorText: const Color(0xFFFF9A91),
+      badgeDangerColorBorder: const Color(0x59FF9A91),
+      badgeInfoColorBackground: const Color(0xFF12294C),
       badgeInfoColorText: const Color(0xFF8FBEFF),
-      badgeInfoColorBorder: const Color(0xFF14243D),
+      badgeInfoColorBorder: const Color(0x598FBEFF),
       // Shape and touch geometry carried across from light, so the two modes
       // are the same object in different light.
-      badgeBorderRadius: 100,
+      badgeBorderRadius: 999,
       badgePaddingX: 10,
       badgePaddingY: 4,
       badgeLabelFontSize: 13,
       badgeLabelFontWeight: DsTypography.medium,
-      buttonBorderRadius: 26,
+      buttonBorderRadius: 999,
       formBorderRadius: 14,
-      radiusControl: 8,
-      radiusLg: 20,
-      overlayBorderRadius: 24,
+      radiusXxs: 4,
+      radiusControl: 10,
+      radiusLg: 16,
+      overlayBorderRadius: 28,
       borderRadius: 16,
-      buttonMinHeight: 52,
+      buttonMinHeight: 56,
       buttonPaddingX: 24,
       buttonPaddingY: 16,
       buttonIconSize: 20,
@@ -849,29 +993,65 @@ abstract final class DsSkins {
       overlays: DsOverlayStyle.drawer,
       overlayBackdropColor: const Color(0xA6000000),
       bodyLg: const DsTypeToken(
-          fontSize: 19, fontWeight: DsTypography.regular, height: 1.45),
+          fontSize: 17,
+          fontWeight: DsTypography.regular,
+          height: 1.5,
+          letterSpacing: -0.2),
       bodyMd: const DsTypeToken(
-          fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
+          fontSize: 15,
+          fontWeight: DsTypography.regular,
+          height: 1.5,
+          letterSpacing: -0.2),
       bodySm: const DsTypeToken(
-          fontSize: 15, fontWeight: DsTypography.regular, height: 1.4),
+          fontSize: 14,
+          fontWeight: DsTypography.regular,
+          height: 1.4,
+          letterSpacing: -0.1),
+      display: const DsTypeToken(
+          fontSize: 48,
+          fontWeight: DsTypography.extraBold,
+          height: 1.05,
+          letterSpacing: -2),
+      stepTitle: const DsTypeToken(
+          fontSize: 34,
+          fontWeight: DsTypography.bold,
+          height: 1.15,
+          letterSpacing: -1),
       headingXl: const DsTypeToken(
-          fontSize: 30,
+          fontSize: 28,
           fontWeight: DsTypography.bold,
           height: 1.2,
-          letterSpacing: -0.4),
+          letterSpacing: -1),
       headingLg: const DsTypeToken(
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: DsTypography.bold,
           height: 1.25,
-          letterSpacing: -0.3),
+          letterSpacing: -0.5),
       headingMd: const DsTypeToken(
-          fontSize: 20, fontWeight: DsTypography.semiBold, height: 1.3),
+          fontSize: 18,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.3),
       headingSm: const DsTypeToken(
-          fontSize: 17, fontWeight: DsTypography.semiBold, height: 1.35),
+          fontSize: 17,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.2),
+      headingXs: const DsTypeToken(
+          fontSize: 12,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.1),
       labelMd: const DsTypeToken(
-          fontSize: 15, fontWeight: DsTypography.semiBold, height: 1.3),
+          fontSize: 15,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: -0.2),
       labelSm: const DsTypeToken(
-          fontSize: 13, fontWeight: DsTypography.medium, height: 1.35),
+          fontSize: 13,
+          fontWeight: DsTypography.medium,
+          height: 1.35,
+          letterSpacing: -0.1),
       buttonLabelFontSize: 17,
       buttonLabelFontWeight: DsTypography.semiBold,
       shadowLow: const <BoxShadow>[
@@ -886,12 +1066,29 @@ abstract final class DsSkins {
         BoxShadow(
             color: Color(0x73000000), offset: Offset(0, 16), blurRadius: 40),
       ],
-      authWashGradient: const [Color(0xFF14243D), Color(0xFF0E1116)],
+      labelEyebrow: const DsTypeToken(
+          fontSize: 13,
+          fontWeight: DsTypography.semiBold,
+          height: 1.3,
+          letterSpacing: 1.04,
+          textTransform: DsTextTransform.uppercase),
+      // The gradient lifts with the rest of the brand on the dark page. Both
+      // stops carry white label text, so the button ramp stays legible across
+      // its whole width.
+      brandGradient: const <Color>[Color(0xFF1F5FD0), Color(0xFF0D3A8A)],
+      buttonPrimaryGradient: const <Color>[
+        Color(0xFF1F5FD0),
+        Color(0xFF0D3A8A)
+      ],
+      authWashGradient: const [Color(0xFF0D2040), Color(0xFF0A1628)],
       authWashStops: const [0.0, 0.55],
       bloomColor: const Color(0xFF1B3560),
-      brandTintColor: const Color(0xFF14243D),
+      brandTintColor: const Color(0xFF12294C),
       wordmarkPrimaryText: 'Engen',
+      wordmarkAccentText: 'XT',
       wordmarkPrimaryFontWeight: DsTypography.bold,
+      // The lifted red, so the suffix stays legible on the navy page.
+      wordmarkAccentColor: const Color(0xFFFF8A80),
     );
   }
 }
