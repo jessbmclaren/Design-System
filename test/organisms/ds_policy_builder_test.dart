@@ -159,9 +159,12 @@ void main() {
         surfaceSize: const Size(1000, 900),
       );
       await tester.pump();
-      await tester.tap(find.byType(DropdownButtonFormField<DsPolicyEffect>));
+      await tester.tap(
+        find.byType(DsSelect<DsPolicyEffect>),
+        warnIfMissed: false,
+      );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Restrict').last);
+      await tester.tap(find.widgetWithText(MenuItemButton, 'Restrict'));
       await tester.pumpAndSettle();
       expect(last, isNotNull);
       expect(last!.rules.single.effect, DsPolicyEffect.restrict);

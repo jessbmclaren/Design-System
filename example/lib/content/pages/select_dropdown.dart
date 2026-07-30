@@ -18,6 +18,16 @@ final PatternPage selectDropdownPage = PatternPage(
   hasLiveDemo: true,
   blocks: const [
     ProseBlock(
+      'The menu drops beneath the closed field rather than covering it, so the '
+      'question stays readable while the answer is chosen, and it takes the '
+      'width and the text inset of the field so nothing shifts as it opens. '
+      'The current choice carries the brand tint and a tick, not colour alone, '
+      'and the menu opens with that row focused and scrolled into view, so a '
+      'long list starts where the reader left off. Past roughly seven rows the '
+      'surface stops growing and scrolls instead of running the height of the '
+      'screen.',
+    ),
+    ProseBlock(
       'Order the options in a way people can predict (alphabetical, by '
       'frequency or in a natural sequence) so the list is quick to skim '
       'rather than something to read end to end. When a submitted value fails '
@@ -28,7 +38,19 @@ final PatternPage selectDropdownPage = PatternPage(
       'that an `errorText` temporarily replaces. Inside a `Form`, pass a '
       '`validator` instead and the field reports its own message when the '
       'form validates; `autovalidateMode` controls when that happens and '
-      '`onSaved` receives the chosen value when the form is saved.',
+      '`onSaved` receives the chosen value when the form is saved. Either way '
+      'the message sits beneath the control rather than inside it, so the '
+      'field keeps its full tap target while it is saying something went '
+      'wrong. In a row of fields, set `reserveErrorSpace` to keep that line '
+      'allocated so nothing jumps as the message appears.',
+    ),
+    ProseBlock(
+      'The closed field is a button to assistive technology: it announces its '
+      'label, its current value and any error together, and reports whether '
+      'it is open. Tab reaches it, Enter or Space opens it, the arrow keys '
+      'walk the options and Escape closes the menu and returns to the field. '
+      'A select with no options, or with a null `onChanged`, is disabled and '
+      'leaves the focus order entirely.',
     ),
   ],
   dos: const [
