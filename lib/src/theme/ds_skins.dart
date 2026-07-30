@@ -593,4 +593,305 @@ abstract final class DsSkins {
           letterSpacing: 0.8),
     );
   }
+
+  // --- Engen Mobile ---------------------------------------------------------
+
+  // The Engen Mobile palette. Every pair below was checked against the surface
+  // it sits on: the azure clears AA with white label text (5.75:1), the
+  // secondary ink clears it on the page (5.95:1) and the placeholder clears it
+  // on the field fill (4.69:1). Re-check if you retune a value.
+  static const Color _azure = Color(0xFF0B5FD9); // brand
+  static const Color _azureSoft = Color(0xFFE8F0FE); // brand wash
+  static const Color _mobileInk = Color(0xFF101828); // body ink
+  static const Color _mobileInkSoft = Color(0xFF5A6478); // secondary text
+  static const Color _mobileBorder = Color(0xFFDFE3EB); // border
+  static const Color _mobileHairline = Color(0xFFEDF0F5); // divider hairline
+  static const Color _mobileFill = Color(0xFFF2F5F9); // muted / offset surface
+  static const Color _mobilePlaceholder = Color(0xFF6B7488); // placeholder
+  static const Color _mobileDanger = Color(0xFFD92D20);
+
+  /// A touch-first mobile skin: azure on white, stadium controls, a larger
+  /// reading ramp and edge-anchored overlays.
+  ///
+  /// This is a phone theme rather than a desktop theme shrunk down, and the
+  /// differences are deliberate:
+  ///
+  /// * **Controls are thumb-sized.** Buttons stand 52dp tall with a stadium
+  ///   corner, because a control the thumb has to aim at is a different object
+  ///   from one the pointer lands on precisely.
+  /// * **Cards hold less inset, not more.** A phone is narrow, so padding that
+  ///   reads as generous on a desktop card eats the line length a paragraph
+  ///   needs. The corners grow instead.
+  /// * **Glyphs run one step up.** An icon legible at arm's length on a
+  ///   monitor is not legible at a glance, one-handed, outdoors.
+  /// * **Overlays present as drawers.** A sheet from the edge is the mobile
+  ///   idiom; a centred dialog is not.
+  /// * **The focus ring is a stroke thicker**, so it survives a bright screen.
+  ///
+  /// It is a skin like any other: the neutral base is untouched, and a product
+  /// opts in with `DsTheme.light(tokens: DsSkins.engenMobileLight())`.
+  static DsTokens engenMobileLight() {
+    return DsTokens.light().copyWith(
+      // Font: the platform system font, so the app sets in the face the
+      // device already reads in.
+      fontFamily: null,
+      // Brand
+      colorPrimary: _azure,
+      buttonPrimaryColorBackground: _azure,
+      buttonPrimaryColorBorder: _azure,
+      actionPrimaryColorText: _azure,
+      actionPrimaryTextDecorationColor: _azure,
+      actionSecondaryColorText: _mobileInkSoft,
+      buttonTertiaryColorText: _azure,
+      formAccentColor: _azure,
+      formHighlightColorBorder: _azure,
+      focusRingColor: _azure,
+      // Text and surfaces: ink on white, with the fill tier one step off it.
+      colorText: _mobileInk,
+      colorSecondaryText: _mobileInkSoft,
+      colorBorder: _mobileBorder,
+      colorBorderSubtle: _mobileHairline,
+      colorBackground: const Color(0xFFFFFFFF),
+      offsetBackgroundColor: _mobileFill,
+      colorSurfaceMuted: _mobileFill,
+      formPlaceholderTextColor: _mobilePlaceholder,
+      colorIconMuted: _mobileInkSoft,
+      colorTextDisabled: const Color(0xFFB0B7C3),
+      // Signals
+      colorDanger: _mobileDanger,
+      colorSuccess: const Color(0xFF067647),
+      colorWarning: const Color(0xFFB54708),
+      buttonDangerColorBackground: _mobileDanger,
+      buttonDangerColorBorder: _mobileDanger,
+      // Disabled primary: a solid tint, so the treatment reads identically on
+      // any backdrop rather than picking up whatever sits behind it.
+      buttonPrimaryDisabledColorBackground: const Color(0xFF9DBCEC),
+      buttonPrimaryDisabledColorText: const Color(0xFFF5F8FE),
+      // Secondary and neutral actions: a quiet outline on white.
+      buttonSecondaryColorBackground: const Color(0xFFFFFFFF),
+      buttonSecondaryColorBorder: _mobileBorder,
+      buttonSecondaryColorText: _mobileInk,
+      buttonNeutralColorBackground: const Color(0xFFFFFFFF),
+      buttonNeutralColorBorder: _mobileBorder,
+      buttonNeutralColorText: _mobileInk,
+      // States: an azure press tint and a hairline hover fill.
+      statePressedTintColor: const Color(0xFFB6CEF3),
+      surfaceHoverColor: _mobileHairline,
+      controlTrackColor: _mobileBorder,
+      // Badges: stadium containers in the mobile tones.
+      badgeNeutralColorBackground: _mobileFill,
+      badgeNeutralColorText: _mobileInkSoft,
+      badgeNeutralColorBorder: _mobileHairline,
+      badgeSuccessColorBackground: const Color(0xFFE3F5EC),
+      badgeSuccessColorText: const Color(0xFF05603A),
+      badgeSuccessColorBorder: const Color(0xFFE3F5EC),
+      badgeWarningColorBackground: const Color(0xFFFDF0E3),
+      badgeWarningColorText: const Color(0xFF93370D),
+      badgeWarningColorBorder: const Color(0xFFFDF0E3),
+      badgeDangerColorBackground: const Color(0xFFFCE9E7),
+      badgeDangerColorText: const Color(0xFFB42318),
+      badgeDangerColorBorder: const Color(0xFFFCE9E7),
+      badgeInfoColorBackground: _azureSoft,
+      badgeInfoColorText: const Color(0xFF0A4CAD),
+      badgeInfoColorBorder: _azureSoft,
+      badgeBorderRadius: 100,
+      badgePaddingX: 10,
+      badgePaddingY: 4,
+      badgeLabelFontSize: 13,
+      badgeLabelFontWeight: DsTypography.medium,
+      // Shape: stadium controls, generous card corners, sheet-sized overlays.
+      buttonBorderRadius: 26,
+      formBorderRadius: 14,
+      radiusControl: 8,
+      radiusLg: 20,
+      overlayBorderRadius: 24,
+      borderRadius: 16,
+      // Touch geometry: a 52dp button clears the thumb comfortably, and the
+      // field matches it so a form reads as one stack of equal controls.
+      buttonMinHeight: 52,
+      buttonPaddingX: 24,
+      buttonPaddingY: 16,
+      buttonIconSize: 20,
+      buttonIconGap: 10,
+      inputFieldPaddingX: 16,
+      textFieldPaddingY: 16,
+      fieldLabelGap: 8,
+      // A thicker ring, so keyboard focus survives a bright screen outdoors.
+      focusRingWidth: 3,
+      // Cards hold a tighter inset than a desktop skin: the phone is narrow,
+      // and the line length matters more than the margin.
+      cardPadding: 20,
+      // Glyphs run one step up the scale, for a screen read at arm's length
+      // and often one-handed.
+      iconSizeXxs: 14,
+      iconSizeXs: 16,
+      iconSizeSm: 18,
+      iconSizeMd: 20,
+      iconSizeLg: 24,
+      iconSizeXl: 28,
+      // Overlays present from the edge, the mobile idiom, rather than as a
+      // centred dialog.
+      overlays: DsOverlayStyle.drawer,
+      overlayBackdropColor: const Color(0x800B1220),
+      // Type: a larger reading ramp. Body sets at 17 rather than 16, because
+      // a phone is held further from the eye than its size suggests.
+      bodyLg: const DsTypeToken(
+          fontSize: 19, fontWeight: DsTypography.regular, height: 1.45),
+      bodyMd: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
+      bodySm: const DsTypeToken(
+          fontSize: 15, fontWeight: DsTypography.regular, height: 1.4),
+      headingXl: const DsTypeToken(
+          fontSize: 30,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      headingLg: const DsTypeToken(
+          fontSize: 24,
+          fontWeight: DsTypography.bold,
+          height: 1.25,
+          letterSpacing: -0.3),
+      headingMd: const DsTypeToken(
+          fontSize: 20, fontWeight: DsTypography.semiBold, height: 1.3),
+      headingSm: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.semiBold, height: 1.35),
+      labelMd: const DsTypeToken(
+          fontSize: 15, fontWeight: DsTypography.semiBold, height: 1.3),
+      labelSm: const DsTypeToken(
+          fontSize: 13, fontWeight: DsTypography.medium, height: 1.35),
+      buttonLabelFontSize: 17,
+      buttonLabelFontWeight: DsTypography.semiBold,
+      // Elevation: a cooler, tighter drop than the desktop scale. A phone
+      // surface sits close to the page; a long shadow reads as a desktop
+      // window floating.
+      shadowLow: const <BoxShadow>[
+        BoxShadow(color: Color(0x140B1220), offset: Offset(0, 1), blurRadius: 3),
+        BoxShadow(color: Color(0x0F0B1220), offset: Offset(0, 2), blurRadius: 8),
+      ],
+      shadowMedium: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x1F0B1220), offset: Offset(0, 8), blurRadius: 24),
+      ],
+      shadowHigh: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x2E0B1220), offset: Offset(0, 16), blurRadius: 40),
+      ],
+      // Auth chrome: a soft azure wash lifting off the top of the screen.
+      authWashGradient: const [_azureSoft, Color(0xFFFFFFFF)],
+      authWashStops: const [0.0, 0.55],
+      bloomColor: _azureSoft,
+      brandTintColor: _azureSoft,
+      wordmarkPrimaryText: 'Engen',
+      wordmarkPrimaryFontWeight: DsTypography.bold,
+    );
+  }
+
+  /// The dark Engen Mobile skin: the same touch geometry on a deep navy page.
+  static DsTokens engenMobileDark() {
+    return DsTokens.dark().copyWith(
+      // Brand: the azure lifts on dark, and the button fill runs deeper so
+      // white label text still clears AA (5.82:1).
+      colorPrimary: const Color(0xFF5B9DFF),
+      actionPrimaryColorText: const Color(0xFF8FBEFF),
+      actionPrimaryTextDecorationColor: const Color(0xFF8FBEFF),
+      buttonTertiaryColorText: const Color(0xFF8FBEFF),
+      formAccentColor: const Color(0xFF5B9DFF),
+      formHighlightColorBorder: const Color(0xFF5B9DFF),
+      focusRingColor: const Color(0xFF5B9DFF),
+      buttonPrimaryColorBackground: const Color(0xFF1F5FD0),
+      buttonPrimaryColorBorder: const Color(0xFF1F5FD0),
+      buttonPrimaryDisabledColorBackground: const Color(0xFF1B3560),
+      buttonPrimaryDisabledColorText: const Color(0xFFE9EEF7),
+      // Surfaces: a navy-tinted page with the fill tier one step above it.
+      colorBackground: const Color(0xFF0E1116),
+      formBackgroundColor: const Color(0xFF12161C),
+      offsetBackgroundColor: const Color(0xFF171B22),
+      colorSurfaceMuted: const Color(0xFF171B22),
+      colorBorder: const Color(0xFF2A303A),
+      colorBorderSubtle: const Color(0xFF2A303A),
+      colorText: const Color(0xFFE6E9EF),
+      colorSecondaryText: const Color(0xFF98A2B3),
+      colorIconMuted: const Color(0xFF98A2B3),
+      controlTrackColor: const Color(0xFF2A303A),
+      statePressedTintColor: const Color(0xFF17325C),
+      badgeInfoColorBackground: const Color(0xFF14243D),
+      badgeInfoColorText: const Color(0xFF8FBEFF),
+      badgeInfoColorBorder: const Color(0xFF14243D),
+      // Shape and touch geometry carried across from light, so the two modes
+      // are the same object in different light.
+      badgeBorderRadius: 100,
+      badgePaddingX: 10,
+      badgePaddingY: 4,
+      badgeLabelFontSize: 13,
+      badgeLabelFontWeight: DsTypography.medium,
+      buttonBorderRadius: 26,
+      formBorderRadius: 14,
+      radiusControl: 8,
+      radiusLg: 20,
+      overlayBorderRadius: 24,
+      borderRadius: 16,
+      buttonMinHeight: 52,
+      buttonPaddingX: 24,
+      buttonPaddingY: 16,
+      buttonIconSize: 20,
+      buttonIconGap: 10,
+      inputFieldPaddingX: 16,
+      textFieldPaddingY: 16,
+      fieldLabelGap: 8,
+      focusRingWidth: 3,
+      cardPadding: 20,
+      iconSizeXxs: 14,
+      iconSizeXs: 16,
+      iconSizeSm: 18,
+      iconSizeMd: 20,
+      iconSizeLg: 24,
+      iconSizeXl: 28,
+      overlays: DsOverlayStyle.drawer,
+      overlayBackdropColor: const Color(0xA6000000),
+      bodyLg: const DsTypeToken(
+          fontSize: 19, fontWeight: DsTypography.regular, height: 1.45),
+      bodyMd: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.regular, height: 1.45),
+      bodySm: const DsTypeToken(
+          fontSize: 15, fontWeight: DsTypography.regular, height: 1.4),
+      headingXl: const DsTypeToken(
+          fontSize: 30,
+          fontWeight: DsTypography.bold,
+          height: 1.2,
+          letterSpacing: -0.4),
+      headingLg: const DsTypeToken(
+          fontSize: 24,
+          fontWeight: DsTypography.bold,
+          height: 1.25,
+          letterSpacing: -0.3),
+      headingMd: const DsTypeToken(
+          fontSize: 20, fontWeight: DsTypography.semiBold, height: 1.3),
+      headingSm: const DsTypeToken(
+          fontSize: 17, fontWeight: DsTypography.semiBold, height: 1.35),
+      labelMd: const DsTypeToken(
+          fontSize: 15, fontWeight: DsTypography.semiBold, height: 1.3),
+      labelSm: const DsTypeToken(
+          fontSize: 13, fontWeight: DsTypography.medium, height: 1.35),
+      buttonLabelFontSize: 17,
+      buttonLabelFontWeight: DsTypography.semiBold,
+      shadowLow: const <BoxShadow>[
+        BoxShadow(color: Color(0x40000000), offset: Offset(0, 1), blurRadius: 3),
+        BoxShadow(color: Color(0x33000000), offset: Offset(0, 2), blurRadius: 8),
+      ],
+      shadowMedium: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x59000000), offset: Offset(0, 8), blurRadius: 24),
+      ],
+      shadowHigh: const <BoxShadow>[
+        BoxShadow(
+            color: Color(0x73000000), offset: Offset(0, 16), blurRadius: 40),
+      ],
+      authWashGradient: const [Color(0xFF14243D), Color(0xFF0E1116)],
+      authWashStops: const [0.0, 0.55],
+      bloomColor: const Color(0xFF1B3560),
+      brandTintColor: const Color(0xFF14243D),
+      wordmarkPrimaryText: 'Engen',
+      wordmarkPrimaryFontWeight: DsTypography.bold,
+    );
+  }
 }

@@ -15,13 +15,20 @@ import 'package:ds_docs/demos/demo_registry.dart';
 /// in portrait and landscape (600 to 1024) and desktops up to 1920dp.
 const _widths = <double>[320, 360, 390, 414, 600, 768, 834, 1024, 1280, 1440, 1920];
 
-/// Every theme the system ships: the white-label base and the Engen skin, in
+/// Every theme the system ships: the white-label base and the Engen skins, in
 /// both brightnesses.
+///
+/// Engen Mobile earns its place here more than the others do. Its touch
+/// geometry is the largest the system ships (a 52dp button, a 17dp body ramp,
+/// glyphs a step up the scale), so it is the skin most likely to overflow the
+/// 320dp column, and this sweep is what catches that.
 final Map<String, ThemeData> _themes = <String, ThemeData>{
   'light': DsTheme.light(),
   'dark': DsTheme.dark(),
   'engen light': DsTheme.light(tokens: DsSkins.engenLight()),
   'engen dark': DsTheme.dark(tokens: DsSkins.engenDark()),
+  'engen mobile light': DsTheme.light(tokens: DsSkins.engenMobileLight()),
+  'engen mobile dark': DsTheme.dark(tokens: DsSkins.engenMobileDark()),
 };
 
 Widget _host(ThemeData theme, double width, Widget demo,

@@ -110,6 +110,9 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | `stateDisabledTextOpacity` | `double` | `0.9` | The fade for a disabled filled button's label. Gentler than stateDisabledOpacity, so the label stays readable on the dimmed fill. |
 | `stateDisabledIconOpacity` | `double` | `0.38` | The fade for a disabled icon-only control's glyph. |
 | `focusRingWidth` | `double` | `2` | The stroke width of the keyboard focus ring on buttons and icon buttons. |
+| `focusRingColor` | `Color` | `#0F766E` | The colour of the keyboard focus ring. Defaults to formAccentColor. A control whose own foreground carries the focus state instead, a filled button ringing itself in its label colour so the ring stays legible on any variant fill, is the deliberate exception. |
+| `focusRingGap` | `double` | `1` | The gap held between a control's edge and its focus ring, so the ring stays visible against a filled control rather than merging with it. |
+| `buttonPressedScale` | `double` | `0.96` | How far a button shrinks while pressed, as a scale factor. Just under 1, so the press reads as the surface giving under the finger rather than as the control changing size. |
 
 ### Action text decoration
 
@@ -150,6 +153,7 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 | `buttonBorderRadius` | `double` | `4` | The border radius used for buttons. |
 | `formBorderRadius` | `double` | `6` | The border radius used for form elements. |
 | `badgeBorderRadius` | `double` | `4` | The border radius used for badges. |
+| `radiusLg` | `double` | `12` | The corner radius for card-sized surfaces: a board lane, a panel, a raised tile. Nested surfaces derive from this rather than declaring their own, so an inner card inset by n takes radiusLg minus n and the two curves stay concentric when a skin retunes the outer one. |
 | `buttonPaddingX` | `double` | `16` | The horizontal padding for buttons, the full inset the button paints. |
 | `buttonPaddingY` | `double` | `10` | The vertical padding for buttons, the full inset the button paints. |
 | `buttonMinHeight` | `double` | `40` | The minimum height for buttons. |
@@ -168,7 +172,7 @@ Type comes in levels. Each heading, body and label level is a `DsTypeToken` that
 
 ## Elevation, icons and weights
 
-Shadows are tokens too. A raised surface casts one of three shadows (`shadowLow`, `shadowMedium`, `shadowHigh`), so a brand can retint every shadow at once with `DsElevation.tinted`. The system also ships two shared scales components use directly: a set of icon sizes and a set of font weights. The bundled Inter font carries all four weights (400, 500, 600 and 700), so you have more than just regular and bold.
+Shadows are tokens too. A raised surface casts one of three shadows (`shadowLow`, `shadowMedium`, `shadowHigh`), so a brand can retint every shadow at once with `DsElevation.tinted`. The system also ships an icon scale and a set of font weights. The icon steps are tokens for the same reason the type ramp is: a brand that re-scales its text without re-scaling the glyphs beside it ends up with icons that no longer sit on the line. `DsIconSize` still backs the defaults. The bundled Inter font carries all four weights (400, 500, 600 and 700), so you have more than just regular and bold.
 
 ### Elevation
 
@@ -179,16 +183,16 @@ Shadows are tokens too. A raised surface casts one of three shadows (`shadowLow`
 | `shadowHigh` | `List<BoxShadow>` | `DsElevation.high` | The drop shadow for modal surfaces: dialogs, drawers and takeovers. |
 | `DsElevation.tinted` | `Color → shadows` | `brand` | A brand-tinted scale derived from a colour, ready to feed the three shadow tokens above. |
 
-### Icon size (DsIconSize)
+### Icon scale
 
 | Name | Type | Example value | Description |
 | --- | --- | --- | --- |
-| `DsIconSize.xxs` | `double` | `12` | Tiny marker glyphs. |
-| `DsIconSize.xs` | `double` | `14` | Inline with small text. |
-| `DsIconSize.sm` | `double` | `16` | The default control icon (buttons, inputs, chips). |
-| `DsIconSize.md` | `double` | `18` | List rows and toolbars. |
-| `DsIconSize.lg` | `double` | `20` | Prominent actions and status icons. |
-| `DsIconSize.xl` | `double` | `24` | Headers and empty-state glyphs. |
+| `iconSizeXxs` | `double` | `12` | Tiny marker glyphs. |
+| `iconSizeXs` | `double` | `14` | Glyphs set inline with small text. |
+| `iconSizeSm` | `double` | `16` | The default control glyph, for buttons, inputs and chips. |
+| `iconSizeMd` | `double` | `18` | Glyphs in list rows and toolbars. |
+| `iconSizeLg` | `double` | `20` | Glyphs on prominent actions and status readouts. |
+| `iconSizeXl` | `double` | `24` | Header and empty-state glyphs, the largest step. |
 
 ### Font weight (DsTypography)
 
@@ -198,6 +202,17 @@ Shadows are tokens too. A raised surface casts one of three shadows (`shadowLow`
 | `DsTypography.medium` | `FontWeight` | `500` | Quiet emphasis: labels and secondary controls. |
 | `DsTypography.semiBold` | `FontWeight` | `600` | Strong labels, control text, active tabs. |
 | `DsTypography.bold` | `FontWeight` | `700` | Headings. |
+
+## Charts
+
+A chart is the one surface where colour carries data rather than decoration, so its ramps are tokens in their own right. The defaults come from `DsChartPalette` and were validated for colour-vision separation, chroma and contrast against their surface; the dark theme carries its own ramp rather than a flip of the light one. A skin that replaces them owes the same check. Read a series colour with `tokens.chartColorAt(index)`: the order is fixed and assigned by series identity, never cycled, and anything past the end folds into the neutral `chartOther` bucket instead of repeating a hue that already means something else on the same chart. Status and state stay with the badge tokens, never a categorical hue.
+
+| Name | Type | Example value | Description |
+| --- | --- | --- | --- |
+| `chartCategorical` | `List<Color>` | `6 hues` | The fixed categorical order, assigned by series identity and never cycled. |
+| `chartOther` | `Color` | `#8A94A6` | The neutral bucket for series past the end of chartCategorical. |
+| `chartSequential` | `List<Color>` | `6 steps` | The sequential ramp carrying magnitude: a single hue, light to dark. |
+| `chartDiverging` | `List<Color>` | `3 stops` | The diverging ramp carrying polarity, as negative pole, neutral midpoint and positive pole. |
 
 ## Overlays
 
@@ -255,6 +270,13 @@ MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // The editorial skin: ink on paper, square corners, letter-spaced labels.
 MaterialApp(theme: DsTheme.light(tokens: DsSkins.editorialLight()));
+
+// The mobile skin: stadium controls sized for a thumb, a larger reading
+// ramp, glyphs a step up and overlays that arrive from the edge.
+MaterialApp(
+  theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+  darkTheme: DsTheme.dark(tokens: DsSkins.engenMobileDark()),
+);
 
 // Read a token inside a widget.
 final tokens = DsTokens.of(context);

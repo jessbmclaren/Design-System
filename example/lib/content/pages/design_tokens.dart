@@ -135,6 +135,9 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'stateDisabledTextOpacity', type: 'double', example: '0.9', description: 'The fade for a disabled filled button\'s label. Gentler than stateDisabledOpacity, so the label stays readable on the dimmed fill.'),
         VariableRow(name: 'stateDisabledIconOpacity', type: 'double', example: '0.38', description: 'The fade for a disabled icon-only control\'s glyph.'),
         VariableRow(name: 'focusRingWidth', type: 'double', example: '2', description: 'The stroke width of the keyboard focus ring on buttons and icon buttons.'),
+        VariableRow(name: 'focusRingColor', type: 'Color', example: '#0F766E', description: 'The colour of the keyboard focus ring. Defaults to formAccentColor. A control whose own foreground carries the focus state instead, a filled button ringing itself in its label colour so the ring stays legible on any variant fill, is the deliberate exception.'),
+        VariableRow(name: 'focusRingGap', type: 'double', example: '1', description: 'The gap held between a control\'s edge and its focus ring, so the ring stays visible against a filled control rather than merging with it.'),
+        VariableRow(name: 'buttonPressedScale', type: 'double', example: '0.96', description: 'How far a button shrinks while pressed, as a scale factor. Just under 1, so the press reads as the surface giving under the finger rather than as the control changing size.'),
       ],
     ),
     VariablesBlock(
@@ -175,6 +178,7 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'buttonBorderRadius', type: 'double', example: '4', description: 'The border radius used for buttons.'),
         VariableRow(name: 'formBorderRadius', type: 'double', example: '6', description: 'The border radius used for form elements.'),
         VariableRow(name: 'badgeBorderRadius', type: 'double', example: '4', description: 'The border radius used for badges.'),
+        VariableRow(name: 'radiusLg', type: 'double', example: '12', description: 'The corner radius for card-sized surfaces: a board lane, a panel, a raised tile. Nested surfaces derive from this rather than declaring their own, so an inner card inset by n takes radiusLg minus n and the two curves stay concentric when a skin retunes the outer one.'),
         VariableRow(name: 'buttonPaddingX', type: 'double', example: '16', description: 'The horizontal padding for buttons, the full inset the button paints.'),
         VariableRow(name: 'buttonPaddingY', type: 'double', example: '10', description: 'The vertical padding for buttons, the full inset the button paints.'),
         VariableRow(name: 'buttonMinHeight', type: 'double', example: '40', description: 'The minimum height for buttons.'),
@@ -197,9 +201,12 @@ final PatternPage designTokensPage = PatternPage(
       'Shadows are tokens too. A raised surface casts one of three shadows '
       '(`shadowLow`, `shadowMedium`, `shadowHigh`), so a brand can retint '
       'every shadow at once with `DsElevation.tinted`. The system also ships '
-      'two shared scales components use directly: a set of icon sizes and a '
-      'set of font weights. The bundled Inter font carries all four weights '
-      '(400, 500, 600 and 700), so you have more than just regular and bold.',
+      'an icon scale and a set of font weights. The icon steps are tokens for '
+      'the same reason the type ramp is: a brand that re-scales its text '
+      'without re-scaling the glyphs beside it ends up with icons that no '
+      'longer sit on the line. `DsIconSize` still backs the defaults. The '
+      'bundled Inter font carries all four weights (400, 500, 600 and 700), '
+      'so you have more than just regular and bold.',
     ),
     VariablesBlock(
       title: 'Elevation',
@@ -211,14 +218,14 @@ final PatternPage designTokensPage = PatternPage(
       ],
     ),
     VariablesBlock(
-      title: 'Icon size (DsIconSize)',
+      title: 'Icon scale',
       rows: [
-        VariableRow(name: 'DsIconSize.xxs', type: 'double', example: '12', description: 'Tiny marker glyphs.'),
-        VariableRow(name: 'DsIconSize.xs', type: 'double', example: '14', description: 'Inline with small text.'),
-        VariableRow(name: 'DsIconSize.sm', type: 'double', example: '16', description: 'The default control icon (buttons, inputs, chips).'),
-        VariableRow(name: 'DsIconSize.md', type: 'double', example: '18', description: 'List rows and toolbars.'),
-        VariableRow(name: 'DsIconSize.lg', type: 'double', example: '20', description: 'Prominent actions and status icons.'),
-        VariableRow(name: 'DsIconSize.xl', type: 'double', example: '24', description: 'Headers and empty-state glyphs.'),
+        VariableRow(name: 'iconSizeXxs', type: 'double', example: '12', description: 'Tiny marker glyphs.'),
+        VariableRow(name: 'iconSizeXs', type: 'double', example: '14', description: 'Glyphs set inline with small text.'),
+        VariableRow(name: 'iconSizeSm', type: 'double', example: '16', description: 'The default control glyph, for buttons, inputs and chips.'),
+        VariableRow(name: 'iconSizeMd', type: 'double', example: '18', description: 'Glyphs in list rows and toolbars.'),
+        VariableRow(name: 'iconSizeLg', type: 'double', example: '20', description: 'Glyphs on prominent actions and status readouts.'),
+        VariableRow(name: 'iconSizeXl', type: 'double', example: '24', description: 'Header and empty-state glyphs, the largest step.'),
       ],
     ),
     VariablesBlock(
@@ -228,6 +235,28 @@ final PatternPage designTokensPage = PatternPage(
         VariableRow(name: 'DsTypography.medium', type: 'FontWeight', example: '500', description: 'Quiet emphasis: labels and secondary controls.'),
         VariableRow(name: 'DsTypography.semiBold', type: 'FontWeight', example: '600', description: 'Strong labels, control text, active tabs.'),
         VariableRow(name: 'DsTypography.bold', type: 'FontWeight', example: '700', description: 'Headings.'),
+      ],
+    ),
+    SubheadingBlock('Charts'),
+    ProseBlock(
+      'A chart is the one surface where colour carries data rather than '
+      'decoration, so its ramps are tokens in their own right. The defaults '
+      'come from `DsChartPalette` and were validated for colour-vision '
+      'separation, chroma and contrast against their surface; the dark theme '
+      'carries its own ramp rather than a flip of the light one. A skin that '
+      'replaces them owes the same check. Read a series colour with '
+      '`tokens.chartColorAt(index)`: the order is fixed and assigned by series '
+      'identity, never cycled, and anything past the end folds into the '
+      'neutral `chartOther` bucket instead of repeating a hue that already '
+      'means something else on the same chart. Status and state stay with the '
+      'badge tokens, never a categorical hue.',
+    ),
+    VariablesBlock(
+      rows: [
+        VariableRow(name: 'chartCategorical', type: 'List<Color>', example: '6 hues', description: 'The fixed categorical order, assigned by series identity and never cycled.'),
+        VariableRow(name: 'chartOther', type: 'Color', example: '#8A94A6', description: 'The neutral bucket for series past the end of chartCategorical.'),
+        VariableRow(name: 'chartSequential', type: 'List<Color>', example: '6 steps', description: 'The sequential ramp carrying magnitude: a single hue, light to dark.'),
+        VariableRow(name: 'chartDiverging', type: 'List<Color>', example: '3 stops', description: 'The diverging ramp carrying polarity, as negative pole, neutral midpoint and positive pole.'),
       ],
     ),
     SubheadingBlock('Overlays'),
@@ -284,6 +313,13 @@ MaterialApp(theme: DsTheme.light(tokens: DsSkins.engenLight()));
 
 // The editorial skin: ink on paper, square corners, letter-spaced labels.
 MaterialApp(theme: DsTheme.light(tokens: DsSkins.editorialLight()));
+
+// The mobile skin: stadium controls sized for a thumb, a larger reading
+// ramp, glyphs a step up and overlays that arrive from the edge.
+MaterialApp(
+  theme: DsTheme.light(tokens: DsSkins.engenMobileLight()),
+  darkTheme: DsTheme.dark(tokens: DsSkins.engenMobileDark()),
+);
 
 // Read a token inside a widget.
 final tokens = DsTokens.of(context);

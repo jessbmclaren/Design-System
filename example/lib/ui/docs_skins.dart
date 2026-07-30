@@ -35,4 +35,9 @@ class DocsSkin {
 const List<DocsSkin> kDocsSkins = [
   DocsSkin(name: 'Default'),
   DocsSkin(name: 'Engen', light: DsSkins.engenLight, dark: DsSkins.engenDark),
+  DocsSkin(
+    name: 'Engen Mobile',
+    light: DsSkins.engenMobileLight,
+    dark: DsSkins.engenMobileDark,
+  ),
 ];
