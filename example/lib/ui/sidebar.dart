@@ -6,24 +6,6 @@ import '../content/doc_registry.dart';
 import '../content/pattern_page_content.dart';
 import 'docs_style.dart';
 
-/// Page ids shown with a tick in the nav: the set being worked through for the
-/// Engen theme. Edit this list to move the ticks around.
-const Set<String> _tickedPageIds = {
-  // Foundations
-  'design-tokens',
-  'motion',
-  'iconography',
-  // Sign in and sign up, and the atoms and molecules they are built from
-  'sign-in',
-  'sign-up',
-  'text-fields',
-  'form-field-group',
-  'icon',
-  'icon-button',
-  'box',
-  'wordmark',
-};
-
 /// The grouped navigation sidebar listing every documentation page.
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.currentId, this.onNavigate});
@@ -158,32 +140,14 @@ class _NavItem extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    page.navTitle,
-                    overflow: TextOverflow.ellipsis,
-                    style: DocsType.navItem(
-                      // link (not accent) clears 4.5:1 over the accentSoft wash.
-                      selected ? docs.link : docs.textPrimary,
-                      selected: selected,
-                    ),
-                  ),
-                ),
-                if (_tickedPageIds.contains(page.id)) ...[
-                  const SizedBox(width: 8),
-                  // A circled tick in the positive colour reads as "done"; a
-                  // bare accent stroke at this size can be mistaken for a
-                  // disclosure chevron on the row.
-                  Icon(
-                    LucideIcons.circle_check,
-                    size: 14,
-                    color: docs.positive,
-                    semanticLabel: 'In the current working set',
-                  ),
-                ],
-              ],
+            child: Text(
+              page.navTitle,
+              overflow: TextOverflow.ellipsis,
+              style: DocsType.navItem(
+                // link (not accent) clears 4.5:1 over the accentSoft wash.
+                selected ? docs.link : docs.textPrimary,
+                selected: selected,
+              ),
             ),
           ),
         ),
