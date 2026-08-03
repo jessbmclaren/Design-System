@@ -894,6 +894,11 @@ abstract final class DsSkins {
   /// The dark Engen Mobile skin: the same touch geometry on a deep navy page.
   static DsTokens engenMobileDark() {
     return DsTokens.dark().copyWith(
+      // Font: the platform system font, as in light. The two modes are the
+      // same object in different light, and a phone app that sets in the
+      // bundled face in the dark and the device's own in the day is two
+      // different apps.
+      fontFamily: null,
       // Brand: the blue lifts on dark, and the button fill runs deeper so
       // white label text still clears AA (5.82:1).
       colorPrimary: const Color(0xFF5B9DFF),
