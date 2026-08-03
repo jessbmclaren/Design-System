@@ -62,6 +62,30 @@ void main() {
           moreOrLessEquals(DsTokens.light().bloomColor.a * 0.25));
     });
 
+    testWidgets('takes a per-instance colour over the theme bloom',
+        (tester) async {
+      // A second glow on the same backdrop, carrying the brand's other hue.
+      final second = DsSkins.engenLight().colorBrandSecondaryTint;
+      await pumpDs(
+        tester,
+        SizedBox(
+          width: 200,
+          height: 200,
+          child: DsBrandBloom(color: second, opacity: 0.5),
+        ),
+      );
+
+      final gradient = gradientOf(tester);
+      expect(gradient.colors.first.toARGB32() & 0x00FFFFFF,
+          second.toARGB32() & 0x00FFFFFF);
+      expect(gradient.colors.first.a, moreOrLessEquals(second.a * 0.5));
+      expect(gradient.colors.last.a, 0);
+      // The theme's own bloom is a different hue, so this is an override
+      // rather than a coincidence.
+      expect(second.toARGB32() & 0x00FFFFFF,
+          isNot(DsTokens.light().bloomColor.toARGB32() & 0x00FFFFFF));
+    });
+
     testWidgets('reads a skin bloom from the theme', (tester) async {
       final skinned = DsSkins.engenLight();
       await pumpDs(

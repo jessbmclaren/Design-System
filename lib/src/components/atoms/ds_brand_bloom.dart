@@ -13,6 +13,10 @@ import '../../theme/ds_tokens_extension.dart';
 /// a branded one; the default token keeps the glow a quiet neutral, so the
 /// white-label look barely changes until a skin supplies a brand tint.
 ///
+/// A marketing backdrop that pools more than one of the brand's hues passes
+/// [color] per instance, so a second glow can carry the brand's other colour
+/// without the theme having to choose between them.
+///
 /// For a richer, multi-hue wash rising from the bottom edge — the spotlight
 /// glow behind a [DsSpotlight] nudge — use [DsBrandBloom.pools], which paints a
 /// sweep of soft pools from the theme's `bloomStops`. On the neutral base,
@@ -40,6 +44,7 @@ class DsBrandBloom extends StatelessWidget {
     this.alignment = Alignment.bottomCenter,
     this.radius = 1.2,
     this.opacity = 0.6,
+    this.color,
   })  : _pools = false,
         assert(radius > 0, 'radius must be positive'),
         assert(
@@ -60,6 +65,7 @@ class DsBrandBloom extends StatelessWidget {
   })  : _pools = true,
         alignment = Alignment.bottomCenter,
         radius = 1.2,
+        color = null,
         assert(
           opacity >= 0 && opacity <= 1,
           'opacity must be between 0 and 1',
@@ -83,6 +89,15 @@ class DsBrandBloom extends StatelessWidget {
   /// (whose pools carry their own peak alphas that this simply scales).
   final double opacity;
 
+  /// The pool's hue, overriding the theme's `bloomColor`.
+  ///
+  /// Leave it null and the glow takes the theme's own bloom, which is what a
+  /// single backdrop glow should do. Pass another *token* — a brand tint, the
+  /// second brand colour's wash — when a backdrop pools more than one hue and
+  /// the theme can only name one of them. Unused by [DsBrandBloom.pools],
+  /// whose hues come from `bloomStops`.
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final tokens = DsTokens.of(context);
@@ -102,8 +117,8 @@ class DsBrandBloom extends StatelessWidget {
       );
     }
 
-    final peak =
-        tokens.bloomColor.withValues(alpha: tokens.bloomColor.a * opacity);
+    final bloom = color ?? tokens.bloomColor;
+    final peak = bloom.withValues(alpha: bloom.a * opacity);
     return ExcludeSemantics(
       child: DecoratedBox(
         decoration: BoxDecoration(

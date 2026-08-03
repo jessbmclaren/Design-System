@@ -23,11 +23,19 @@ final PatternPage brandBloomPage = PatternPage(
       'glow competes with what sits on top. Like the wash, it fills the '
       'bounds its parent provides.',
     ),
+    ProseBlock(
+      'A marketing backdrop sometimes pools more than one of the brand\'s '
+      'hues, and the theme can only name one of them in `bloomColor`. Pass '
+      '`color` to give a second glow the brand\'s other tint. Pass another '
+      'token, never a literal: a hardcoded hue is the one thing on the page '
+      'a re-skin cannot reach.',
+    ),
   ],
   dos: const [
     'Anchor the glow along an edge or corner, rising into the page.',
     'Keep the default opacity unless the content on top loses contrast.',
     'Let the `bloomColor` token carry the brand; the widget only shapes it.',
+    'Reach for `color` only for a second hue, and feed it a token.',
   ],
   donts: const [
     'Don\'t stack several blooms to build a scene; one pool is an accent, '
@@ -36,11 +44,19 @@ final PatternPage brandBloomPage = PatternPage(
     'Don\'t use it to signal state; it is decoration, not feedback.',
   ],
   code: '''
+final tokens = DsTokens.of(context);
+
 Stack(
   fit: StackFit.expand,
   children: [
     const DsAuthGradient(),
     const DsBrandBloom(alignment: Alignment.bottomRight),
+    // A second pool, carrying the brand's other hue.
+    DsBrandBloom(
+      alignment: Alignment.topLeft,
+      color: tokens.colorBrandSecondaryTint,
+      opacity: 0.5,
+    ),
     Center(child: signInCard),
   ],
 );
