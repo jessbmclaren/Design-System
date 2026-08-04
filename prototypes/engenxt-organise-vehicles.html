@@ -243,6 +243,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .a-btn--danger { background: var(--color-error-bg); color: var(--color-error-text); border-color: var(--color-error-bd); }
 .a-btn--sm { min-height: 32px; padding: 0 var(--sp-2h); font-size: var(--text-caption); }
 .a-btn--xs { min-height: 26px; padding: 0 var(--sp-2); font-size: var(--text-micro); border-radius: var(--radius-xs); }
+/* A dense inspector wants a small button. A thumb wants 44px. Both, via a
+   hit area that extends past the paint. Horizontal growth stays inside the
+   4px gap between adjacent actions so neighbours cannot steal a tap. */
+.a-btn--xs, .a-btn--sm, .o-tree__more, .a-tag__x, .o-tree__twist { position: relative; }
+.a-btn--xs::after   { content:''; position:absolute; inset:-9px -2px; }
+.a-btn--sm::after   { content:''; position:absolute; inset:-6px -2px; }
+.o-tree__more::after,
+.o-tree__twist::after { content:''; position:absolute; inset:-11px -4px; }
+.a-tag__x::after    { content:''; position:absolute; inset:-12px -2px; }
+/* Touch has no hover, so nothing is allowed to be hover-only there. */
+@media (pointer: coarse) {
+  .a-btn--xs { min-height: 36px; }
+  .o-tree__more { opacity: 1; }
+}
 .a-btn--full { width: 100%; }
 
 .a-link {
@@ -521,7 +535,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .o-state-nav__b {
   display: flex; align-items: baseline; gap: var(--sp-2); width: 100%;
-  padding: var(--sp-1h) var(--sp-2); margin-bottom: 1px;
+  padding: var(--sp-1h) var(--sp-2); margin-bottom: 1px; min-height: 34px; position: relative;
   border: 0; border-radius: var(--radius-xs); background: none; cursor: pointer;
   color: var(--color-nav-text); font-size: var(--text-caption); text-align: left; line-height: 1.35;
 }
@@ -530,11 +544,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .o-state-nav__b:focus-visible { outline: 3px solid #A8C4F8; outline-offset: -2px; }
 .o-state-nav__id { flex: none; width: 22px; font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-nav-head); }
 .o-state-nav__b[aria-current="true"] .o-state-nav__id { color: #A8C4F8; }
+.o-state-nav__b::after, .o-state-nav__chip::after { content:''; position:absolute; inset:-7px -2px; }
 .o-state-nav__sw { display: flex; flex-wrap: wrap; gap: var(--sp-1); padding: var(--sp-1) var(--sp-2) 0; }
 .o-state-nav__chip {
   border: var(--hairline) solid var(--color-nav-line); background: rgba(255,255,255,0.05);
   color: var(--color-nav-text); border-radius: var(--radius-pill);
-  padding: 3px var(--sp-2h); font-size: var(--text-nano); font-weight: 600; cursor: pointer;
+  padding: 3px var(--sp-2h); font-size: var(--text-nano); font-weight: 600; cursor: pointer; min-height: 30px; position: relative;
 }
 .o-state-nav__chip[aria-pressed="true"] { background: #fff; color: #0a1628; border-color: #fff; }
 
@@ -559,7 +574,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .t-portal__mark { font-size: var(--text-small); font-weight: 800; letter-spacing: -0.02em; }
 .t-portal__mark em { font-style: normal; color: var(--color-secondary); }
-.t-portal__step { font-size: var(--text-micro); color: var(--color-text-tertiary); font-weight: 600; }
+.t-portal__step { font-size: var(--text-micro); color: var(--color-text-tertiary); font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-portal__mark { flex: none; }
 .t-portal__body { flex: 1 1 auto; min-height: 0; overflow: auto; }
 .t-screen { display: none; padding: var(--sp-5); }
 .t-screen[data-state="on"] { display: block; }
@@ -570,7 +586,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* The workspace: tree, records, inspector. */
 .t-work { display: grid; grid-template-columns: 300px minmax(0,1fr) 360px; gap: var(--sp-3); height: 100%; padding: var(--sp-3); }
-.t-work > * { min-height: 0; }
+/* min-width:0 as well as min-height:0. Without it the records table's own
+   min-width sizes the whole grid column and the page scrolls sideways. */
+.t-work > * { min-height: 0; min-width: 0; }
 
 .p-organise__caption {
   flex: none; margin: 0; font-size: var(--text-micro); color: var(--color-text-tertiary);
@@ -600,7 +618,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 .o-pop {
-  position: absolute; z-index: 50; width: min(420px, calc(100vw - 32px));
+  position: fixed; z-index: 50; width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px); overflow: auto;
   background: var(--color-surface); border: var(--hairline) solid var(--color-border);
   border-radius: var(--radius-card); box-shadow: var(--shadow-pop); padding: var(--sp-4);
 }
@@ -1115,6 +1134,22 @@ function seedPolicies(){
       S.attach[g.id] = Object.assign({}, S.attach[g.id], JSON.parse(JSON.stringify(seed.rules)));
     });
   });
+  /* Money limits are sized to the vehicles that are actually in the account.
+     A R9 000 per-fill limit shown to somebody with five 80-litre vans reads
+     as a number nobody chose, which is how a starting policy loses trust. */
+  const root = rootGroup();
+  if (!root || !S.attach[root.id]) return;
+  const biggest = Math.max(80, ...S.account.vehicles.map(v => v.tank || 0));
+  const round = n => Math.round(n / 500) * 500;
+  const fill = round(biggest * 24.6 * 1.1);
+  S.attach[root.id].maxValue.value = fill;
+  S.attach[root.id].dailyCap.value = round(fill * 1.6);
+  S.attach[root.id].approval.value = round(fill * 0.7);
+  const log = S.groups.find(g => g.name === 'Takealot Logistics');
+  if (log && S.attach[log.id]){
+    S.attach[log.id].maxValue.value = round(fill * 0.85);
+    S.attach[log.id].dailyCap.value = round(fill * 1.35);
+  }
 }
 
 /* Simple mode still has a real root and a real policy. The customer just
@@ -1375,12 +1410,19 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── Provenance chip. Colour is never the only carrier. ────────────────── */
+/* Tighten-only is not locked. A rule this group successfully overrode must
+   read as its own, with the ceiling shown beside it, or the two lock modes
+   become indistinguishable and the whole point of having both is lost. */
 function sourceChip(res, groupId){
   if (!res) return '<span class="a-chip" data-source="default">Not set</span>';
-  if (res.lock && res.lock.id !== groupId)
+  const above = res.lock && res.lock.id !== groupId;
+  if (above && res.lock.mode === 'exact')
     return '<span class="a-chip" data-source="locked">🔒 Locked by ' + esc(res.lock.name) + '</span>';
-  if (res.srcId === groupId) return '<span class="a-chip" data-source="here">Set here</span>';
-  return '<span class="a-chip" data-source="inherited">Inherited from ' + esc(res.srcName) + '</span>';
+  const own = res.srcId === groupId
+    ? '<span class="a-chip" data-source="here">Set here</span>'
+    : '<span class="a-chip" data-source="inherited">Inherited from ' + esc(res.srcName) + '</span>';
+  return own + (above
+    ? ' <span class="a-chip" data-source="locked">Tighten only, from ' + esc(res.lock.name) + '</span>' : '');
 }
 
 /* ── Rule rows, shared by Simple mode and the inspector ────────────────── */
@@ -1533,10 +1575,12 @@ function renderFlat(){
     '<div class="o-panel__body"><div style="padding:var(--sp-2)">' +
     S.groups.map(g =>
       '<button class="o-tree__row" type="button" style="width:100%;text-align:left" data-act="select" data-id="' + g.id + '">' +
-        '<span style="min-width:0"><span class="o-tree__name" style="display:block">' + esc(g.name) + '</span>' +
-        '<span class="m-crumb" style="display:block">' + esc(pathString(g.id)) + '</span></span>' +
-        '<span class="o-tree__meta"><span class="a-kind">' + esc(g.kind) + '</span>' +
-        '<span class="a-count">' + num(vehiclesIn(g.id, true).length) + '</span></span>' +
+        '<span class="o-tree__main">' +
+          '<span class="o-tree__name">' + esc(g.name) + '</span>' +
+          '<span class="o-tree__sub"><span class="a-kind">' + esc(g.kind) + '</span>' +
+            '<span class="u-truncate">' + esc(pathString(g.id)) + '</span></span>' +
+        '</span>' +
+        '<span class="o-tree__meta"><span class="a-count">' + num(vehiclesIn(g.id, true).length) + '</span></span>' +
       '</button>').join('') +
     '</div></div>';
 }
@@ -1625,7 +1669,7 @@ function tryMove(nodeId, targetId){
 
   openDialog('Move ' + esc(g.name) + ' into ' + esc(t.name) + '?',
     '<p style="margin:0 0 var(--sp-3);font-size:var(--text-small)">' +
-      'This moves <strong>' + num(nG) + ' groups beneath it</strong> and <strong>' + num(nV) + ' vehicles</strong>.</p>' +
+      'This moves <strong>' + num(nV) + ' vehicles</strong>' + (nG ? ' and <strong>' + num(nG) + ' groups beneath it</strong>' : '') + '.</p>' +
     (depthAfter > 4 ?
       '<div class="m-note" data-tone="warning" style="margin-bottom:var(--sp-3)"><span class="m-note__ico">△</span>' +
       '<span>That puts this branch ' + (depthAfter + 1) + ' levels deep. Deep structures go stale. ' +
@@ -2017,7 +2061,7 @@ function renderShared(){
         '<div style="padding:var(--sp-3) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
           '<h3 class="o-panel__title" style="margin:0">Shared with</h3>' +
           '<div style="margin:var(--sp-2) 0 0;display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">' +
-            '<span class="a-tag"><span class="a-tag__v">' + esc(shareG.name) + '</span>' +
+            '<span class="a-tag"><span class="a-tag__v">' + esc(pathString(shareG.id)) + '</span>' +
             '<button class="a-tag__x" type="button" data-act="unshare" aria-label="Stop sharing with ' + esc(shareG.name) + '">✕</button></span>' +
             '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="add-share">Add</button>' +
           '</div>' +
@@ -2027,7 +2071,7 @@ function renderShared(){
         '</div>' +
         '<div style="padding-top:var(--sp-3)">' +
           '<h3 class="o-panel__title" style="margin:0">Operating now</h3>' +
-          '<p style="margin:var(--sp-1) 0 0;font-weight:700">' + esc(byId(fill.payingId) ? byId(fill.payingId).name : 'Not set') + '</p>' +
+          '<p style="margin:var(--sp-1) 0 0;font-weight:700">' + esc(fill.payingId && byId(fill.payingId) ? pathString(fill.payingId) : 'Not set') + '</p>' +
           '<p style="margin:2px 0 var(--sp-2);font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
             'from ' + esc(operating ? operating.label.toLowerCase() : 'the vehicle') + ' · driver ' + esc(d.name) + '</p>' +
           '<button class="a-btn a-btn--sm a-btn--secondary" type="button" data-act="why-operating">How was this decided?</button>' +
@@ -2068,7 +2112,7 @@ function showPrecedence(){
       '<li class="m-chain__i" data-state="' + s.state + '">' +
         '<span class="m-chain__mark">' + (s.state === 'won' ? '✓' : s.state === 'lost' ? '✕' : '–') + '</span>' +
         '<span class="m-chain__what">' + esc(s.label) + '</span>' +
-        '<span class="m-chain__why">' + esc(s.gid ? (byId(s.gid) ? byId(s.gid).name : '') : s.miss) + '</span>' +
+        '<span class="m-chain__why">' + esc(s.gid && byId(s.gid) ? pathString(s.gid).split(' › ').slice(-2).join(' › ') : s.miss) + '</span>' +
       '</li>').join('') + '</ul>' +
     '<div style="margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:var(--hairline) solid var(--color-border-light)">' +
       '<p style="margin:0 0 var(--sp-2);font-size:var(--text-caption);font-weight:700">Then applies the strictest of the vehicle, the driver and that group</p>' +
@@ -2084,11 +2128,15 @@ function showPrecedence(){
   p.hidden = false;
   const btn = document.querySelector('[data-act="why-operating"]');
   if (btn){
+    /* Fixed to the viewport, and flipped above the trigger when there is
+       not enough room below. A popover half off the screen is not a popover. */
     const r = btn.getBoundingClientRect();
-    p.style.top = (window.scrollY + r.bottom + 8) + 'px';
-    p.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.innerWidth - 440)) + 'px';
+    const h = p.offsetHeight;
+    const below = window.innerHeight - r.bottom - 16;
+    p.style.top = (below >= h ? r.bottom + 8 : Math.max(8, r.top - h - 8)) + 'px';
+    p.style.left = Math.max(8, Math.min(r.left, window.innerWidth - p.offsetWidth - 16)) + 'px';
   }
-  p.querySelector('[data-act="close-pop"]').focus();
+  p.querySelector('[data-act="close-pop"]').focus({ preventScroll:true });
 }
 
 /* ── G · Explain a decline ─────────────────────────────────────────────── */
@@ -2230,8 +2278,9 @@ const STATES = [
       note('Cape Town, cape town and Cape Town Depot are one place, not three siblings nobody can tell apart.');
       setTimeout(showDupes, 80); } },
   { g:'C · Confirm', id:'C5', t:'Vehicles with nothing to go on', run(){
-      setAccount('group'); renderConfirm(); showScreen('scConfirm','Organise');
-      note('412 vehicles have no branch. They go to a holding group, out of every billing rollup, as a standing task.'); } },
+      setAccount('mid'); renderConfirm(); showScreen('scConfirm','Organise');
+      note('Six vehicles have no branch at all, so they wait in a holding group, out of every billing rollup. ' +
+           'A vehicle that has a region but no branch is different: it sits at the region, rather than being forced into a made-up leaf.'); } },
 
   { g:'D · Structure', id:'D1', t:'Tree, records, inspector', run(){
       setAccount('group'); ensureStructure(); note('Reached by choice, not by default. Arrow keys work, type-ahead works, Tab still leaves.');
@@ -2251,9 +2300,11 @@ const STATES = [
   { g:'D · Structure', id:'D4', t:'Depth nudge', run(){
       setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
       note('Past four levels the screen offers a label instead. Labels survive a reorganisation, branches do not.');
-      const deep = S.groups.slice().sort((a,b) => depthOf(b.id) - depthOf(a.id))[0];
-      const other = S.groups.find(g => depthOf(g.id) >= 2 && canMoveUnder(deep.id, g.id));
-      if (deep && other) setTimeout(() => tryMove(deep.id, other.id), 90); } },
+      /* Move a branch that still has children under a leaf, so the result
+         genuinely goes deeper than four. */
+      const src = S.groups.find(g => childrenOf(g.id).length && depthOf(g.id) === 2);
+      const dst = S.groups.find(g => depthOf(g.id) === 3 && canMoveUnder(src.id, g.id));
+      if (src && dst) setTimeout(() => tryMove(src.id, dst.id), 90); } },
   { g:'D · Structure', id:'D5', t:'Search with the full path', run(){
       setAccount('group'); ensureStructure(); treeFilter = 'sandton'; renderAll(); showScreen('scWork','Structure');
       el('treeSearch').value = 'sandton';
