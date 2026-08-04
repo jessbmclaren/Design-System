@@ -63,7 +63,7 @@
 
   /* Text */
   --color-text-primary:   #0d1e2a;
-  --color-text-secondary: #52617D;   /* 4.63:1 on the sheet glass */
+  --color-text-secondary: #4C5973;   /* 5.03:1 on the sheet glass */
   --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.79:1 on sunken */
   --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
   --color-text-on-dark:   #ffffff;
@@ -99,7 +99,6 @@
   --color-focus:      var(--color-primary-dark);
   --color-handle:     rgba(0,0,0,0.25);
   --color-hardware:   #000;   /* the physical bezel, not a brand colour */
-  --color-progress-track: #727988;   /* 3.24:1 against the sheet glass */
   --color-switch-track:   #8A91A3;   /* 3:1 against white */
   --color-focus-halo: rgba(255,255,255,0.92);
 
@@ -171,9 +170,13 @@
 
   /* Glass. Near opaque, because the sheet sits over a near-black hero and
      0.72 alpha put every piece of secondary text below 2.5:1. */
-  --glass-sheet-bg: rgba(228,235,250,0.94);   /* composites to #D7DEEE */
-  --glass-sheet-bd: blur(80px) saturate(200%) brightness(104%);
+  --glass-sheet-bg: rgba(228,235,250,0.35);
+  --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
+  /* The rendered composite of the glass over the hero. backdrop-filter cannot
+     be computed from the tokens, so this is measured from the painted page and
+     must be re-measured whenever --glass-sheet-bg or -bd changes. */
+  --glass-sheet-measured: #D4DAE9;
   --glass-card-bg:  rgba(255,255,255,0.62);
 
   /* Motion */
@@ -406,18 +409,6 @@ button { background: none; border: none; color: inherit; }
 /* a-spinner */
 .a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
 
-/* a-progress-dot. Done and current must differ by more than fill, so current
-   carries an inset cap. Incomplete is raised to 3:1 against the sheet. */
-.a-progress-dot {
-  flex: 1; height: 5px; border-radius: var(--radius-pill);
-  background: var(--color-progress-track);
-  transition: background .35s var(--ease-out), flex .35s var(--ease-out);
-}
-.a-progress-dot[data-state="done"]    { background: var(--color-primary); }
-.a-progress-dot[data-state="current"] {
-  flex: 2; background: var(--color-primary-dark);
-  box-shadow: inset 0 0 0 1px var(--color-on-dark-mid);
-}
 
 /* a-notch, a-toast */
 .a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
@@ -526,7 +517,11 @@ button { background: none; border: none; color: inherit; }
 .m-sheet-header__badge { margin-top: var(--sp-2); }
 
 /* m-progress */
-.m-progress { display: flex; align-items: center; gap: var(--sp-1h); margin-bottom: var(--sp-4h); }
+.m-progress {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-4h);
+}
 
 /* m-phone-field */
 .m-phone-field__prefix {
@@ -655,6 +650,8 @@ button { background: none; border: none; color: inherit; }
 /* Without backdrop-filter, which is real on older Android WebViews, a
    translucent panel over a near-black hero is unreadable. Go opaque. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  /* No filter means no lift, so the tint alone would sit at 0.35 over a
+     near-black hero. Go fully opaque instead of merely lighter. */
   .o-signup-sheet { background: var(--glass-sheet-fallback); }
 }
 .o-signup-sheet__grab {
@@ -823,8 +820,6 @@ button { background: none; border: none; color: inherit; }
   .a-otp-cell[data-state="filled"] { border-width: 3px; }
   .m-otp-group[data-state="valid"] .a-otp-cell { outline: 2px solid; outline-offset: 2px; }
   .m-otp-group[data-state="error"] .a-otp-cell { outline: 2px dashed; outline-offset: 2px; }
-  .a-progress-dot { border: 1px solid; }
-  .a-progress-dot[data-state="done"], .a-progress-dot[data-state="current"] { border-width: 3px; }
   .a-btn[aria-disabled="true"], .a-btn:disabled { opacity: .5; }
   .a-field[data-state="error"] { outline: 2px dashed; outline-offset: 2px; }
 }
@@ -1141,12 +1136,7 @@ button { background: none; border: none; color: inherit; }
             </button>
           </header>
 
-          <div class="m-progress" id="progress">
-            <span class="u-visually-hidden" id="progressLabel">Step 1 of 3</span>
-            <span class="a-progress-dot" aria-hidden="true"></span>
-            <span class="a-progress-dot" aria-hidden="true"></span>
-            <span class="a-progress-dot" aria-hidden="true"></span>
-          </div>
+          <p class="m-progress" id="progress"><span id="progressLabel">Step 1 of 2</span></p>
 
           <!-- STAGE · NUMBER -->
           <div class="o-signup-sheet__stage" id="stageNumber">
@@ -1159,11 +1149,6 @@ button { background: none; border: none; color: inherit; }
               <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric"
                      autocomplete="tel-national" placeholder="82 123 4567"
                      aria-describedby="phoneHelper">
-              <span class="a-field__affix" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
-                </svg>
-              </span>
             </div>
             <span class="a-helper" id="phoneHelper" role="status"></span>
 
@@ -1753,13 +1738,13 @@ button { background: none; border: none; color: inherit; }
     });
     el.progress.style.display = (name === 'blocked') ? 'none' : 'flex';
     var label = document.getElementById('progressLabel');
-    if (label) { label.textContent = 'Step ' + (step + 1) + ' of 3'; }
+    if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
     el.channelBadgeWrap.hidden = (name !== 'code');
     if (name === 'code') { paintChannelBadge(); }
 
     if (name === 'number') {
       el.sheetTitle.textContent = 'Enter your mobile number';
-      el.sheetSub.textContent = 'Use the number your manager registered for you.';
+      el.sheetSub.textContent = 'Use the number your company registered for you.';
     } else if (name === 'code') {
       el.sheetTitle.textContent = S.channel === 'whatsapp' ? 'Check WhatsApp' : 'Check your messages';
       el.sheetSub.innerHTML = 'We sent a code to <b>' + maskedPhone() + '</b>. In this demo, use <b>123456</b>.';
@@ -1788,12 +1773,12 @@ button { background: none; border: none; color: inherit; }
     clearTimers();
     S.sending = false;
     el.phoneInput.value = value ? formatPhone(value) : '';
-    el.phoneInput.disabled = false;
+    el.phoneInput.readOnly = false;
     el.phoneInput.removeAttribute('aria-invalid');
     el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
     el.phoneField.removeAttribute('data-state');
     hideAlert(el.numberAlert);
-    setHelper(el.phoneHelper, "We'll send your code on WhatsApp. It uses a small amount of data.");
+    setHelper(el.phoneHelper, "We'll send a code to this number on WhatsApp. A small amount of data is needed.");
     paintPhoneValidity();
     setBtn(el.phoneCta, phoneComplete(), 'Continue');
     showStage('number');
@@ -1819,7 +1804,7 @@ button { background: none; border: none; color: inherit; }
     }
     renderAlert(el.numberAlert, def);
     setBtn(el.phoneCta, false, 'Continue');
-    el.phoneInput.disabled = false;
+    el.phoneInput.readOnly = false;
     shake(el.stageNumber);
   }
 
@@ -1830,15 +1815,15 @@ button { background: none; border: none; color: inherit; }
     if (d.length !== 9) {
       el.phoneField.setAttribute('data-state', 'error');
       setHelper(el.phoneHelper, d.length === 0
-        ? 'Enter the mobile number your manager added for you.'
-        : 'That number is too short. It needs 9 digits after +27.', 'error');
+        ? 'Enter a valid mobile number.'
+        : 'Enter 9 digits after +27.', 'error');
       shake(el.stageNumber);
       el.phoneInput.focus({ preventScroll: true });
       return;
     }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
-      setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your manager added for you.', 'error');
+      setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
       shake(el.stageNumber);
       return;
     }
@@ -1847,18 +1832,22 @@ button { background: none; border: none; color: inherit; }
     S.sending = true;
     hideAlert(el.numberAlert);
     setHelper(el.phoneHelper, S.channel === 'whatsapp'
-      ? 'Sending your code on WhatsApp…'
-      : 'Sending your code by SMS…');
+      ? 'Sending a code on WhatsApp…'
+      : 'Sending a code by SMS…');
     el.phoneField.setAttribute('data-state', 'pending');
-    el.phoneInput.disabled = true;
-    el.phoneCta.innerHTML = spinnerMarkup();
+    /* readonly, not disabled, so the number the driver typed stays readable
+       and the field keeps its place in the reading order. */
+    el.phoneInput.readOnly = true;
+    el.phoneField.removeAttribute('data-valid');
+    el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
     setBtn(el.phoneCta, false);
 
     after(900, function () {
       S.sending = false;
-      el.phoneInput.disabled = false;
+      el.phoneInput.readOnly = false;
       el.phoneField.removeAttribute('data-state');
       el.phoneCta.textContent = 'Continue';
+      paintPhoneValidity();
 
       if (isOffline()) { showNumberError('offline'); return; }
       /* The server resolves new against returning, which is why the home
@@ -2269,9 +2258,10 @@ button { background: none; border: none; color: inherit; }
     'number/sending':        { label: 'Sending',            run: function () {
                                  base('signup', '821234567');
                                  el.phoneField.setAttribute('data-state', 'pending');
-                                 el.phoneInput.disabled = true;
-                                 el.phoneCta.innerHTML = spinnerMarkup(); setBtn(el.phoneCta, false);
-                                 setHelper(el.phoneHelper, 'Sending your code on WhatsApp…');
+                                 el.phoneInput.readOnly = true;
+                                 el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
+                                 setBtn(el.phoneCta, false);
+                                 setHelper(el.phoneHelper, 'Sending a code on WhatsApp…');
                                } },
     'number/err-format':     { label: 'Too few digits',     run: function () { base('signup', '82 12'); submitPhone(); } },
     'number/err-landline':   { label: 'Landline entered',   run: function () { base('signup', '111234567'); submitPhone(); } },
@@ -2457,6 +2447,15 @@ button { background: none; border: none; color: inherit; }
   });
   el.phoneInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); submitPhone(); }
+  });
+  /* Nothing is wrong until the driver has finished, so validation waits for
+     them to leave the field rather than scolding them mid-number. */
+  el.phoneInput.addEventListener('blur', function () {
+    var d = phoneDigits();
+    if (S.sending || d.length === 0 || phoneComplete()) { return; }
+    el.phoneField.setAttribute('data-state', 'error');
+    el.phoneInput.setAttribute('aria-invalid', 'true');
+    setHelper(el.phoneHelper, 'Enter 9 digits after +27.', 'error');
   });
   el.phoneCta.addEventListener('click', submitPhone);
   el.otpCta.addEventListener('click', submitOtp);
@@ -2833,7 +2832,9 @@ button { background: none; border: none; color: inherit; }
   }
   function renderContrast() {
     var hero   = tok('--color-hero-3');
-    var sheet  = composite(tok('--glass-sheet-bg'), hero);
+    /* The sheet's filter lifts its own backdrop, which no formula can predict,
+       so the surface here is the measured one rather than a composite. */
+    var sheet  = tok('--glass-sheet-measured');
     var card   = composite(tok('--glass-card-bg'), sheet);
     var sunken = tok('--color-surface-sunken');
     var pairs = [
@@ -2854,9 +2855,7 @@ button { background: none; border: none; color: inherit; }
       ['Alert body on error',    '--color-text-secondary', tok('--color-secondary-bg'),  4.5, 'tint'],
       ['Alert body on warning',  '--color-text-secondary', tok('--color-warning-bg'),    4.5, 'tint'],
       ['Alert body on success',  '--color-text-secondary', tok('--color-success-bg'),    4.5, 'tint'],
-      ['Field border',           '--color-border-field',   card,   3.0, 'field'],
-      ['Progress track',         '--color-progress-track', sheet,  3.0, 'sheet'],
-      ['Progress done',          '--color-primary',        sheet,  3.0, 'sheet']
+      ['Field border',           '--color-border-field',   card,   3.0, 'field']
     ];
     var rows = pairs.map(function (pr) {
       var fg = tok(pr[1]);
@@ -2878,8 +2877,9 @@ button { background: none; border: none; color: inherit; }
       if (fg[3] < 1) { fg = composite(fg, pr[2]); }
       return contrast(fg, pr[2]) < pr[3];
     }).length;
-    return '<p class="d-section__note">Measured from the live tokens, composited where the surface is ' +
-      'translucent. Text needs 4.5:1, non-text and large text need 3:1. ' +
+    return '<p class="d-section__note">Read from the live tokens. The sheet surface is the ' +
+      'measured rendered composite, because its backdrop-filter cannot be derived from the ' +
+      'tokens. Text needs 4.5:1, non-text and large text need 3:1. ' +
       (fails ? '<b>' + fails + ' failing.</b>' : 'All passing.') + '</p>' + rows;
   }
 

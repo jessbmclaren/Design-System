@@ -1,0 +1,2566 @@
+<!DOCTYPE html>
+<html lang="en-ZA" data-motion="system" data-theme="light" data-density="default">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EngenXT · Organise your vehicles · Every state</title>
+
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   ENGENXT · ORGANISE YOUR VEHICLES
+   The step after the vehicle and driver import.
+
+   Naming: atomic design levels as prefixes, BEM for structure,
+           data-* attributes for runtime state.
+
+     tokens    CSS custom properties     --color-primary
+     atoms     a-                        a-btn, a-chip, a-pill
+     molecules m-                        m-rule-row, m-proposal-row
+     organisms o-                        o-tree, o-inspector, o-proposal
+     templates t-                        t-portal, t-screen
+     pages     p-                        p-organise
+     utilities u-                        u-visually-hidden
+
+   State is never a class. It is an attribute:
+     data-state    idle | pending | done | blocked | empty | error
+     data-tone     error | warning | success | info | neutral
+     data-source   here | inherited | locked | default
+     data-lock     open | tighten | exact
+
+   The three rule classes are the spine of this prototype:
+     asset  rules resolve from the VEHICLE's home group
+     person rules resolve from the DRIVER's home group
+     money  rules resolve from the PAYING group
+   and the outcome is the strictest of the three. Deny wins.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ TOKENS ══════════════════════════════════════════════════════════════ */
+:root {
+  --color-primary:       #1650B8;
+  --color-primary-dark:  #0D3A8A;
+  --color-primary-light: #EEF3FF;
+  --color-primary-08: rgba(22,80,184,0.08);
+  --color-primary-12: rgba(22,80,184,0.12);
+  --color-primary-30: rgba(22,80,184,0.30);
+
+  --color-secondary:     #E2231A;
+  --color-secondary-bg:  #FDEEEE;
+
+  --color-success:      #166832;
+  --color-success-bg:   #E8F5EE;
+  --color-success-bd:   rgba(22,104,50,0.28);
+  --color-warning:      #9C4708;
+  --color-warning-bg:   #FDF1E3;
+  --color-warning-bd:   rgba(156,71,8,0.28);
+  --color-error-text:   #B81510;
+  --color-error-bg:     #FDEEEE;
+  --color-error-bd:     rgba(184,21,16,0.28);
+  --color-info:         #1650B8;
+  --color-info-bg:      #EEF3FF;
+  --color-info-bd:      rgba(22,80,184,0.28);
+
+  --color-text-primary:   #0d1e2a;
+  --color-text-secondary: #52617D;
+  --color-text-tertiary:  #6C7385;
+  --color-text-muted:     #97A1B4;
+  --color-text-on-dark:   #ffffff;
+
+  --color-surface:        #ffffff;
+  --color-surface-sunken: #F4F6FA;
+  --color-surface-page:   #E9ECF3;
+  --color-surface-hover:  #F2F5FB;
+  --color-surface-sel:    #E4ECFB;
+  --color-border:         rgba(13,30,42,0.12);
+  --color-border-light:   rgba(13,30,42,0.07);
+  --color-border-strong:  rgba(13,30,42,0.28);
+  --color-scrim:          rgba(10,22,40,0.48);
+
+  --color-nav-bg:    #0a1628;
+  --color-nav-line:  rgba(255,255,255,0.10);
+  --color-nav-text:  rgba(255,255,255,0.62);
+  --color-nav-head:  rgba(255,255,255,0.38);
+  --color-nav-on:    #ffffff;
+
+  --color-focus: #0D3A8A;
+
+  /* Provenance. One hue per source, never colour alone. */
+  --color-here:      #9C4708;
+  --color-here-bg:   #FDF1E3;
+  --color-inherit:   #52617D;
+  --color-inherit-bg:#EEF1F6;
+  --color-locked:    #5B3A9E;
+  --color-locked-bg: #F0EBFB;
+  --color-locked-bd: rgba(91,58,158,0.28);
+
+  --font-sans: "SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-mono: "SF Mono","Menlo",monospace;
+  --text-hero:    28px;
+  --text-title:   22px;
+  --text-large:   18px;
+  --text-heading: 16px;
+  --text-body:    15px;
+  --text-small:   14px;
+  --text-caption: 13px;
+  --text-micro:   12px;
+  --text-nano:    11px;
+
+  --radius-pill: 999px;
+  --radius-lg:   14px;
+  --radius-card: 10px;
+  --radius-sm:   7px;
+  --radius-xs:   5px;
+
+  --shadow-card:    0 1px 2px rgba(13,30,42,0.05), 0 4px 18px rgba(22,80,184,0.07);
+  --shadow-pop:     0 12px 40px rgba(10,22,40,0.20), 0 2px 6px rgba(10,22,40,0.10);
+  --shadow-overlay: 0 28px 80px rgba(10,22,40,0.32);
+  --shadow-toast:   0 8px 30px rgba(10,22,40,0.30);
+
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 40px;
+  --sp-1h: 6px; --sp-2h: 10px; --sp-4h: 18px;
+
+  --size-target: 44px;
+  --size-row:    38px;
+  --size-indent: 22px;
+  --hairline: 1px;
+
+  --ease-out:    cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out: cubic-bezier(0.4,0,0.2,1);
+  --dur-fast: 0.12s;
+  --dur-base: 0.24s;
+  --dur-slow: 0.38s;
+}
+
+/* Dark. Every surface and every provenance tone has a twin. */
+[data-theme="dark"] {
+  --color-primary:       #6E9BF0;
+  --color-primary-dark:  #A8C4F8;
+  --color-primary-light: #17233A;
+  --color-primary-08: rgba(110,155,240,0.10);
+  --color-primary-12: rgba(110,155,240,0.16);
+  --color-primary-30: rgba(110,155,240,0.32);
+
+  --color-success:    #6FD79A;  --color-success-bg: #10291C;  --color-success-bd: rgba(111,215,154,0.30);
+  --color-warning:    #F0B274;  --color-warning-bg: #2C1D0E;  --color-warning-bd: rgba(240,178,116,0.30);
+  --color-error-text: #F58C86;  --color-error-bg:   #2E1414;  --color-error-bd:   rgba(245,140,134,0.30);
+  --color-info:       #6E9BF0;  --color-info-bg:    #14203A;  --color-info-bd:    rgba(110,155,240,0.30);
+
+  --color-text-primary:   #E8EDF6;
+  --color-text-secondary: #A3AEC2;
+  --color-text-tertiary:  #8A94A8;
+  --color-text-muted:     #6B7488;
+
+  --color-surface:        #131A26;
+  --color-surface-sunken: #0E141E;
+  --color-surface-page:   #090D15;
+  --color-surface-hover:  #1B2433;
+  --color-surface-sel:    #1D2B45;
+  --color-border:         rgba(232,237,246,0.15);
+  --color-border-light:   rgba(232,237,246,0.09);
+  --color-border-strong:  rgba(232,237,246,0.34);
+  --color-scrim:          rgba(0,0,0,0.62);
+
+  --color-focus: #A8C4F8;
+
+  --color-here:      #F0B274;  --color-here-bg:    #2C1D0E;
+  --color-inherit:   #A3AEC2;  --color-inherit-bg: #1B2433;
+  --color-locked:    #BFA6F0;  --color-locked-bg:  #221A38;  --color-locked-bd: rgba(191,166,240,0.32);
+
+  --shadow-card:    0 1px 2px rgba(0,0,0,0.40), 0 4px 18px rgba(0,0,0,0.30);
+  --shadow-pop:     0 12px 40px rgba(0,0,0,0.62), 0 2px 6px rgba(0,0,0,0.40);
+  --shadow-overlay: 0 28px 80px rgba(0,0,0,0.70);
+}
+
+/* Comfortable density bumps the row height and the type ramp together. */
+[data-density="comfortable"] {
+  --size-row: 46px;
+  --text-body: 16px;
+  --text-small: 15px;
+  --text-caption: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.45;
+  color: var(--color-text-primary);
+  background: var(--color-surface-page);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.u-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.u-num { font-variant-numeric: tabular-nums; }
+.u-quiet { color: var(--color-text-secondary); }
+.u-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Reduced motion collapses every animation to a still frame. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+/* ══ ATOMS ═══════════════════════════════════════════════════════════════ */
+.a-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: var(--size-target); padding: 0 var(--sp-4);
+  border: var(--hairline) solid transparent; border-radius: var(--radius-sm);
+  background: transparent; color: var(--color-text-primary);
+  font-size: var(--text-small); font-weight: 600; letter-spacing: 0.005em;
+  cursor: pointer; white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-in-out),
+              border-color var(--dur-fast) var(--ease-in-out),
+              color var(--dur-fast) var(--ease-in-out);
+}
+.a-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.a-btn--primary { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+[data-theme="dark"] .a-btn--primary { color: #0a1628; }
+.a-btn--primary:not(:disabled):hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+.a-btn--secondary { background: var(--color-surface); border-color: var(--color-border-strong); }
+.a-btn--secondary:not(:disabled):hover { background: var(--color-surface-hover); }
+.a-btn--quiet { color: var(--color-text-secondary); padding: 0 var(--sp-2h); }
+.a-btn--quiet:not(:disabled):hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
+.a-btn--danger { background: var(--color-error-bg); color: var(--color-error-text); border-color: var(--color-error-bd); }
+.a-btn--sm { min-height: 32px; padding: 0 var(--sp-2h); font-size: var(--text-caption); }
+.a-btn--xs { min-height: 26px; padding: 0 var(--sp-2); font-size: var(--text-micro); border-radius: var(--radius-xs); }
+.a-btn--full { width: 100%; }
+
+.a-link {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--color-primary); font-size: inherit; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.a-link--quiet { color: var(--color-text-secondary); font-weight: 500; }
+
+.a-chip {
+  display: inline-flex; align-items: center; gap: var(--sp-1);
+  padding: 2px var(--sp-2); border-radius: var(--radius-xs);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.03em;
+  text-transform: uppercase; white-space: nowrap;
+  border: var(--hairline) solid transparent;
+}
+.a-chip[data-source="here"]      { background: var(--color-here-bg);    color: var(--color-here);    border-color: var(--color-warning-bd); }
+.a-chip[data-source="inherited"] { background: var(--color-inherit-bg); color: var(--color-inherit); border-color: var(--color-border); }
+.a-chip[data-source="locked"]    { background: var(--color-locked-bg);  color: var(--color-locked);  border-color: var(--color-locked-bd); }
+.a-chip[data-source="default"]   { background: transparent;             color: var(--color-text-muted); border-color: var(--color-border-light); }
+.a-chip[data-tone="success"] { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success-bd); }
+.a-chip[data-tone="warning"] { background: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-warning-bd); }
+.a-chip[data-tone="error"]   { background: var(--color-error-bg);   color: var(--color-error-text); border-color: var(--color-error-bd); }
+.a-chip[data-tone="info"]    { background: var(--color-info-bg);    color: var(--color-info);   border-color: var(--color-info-bd); }
+.a-chip[data-tone="neutral"] { background: var(--color-surface-sunken); color: var(--color-text-secondary); border-color: var(--color-border-light); }
+
+/* The kind chip. Node kind is visible on the row, never hidden metadata. */
+.a-kind {
+  display: inline-block; padding: 1px var(--sp-1h); border-radius: var(--radius-xs);
+  background: var(--color-surface-sunken); color: var(--color-text-tertiary);
+  border: var(--hairline) solid var(--color-border-light);
+  font-size: var(--text-nano); font-weight: 600; letter-spacing: 0.02em; white-space: nowrap;
+}
+
+/* Key:value tag. The colon is structural, not decoration. */
+.a-tag {
+  display: inline-flex; align-items: center; border-radius: var(--radius-xs);
+  border: var(--hairline) solid var(--color-border); background: var(--color-surface);
+  font-size: var(--text-micro); overflow: hidden; white-space: nowrap;
+}
+.a-tag__k { padding: 2px var(--sp-1h); background: var(--color-surface-sunken); color: var(--color-text-tertiary); font-weight: 600; }
+.a-tag__v { padding: 2px var(--sp-1h); color: var(--color-text-primary); font-weight: 500; }
+.a-tag__x {
+  border: 0; background: none; cursor: pointer; padding: 2px var(--sp-1h);
+  color: var(--color-text-tertiary); border-left: var(--hairline) solid var(--color-border-light);
+}
+.a-tag__x:hover { background: var(--color-error-bg); color: var(--color-error-text); }
+
+.a-input, .a-select {
+  width: 100%; min-height: 36px; padding: 0 var(--sp-2h);
+  border: var(--hairline) solid var(--color-border-strong); border-radius: var(--radius-xs);
+  background: var(--color-surface); color: var(--color-text-primary); font-size: var(--text-small);
+}
+.a-input--sm { min-height: 30px; font-size: var(--text-caption); }
+.a-check { width: 17px; height: 17px; accent-color: var(--color-primary); cursor: pointer; flex: none; }
+
+.a-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; padding: 0 var(--sp-1h); height: 19px; border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken); color: var(--color-text-tertiary);
+  font-size: var(--text-nano); font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.a-bar { height: 6px; border-radius: var(--radius-pill); background: var(--color-border-light); overflow: hidden; }
+.a-bar__fill { height: 100%; background: var(--color-primary); border-radius: inherit; transition: width var(--dur-slow) var(--ease-out); }
+.a-bar__fill[data-tone="success"] { background: var(--color-success); }
+
+.a-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.a-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--color-text-muted); }
+.a-dot[data-tone="success"] { background: var(--color-success); }
+.a-dot[data-tone="error"]   { background: var(--color-error-text); }
+.a-dot[data-tone="warning"] { background: var(--color-warning); }
+
+/* ══ MOLECULES ═══════════════════════════════════════════════════════════ */
+.m-card {
+  background: var(--color-surface); border: var(--hairline) solid var(--color-border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+}
+.m-card__head {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5); border-bottom: var(--hairline) solid var(--color-border-light);
+}
+.m-card__title { margin: 0; font-size: var(--text-heading); font-weight: 700; letter-spacing: -0.01em; }
+.m-card__sub { margin: 2px 0 0; font-size: var(--text-caption); color: var(--color-text-secondary); }
+.m-card__body { padding: var(--sp-4) var(--sp-5); }
+.m-card__foot {
+  display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-5); border-top: var(--hairline) solid var(--color-border-light);
+  background: var(--color-surface-sunken); border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.m-note {
+  display: flex; gap: var(--sp-2h); align-items: flex-start;
+  padding: var(--sp-2h) var(--sp-3); border-radius: var(--radius-sm);
+  border: var(--hairline) solid var(--color-border); background: var(--color-surface-sunken);
+  font-size: var(--text-caption); line-height: 1.5;
+}
+.m-note[data-tone="info"]    { background: var(--color-info-bg);    border-color: var(--color-info-bd);    color: var(--color-info); }
+.m-note[data-tone="warning"] { background: var(--color-warning-bg); border-color: var(--color-warning-bd); color: var(--color-warning); }
+.m-note[data-tone="error"]   { background: var(--color-error-bg);   border-color: var(--color-error-bd);   color: var(--color-error-text); }
+.m-note[data-tone="success"] { background: var(--color-success-bg); border-color: var(--color-success-bd); color: var(--color-success); }
+.m-note__ico { flex: none; font-size: var(--text-body); line-height: 1.2; }
+.m-note strong { font-weight: 700; }
+
+/* One rule row. Value, provenance and the action live on one line. */
+.m-rule {
+  display: grid; grid-template-columns: minmax(140px,1.3fr) minmax(96px,0.9fr) auto auto;
+  gap: var(--sp-3); align-items: center;
+  padding: var(--sp-2h) var(--sp-3); border-radius: var(--radius-sm);
+  border: var(--hairline) solid transparent;
+}
+.m-rule + .m-rule { margin-top: 2px; }
+.m-rule:hover { background: var(--color-surface-hover); }
+.m-rule[data-state="blocked"] { background: var(--color-warning-bg); border-color: var(--color-warning-bd); }
+.m-rule__label { font-size: var(--text-small); font-weight: 500; }
+.m-rule__class { display: block; font-size: var(--text-nano); color: var(--color-text-tertiary); font-weight: 600; letter-spacing: 0.02em; }
+.m-rule__value { font-size: var(--text-small); font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-rule__act { display: flex; gap: var(--sp-1); justify-self: end; }
+/* In a 360px inspector the four-column grid clips the provenance chip to
+   "Set he…". Below that width the row stacks instead of shrinking. */
+.m-rule--tight { grid-template-columns: minmax(0,1fr) auto; row-gap: 3px; }
+.m-rule--tight > .m-rule__label { grid-column: 1; grid-row: 1; }
+.m-rule--tight > .m-rule__act   { grid-column: 2; grid-row: 1; align-self: start; }
+.m-rule--tight > .m-rule__value { grid-column: 1 / -1; grid-row: 2; }
+.m-rule--tight > .m-rule__src   { grid-column: 1 / -1; grid-row: 3; }
+.m-rule__src { min-width: 0; }
+.m-rule__src .a-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+
+/* A proposal row. Rename inline, exclude with a checkbox, count on the right. */
+.m-prop {
+  display: grid; grid-template-columns: auto minmax(120px,1fr) auto minmax(120px,1fr) auto;
+  gap: var(--sp-3); align-items: center; padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+}
+.m-prop:hover { background: var(--color-surface-hover); }
+.m-prop[data-state="excluded"] { opacity: 0.42; }
+.m-prop[data-state="merged"] { background: var(--color-info-bg); }
+.m-prop__from { font-size: var(--text-small); color: var(--color-text-secondary); font-family: var(--font-mono); }
+.m-prop__arrow { color: var(--color-text-muted); font-size: var(--text-caption); }
+.m-prop__count { font-size: var(--text-caption); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; justify-self: end; white-space: nowrap; }
+
+/* The precedence chain. Losers are struck through, the winner is not. */
+.m-chain { list-style: none; margin: 0; padding: 0; }
+.m-chain__i {
+  display: grid; grid-template-columns: 18px 1fr auto; gap: var(--sp-2h);
+  align-items: baseline; padding: var(--sp-1h) 0;
+  font-size: var(--text-caption); color: var(--color-text-tertiary);
+}
+.m-chain__i + .m-chain__i { border-top: var(--hairline) solid var(--color-border-light); }
+.m-chain__i[data-state="lost"] .m-chain__what { text-decoration: line-through; }
+.m-chain__i[data-state="won"] { color: var(--color-text-primary); font-weight: 700; }
+.m-chain__i[data-state="unused"] { opacity: 0.5; }
+.m-chain__mark { text-align: center; font-weight: 700; }
+.m-chain__i[data-state="won"] .m-chain__mark { color: var(--color-success); }
+.m-chain__i[data-state="lost"] .m-chain__mark { color: var(--color-text-muted); }
+.m-chain__why { color: var(--color-text-tertiary); font-weight: 400; font-size: var(--text-micro); }
+
+.m-kv { display: grid; grid-template-columns: minmax(96px,auto) 1fr; gap: var(--sp-2) var(--sp-4); font-size: var(--text-small); }
+.m-kv dt { color: var(--color-text-secondary); }
+.m-kv dd { margin: 0; font-weight: 600; }
+
+.m-crumb { display: flex; align-items: center; gap: var(--sp-1); flex-wrap: wrap; font-size: var(--text-micro); color: var(--color-text-tertiary); }
+.m-crumb__sep { opacity: 0.5; }
+.m-crumb__last { color: var(--color-text-primary); font-weight: 600; }
+
+.m-empty {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2h);
+  padding: var(--sp-8) var(--sp-5); text-align: center; color: var(--color-text-secondary);
+}
+.m-empty__title { margin: 0; font-size: var(--text-heading); font-weight: 700; color: var(--color-text-primary); }
+.m-empty__body { margin: 0; max-width: 42ch; font-size: var(--text-small); }
+/* ══ ORGANISMS ═══════════════════════════════════════════════════════════ */
+
+/* The tree. A real ARIA tree: one tabbable node, arrow keys on the treeitem. */
+.o-tree { list-style: none; margin: 0; padding: var(--sp-2); }
+.o-tree ul { list-style: none; margin: 0; padding: 0; }
+.o-tree__row {
+  display: flex; align-items: center; gap: var(--sp-1h);
+  min-height: var(--size-row); padding: 0 var(--sp-2) 0 0;
+  border-radius: var(--radius-sm); cursor: pointer;
+  border: 2px solid transparent;
+}
+.o-tree__row:hover { background: var(--color-surface-hover); }
+.o-tree__item[aria-selected="true"] > .o-tree__row {
+  background: var(--color-surface-sel);
+  border-color: var(--color-primary);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+.o-tree__item:focus { outline: none; }
+.o-tree__item:focus-visible > .o-tree__row { outline: 3px solid var(--color-focus); outline-offset: -1px; }
+.o-tree__twist {
+  flex: none; width: 22px; height: 22px; border: 0; background: none; cursor: pointer;
+  color: var(--color-text-tertiary); font-size: 10px; display: grid; place-items: center;
+  transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.o-tree__twist[data-state="open"] { transform: rotate(90deg); }
+.o-tree__twist[data-state="leaf"] { visibility: hidden; }
+/* The name wins the width contest. Meta yields, because "Take…" and "T."
+   are what happens when a chip row is allowed to starve the only text that
+   tells you which group you are looking at. */
+.o-tree__main { flex: 1 1 auto; min-width: 0; padding: var(--sp-1) 0; }
+.o-tree__name {
+  display: block; font-size: var(--text-small); font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.o-tree__sub {
+  display: flex; align-items: center; gap: var(--sp-1); min-width: 0;
+  font-size: var(--text-nano); color: var(--color-text-tertiary);
+}
+.o-tree__sub .a-kind, .o-tree__sub .a-chip { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.o-tree__meta { display: flex; align-items: center; gap: var(--sp-1h); flex: none; }
+/* Drop indicators are 3px with a cap, never a 1px rumour. */
+.o-tree__row[data-drop="into"] { border-color: var(--color-primary); background: var(--color-primary-12); }
+.o-tree__row[data-drop="above"] { box-shadow: 0 -3px 0 var(--color-primary), -3px -3px 0 var(--color-primary); }
+.o-tree__row[data-drop="below"] { box-shadow: 0 3px 0 var(--color-primary), -3px 3px 0 var(--color-primary); }
+/* The overflow control is always visible. Hover-only controls do not exist on touch. */
+.o-tree__more {
+  flex: none; width: 26px; height: 26px; border-radius: var(--radius-xs);
+  border: 0; background: none; cursor: pointer; color: var(--color-text-tertiary);
+  opacity: 0.45; font-size: var(--text-body); line-height: 1;
+}
+.o-tree__row:hover .o-tree__more, .o-tree__more:focus-visible { opacity: 1; background: var(--color-surface); }
+
+.o-panel {
+  display: flex; flex-direction: column; min-height: 0;
+  background: var(--color-surface); border: var(--hairline) solid var(--color-border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.o-panel__head {
+  display: flex; align-items: center; gap: var(--sp-2); flex: none;
+  padding: var(--sp-2h) var(--sp-3); border-bottom: var(--hairline) solid var(--color-border-light);
+  background: var(--color-surface-sunken);
+}
+.o-panel__title { margin: 0; font-size: var(--text-caption); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-text-secondary); }
+.o-panel__body { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.o-panel__foot { flex: none; padding: var(--sp-2h) var(--sp-3); border-top: var(--hairline) solid var(--color-border-light); background: var(--color-surface-sunken); }
+
+/* The records table. Selection is persistent and stated. */
+/* Wide content scrolls inside its own container rather than squashing a
+   registration onto two lines. */
+.o-records { width: 100%; min-width: 640px; border-collapse: collapse; font-size: var(--text-caption); }
+.o-records td, .o-records th { white-space: nowrap; }
+.o-records th {
+  position: sticky; top: 0; z-index: 1; text-align: left; font-weight: 600;
+  padding: var(--sp-2) var(--sp-2h); background: var(--color-surface-sunken);
+  border-bottom: var(--hairline) solid var(--color-border); color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+.o-records td { padding: var(--sp-2) var(--sp-2h); border-bottom: var(--hairline) solid var(--color-border-light); }
+.o-records tr[data-state="selected"] td { background: var(--color-surface-sel); }
+.o-records tr:hover td { background: var(--color-surface-hover); }
+.o-records tr[data-state="selected"]:hover td { background: var(--color-surface-sel); }
+.o-records__home { color: var(--color-text-secondary); font-size: var(--text-micro); }
+
+.o-selbar {
+  display: flex; align-items: center; gap: var(--sp-2h); flex-wrap: wrap;
+  padding: var(--sp-2) var(--sp-3); background: var(--color-primary-08);
+  border-top: var(--hairline) solid var(--color-primary-30);
+}
+.o-selbar__n { font-size: var(--text-caption); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* The state map, in the manner of the sign-up prototype. */
+.o-state-nav {
+  grid-area: nav; overflow-y: auto; padding: var(--sp-4) var(--sp-3) var(--sp-8);
+  background: var(--color-nav-bg); color: var(--color-nav-text);
+  border-right: var(--hairline) solid var(--color-nav-line);
+}
+.o-state-nav__brand { display: flex; align-items: baseline; gap: var(--sp-2); margin: 0 0 var(--sp-1) var(--sp-2); }
+.o-state-nav__mark { font-size: var(--text-heading); font-weight: 800; color: var(--color-nav-on); letter-spacing: -0.02em; }
+.o-state-nav__mark em { font-style: normal; color: #E2231A; }
+.o-state-nav__tag { font-size: var(--text-nano); color: var(--color-nav-head); letter-spacing: 0.06em; text-transform: uppercase; }
+.o-state-nav__lede { margin: 0 var(--sp-2) var(--sp-4); font-size: var(--text-micro); line-height: 1.5; color: var(--color-nav-head); }
+.o-state-nav__h {
+  margin: var(--sp-4) 0 var(--sp-1); padding: 0 var(--sp-2);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--color-nav-head);
+}
+.o-state-nav__b {
+  display: flex; align-items: baseline; gap: var(--sp-2); width: 100%;
+  padding: var(--sp-1h) var(--sp-2); margin-bottom: 1px;
+  border: 0; border-radius: var(--radius-xs); background: none; cursor: pointer;
+  color: var(--color-nav-text); font-size: var(--text-caption); text-align: left; line-height: 1.35;
+}
+.o-state-nav__b:hover { background: rgba(255,255,255,0.07); color: var(--color-nav-on); }
+.o-state-nav__b[aria-current="true"] { background: rgba(255,255,255,0.13); color: var(--color-nav-on); font-weight: 600; }
+.o-state-nav__b:focus-visible { outline: 3px solid #A8C4F8; outline-offset: -2px; }
+.o-state-nav__id { flex: none; width: 22px; font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-nav-head); }
+.o-state-nav__b[aria-current="true"] .o-state-nav__id { color: #A8C4F8; }
+.o-state-nav__sw { display: flex; flex-wrap: wrap; gap: var(--sp-1); padding: var(--sp-1) var(--sp-2) 0; }
+.o-state-nav__chip {
+  border: var(--hairline) solid var(--color-nav-line); background: rgba(255,255,255,0.05);
+  color: var(--color-nav-text); border-radius: var(--radius-pill);
+  padding: 3px var(--sp-2h); font-size: var(--text-nano); font-weight: 600; cursor: pointer;
+}
+.o-state-nav__chip[aria-pressed="true"] { background: #fff; color: #0a1628; border-color: #fff; }
+
+/* ══ TEMPLATES ═══════════════════════════════════════════════════════════ */
+.p-organise {
+  display: grid; grid-template-areas: "nav stage"; grid-template-columns: 264px 1fr;
+  height: 100vh; height: 100dvh;
+}
+.p-organise__stage {
+  grid-area: stage; min-width: 0; min-height: 0; overflow: auto;
+  padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.t-portal {
+  flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0;
+  background: var(--color-surface-sunken); border: var(--hairline) solid var(--color-border);
+  border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card);
+}
+.t-portal__bar {
+  flex: none; display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2h) var(--sp-4); background: var(--color-surface);
+  border-bottom: var(--hairline) solid var(--color-border);
+}
+.t-portal__mark { font-size: var(--text-small); font-weight: 800; letter-spacing: -0.02em; }
+.t-portal__mark em { font-style: normal; color: var(--color-secondary); }
+.t-portal__step { font-size: var(--text-micro); color: var(--color-text-tertiary); font-weight: 600; }
+.t-portal__body { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.t-screen { display: none; padding: var(--sp-5); }
+.t-screen[data-state="on"] { display: block; }
+.t-screen--flush { padding: 0; height: 100%; }
+.t-screen__lede { max-width: 62ch; margin: 0 0 var(--sp-4); }
+.t-screen__h1 { margin: 0 0 var(--sp-1); font-size: var(--text-title); font-weight: 800; letter-spacing: -0.02em; }
+.t-screen__sub { margin: 0; font-size: var(--text-small); color: var(--color-text-secondary); }
+
+/* The workspace: tree, records, inspector. */
+.t-work { display: grid; grid-template-columns: 300px minmax(0,1fr) 360px; gap: var(--sp-3); height: 100%; padding: var(--sp-3); }
+.t-work > * { min-height: 0; }
+
+.p-organise__caption {
+  flex: none; margin: 0; font-size: var(--text-micro); color: var(--color-text-tertiary);
+  display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap;
+}
+
+/* Overlays. */
+.o-scrim {
+  position: fixed; inset: 0; background: var(--color-scrim); z-index: 40;
+  display: grid; place-items: center; padding: var(--sp-5);
+  opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-in-out);
+}
+.o-scrim[data-state="on"] { opacity: 1; pointer-events: auto; }
+.o-dialog {
+  width: min(560px, 100%); max-height: 84vh; overflow: auto;
+  background: var(--color-surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay); border: var(--hairline) solid var(--color-border);
+}
+.o-dialog--wide { width: min(760px, 100%); }
+.o-dialog__head { padding: var(--sp-4) var(--sp-5) var(--sp-3); }
+.o-dialog__title { margin: 0; font-size: var(--text-large); font-weight: 800; letter-spacing: -0.01em; }
+.o-dialog__body { padding: 0 var(--sp-5) var(--sp-4); }
+.o-dialog__foot {
+  display: flex; justify-content: flex-end; gap: var(--sp-2); flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-5); border-top: var(--hairline) solid var(--color-border-light);
+  background: var(--color-surface-sunken); border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.o-pop {
+  position: absolute; z-index: 50; width: min(420px, calc(100vw - 32px));
+  background: var(--color-surface); border: var(--hairline) solid var(--color-border);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-pop); padding: var(--sp-4);
+}
+.o-pop[hidden] { display: none; }
+.o-pop__title { margin: 0 0 var(--sp-2h); font-size: var(--text-caption); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-secondary); }
+
+.a-toast {
+  position: fixed; left: 50%; bottom: var(--sp-6); transform: translate(-50%, 12px);
+  z-index: 60; display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2h) var(--sp-3) var(--sp-2h) var(--sp-4);
+  background: #0d1e2a; color: #fff; border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-toast); font-size: var(--text-caption);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+[data-theme="dark"] .a-toast { background: #E8EDF6; color: #0d1e2a; }
+.a-toast[data-state="on"] { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.a-toast__undo { background: none; border: 0; cursor: pointer; color: #A8C4F8; font-weight: 700; font-size: var(--text-caption); text-decoration: underline; text-underline-offset: 3px; }
+[data-theme="dark"] .a-toast__undo { color: var(--color-primary-dark); }
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════════ */
+/* Below 900px the tree is replaced by a flat grouped list with a move sheet.
+   Nesting UI has no touch story, so it does not pretend to have one. */
+@media (max-width: 1180px) {
+  .t-work { grid-template-columns: 240px minmax(0,1fr); }
+  .t-work__inspect { grid-column: 1 / -1; max-height: 340px; }
+}
+@media (max-width: 900px) {
+  .p-organise { grid-template-areas: "nav" "stage"; grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .o-state-nav { max-height: 190px; border-right: 0; border-bottom: var(--hairline) solid var(--color-nav-line); }
+  .p-organise__stage { padding: var(--sp-3); }
+  .t-work { grid-template-columns: 1fr; grid-auto-rows: minmax(0,auto); height: auto; }
+  .t-work__tree { display: none; }
+  .t-work__flat { display: flex !important; }
+  .m-rule { grid-template-columns: 1fr auto; row-gap: var(--sp-1); }
+  .m-rule__act { grid-column: 2; }
+  .m-prop { grid-template-columns: auto 1fr auto; }
+  .m-prop__arrow, .m-prop__from { display: none; }
+}
+@media (max-width: 560px) {
+  .t-screen { padding: var(--sp-3); }
+  .m-card__head, .m-card__body { padding: var(--sp-3); }
+  .m-card__foot { padding: var(--sp-3); }
+  .a-btn { padding: 0 var(--sp-3); }
+}
+.t-work__flat { display: none; flex-direction: column; }
+
+@media print { .o-state-nav { display: none; } }
+/* CSS-PART-4 */
+</style>
+</head>
+<body>
+<div class="p-organise">
+
+  <!-- ══ STATE MAP ══════════════════════════════════════════════════════ -->
+  <nav class="o-state-nav" aria-label="Prototype states">
+    <p class="o-state-nav__brand">
+      <span class="o-state-nav__mark">Engen<em>XT</em></span>
+      <span class="o-state-nav__tag">Prototype</span>
+    </p>
+    <p class="o-state-nav__lede">
+      Organise your vehicles: the step after the vehicle and driver import.
+      Pick a sample account, then walk the states. Every state is reachable.
+    </p>
+
+    <h2 class="o-state-nav__h">Sample account</h2>
+    <div class="o-state-nav__sw" id="accountSwitch" role="group" aria-label="Sample account"></div>
+
+    <div id="stateList"></div>
+
+    <h2 class="o-state-nav__h">Modes</h2>
+    <div class="o-state-nav__sw" role="group" aria-label="Display modes">
+      <button class="o-state-nav__chip" type="button" data-mode="theme"   aria-pressed="false">Dark</button>
+      <button class="o-state-nav__chip" type="button" data-mode="motion"  aria-pressed="false">Reduced motion</button>
+      <button class="o-state-nav__chip" type="button" data-mode="density" aria-pressed="false">Comfortable</button>
+      <button class="o-state-nav__chip" type="button" data-mode="narrow"  aria-pressed="false">320dp</button>
+    </div>
+  </nav>
+
+  <!-- ══ STAGE ══════════════════════════════════════════════════════════ -->
+  <div class="p-organise__stage" id="stage">
+    <div class="t-portal" id="portal">
+      <div class="t-portal__bar">
+        <span class="t-portal__mark">Engen<em>XT</em></span>
+        <span class="t-portal__step" id="portalStep">Setup</span>
+        <span style="margin-left:auto" class="t-portal__step" id="portalAccount"></span>
+      </div>
+      <div class="t-portal__body" id="portalBody">
+
+        <!-- B · Simple mode. No tree, no "group", no "hierarchy". -->
+        <section class="t-screen" id="scSimple" aria-labelledby="simpleH"></section>
+
+        <!-- C · Confirm the inferred structure. -->
+        <section class="t-screen" id="scConfirm" aria-labelledby="confirmH"></section>
+
+        <!-- D + E · Structure workspace. -->
+        <section class="t-screen t-screen--flush" id="scWork" aria-label="Structure workspace">
+          <div class="t-work">
+            <div class="o-panel t-work__tree">
+              <div class="o-panel__head">
+                <h2 class="o-panel__title">Structure</h2>
+                <button class="a-btn a-btn--xs a-btn--secondary" type="button" id="addChildBtn" style="margin-left:auto">Add</button>
+              </div>
+              <div style="padding:var(--sp-2);border-bottom:var(--hairline) solid var(--color-border-light)">
+                <input class="a-input a-input--sm" type="search" id="treeSearch" placeholder="Find a group" aria-label="Find a group">
+              </div>
+              <div class="o-panel__body" id="treeHost"></div>
+              <div class="o-panel__foot" id="treeFoot"></div>
+            </div>
+
+            <div class="o-panel t-work__flat" id="flatHost"></div>
+
+            <div class="o-panel t-work__records">
+              <div class="o-panel__head" id="recordsHead"></div>
+              <div class="o-panel__body" id="recordsHost"></div>
+              <div id="selBarHost"></div>
+            </div>
+
+            <div class="o-panel t-work__inspect">
+              <div class="o-panel__head">
+                <h2 class="o-panel__title" id="inspectTitle">Inspector</h2>
+              </div>
+              <div class="o-panel__body" id="inspectHost"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- F · Shared asset. -->
+        <section class="t-screen" id="scShared" aria-labelledby="sharedH"></section>
+
+        <!-- G · Explain a decline. -->
+        <section class="t-screen" id="scDecline" aria-labelledby="declineH"></section>
+
+        <!-- H · Done. -->
+        <section class="t-screen" id="scDone" aria-labelledby="doneH"></section>
+
+      </div>
+    </div>
+    <p class="p-organise__caption" id="caption"></p>
+  </div>
+</div>
+
+<!-- Overlays -->
+<div class="o-scrim" id="scrim" role="presentation">
+  <div class="o-dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" tabindex="-1"></div>
+</div>
+<div class="o-pop" id="pop" role="dialog" aria-label="How this was decided" hidden></div>
+<div class="a-toast" id="toast" role="status"></div>
+<span class="u-visually-hidden" id="announcer" role="status" aria-live="polite"></span>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════════════════════════
+   DATA
+   Three sample accounts, one rule schema. Every count on screen is computed
+   from these rows, never hardcoded, so the prototype cannot quietly lie.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Rule classes are the spine. A rule resolves from the vehicle, the driver
+   or the paying group depending on what kind of rule it is. `dir` is the
+   monotonic direction that makes "tighten only" decidable. */
+const RULES = [
+  { key:'products',  label:'Fuel products',         cls:'asset',  type:'set',    dir:'subset', needs:'fuelType' },
+  { key:'maxLitres', label:'Max litres per fill',   cls:'asset',  type:'litres', dir:'lower',  needs:'tank' },
+  { key:'window',    label:'Fuelling window',       cls:'person', type:'window', dir:'inside' },
+  { key:'pin',       label:'Driver PIN',            cls:'person', type:'bool',   dir:'onlyOn' },
+  { key:'odo',       label:'Odometer capture',      cls:'person', type:'bool',   dir:'onlyOn' },
+  { key:'maxValue',  label:'Max value per fill',    cls:'money',  type:'rand',   dir:'lower' },
+  { key:'dailyCap',  label:'Daily cap',             cls:'money',  type:'rand',   dir:'lower' },
+  { key:'approval',  label:'Approval needed above', cls:'money',  type:'rand',   dir:'lower' },
+];
+const RULE_BY_KEY = Object.fromEntries(RULES.map(r => [r.key, r]));
+const CLS_LABEL = { asset:'From the vehicle', person:'From the driver', money:'From the paying group' };
+
+/* Node kinds are a controlled vocabulary. Free text here produces
+   Depot / depot / Depo / Dept and six categories in one report. */
+const KINDS = ['Company','Subsidiary','Division','Region','Department','Team','Depot','Site'];
+
+/* Column names that imply structure. Everything else becomes a tag group. */
+const STRUCTURAL = ['subsidiary','company','entity','division','region','area','province','branch',
+                    'depot','site','location','yard','hub','department','team','crew','business area','cost centre','cost center'];
+
+const FIRST = ['Thandi','Sipho','Rajesh','Marlize','Nomsa','Pieter','Lerato','Kobus','Ayanda','Fatima',
+               'Johan','Zanele','Devan','Anele','Riaan','Precious','Themba','Chantelle','Musa','Yusuf'];
+const LAST  = ['Nkosi','Dlamini','Naidoo','van der Merwe','Khumalo','Botha','Mokoena','Pillay','Mahlangu',
+               'du Toit','Ndlovu','Adams','Sithole','Jacobs','Molefe','Petersen','Zulu','Fourie'];
+
+/* A small deterministic PRNG. No Math.random, so a reload is reproducible
+   and a screenshot taken today matches one taken tomorrow. */
+let _seed = 20260804;
+function rnd(){ _seed = (_seed * 1103515245 + 12345) & 0x7fffffff; return _seed / 0x7fffffff; }
+function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+function reseed(){ _seed = 20260804; }
+
+const PLATE = {
+  'Gauteng':      () => `${pick(['JN','BX','HK','TS'])} ${(10+Math.floor(rnd()*89))} ${pick(['RT','VN','GP','ZL'])} GP`,
+  'Western Cape': () => `CA ${100 + Math.floor(rnd()*899)} ${100 + Math.floor(rnd()*899)}`,
+  'KwaZulu-Natal':() => `ND ${10 + Math.floor(rnd()*89)} ${100 + Math.floor(rnd()*899)}`,
+  '':             () => `CJ ${10 + Math.floor(rnd()*89)} ${100 + Math.floor(rnd()*899)}`,
+};
+
+/* Distribution specs. [subsidiary, region, branch, count] */
+const SPECS = {
+  solo: {
+    label: '5 vans',
+    company: 'Metro courier',
+    columns: ['Registration','Make','Model','Driver','Tank (L)'],
+    dist: [['', '', '', 5]],
+    drivers: 6,
+  },
+  mid: {
+    label: '220 vehicles',
+    company: 'Three-depot logistics',
+    columns: ['Registration','Branch','Shift','Class','Driver'],
+    /* Deliberate near-duplicates. Four spellings of one place is what a real
+       spreadsheet looks like, and the merge review exists because of it. */
+    dist: [
+      ['', '', 'Johannesburg', 140],
+      ['', '', 'Cape Town', 31],
+      ['', '', 'cape town ', 12],
+      ['', '', 'Cape Town Depot', 9],
+      ['', '', 'Durban', 22],
+      ['', '', '', 6],
+    ],
+    drivers: 186,
+  },
+  group: {
+    label: 'Group, 5 levels',
+    company: 'Takealot Group',
+    columns: ['Registration','Subsidiary','Region','Branch','Cost Centre','Shift','Class'],
+    dist: [
+      ['Takealot Retail',   'Gauteng',       'Sandton',      412],
+      ['Takealot Retail',   'Gauteng',       'Bryanston',    288],
+      ['Takealot Retail',   'Gauteng',       'Midrand',      236],
+      ['Takealot Retail',   'Western Cape',  'Cape Town',    540],
+      ['Takealot Retail',   'Western Cape',  'Stellenbosch', 180],
+      ['Takealot Retail',   'KwaZulu-Natal', 'Durban',       620],
+      ['Takealot Retail',   'Gauteng',       '',             124],
+      ['Takealot Logistics','Gauteng',       'Sandton',      380],
+      ['Takealot Logistics','Gauteng',       'Kempton Park', 420],
+      ['Takealot Logistics','Western Cape',  'Cape Town',    310],
+      ['Takealot Logistics','KwaZulu-Natal', 'Durban',       290],
+      ['Takealot Logistics','',              '',             288],
+      ['Superbalist',       'Gauteng',       'Sandton',      122],
+    ],
+    drivers: 3986,
+  },
+};
+
+function buildAccount(id){
+  reseed();
+  const spec = SPECS[id];
+  const vehicles = [], drivers = [];
+  let n = 0;
+  spec.dist.forEach(([sub, region, branch, count]) => {
+    for (let i = 0; i < count; i++){
+      const cls = pick(['LDV','LDV','LDV','Rigid','Interlink','Reefer']);
+      const tankByCls = { LDV:80, Rigid:200, Interlink:400, Reefer:300 };
+      /* Tank capacity is missing on a chunk of every real import. The
+         "this rule is inactive for N vehicles" warning depends on it. */
+      const hasTank = rnd() > (id === 'solo' ? 0.0 : 0.34);
+      vehicles.push({
+        id: 'v' + (++n),
+        reg: (PLATE[region] || PLATE[''])(),
+        sub, region, branch,
+        cc: branch ? 'ZA-' + (region ? region.slice(0,2).toUpperCase() : 'XX') + '-' + (4000 + Math.floor(rnd()*900)) : '',
+        shift: pick(['Day','Day','Night']),
+        cls,
+        tank: hasTank ? tankByCls[cls] : null,
+        fuelType: cls === 'LDV' && rnd() > 0.7 ? 'Petrol' : 'Diesel',
+        homeId: null,
+        sharedWith: [],
+      });
+    }
+  });
+  for (let i = 0; i < spec.drivers; i++){
+    drivers.push({
+      id: 'd' + (i+1),
+      name: pick(FIRST) + ' ' + pick(LAST),
+      homeId: null,
+      pdp: rnd() > 0.2,
+    });
+  }
+  return { id, spec, vehicles, drivers, columns: spec.columns };
+}
+
+/* Column key on a vehicle for a given CSV column heading. */
+const COL_FIELD = {
+  'Subsidiary':'sub', 'Region':'region', 'Branch':'branch',
+  'Cost Centre':'cc', 'Shift':'shift', 'Class':'cls', 'Registration':'reg',
+};
+
+/* Policy seeds, applied by group name once a structure exists. This is what
+   makes the cascade, the locks and the move-impact preview real. */
+const POLICY_SEEDS = [
+  { match: r => r.parentId === null, rules: {
+      products:  { value:['Diesel','Petrol'], lock:'tighten' },
+      maxLitres: { value:1.15,                lock:'open' },
+      window:    { value:[5,19],              lock:'tighten' },
+      pin:       { value:true,                lock:'exact' },
+      odo:       { value:true,                lock:'open' },
+      maxValue:  { value:9000,                lock:'tighten' },
+      dailyCap:  { value:14000,               lock:'open' },
+      approval:  { value:6000,                lock:'open' },
+  }},
+  { match: r => r.name === 'Takealot Logistics', rules: {
+      maxValue: { value:7500, lock:'open' },
+      window:   { value:[6,18], lock:'open' },
+      dailyCap: { value:12000, lock:'open' },
+  }},
+  { match: r => r.name === 'Sandton', rules: {
+      products: { value:['Diesel'], lock:'open' },
+  }},
+  { match: r => r.name === 'Cape Town', rules: {
+      odo: { value:false, lock:'open' },
+  }},
+];
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STATE + ENGINE
+   ══════════════════════════════════════════════════════════════════════════ */
+const S = {
+  accountId: null, account: null,
+  groups: [],          /* {id,name,kind,parentId,system} */
+  attach: {},          /* groupId -> { ruleKey: {value, lock} } */
+  tagGroups: [],       /* {key, values:[...]}  key:value, never bare strings */
+  tags: {},            /* vehicleId -> { key: value } */
+  loans: [],           /* {vehicleId, groupId, from, to}  time-bounded operating */
+  expanded: new Set(),
+  selectedGroup: null,
+  selectedRows: new Set(),
+  undo: [],
+  screen: 'A',
+  proposal: null,
+  seq: 0,
+};
+
+const uid = p => p + (++S.seq);
+const byId = id => S.groups.find(g => g.id === id) || null;
+const childrenOf = id => S.groups.filter(g => g.parentId === id);
+const rootGroup = () => S.groups.find(g => g.parentId === null) || null;
+
+function ancestors(id){            /* self, parent, ... root */
+  const out = []; let g = byId(id); let guard = 0;
+  while (g && guard++ < 64){ out.push(g); g = g.parentId ? byId(g.parentId) : null; }
+  return out;
+}
+function pathOf(id){ return ancestors(id).reverse(); }
+function pathString(id){ return pathOf(id).map(g => g.name).join(' › '); }
+function depthOf(id){ return ancestors(id).length - 1; }
+function descendants(id){
+  const out = []; const walk = p => childrenOf(p).forEach(c => { out.push(c); walk(c.id); });
+  walk(id); return out;
+}
+function canMoveUnder(nodeId, targetId){
+  if (nodeId === targetId) return false;
+  if (byId(nodeId)?.parentId === null) return false;      /* the root never moves */
+  return !ancestors(targetId).some(a => a.id === nodeId); /* no cycles */
+}
+function vehiclesIn(id, deep){
+  const ids = new Set([id].concat(deep ? descendants(id).map(g => g.id) : []));
+  return S.account.vehicles.filter(v => ids.has(v.homeId));
+}
+function driversIn(id, deep){
+  const ids = new Set([id].concat(deep ? descendants(id).map(g => g.id) : []));
+  return S.account.drivers.filter(d => ids.has(d.homeId));
+}
+
+/* ── Inference ─────────────────────────────────────────────────────────── */
+/* Trim, casefold, collapse whitespace, strip a place-word suffix. This is
+   what turns "Cape Town", "cape town " and "Cape Town Depot" into one group
+   instead of three siblings nobody can tell apart in a dropdown. */
+function normKey(s){
+  return String(s || '').toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/\s+(depot|branch|site|yard|hub|dc|distribution centre)$/,'').trim();
+}
+function titleise(s){
+  return String(s || '').trim().replace(/\s+/g,' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function structuralColumns(){
+  return S.account.columns.filter(c => {
+    const f = COL_FIELD[c];
+    if (!f || f === 'reg') return false;
+    if (!STRUCTURAL.includes(c.toLowerCase())) return false;
+    return new Set(S.account.vehicles.map(v => v[f]).filter(Boolean)).size > 1;
+  });
+}
+
+/* Distinct values of a column, clustered by the normalised key. */
+function clusterColumn(col){
+  const f = COL_FIELD[col];
+  const map = new Map();
+  let blank = 0;
+  S.account.vehicles.forEach(v => {
+    const raw = v[f];
+    if (!raw || !String(raw).trim()) { blank++; return; }
+    const k = normKey(raw);
+    if (!map.has(k)) map.set(k, { key:k, name:titleise(raw), variants:[], count:0 });
+    const e = map.get(k);
+    e.count++;
+    if (!e.variants.includes(raw)) e.variants.push(raw);
+  });
+  return { col, field:f, rows:[...map.values()].sort((a,b) => b.count - a.count), blank };
+}
+
+/* cols is an ordered list. The first column becomes the top level, each
+   further column nests beneath the one before it. The customer only ever
+   sees two selects; the seeded deep account uses three. */
+function buildProposal(cols){
+  cols = [].concat(cols).filter(Boolean);
+  const c = clusterColumn(cols[0]);
+  return {
+    cols, blank: c.blank,
+    rows: c.rows.map(r => ({ ...r, include:true })),
+    nestUnder: rootGroup() ? rootGroup().id : null,
+  };
+}
+
+/* ── Committing a proposal ─────────────────────────────────────────────── */
+function ensureRoot(){
+  if (rootGroup()) return rootGroup();
+  const g = { id:uid('g'), name:S.account.spec.company, kind:'Company', parentId:null };
+  S.groups.push(g);
+  S.expanded.add(g.id);
+  return g;
+}
+function systemUnassigned(){
+  let u = S.groups.find(g => g.system);
+  if (!u){
+    u = { id:uid('g'), name:'Unassigned', kind:'Team', parentId:rootGroup().id, system:true };
+    S.groups.push(u);
+  }
+  return u;
+}
+
+const KIND_FOR = { Subsidiary:'Subsidiary', Region:'Region', Branch:'Depot',
+                   'Cost Centre':'Department', Department:'Department' };
+
+function commitProposal(p){
+  snapshot('Created groups');
+  const root = ensureRoot();
+  const parent = byId(p.nestUnder) || root;
+  const nameByKey = new Map(p.rows.map(r => [r.key, r]));
+  const nodes = new Map();       /* full path key -> group */
+
+  /* Identity is the full path, not the name, so a Sandton under one
+     subsidiary is not confused with a Sandton under another. */
+  S.account.vehicles.forEach(v => {
+    let cur = parent, path = '', placed = null;
+    for (let i = 0; i < p.cols.length; i++){
+      const raw = v[COL_FIELD[p.cols[i]]];
+      if (!raw || !String(raw).trim()) break;
+      const k = normKey(raw);
+      if (i === 0){
+        const row = nameByKey.get(k);
+        if (!row || !row.include) break;
+      }
+      path += (path ? '|' : '') + k;
+      let g = nodes.get(path);
+      if (!g){
+        g = { id: uid('g'),
+              name: i === 0 ? (nameByKey.get(k) || {}).name || titleise(raw) : titleise(raw),
+              kind: KIND_FOR[p.cols[i]] || 'Team',
+              parentId: cur.id };
+        S.groups.push(g); nodes.set(path, g);
+      }
+      cur = g; placed = g;
+    }
+    v.homeId = placed ? placed.id : null;
+  });
+
+  /* Nothing is silently dropped onto the top group. */
+  const unassigned = systemUnassigned();
+  S.account.vehicles.forEach(v => { if (!v.homeId) v.homeId = unassigned.id; });
+
+  /* Drivers spread across the groups that hold vehicles, so the shared case is real. */
+  const holders = S.groups.filter(g => !g.system && !childrenOf(g.id).length).map(g => g.id);
+  S.account.drivers.forEach((d, i) => { d.homeId = holders.length ? holders[i % holders.length] : root.id; });
+
+  S.expanded.add(root.id);
+  childrenOf(root.id).forEach(g => S.expanded.add(g.id));
+
+  /* Every unmapped column becomes a label group. Nothing in the file is thrown away. */
+  buildTagGroups(p.cols);
+  seedPolicies();
+  S.selectedGroup = root.id;
+  S.proposal = null;
+}
+
+function buildTagGroups(usedCols){
+  S.tagGroups = []; S.tags = {};
+  S.account.columns.forEach(col => {
+    const f = COL_FIELD[col];
+    if (!f || f === 'reg' || usedCols.includes(col)) return;
+    const values = [...new Set(S.account.vehicles.map(v => v[f]).filter(Boolean).map(titleise))];
+    if (!values.length || values.length > 40) return;
+    S.tagGroups.push({ key: col.toLowerCase().replace(/\s+/g,'-'), label: col, values,
+                       exclusive: values.length <= 4 });
+    S.account.vehicles.forEach(v => {
+      if (!v[f]) return;
+      (S.tags[v.id] = S.tags[v.id] || {})[col.toLowerCase().replace(/\s+/g,'-')] = titleise(v[f]);
+    });
+  });
+}
+
+function seedPolicies(){
+  S.attach = {};
+  POLICY_SEEDS.forEach(seed => {
+    S.groups.filter(seed.match).forEach(g => {
+      S.attach[g.id] = Object.assign({}, S.attach[g.id], JSON.parse(JSON.stringify(seed.rules)));
+    });
+  });
+}
+
+/* Simple mode still has a real root and a real policy. The customer just
+   never sees the word "group". Promotion adds children to what exists. */
+function ensureSimple(){
+  if (rootGroup()) return;
+  const root = ensureRoot();
+  S.account.vehicles.forEach(v => v.homeId = root.id);
+  S.account.drivers.forEach(d => d.homeId = root.id);
+  buildTagGroups([]);
+  seedPolicies();
+  S.selectedGroup = root.id;
+}
+function ensureStructure(){
+  if (S.groups.length > 1) return;
+  const cols = structuralColumns();
+  if (!cols.length){ ensureSimple(); return; }
+  S.groups = []; S.attach = {}; ensureRoot();
+  const p = buildProposal(cols.slice(0, 3));
+  commitProposal(p);
+}
+
+/* ── Policy resolution, per rule ───────────────────────────────────────── */
+/* Nearest-policy-wins would let a site attaching a fuel-type rule silently
+   delete head office's night ban for everything beneath it. So the effective
+   policy is a rule-by-rule merge, each rule carrying its own provenance. */
+function isTighter(key, nv, cv){
+  const r = RULE_BY_KEY[key];
+  if (cv == null) return true;
+  switch (r.dir){
+    case 'lower':  return nv <= cv;
+    case 'subset': return nv.every(x => cv.includes(x));
+    case 'inside': return nv[0] >= cv[0] && nv[1] <= cv[1];
+    case 'onlyOn': return nv === true || cv === false;
+  }
+  return true;
+}
+function strictest(key, vals){
+  const r = RULE_BY_KEY[key];
+  return vals.filter(v => v != null).reduce((a, b) => {
+    if (a == null) return b;
+    switch (r.dir){
+      case 'lower':  return Math.min(a, b);
+      case 'subset': return a.filter(x => b.includes(x));
+      case 'inside': return [Math.max(a[0], b[0]), Math.min(a[1], b[1])];
+      case 'onlyOn': return a || b;
+    }
+    return a;
+  }, null);
+}
+
+function resolveRule(groupId, key){
+  if (!groupId) return null;
+  const chain = pathOf(groupId);            /* root first */
+  let win = null, lock = null; const blocked = [];
+  chain.forEach(g => {
+    const a = S.attach[g.id] && S.attach[g.id][key];
+    if (!a) return;
+    if (lock && lock.mode === 'exact'){
+      blocked.push({ group:g, value:a.value, why:'locked exactly by ' + lock.name }); return;
+    }
+    if (lock && lock.mode === 'tighten' && win && !isTighter(key, a.value, win.value)){
+      blocked.push({ group:g, value:a.value, why:'would loosen a rule locked by ' + lock.name }); return;
+    }
+    win = { value:a.value, srcId:g.id, srcName:g.name, own: g.id === groupId };
+    if (a.lock && a.lock !== 'open') lock = { id:g.id, name:g.name, mode:a.lock };
+  });
+  return win ? Object.assign(win, { lock, blocked }) : null;
+}
+function effectivePolicy(groupId){
+  const out = {};
+  RULES.forEach(r => out[r.key] = resolveRule(groupId, r.key));
+  return out;
+}
+/* A strict-looking rule that governs a quarter of the vehicles while reporting
+   "enforcing" is a false assurance of safety, so we count what it misses. */
+function inactiveFor(groupId, key){
+  const need = RULE_BY_KEY[key].needs;
+  if (!need) return 0;
+  return vehiclesIn(groupId, true).filter(v => v[need] == null).length;
+}
+
+/* ── The shared asset ──────────────────────────────────────────────────── */
+function activeLoan(vehicleId){ return S.loans.find(l => l.vehicleId === vehicleId && l.active) || null; }
+
+function operatingChain(vehicle, driver, ctx){
+  ctx = ctx || {};
+  const loan = activeLoan(vehicle.id);
+  const steps = [
+    { label:'Job or cost-centre code at the pump', gid: ctx.jobGroupId || null, miss:'not entered' },
+    { label:'Geofence', gid: ctx.geoGroupId || null, miss:'no match' },
+    { label:'Active loan or reservation', gid: loan ? loan.groupId : null, miss:'none' },
+    { label:"Driver's home group", gid: driver ? driver.homeId : null, miss:'no driver identified' },
+    { label:"Vehicle's home group", gid: vehicle.homeId, miss:'not set' },
+  ];
+  let found = false;
+  steps.forEach(s => {
+    if (found) { s.state = 'unused'; return; }
+    if (s.gid) { s.state = 'won'; found = true; } else { s.state = 'lost'; }
+  });
+  return steps;
+}
+
+/* Rule class picks which group is authoritative. The applied value is the
+   strictest of the three, so a loose sibling can never be used as an escape. */
+function resolveForFill(vehicle, driver, ctx){
+  const chain = operatingChain(vehicle, driver, ctx);
+  const operating = chain.find(s => s.state === 'won');
+  const payingId = operating ? operating.gid : vehicle.homeId;
+  const out = { payingId, chain, rules:{} };
+  RULES.forEach(r => {
+    const fromVehicle = resolveRule(vehicle.homeId, r.key);
+    const fromDriver  = driver ? resolveRule(driver.homeId, r.key) : null;
+    const fromPaying  = resolveRule(payingId, r.key);
+    const authoritative = r.cls === 'asset' ? fromVehicle : r.cls === 'person' ? fromDriver : fromPaying;
+    const applied = strictest(r.key, [fromVehicle && fromVehicle.value,
+                                      fromDriver && fromDriver.value,
+                                      fromPaying && fromPaying.value]);
+    const tightened = authoritative && !sameValue(r.key, applied, authoritative.value);
+    out.rules[r.key] = { fromVehicle, fromDriver, fromPaying, authoritative, applied, tightened };
+  });
+  return out;
+}
+function sameValue(key, a, b){
+  if (a == null || b == null) return a === b;
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+/* ── Simulation ────────────────────────────────────────────────────────── */
+/* Nothing else makes a cascading policy trustworthy before you switch it on. */
+function simulate(groupId){
+  reseed();
+  const vs = vehiclesIn(groupId, true);
+  const sample = vs.slice(0, 400);
+  let fills = 0, declines = 0; const reasons = {};
+  sample.forEach(v => {
+    const eff = effectivePolicy(v.homeId);
+    for (let i = 0; i < 8; i++){
+      fills++;
+      /* Real fuelling clusters in working hours. A uniform spread would put
+         a fifth of every fill outside the window and make the check look
+         broken rather than informative. */
+      const hour = rnd() < 0.995 ? 6 + Math.floor(rnd() * 11)
+                 : (rnd() < 0.5 ? 4 : 19 + Math.floor(rnd() * 3));
+      const litres = Math.round((v.tank || 120) * (0.35 + rnd() * 0.45));
+      const value = Math.round(litres * 24.6);
+      const fuel = v.fuelType;
+      let why = null;
+      const w = eff.window && eff.window.value;
+      if (w && (hour < w[0] || hour >= w[1])) why = 'Outside the fuelling window';
+      else if (eff.products && !eff.products.value.includes(fuel)) why = 'Fuel product not allowed';
+      else if (eff.maxValue && value > eff.maxValue.value) why = 'Over the per-fill value limit';
+      else if (eff.maxLitres && v.tank && litres > v.tank * eff.maxLitres.value) why = 'Over the litre limit';
+      if (why){ declines++; reasons[why] = (reasons[why] || 0) + 1; }
+    }
+  });
+  const scale = vs.length / Math.max(sample.length, 1);
+  return {
+    fills: Math.round(fills * scale), declines: Math.round(declines * scale),
+    pct: fills ? (declines / fills * 100) : 0,
+    top: Object.entries(reasons).sort((a,b) => b[1] - a[1]).slice(0,3)
+           .map(([why, n]) => [why, Math.round(n * scale)]),
+    sampled: sample.length, of: vs.length,
+  };
+}
+
+/* ── Undo ──────────────────────────────────────────────────────────────── */
+/* Every structural mutation is reversible. A delete that silently takes 340
+   descendants with it is the difference between a tool and a hazard. */
+function snapshot(label){
+  S.undo.push({
+    label,
+    groups: JSON.parse(JSON.stringify(S.groups)),
+    attach: JSON.parse(JSON.stringify(S.attach)),
+    homes: S.account.vehicles.map(v => v.homeId),
+    dhomes: S.account.drivers.map(d => d.homeId),
+    shared: S.account.vehicles.map(v => v.sharedWith.slice()),
+    loans: JSON.parse(JSON.stringify(S.loans)),
+  });
+  if (S.undo.length > 24) S.undo.shift();
+}
+function undo(){
+  const u = S.undo.pop(); if (!u) return false;
+  S.groups = u.groups; S.attach = u.attach; S.loans = u.loans;
+  S.account.vehicles.forEach((v, i) => { v.homeId = u.homes[i]; v.sharedWith = u.shared[i]; });
+  S.account.drivers.forEach((d, i) => d.homeId = u.dhomes[i]);
+  if (!byId(S.selectedGroup)) S.selectedGroup = rootGroup() && rootGroup().id;
+  return u.label;
+}
+
+/* ── Formatting ────────────────────────────────────────────────────────── */
+const pad2 = n => String(n).padStart(2, '0');
+const zar = n => 'R' + Number(n).toLocaleString('en-ZA');
+const num = n => Number(n).toLocaleString('en-ZA');
+function fmtValue(key, v){
+  if (v == null) return 'Not set';
+  switch (RULE_BY_KEY[key].type){
+    case 'set':    return v.length ? v.join(' and ') : 'None allowed';
+    case 'litres': return v + '× tank capacity';
+    case 'window': return pad2(v[0]) + ':00 to ' + pad2(v[1]) + ':00';
+    case 'bool':   return v ? 'Required' : 'Not required';
+    case 'rand':   return zar(v);
+  }
+  return String(v);
+}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+  ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════════════════════════════════════════ */
+const $ = s => document.querySelector(s);
+const el = id => document.getElementById(id);
+
+function announce(msg){ el('announcer').textContent = ''; setTimeout(() => el('announcer').textContent = msg, 30); }
+
+let toastTimer = null;
+function toast(msg, undoLabel){
+  const t = el('toast');
+  t.innerHTML = '<span>' + esc(msg) + '</span>' +
+    (undoLabel ? '<button class="a-toast__undo" type="button" id="toastUndo">Undo</button>' : '');
+  t.dataset.state = 'on';
+  if (undoLabel) el('toastUndo').onclick = () => {
+    const label = undo(); t.dataset.state = 'off';
+    if (label){ renderAll(); announce(label + ' undone'); }
+  };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.dataset.state = 'off', 10000);
+  announce(msg);
+}
+
+let lastFocus = null;
+function openDialog(title, body, foot){
+  lastFocus = document.activeElement;
+  el('dialog').innerHTML =
+    '<div class="o-dialog__head"><h2 class="o-dialog__title" id="dialogTitle">' + title + '</h2></div>' +
+    '<div class="o-dialog__body">' + body + '</div>' +
+    '<div class="o-dialog__foot">' + foot + '</div>';
+  el('scrim').dataset.state = 'on';
+  el('dialog').focus();
+}
+function closeDialog(){
+  el('scrim').dataset.state = 'off';
+  if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+}
+el('scrim').addEventListener('click', e => { if (e.target === el('scrim')) closeDialog(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ closeDialog(); el('pop').hidden = true; }
+  /* Undo is a global. Nothing structural happens that cannot be taken back. */
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !e.shiftKey){
+    const t = e.target.tagName;
+    if (t !== 'INPUT' && t !== 'TEXTAREA'){
+      e.preventDefault();
+      const label = undo();
+      if (label){ renderAll(); toast(label + ' undone'); } else toast('Nothing left to undo');
+    }
+  }
+});
+
+/* ── Provenance chip. Colour is never the only carrier. ────────────────── */
+function sourceChip(res, groupId){
+  if (!res) return '<span class="a-chip" data-source="default">Not set</span>';
+  if (res.lock && res.lock.id !== groupId)
+    return '<span class="a-chip" data-source="locked">🔒 Locked by ' + esc(res.lock.name) + '</span>';
+  if (res.srcId === groupId) return '<span class="a-chip" data-source="here">Set here</span>';
+  return '<span class="a-chip" data-source="inherited">Inherited from ' + esc(res.srcName) + '</span>';
+}
+
+/* ── Rule rows, shared by Simple mode and the inspector ────────────────── */
+function ruleRows(groupId, opts){
+  opts = opts || {};
+  return RULES.map(r => {
+    const res = resolveRule(groupId, r.key);
+    const dead = inactiveFor(groupId, r.key);
+    const lockedAbove = res && res.lock && res.lock.id !== groupId && res.lock.mode === 'exact';
+    const own = res && res.srcId === groupId;
+    return '<div class="m-rule' + (opts.tight ? ' m-rule--tight' : '') + '" data-state="' + (dead ? 'blocked' : 'idle') + '">' +
+      '<span class="m-rule__label">' + esc(r.label) +
+        (opts.showClass ? '<span class="m-rule__class">' + esc(CLS_LABEL[r.cls]) + '</span>' : '') +
+      '</span>' +
+      '<span class="m-rule__value">' + esc(fmtValue(r.key, res && res.value)) + '</span>' +
+      (opts.showSource === false ? '<span class="m-rule__src"></span>'
+                                 : '<span class="m-rule__src">' + sourceChip(res, groupId) + '</span>') +
+      '<span class="m-rule__act">' +
+        (lockedAbove ? '' :
+          '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="edit-rule" data-rule="' + r.key + '">' +
+          (own ? 'Change' : 'Override') + '</button>') +
+        (own && byId(groupId).parentId ?
+          '<button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="reset-rule" data-rule="' + r.key + '">Reset</button>' : '') +
+      '</span>' +
+      (dead ?
+        '<div style="grid-column:1/-1;font-size:var(--text-micro);color:var(--color-warning);padding-top:2px">' +
+        'Inactive for ' + num(dead) + ' of ' + num(vehiclesIn(groupId, true).length) +
+        ' vehicles: ' + (RULE_BY_KEY[r.key].needs === 'tank' ? 'tank capacity missing' : 'fuel type missing') +
+        ' · <button class="a-link" type="button" data-act="fix-missing" data-rule="' + r.key + '">Fix</button></div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+/* ── B · Simple mode ───────────────────────────────────────────────────── */
+/* One screen. The words group, hierarchy and level do not appear. */
+function renderSimple(){
+  ensureSimple();
+  const root = rootGroup();
+  const nV = S.account.vehicles.length, nD = S.account.drivers.length;
+  const suggested = S.tagGroups.slice(0, 3);
+  el('scSimple').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="simpleH">' + num(nV) + ' vehicles and ' + num(nD) + ' drivers imported</h1>' +
+      '<p class="t-screen__sub">Set the rules for using a card. You can change any of this later, and nothing here holds up going live.</p>' +
+    '</div>' +
+    '<div class="m-card" style="max-width:720px">' +
+      '<div class="m-card__head">' +
+        '<div><h2 class="m-card__title">Card rules for ' + esc(root.name) + '</h2>' +
+        '<p class="m-card__sub">Started from a standard set, so you are never staring at a blank policy.</p></div>' +
+      '</div>' +
+      '<div class="m-card__body" id="simpleRules">' + ruleRows(root.id, { showSource:false }) + '</div>' +
+      '<div class="m-card__foot">' +
+        '<button class="a-btn a-btn--primary" type="button" data-act="go" data-to="H1">Looks right, continue</button>' +
+        '<button class="a-btn a-btn--quiet" type="button" data-act="simulate">Check against the last 30 days</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<details style="max-width:720px;margin-top:var(--sp-4)" id="labelBox">' +
+      '<summary style="cursor:pointer;font-size:var(--text-small);font-weight:600;padding:var(--sp-2) 0">' +
+        'Add labels for reporting (optional)</summary>' +
+      '<div class="m-card" style="margin-top:var(--sp-2)"><div class="m-card__body">' +
+        '<p style="margin:0 0 var(--sp-2h);font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+          'Labels group things for reports. They do not change any rule and they do not give anyone access.</p>' +
+        '<div style="display:flex;gap:var(--sp-2);flex-wrap:wrap">' +
+          (suggested.length ? suggested.map(tg =>
+            '<span class="a-tag"><span class="a-tag__k">' + esc(tg.label.toLowerCase()) + '</span>' +
+            '<span class="a-tag__v">' + esc(tg.values[0]) + '</span></span>').join('') +
+            '<span class="a-chip" data-tone="neutral">Suggested from your import</span>'
+            : '<span class="u-quiet" style="font-size:var(--text-caption)">Nothing in your import looked like a label.</span>') +
+        '</div>' +
+      '</div></div>' +
+    '</details>' +
+
+    '<div style="max-width:720px;margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:var(--hairline) solid var(--color-border)">' +
+      '<button class="a-link" type="button" data-act="promote">Different rules for different parts of the business?</button>' +
+      '<p style="margin:var(--sp-1) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+        'Adds to what you already have. Nothing is re-imported and nothing is lost.</p>' +
+    '</div>';
+}
+
+/* ── D · Structure workspace ───────────────────────────────────────────── */
+let treeFocusId = null;
+let treeFilter = '';
+
+function matchesFilter(g){
+  if (!treeFilter) return true;
+  const q = treeFilter.toLowerCase();
+  if (g.name.toLowerCase().includes(q)) return true;
+  return descendants(g.id).some(d => d.name.toLowerCase().includes(q));
+}
+
+function renderTree(){
+  const root = rootGroup();
+  if (!root){ el('treeHost').innerHTML = ''; return; }
+  if (!treeFocusId || !byId(treeFocusId)) treeFocusId = S.selectedGroup || root.id;
+
+  const node = (g, pos, size, level) => {
+    const kids = childrenOf(g.id).filter(matchesFilter);
+    const open = S.expanded.has(g.id) || (treeFilter && kids.length);
+    const nV = vehiclesIn(g.id, true).length;
+    const eff = S.attach[g.id] ? 'here' : 'inherited';
+    const deep = depthOf(g.id);
+    return '<li class="o-tree__item" role="treeitem" id="tn-' + g.id + '" data-id="' + g.id + '"' +
+        ' aria-level="' + level + '" aria-posinset="' + pos + '" aria-setsize="' + size + '"' +
+        (kids.length ? ' aria-expanded="' + (open ? 'true' : 'false') + '"' : '') +
+        ' aria-selected="' + (S.selectedGroup === g.id ? 'true' : 'false') + '"' +
+        ' tabindex="' + (treeFocusId === g.id ? '0' : '-1') + '"' +
+        (g.parentId ? ' draggable="true"' : '') + '>' +
+      '<div class="o-tree__row" style="padding-left:' + (level - 1) * 18 + 'px">' +
+        '<button class="o-tree__twist" type="button" tabindex="-1" aria-hidden="true"' +
+          ' data-act="twist" data-id="' + g.id + '"' +
+          ' data-state="' + (kids.length ? (open ? 'open' : 'shut') : 'leaf') + '">▶</button>' +
+        '<span class="o-tree__main">' +
+          '<span class="o-tree__name">' + esc(g.name) + '</span>' +
+          '<span class="o-tree__sub">' +
+            (g.system ? '<span class="a-chip" data-tone="warning">Holding</span>' :
+                        '<span class="a-kind">' + esc(g.kind) + '</span>') +
+            (S.attach[g.id] ? '<span class="a-chip" data-source="here" title="Rules set on this group">Rules</span>' : '') +
+          '</span>' +
+        '</span>' +
+        '<span class="o-tree__meta">' +
+          '<span class="a-count" title="' + num(nV) + ' vehicles">' + num(nV) + '</span>' +
+          '<button class="o-tree__more" type="button" tabindex="-1" data-act="node-menu" data-id="' + g.id +
+            '" aria-label="Actions for ' + esc(g.name) + '">⋯</button>' +
+        '</span>' +
+      '</div>' +
+      (kids.length && open ? '<ul role="group">' +
+        kids.map((c, i) => node(c, i + 1, kids.length, level + 1)).join('') + '</ul>' : '') +
+      '</li>';
+  };
+
+  el('treeHost').innerHTML =
+    '<ul class="o-tree" role="tree" aria-label="Group structure" id="treeRoot">' +
+    node(root, 1, 1, 1) + '</ul>';
+
+  el('treeFoot').innerHTML =
+    '<div style="display:flex;align-items:center;gap:var(--sp-2);font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+      '<span>' + S.groups.length + ' groups · ' + (Math.max(...S.groups.map(g => depthOf(g.id))) + 1) + ' levels deep</span>' +
+      '<button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="tree-help" style="margin-left:auto">Keys</button>' +
+    '</div>';
+
+  renderFlat();
+}
+
+/* Below 900px the tree is replaced by a flat grouped list plus a move picker.
+   Nesting has no honest touch story, so it does not pretend to have one. */
+function renderFlat(){
+  el('flatHost').innerHTML =
+    '<div class="o-panel__head"><h2 class="o-panel__title">Groups</h2></div>' +
+    '<div class="o-panel__body"><div style="padding:var(--sp-2)">' +
+    S.groups.map(g =>
+      '<button class="o-tree__row" type="button" style="width:100%;text-align:left" data-act="select" data-id="' + g.id + '">' +
+        '<span style="min-width:0"><span class="o-tree__name" style="display:block">' + esc(g.name) + '</span>' +
+        '<span class="m-crumb" style="display:block">' + esc(pathString(g.id)) + '</span></span>' +
+        '<span class="o-tree__meta"><span class="a-kind">' + esc(g.kind) + '</span>' +
+        '<span class="a-count">' + num(vehiclesIn(g.id, true).length) + '</span></span>' +
+      '</button>').join('') +
+    '</div></div>';
+}
+
+/* Keyboard. Tab is never rebound: Tab is the fire exit. */
+let typeBuf = '', typeAt = 0;
+function visibleNodes(){
+  return [...document.querySelectorAll('#treeRoot [role="treeitem"]')];
+}
+function focusNode(id){
+  treeFocusId = id;
+  visibleNodes().forEach(n => n.tabIndex = n.dataset.id === id ? 0 : -1);
+  const n = document.getElementById('tn-' + id);
+  if (n) n.focus();
+}
+function onTreeKey(e){
+  const item = e.target.closest('[role="treeitem"]'); if (!item) return;
+  const id = item.dataset.id, g = byId(id);
+  const list = visibleNodes(), i = list.indexOf(item);
+  const kids = childrenOf(id);
+  const open = S.expanded.has(id);
+  const K = e.key;
+
+  if (K === 'ArrowDown'){ e.preventDefault(); if (list[i+1]) focusNode(list[i+1].dataset.id); }
+  else if (K === 'ArrowUp'){ e.preventDefault(); if (list[i-1]) focusNode(list[i-1].dataset.id); }
+  else if (K === 'ArrowRight'){
+    e.preventDefault();
+    if (kids.length && !open){ S.expanded.add(id); renderTree(); focusNode(id); }
+    else if (kids.length && list[i+1]) focusNode(list[i+1].dataset.id);
+  }
+  else if (K === 'ArrowLeft'){
+    e.preventDefault();
+    if (kids.length && open){ S.expanded.delete(id); renderTree(); focusNode(id); }
+    else if (g.parentId) focusNode(g.parentId);
+  }
+  else if (K === 'Home'){ e.preventDefault(); focusNode(list[0].dataset.id); }
+  else if (K === 'End'){ e.preventDefault(); focusNode(list[list.length-1].dataset.id); }
+  else if (K === 'Enter' || K === ' '){ e.preventDefault(); selectGroup(id); }
+  else if ((e.metaKey || e.ctrlKey) && K.toLowerCase() === 'x'){ e.preventDefault(); cutId = id; toast('Cut ' + g.name + '. Move to a group and press Cmd V.'); }
+  else if ((e.metaKey || e.ctrlKey) && K.toLowerCase() === 'v'){ e.preventDefault(); if (cutId) tryMove(cutId, id); }
+  else if (K.length === 1 && /\S/.test(K) && !e.metaKey && !e.ctrlKey){
+    const now = Date.now(); typeBuf = (now - typeAt < 800) ? typeBuf + K : K; typeAt = now;
+    const hit = list.find(n => byId(n.dataset.id).name.toLowerCase().startsWith(typeBuf.toLowerCase()));
+    if (hit) focusNode(hit.dataset.id);
+  }
+}
+let cutId = null;
+
+function selectGroup(id){
+  S.selectedGroup = id;
+  renderTree(); renderRecords(); renderInspector();
+  announce(byId(id).name + ' selected, ' + num(vehiclesIn(id, true).length) + ' vehicles');
+}
+
+/* ── Move: preview the blast radius, then commit, then allow undo ──────── */
+function policyDiff(nodeId, newParentId){
+  const before = effectivePolicy(nodeId);
+  const saveParent = byId(nodeId).parentId;
+  byId(nodeId).parentId = newParentId;
+  const after = effectivePolicy(nodeId);
+  byId(nodeId).parentId = saveParent;
+  const rows = [];
+  RULES.forEach(r => {
+    const b = before[r.key], a = after[r.key];
+    const bv = b && b.value, av = a && a.value;
+    if (!sameValue(r.key, bv, av)) rows.push({ rule:r, from:bv, to:av });
+    else if ((a && a.lock ? 1 : 0) !== (b && b.lock ? 1 : 0)) rows.push({ rule:r, from:bv, to:av, lockOnly:true });
+  });
+  return rows;
+}
+
+function tryMove(nodeId, targetId){
+  const g = byId(nodeId), t = byId(targetId);
+  if (!g || !t) return;
+  if (!canMoveUnder(nodeId, targetId)){
+    /* Never a silent no-op. The refusal explains itself, where it happened. */
+    toast(nodeId === targetId ? 'A group cannot go inside itself'
+      : g.parentId === null ? 'The top group cannot be moved'
+      : 'That would put ' + g.name + ' inside its own branch');
+    return;
+  }
+  const depthAfter = depthOf(targetId) + 1 + Math.max(0, ...descendants(nodeId).map(d => depthOf(d.id) - depthOf(nodeId)));
+  const diff = policyDiff(nodeId, targetId);
+  const nV = vehiclesIn(nodeId, true).length;
+  const nG = descendants(nodeId).length;
+
+  openDialog('Move ' + esc(g.name) + ' into ' + esc(t.name) + '?',
+    '<p style="margin:0 0 var(--sp-3);font-size:var(--text-small)">' +
+      'This moves <strong>' + num(nG) + ' groups beneath it</strong> and <strong>' + num(nV) + ' vehicles</strong>.</p>' +
+    (depthAfter > 4 ?
+      '<div class="m-note" data-tone="warning" style="margin-bottom:var(--sp-3)"><span class="m-note__ico">△</span>' +
+      '<span>That puts this branch ' + (depthAfter + 1) + ' levels deep. Deep structures go stale. ' +
+      'A label such as <span class="a-tag"><span class="a-tag__k">site</span><span class="a-tag__v">' + esc(g.name) +
+      '</span></span> often does the same job and survives a reorganisation.</span></div>' : '') +
+    (diff.length ?
+      '<h3 style="font-size:var(--text-caption);text-transform:uppercase;letter-spacing:0.04em;color:var(--color-text-secondary);margin:0 0 var(--sp-2)">' +
+        diff.length + ' rule' + (diff.length === 1 ? '' : 's') + ' change for those ' + num(nV) + ' vehicles</h3>' +
+      '<div>' + diff.map(d =>
+        '<div class="m-rule"><span class="m-rule__label">' + esc(d.rule.label) + '</span>' +
+        '<span class="m-rule__value" style="color:var(--color-text-tertiary);text-decoration:line-through">' +
+          esc(fmtValue(d.rule.key, d.from)) + '</span>' +
+        '<span class="m-rule__value" style="color:var(--color-warning)">' + esc(fmtValue(d.rule.key, d.to)) + '</span>' +
+        '<span></span></div>').join('') + '</div>'
+      : '<div class="m-note" data-tone="success"><span class="m-note__ico">✓</span><span>No rules change.</span></div>'),
+
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+    (diff.length ? '<button class="a-btn a-btn--secondary" type="button" data-act="move-neutral" data-id="' + nodeId +
+      '" data-to="' + targetId + '">Move and keep today\'s rules</button>' : '') +
+    '<button class="a-btn a-btn--primary" type="button" data-act="move-go" data-id="' + nodeId +
+      '" data-to="' + targetId + '">Move</button>');
+}
+
+function doMove(nodeId, targetId, pinPolicy){
+  snapshot('Moved ' + byId(nodeId).name);
+  if (pinPolicy){
+    /* Pin the current effective policy onto the moved node so a restructure
+       does not silently repoint 300 vehicles at a stricter parent. */
+    const eff = effectivePolicy(nodeId);
+    S.attach[nodeId] = S.attach[nodeId] || {};
+    RULES.forEach(r => { if (eff[r.key] && !S.attach[nodeId][r.key])
+      S.attach[nodeId][r.key] = { value: eff[r.key].value, lock:'open' }; });
+  }
+  byId(nodeId).parentId = targetId;
+  S.expanded.add(targetId);
+  cutId = null;
+  closeDialog(); renderAll();
+  toast('Moved ' + byId(nodeId).name + ' into ' + byId(targetId).name, true);
+}
+
+function movePicker(nodeId){
+  const g = byId(nodeId);
+  const opts = S.groups.filter(t => canMoveUnder(nodeId, t.id));
+  openDialog('Move ' + esc(g.name),
+    '<label style="font-size:var(--text-caption);color:var(--color-text-secondary)">Find a group' +
+    '<input class="a-input" id="movePickInput" list="moveList" placeholder="Type to search" style="margin-top:var(--sp-1)"></label>' +
+    '<datalist id="moveList">' + opts.map(t => '<option value="' + esc(pathString(t.id)) + '">').join('') + '</datalist>' +
+    '<div style="max-height:260px;overflow:auto;margin-top:var(--sp-3)">' +
+    opts.map(t => '<button class="a-btn a-btn--quiet" style="width:100%;justify-content:flex-start;min-height:34px" type="button"' +
+      ' data-act="move-pick" data-id="' + nodeId + '" data-to="' + t.id + '">' +
+      '<span class="m-crumb">' + pathOf(t.id).map((s, i, arr) =>
+        '<span class="' + (i === arr.length - 1 ? 'm-crumb__last' : '') + '">' + esc(s.name) + '</span>' +
+        (i < arr.length - 1 ? '<span class="m-crumb__sep">›</span>' : '')).join('') + '</span></button>').join('') +
+    '</div>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>');
+  setTimeout(() => el('movePickInput') && el('movePickInput').focus(), 40);
+}
+
+/* ── Records and selection ─────────────────────────────────────────────── */
+const PAGE = 150;
+function renderRecords(){
+  const gid = S.selectedGroup; if (!gid) return;
+  const g = byId(gid);
+  const vs = vehiclesIn(gid, true);
+  const shown = vs.slice(0, PAGE);
+  el('recordsHead').innerHTML =
+    '<div style="min-width:0"><h2 class="o-panel__title">' + esc(g.name) + '</h2>' +
+    '<div class="m-crumb">' + esc(pathString(gid)) + '</div></div>' +
+    '<span class="a-count" style="margin-left:auto">' + num(vs.length) + '</span>';
+
+  el('recordsHost').innerHTML = vs.length ?
+    '<table class="o-records"><thead><tr>' +
+      '<th style="width:28px"><input class="a-check" type="checkbox" data-act="sel-all" aria-label="Select all shown"></th>' +
+      '<th>Registration</th><th>Class</th><th>Tank</th><th>Home group</th><th>Labels</th>' +
+    '</tr></thead><tbody>' +
+    shown.map(v =>
+      '<tr data-state="' + (S.selectedRows.has(v.id) ? 'selected' : 'idle') + '">' +
+        '<td><input class="a-check" type="checkbox" data-act="sel-row" data-id="' + v.id + '"' +
+          (S.selectedRows.has(v.id) ? ' checked' : '') + ' aria-label="Select ' + esc(v.reg) + '"></td>' +
+        '<td style="font-family:var(--font-mono)">' + esc(v.reg) +
+          (v.sharedWith.length ? ' <span class="a-chip" data-tone="info">Shared</span>' : '') + '</td>' +
+        '<td>' + esc(v.cls) + '</td>' +
+        '<td class="u-num">' + (v.tank ? v.tank + ' L' : '<span class="a-chip" data-tone="warning">Missing</span>') + '</td>' +
+        '<td class="o-records__home">' + esc(byId(v.homeId) ? byId(v.homeId).name : '—') + '</td>' +
+        '<td>' + Object.entries(S.tags[v.id] || {}).slice(0,2).map(([k, val]) =>
+          '<span class="a-tag"><span class="a-tag__k">' + esc(k) + '</span><span class="a-tag__v">' + esc(val) + '</span></span>').join(' ') + '</td>' +
+      '</tr>').join('') +
+    '</tbody></table>' +
+    (vs.length > PAGE ? '<p style="padding:var(--sp-3);margin:0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+      'Showing the first ' + PAGE + ' of ' + num(vs.length) + '. The rest load as you scroll.</p>' : '')
+    : '<div class="m-empty"><p class="m-empty__title">No vehicles here yet</p>' +
+      '<p class="m-empty__body">Select vehicles in another group and use Assign, or move a group into this one.</p></div>';
+
+  const n = S.selectedRows.size;
+  el('selBarHost').innerHTML = n ?
+    '<div class="o-selbar"><span class="o-selbar__n">' + num(n) + ' selected</span>' +
+      '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="assign">Assign to group</button>' +
+      '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="label">Add labels</button>' +
+      '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="share">Share with a group</button>' +
+      '<button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="sel-clear" style="margin-left:auto">Clear</button>' +
+    '</div>' : '';
+}
+
+/* ── E · Inspector: effective policy with per-rule provenance ───────────── */
+let inspectTab = 'policy';
+function renderInspector(){
+  const gid = S.selectedGroup; if (!gid) return;
+  const g = byId(gid);
+  const vs = vehiclesIn(gid, true);
+  el('inspectTitle').textContent = g.name;
+
+  const tabs = ['policy','members','access'].map(t =>
+    '<button class="a-btn a-btn--xs ' + (inspectTab === t ? 'a-btn--secondary' : 'a-btn--quiet') +
+    '" type="button" data-act="tab" data-t="' + t + '" aria-pressed="' + (inspectTab === t) + '">' +
+    t[0].toUpperCase() + t.slice(1) + '</button>').join('');
+
+  let body = '';
+  if (inspectTab === 'policy'){
+    body =
+      '<div style="padding:var(--sp-3)">' +
+      ruleRows(gid, { showClass:true, tight:true }) +
+      '<div style="margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:var(--hairline) solid var(--color-border-light)">' +
+        '<button class="a-btn a-btn--sm a-btn--secondary a-btn--full" type="button" data-act="simulate">' +
+          'Check against the last 30 days</button>' +
+        '<p style="margin:var(--sp-2) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+          'Replays real spend against these rules before you switch them on.</p>' +
+      '</div></div>';
+  } else if (inspectTab === 'members'){
+    const dr = driversIn(gid, true);
+    body = '<div style="padding:var(--sp-3)"><dl class="m-kv">' +
+      '<dt>Vehicles</dt><dd class="u-num">' + num(vs.length) + '</dd>' +
+      '<dt>Drivers</dt><dd class="u-num">' + num(dr.length) + '</dd>' +
+      '<dt>Sub-groups</dt><dd class="u-num">' + num(descendants(gid).length) + '</dd>' +
+      '<dt>Missing tank</dt><dd class="u-num">' + num(vs.filter(v => v.tank == null).length) + '</dd>' +
+      '<dt>Shared out</dt><dd class="u-num">' + num(vs.filter(v => v.sharedWith.length).length) + '</dd>' +
+      '</dl></div>';
+  } else {
+    body = '<div style="padding:var(--sp-3)">' +
+      '<p style="margin:0 0 var(--sp-2h);font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+        'A role here covers this group and everything beneath it.</p>' +
+      '<div class="m-note"><span class="m-note__ico">◈</span><span>' +
+        'Labels never grant access. Access follows the structure only, so a label made for a report ' +
+        'cannot quietly open one part of the business to another.</span></div>' +
+      '<dl class="m-kv" style="margin-top:var(--sp-3)">' +
+      '<dt>Covers</dt><dd>' + num(vs.length) + ' vehicles</dd>' +
+      '<dt>Scope</dt><dd>' + esc(pathString(gid)) + '</dd></dl></div>';
+  }
+  el('inspectHost').innerHTML =
+    '<div style="display:flex;gap:var(--sp-1);padding:var(--sp-2) var(--sp-3);border-bottom:var(--hairline) solid var(--color-border-light)">' +
+    tabs + '</div>' + body;
+}
+
+/* ── E2/E3 · Editing one rule, and the three lock modes ────────────────── */
+const LOCK_COPY = {
+  open:    ['Open',           'Any group beneath can set its own value.'],
+  tighten: ['Tighten only',   'Groups beneath can make this stricter, but never looser.'],
+  exact:   ['Locked exactly', 'No group beneath can change this at all. Advanced.'],
+};
+function editRule(gid, key){
+  const r = RULE_BY_KEY[key];
+  const res = resolveRule(gid, key);
+  const own = S.attach[gid] && S.attach[gid][key];
+  const v = own ? own.value : (res ? res.value : null);
+  const lock = own ? own.lock : 'open';
+
+  let field = '';
+  if (r.type === 'rand' || r.type === 'litres')
+    field = '<input class="a-input" id="rv" type="number" step="' + (r.type === 'litres' ? '0.05' : '50') + '" value="' + v + '">';
+  else if (r.type === 'window')
+    field = '<div style="display:flex;gap:var(--sp-2);align-items:center">' +
+            '<input class="a-input" id="rv0" type="number" min="0" max="23" value="' + v[0] + '" aria-label="From hour">' +
+            '<span>to</span>' +
+            '<input class="a-input" id="rv1" type="number" min="1" max="24" value="' + v[1] + '" aria-label="To hour"></div>';
+  else if (r.type === 'bool')
+    field = '<label style="display:flex;gap:var(--sp-2);align-items:center">' +
+            '<input class="a-check" id="rv" type="checkbox"' + (v ? ' checked' : '') + '> Required</label>';
+  else if (r.type === 'set')
+    field = ['Diesel','Petrol'].map(p =>
+      '<label style="display:inline-flex;gap:var(--sp-1h);align-items:center;margin-right:var(--sp-4)">' +
+      '<input class="a-check" type="checkbox" data-set="' + p + '"' + (v.includes(p) ? ' checked' : '') + '> ' + p + '</label>').join('');
+
+  const parentRes = byId(gid).parentId ? resolveRule(byId(gid).parentId, key) : null;
+  openDialog(esc(r.label),
+    '<p style="margin:0 0 var(--sp-3);font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+      esc(CLS_LABEL[r.cls]) + '. ' +
+      (parentRes ? 'Inherited value is <strong>' + esc(fmtValue(key, parentRes.value)) + '</strong> from ' + esc(parentRes.srcName) + '.'
+                 : 'Nothing above sets this.') + '</p>' +
+    '<div style="margin-bottom:var(--sp-4)">' + field + '</div>' +
+    '<fieldset style="border:var(--hairline) solid var(--color-border);border-radius:var(--radius-sm);padding:var(--sp-3)">' +
+      '<legend style="font-size:var(--text-caption);font-weight:700;padding:0 var(--sp-1)">What groups beneath may do</legend>' +
+      Object.entries(LOCK_COPY).map(([m, t]) =>
+        '<label style="display:flex;gap:var(--sp-2);align-items:flex-start;padding:var(--sp-1) 0">' +
+        '<input type="radio" name="lockmode" value="' + m + '"' + (lock === m ? ' checked' : '') + '>' +
+        '<span><strong style="font-size:var(--text-small)">' + t[0] + '</strong>' +
+        '<span style="display:block;font-size:var(--text-micro);color:var(--color-text-secondary)">' + t[1] + '</span></span></label>').join('') +
+    '</fieldset>' +
+    (res && res.blocked && res.blocked.length ?
+      '<div class="m-note" data-tone="warning" style="margin-top:var(--sp-3)"><span class="m-note__ico">🔒</span><span>' +
+      res.blocked.map(b => esc(b.group.name) + ' tried to set ' + esc(fmtValue(key, b.value)) + ', ' + esc(b.why)).join('<br>') +
+      '</span></div>' : ''),
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+    '<button class="a-btn a-btn--primary" type="button" data-act="save-rule" data-g="' + gid + '" data-rule="' + key + '">Save</button>');
+}
+function saveRule(gid, key){
+  const r = RULE_BY_KEY[key];
+  let value;
+  if (r.type === 'rand' || r.type === 'litres') value = parseFloat(el('rv').value);
+  else if (r.type === 'window') value = [parseInt(el('rv0').value, 10), parseInt(el('rv1').value, 10)];
+  else if (r.type === 'bool') value = el('rv').checked;
+  else if (r.type === 'set') value = [...document.querySelectorAll('[data-set]')].filter(c => c.checked).map(c => c.dataset.set);
+  const lock = document.querySelector('[name="lockmode"]:checked').value;
+
+  const parentId = byId(gid).parentId;
+  const inherited = parentId ? resolveRule(parentId, key) : null;
+  if (inherited && inherited.lock && inherited.lock.mode === 'tighten' && !isTighter(key, value, inherited.value)){
+    toast('That would loosen a rule ' + inherited.lock.name + ' locked. Allowed up to ' + fmtValue(key, inherited.value) + '.');
+    return;
+  }
+  snapshot('Changed ' + r.label);
+  S.attach[gid] = S.attach[gid] || {};
+  S.attach[gid][key] = { value, lock };
+  closeDialog(); renderAll();
+  toast(r.label + ' set to ' + fmtValue(key, value) + ' on ' + byId(gid).name, true);
+}
+
+/* ── E5 · Simulation ───────────────────────────────────────────────────── */
+function showSimulation(gid){
+  const s = simulate(gid);
+  openDialog('Checked against the last 30 days',
+    '<p style="font-size:var(--text-large);margin:0 0 var(--sp-2)"><strong>' + num(s.declines) + '</strong> of ' +
+      num(s.fills) + ' fills would have been declined <span class="u-quiet">(' + s.pct.toFixed(1) + '%)</span></p>' +
+    '<div class="a-bar" style="margin-bottom:var(--sp-4)"><div class="a-bar__fill" data-tone="' +
+      (s.pct > 5 ? 'warning' : 'success') + '" style="width:' + Math.min(100, s.pct * 6) + '%"></div></div>' +
+    (s.top.length ?
+      '<h3 style="font-size:var(--text-caption);text-transform:uppercase;letter-spacing:0.04em;color:var(--color-text-secondary);margin:0 0 var(--sp-2)">Why</h3>' +
+      s.top.map(t =>
+        '<div class="m-rule"><span class="m-rule__label">' + esc(t[0]) + '</span>' +
+        '<span class="m-rule__value">' + num(t[1]) + '</span><span></span><span></span></div>').join('')
+      : '<div class="m-note" data-tone="success"><span class="m-note__ico">✓</span><span>Nothing would have been declined.</span></div>') +
+    (s.of > s.sampled ? '<p style="margin:var(--sp-3) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+      'Sampled ' + num(s.sampled) + ' of ' + num(s.of) + ' vehicles and scaled up. The real check runs on all of them.</p>' : ''),
+    '<button class="a-btn a-btn--primary" type="button" data-act="close">Close</button>');
+}
+
+/* ── C · Confirm the inferred structure ────────────────────────────────── */
+/* The empty state is a proposal, not an empty tree with a plus button. */
+function renderConfirm(){
+  const cols = structuralColumns();
+  const host = el('scConfirm');
+
+  if (!cols.length){
+    host.innerHTML =
+      '<div class="t-screen__lede"><h1 class="t-screen__h1" id="confirmH">Nothing in your import looked like a structure</h1>' +
+      '<p class="t-screen__sub">No column held a place, a division or a cost centre. Start from a template, or keep everything together and split it later.</p></div>' +
+      '<div class="m-card" style="max-width:640px"><div class="m-card__body">' +
+        '<div style="display:flex;gap:var(--sp-2);flex-wrap:wrap">' +
+        ['Single site','Depots','Subsidiaries and departments'].map(t =>
+          '<button class="a-btn a-btn--secondary" type="button" data-act="template" data-t="' + t + '">' + t + '</button>').join('') +
+        '</div></div>' +
+        '<div class="m-card__foot"><button class="a-btn a-btn--primary" type="button" data-act="go" data-to="B1">Keep it simple for now</button></div>' +
+      '</div>';
+    return;
+  }
+
+  if (!S.proposal) S.proposal = buildProposal([cols[0]]);
+  const p = S.proposal;
+  const kept = p.rows.filter(r => r.include);
+  const covered = kept.reduce((n, r) => n + r.count, 0);
+  const dupes = p.rows.filter(r => r.variants.length > 1);
+
+  host.innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="confirmH">Your vehicles, grouped by ' + esc(p.cols[0].toLowerCase()) + '</h1>' +
+      '<p class="t-screen__sub">Read from your import. Change anything that is wrong, then confirm. ' +
+      'This is how card rules and invoices get split.</p>' +
+    '</div>' +
+
+    (dupes.length ?
+      '<div class="m-note" data-tone="info" style="max-width:860px;margin-bottom:var(--sp-3)">' +
+      '<span class="m-note__ico">◇</span><span><strong>' + dupes.length +
+      (dupes.length === 1 ? ' entry looks' : ' entries look') + ' like the same place spelled more than one way.</strong> ' +
+      'They have been combined. ' +
+      '<button class="a-link" type="button" data-act="show-dupes">See what was combined</button></span></div>' : '') +
+
+    '<div class="m-card" style="max-width:860px">' +
+      '<div class="m-card__head">' +
+        '<div><h2 class="m-card__title">' + kept.length + ' groups from “' + esc(p.cols[0]) + '”</h2>' +
+        '<p class="m-card__sub">' + num(covered) + ' of ' + num(S.account.vehicles.length) + ' vehicles placed</p></div>' +
+        '<div style="margin-left:auto;display:flex;gap:var(--sp-2);align-items:center">' +
+          '<label style="font-size:var(--text-caption);color:var(--color-text-secondary)">Use column' +
+          '<select class="a-select a-input--sm" id="colPick" style="width:auto;margin-left:var(--sp-1)">' +
+          cols.map(c => '<option' + (c === p.cols[0] ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
+          '</select></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="m-card__body" style="max-height:340px;overflow:auto">' +
+        p.rows.map((r, i) =>
+          '<div class="m-prop" data-state="' + (r.include ? 'idle' : 'excluded') + '">' +
+            '<input class="a-check" type="checkbox" ' + (r.include ? 'checked' : '') +
+              ' data-act="toggle-row" data-i="' + i + '" aria-label="Include ' + esc(r.name) + '">' +
+            '<span class="m-prop__from">' + esc(r.variants[0]) +
+              (r.variants.length > 1 ? ' <span class="a-chip" data-tone="neutral">+' + (r.variants.length - 1) + '</span>' : '') + '</span>' +
+            '<span class="m-prop__arrow">→</span>' +
+            '<input class="a-input a-input--sm" value="' + esc(r.name) + '" data-act="rename-row" data-i="' + i +
+              '" aria-label="Group name for ' + esc(r.variants[0]) + '">' +
+            '<span class="m-prop__count">' + num(r.count) + ' vehicles</span>' +
+          '</div>').join('') +
+      '</div>' +
+      '<div class="m-card__foot">' +
+        '<label style="font-size:var(--text-caption);display:flex;align-items:center;gap:var(--sp-2)">Split each of these by' +
+          '<select class="a-select a-input--sm" id="col2Pick" style="width:auto">' +
+            '<option value="">nothing</option>' +
+            cols.filter(c => c !== p.cols[0]).map(c =>
+              '<option value="' + esc(c) + '"' + (c === p.cols[1] ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
+          '</select></label>' +
+        '<span style="margin-left:auto"></span>' +
+        '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="B1">Keep everything together</button>' +
+        '<button class="a-btn a-btn--primary" type="button" data-act="commit">Create ' + kept.length + ' groups</button>' +
+      '</div>' +
+    '</div>' +
+
+    (p.blank ?
+      '<div class="m-note" data-tone="warning" style="max-width:860px;margin-top:var(--sp-3)">' +
+      '<span class="m-note__ico">△</span><span><strong>' + num(p.blank) + ' vehicles have no ' + esc(p.cols[0].toLowerCase()) + '.</strong> ' +
+      'They go to a holding group called Unassigned, stay out of every billing rollup, and show as a standing task. ' +
+      'They are never quietly dropped into the top group.</span></div>' : '');
+}
+
+/* ── F · The shared asset ──────────────────────────────────────────────── */
+function sharedPair(){
+  const shared = S.account.vehicles.find(v => v.sharedWith.length && byId(v.sharedWith[0]));
+  if (!shared) return null;
+  const d = S.account.drivers.find(x => x.homeId === shared.sharedWith[0]) ||
+            S.account.drivers.find(x => x.homeId && x.homeId !== shared.homeId) || S.account.drivers[0];
+  return { v: shared, d };
+}
+function seedShared(){
+  ensureStructure();
+  if (sharedPair()) return;
+  const tops = childrenOf(rootGroup().id).filter(g => !g.system);
+  if (tops.length < 2) return;
+  const [a, b] = tops;
+  const aHolders = [a].concat(descendants(a.id)).filter(g => vehiclesIn(g.id, false).length);
+  const bHolders = [b].concat(descendants(b.id)).filter(g => driversIn(g.id, false).length);
+  if (!aHolders.length || !bHolders.length) return;
+  const v = vehiclesIn(aHolders[0].id, false)[0];
+  if (!v) return;
+  v.sharedWith = [bHolders[0].id];
+  if (!S.loans.some(l => l.vehicleId === v.id))
+    S.loans.push({ vehicleId:v.id, groupId:bHolders[0].id, from:'3 March', to:'17 March', active:false });
+}
+
+function renderShared(){
+  seedShared();
+  const pair = sharedPair();
+  const host = el('scShared');
+  if (!pair){
+    host.innerHTML = '<div class="m-empty"><p class="m-empty__title" id="sharedH">Nothing is shared here</p>' +
+      '<p class="m-empty__body">This account has one part to it, so no vehicle is used by more than one group. ' +
+      'Switch to the group account in the state map to see the shared case.</p></div>';
+    return;
+  }
+  const v = pair.v, d = pair.d;
+  const shareG = byId(v.sharedWith[0]);
+  const fill = resolveForFill(v, d, {});
+  const operating = fill.chain.find(s => s.state === 'won');
+  const loan = S.loans.find(l => l.vehicleId === v.id);
+  const nShared = S.account.vehicles.filter(x => x.sharedWith.length).length;
+
+  host.innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="sharedH">' + num(nShared) + ' vehicle' + (nShared === 1 ? ' is' : 's are') +
+        ' used by more than one part of your business</h1>' +
+      '<p class="t-screen__sub">Tell us how, once. After that the right rules apply on their own.</p>' +
+    '</div>' +
+
+    '<div class="m-card" style="max-width:760px">' +
+      '<div class="m-card__head"><div>' +
+        '<h2 class="m-card__title" style="font-family:var(--font-mono)">' + esc(v.reg) + '</h2>' +
+        '<p class="m-card__sub">' + esc(v.cls) + (v.tank ? ' · ' + v.tank + ' L' : '') + ' · ' + esc(v.fuelType) + '</p>' +
+      '</div></div>' +
+      '<div class="m-card__body">' +
+        '<div style="padding-bottom:var(--sp-3);border-bottom:var(--hairline) solid var(--color-border-light)">' +
+          '<h3 class="o-panel__title" style="margin:0">Home group</h3>' +
+          '<p style="margin:var(--sp-1) 0 0;font-weight:700">' + esc(pathString(v.homeId)) + '</p>' +
+          '<p style="margin:2px 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+            'Owns the asset, the licence disc and the card.</p>' +
+        '</div>' +
+        '<div style="padding:var(--sp-3) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
+          '<h3 class="o-panel__title" style="margin:0">Shared with</h3>' +
+          '<div style="margin:var(--sp-2) 0 0;display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">' +
+            '<span class="a-tag"><span class="a-tag__v">' + esc(shareG.name) + '</span>' +
+            '<button class="a-tag__x" type="button" data-act="unshare" aria-label="Stop sharing with ' + esc(shareG.name) + '">✕</button></span>' +
+            '<button class="a-btn a-btn--xs a-btn--secondary" type="button" data-act="add-share">Add</button>' +
+          '</div>' +
+          '<p style="margin:var(--sp-2) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+            'Drivers in these groups can fuel this vehicle. It does <strong>not</strong> move the vehicle and it does ' +
+            '<strong>not</strong> change whose rules apply.</p>' +
+        '</div>' +
+        '<div style="padding-top:var(--sp-3)">' +
+          '<h3 class="o-panel__title" style="margin:0">Operating now</h3>' +
+          '<p style="margin:var(--sp-1) 0 0;font-weight:700">' + esc(byId(fill.payingId) ? byId(fill.payingId).name : 'Not set') + '</p>' +
+          '<p style="margin:2px 0 var(--sp-2);font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+            'from ' + esc(operating ? operating.label.toLowerCase() : 'the vehicle') + ' · driver ' + esc(d.name) + '</p>' +
+          '<button class="a-btn a-btn--sm a-btn--secondary" type="button" data-act="why-operating">How was this decided?</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="m-card" style="max-width:760px;margin-top:var(--sp-4)">' +
+      '<div class="m-card__head"><div><h2 class="m-card__title">On loan</h2>' +
+      '<p class="m-card__sub">A dated hand-over. Rules and cost follow the borrower for those dates, then hand back on their own. ' +
+      'A vehicle lent for six weeks is not a job.</p></div></div>' +
+      '<div class="m-card__body">' +
+        (loan ?
+          '<div class="m-rule"><span class="m-rule__label" style="font-family:var(--font-mono)">' + esc(v.reg) + '</span>' +
+          '<span class="m-rule__value">' + esc(byId(loan.groupId) ? byId(loan.groupId).name : '') + '</span>' +
+          '<span style="font-size:var(--text-caption);color:var(--color-text-secondary)">' + esc(loan.from) + ' to ' + esc(loan.to) +
+            (loan.active ? ' <span class="a-chip" data-tone="success">Running</span>' : '') + '</span>' +
+          '<span class="m-rule__act"><button class="a-btn a-btn--xs ' + (loan.active ? 'a-btn--secondary' : 'a-btn--primary') +
+            '" type="button" data-act="toggle-loan">' + (loan.active ? 'End early' : 'Start') + '</button></span></div>'
+          : '<p class="u-quiet" style="margin:0;font-size:var(--text-caption)">Nothing on loan.</p>') +
+      '</div>' +
+    '</div>' +
+
+    '<div class="m-note" data-tone="info" style="max-width:760px;margin-top:var(--sp-4)">' +
+      '<span class="m-note__ico">◈</span><span><strong>The rules that apply are the strictest of three.</strong> ' +
+      'This vehicle’s own limits, this driver’s limits, and the operating group’s rules. ' +
+      'A looser group elsewhere can never be used to get around a limit set here.</span></div>';
+}
+
+function showPrecedence(){
+  const pair = sharedPair(); if (!pair) return;
+  const chain = operatingChain(pair.v, pair.d, {});
+  const fill = resolveForFill(pair.v, pair.d, {});
+  const p = el('pop');
+  p.innerHTML =
+    '<h3 class="o-pop__title">How the operating group was decided</h3>' +
+    '<ul class="m-chain">' + chain.map(s =>
+      '<li class="m-chain__i" data-state="' + s.state + '">' +
+        '<span class="m-chain__mark">' + (s.state === 'won' ? '✓' : s.state === 'lost' ? '✕' : '–') + '</span>' +
+        '<span class="m-chain__what">' + esc(s.label) + '</span>' +
+        '<span class="m-chain__why">' + esc(s.gid ? (byId(s.gid) ? byId(s.gid).name : '') : s.miss) + '</span>' +
+      '</li>').join('') + '</ul>' +
+    '<div style="margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:var(--hairline) solid var(--color-border-light)">' +
+      '<p style="margin:0 0 var(--sp-2);font-size:var(--text-caption);font-weight:700">Then applies the strictest of the vehicle, the driver and that group</p>' +
+      RULES.map(r => {
+        const x = fill.rules[r.key];
+        return '<div style="display:flex;justify-content:space-between;gap:var(--sp-3);font-size:var(--text-micro);padding:2px 0">' +
+          '<span class="u-quiet">' + esc(r.label) + '</span>' +
+          '<span style="font-weight:700' + (x.tightened ? ';color:var(--color-warning)' : '') + '">' +
+          esc(fmtValue(r.key, x.applied)) + (x.tightened ? ' · tightened' : '') + '</span></div>';
+      }).join('') +
+    '</div>' +
+    '<button class="a-btn a-btn--sm a-btn--quiet a-btn--full" style="margin-top:var(--sp-3)" type="button" data-act="close-pop">Close</button>';
+  p.hidden = false;
+  const btn = document.querySelector('[data-act="why-operating"]');
+  if (btn){
+    const r = btn.getBoundingClientRect();
+    p.style.top = (window.scrollY + r.bottom + 8) + 'px';
+    p.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.innerWidth - 440)) + 'px';
+  }
+  p.querySelector('[data-act="close-pop"]').focus();
+}
+
+/* ── G · Explain a decline ─────────────────────────────────────────────── */
+/* Transaction first, not rule first. "Inherited from X" on a settings screen
+   answers nothing at 19:04 with a driver standing at a pump. */
+function renderDecline(){
+  seedShared();
+  const pair = sharedPair() || { v:S.account.vehicles[0], d:S.account.drivers[0] };
+  const v = pair.v, d = pair.d;
+  const fill = resolveForFill(v, d, {});
+  const tx = { hour:19, minute:4, litres: v.tank ? Math.round(v.tank * 0.95) : 380, supplier:'Engen Rivonia' };
+  tx.value = Math.round(tx.litres * 24.6);
+
+  const checks = RULES.map(r => {
+    const x = fill.rules[r.key], val = x.applied;
+    let pass = true, note = 'not set';
+    if (val != null) switch (r.key){
+      case 'window':    pass = tx.hour >= val[0] && tx.hour < val[1];
+                        note = 'fill at ' + pad2(tx.hour) + ':' + pad2(tx.minute); break;
+      case 'products':  pass = val.includes(v.fuelType); note = v.fuelType; break;
+      case 'maxValue':  pass = tx.value <= val; note = zar(tx.value); break;
+      case 'dailyCap':  pass = tx.value <= val; note = zar(tx.value) + ' today'; break;
+      case 'maxLitres': pass = !v.tank || tx.litres <= v.tank * val; note = tx.litres + ' of ' + (v.tank || '?') + ' L'; break;
+      case 'approval':  note = tx.value > val ? 'approval requested' : 'below the threshold'; break;
+      default:          note = 'ok';
+    }
+    return { r, pass, note, val, x };
+  });
+  const failed = checks.filter(c => !c.pass);
+
+  el('scDecline').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="declineH">Why this was ' + (failed.length ? 'declined' : 'approved') + '</h1>' +
+      '<p class="t-screen__sub">Every rule that was evaluated, in order, with the group that set it and something you can do about it.</p>' +
+    '</div>' +
+    '<div class="m-card" style="max-width:820px">' +
+      '<div class="m-card__head"><div>' +
+        '<h2 class="m-card__title">' + (failed.length ? 'Declined' : 'Approved') + ' · ' + esc(v.reg) + '</h2>' +
+        '<p class="m-card__sub">' + esc(tx.supplier) + ' · ' + pad2(tx.hour) + ':' + pad2(tx.minute) + ' · ' +
+          tx.litres + ' L · ' + zar(tx.value) + ' · ' + esc(d.name) + '</p></div>' +
+        '<span class="a-chip" data-tone="' + (failed.length ? 'error' : 'success') + '" style="margin-left:auto">' +
+          (failed.length ? failed.length + ' failed' : 'All passed') + '</span></div>' +
+      '<div class="m-card__body">' +
+        checks.map(c => {
+          const src = c.x.authoritative || c.x.fromVehicle || c.x.fromPaying;
+          return '<div class="m-rule" data-state="' + (c.pass ? 'idle' : 'blocked') + '">' +
+            '<span class="m-rule__label">' +
+              '<span class="a-dot" data-tone="' + (c.pass ? 'success' : 'error') + '" style="display:inline-block;margin-right:6px"></span>' +
+              esc(c.r.label) + '<span class="m-rule__class">' + esc(CLS_LABEL[c.r.cls]) + '</span></span>' +
+            '<span class="m-rule__value">' + esc(fmtValue(c.r.key, c.val)) + '</span>' +
+            '<span style="font-size:var(--text-micro);color:var(--color-text-secondary)">' + esc(c.note) + '</span>' +
+            '<span class="m-rule__act">' + (src ?
+              '<span class="a-chip" data-source="' + (src.lock ? 'locked' : 'inherited') + '">' +
+              (src.lock ? '🔒 ' : '') + esc(src.srcName) + '</span>' : '') + '</span></div>';
+        }).join('') +
+      '</div>' +
+      (failed.length ? '<div class="m-card__foot">' +
+        '<button class="a-btn a-btn--secondary a-btn--sm" type="button" data-act="go" data-to="E1">Change this rule for the group</button>' +
+        '<button class="a-btn a-btn--quiet a-btn--sm" type="button" data-act="ask-owner">Ask the rule owner</button></div>' : '') +
+    '</div>' +
+    '<div class="m-note" style="max-width:820px;margin-top:var(--sp-3)"><span class="m-note__ico">◷</span><span>' +
+      'The values above are the ones stored on the transaction at the time, not worked out again now. ' +
+      'A restructure next month will not change what this record says happened.</span></div>';
+}
+
+/* ── H · Done ──────────────────────────────────────────────────────────── */
+function renderDone(){
+  const total = S.account.vehicles.length;
+  const unplaced = S.account.vehicles.filter(v => !v.homeId || (byId(v.homeId) && byId(v.homeId).system)).length;
+  const placed = total - unplaced;
+  const pct = total ? Math.round(placed / total * 100) : 100;
+  el('scDone').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="doneH">Ready to go live</h1>' +
+      '<p class="t-screen__sub">One thing counts as finished. Everything else is optional and can wait.</p></div>' +
+    '<div class="m-card" style="max-width:640px"><div class="m-card__body">' +
+      '<p style="margin:0 0 var(--sp-2);font-weight:700">Every vehicle has a home group</p>' +
+      '<div class="a-bar" style="margin-bottom:var(--sp-2)"><div class="a-bar__fill" data-tone="' +
+        (unplaced ? 'warning' : 'success') + '" style="width:' + pct + '%"></div></div>' +
+      '<p class="u-num" style="margin:0;font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+        num(placed) + ' of ' + num(total) + ' placed' +
+        (unplaced ? ' · <strong>' + num(unplaced) + ' waiting in Unassigned</strong>' : '') + '</p>' +
+      (unplaced ?
+        '<div class="m-note" data-tone="info" style="margin-top:var(--sp-3)"><span class="m-note__ico">◈</span><span>' +
+        'Go live now and place these later. If the answer is a finance question, park it. ' +
+        'Structure never holds up activation.</span></div>' : '') +
+    '</div><div class="m-card__foot">' +
+      '<button class="a-btn a-btn--primary" type="button" data-act="activate">Activate cards</button>' +
+      (unplaced ? '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="D1">Place the rest first</button>' : '') +
+    '</div></div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STATE MAP + WIRING
+   ══════════════════════════════════════════════════════════════════════════ */
+const SCREENS = ['scSimple','scConfirm','scWork','scShared','scDecline','scDone'];
+function showScreen(id, step){
+  SCREENS.forEach(s => el(s).dataset.state = s === id ? 'on' : 'off');
+  el('portalStep').textContent = step || 'Setup';
+  el('portalBody').scrollTop = 0;
+}
+
+const STATES = [
+  { g:'A · Entry', id:'A1', t:'Small account, no structure column', run(){
+      setAccount('solo'); note('The import had no column holding a place or a division, and the account is small. No fork question is asked.');
+      renderSimple(); showScreen('scSimple','Organise'); } },
+  { g:'A · Entry', id:'A2', t:'Structure column found', run(){
+      setAccount('mid'); note('A column called Branch held four spellings of three places. The screen proposes, it does not ask you to build.');
+      renderConfirm(); showScreen('scConfirm','Organise'); } },
+  { g:'A · Entry', id:'A3', t:'No usable column, larger account', run(){
+      setAccount('solo'); S.account.columns = ['Registration','Make','Model'];
+      note('Falls back to three templates and a way out. Never a blank tree with a plus button.');
+      renderConfirm(); showScreen('scConfirm','Organise'); } },
+
+  { g:'B · Simple', id:'B1', t:'Default, no structure words', run(){
+      setAccount('solo'); note('Count the concepts on screen: none. No group, no hierarchy, no level, no inheritance.');
+      renderSimple(); showScreen('scSimple','Organise'); } },
+  { g:'B · Simple', id:'B2', t:'Adjust one rule', run(){
+      setAccount('solo'); ensureSimple(); renderSimple(); showScreen('scSimple','Organise');
+      note('Rules start from a standard set. Nobody is ever handed a blank policy.');
+      setTimeout(() => editRule(rootGroup().id, 'maxValue'), 80); } },
+  { g:'B · Simple', id:'B3', t:'Grow into structure', run(){
+      setAccount('solo'); ensureSimple(); renderSimple(); showScreen('scSimple','Organise');
+      note('The promotion link adds children to the root that already exists. No migration, no re-import.');
+      document.getElementById('labelBox').open = true; } },
+
+  { g:'C · Confirm', id:'C1', t:'The proposal', run(){
+      setAccount('mid'); note('One click covers 214 of 220 vehicles. Rename inline, untick to drop.');
+      renderConfirm(); showScreen('scConfirm','Organise'); } },
+  { g:'C · Confirm', id:'C2', t:'A different column', run(){
+      setAccount('group'); note('Pick the column that matches how the business actually works.');
+      renderConfirm(); showScreen('scConfirm','Organise'); } },
+  { g:'C · Confirm', id:'C3', t:'Split by a second column', run(){
+      setAccount('group'); S.proposal = buildProposal(['Subsidiary','Region']);
+      note('Two levels appear without the word level ever being used.');
+      renderConfirm(); showScreen('scConfirm','Organise'); } },
+  { g:'C · Confirm', id:'C4', t:'Near duplicates combined', run(){
+      setAccount('mid'); renderConfirm(); showScreen('scConfirm','Organise');
+      note('Cape Town, cape town and Cape Town Depot are one place, not three siblings nobody can tell apart.');
+      setTimeout(showDupes, 80); } },
+  { g:'C · Confirm', id:'C5', t:'Vehicles with nothing to go on', run(){
+      setAccount('group'); renderConfirm(); showScreen('scConfirm','Organise');
+      note('412 vehicles have no branch. They go to a holding group, out of every billing rollup, as a standing task.'); } },
+
+  { g:'D · Structure', id:'D1', t:'Tree, records, inspector', run(){
+      setAccount('group'); ensureStructure(); note('Reached by choice, not by default. Arrow keys work, type-ahead works, Tab still leaves.');
+      renderAll(); showScreen('scWork','Structure'); } },
+  { g:'D · Structure', id:'D2', t:'Move, with the blast radius', run(){
+      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+      note('No move commits before you see what changes for how many vehicles.');
+      const a = S.groups.find(g => g.name === 'Sandton'), b = S.groups.find(g => g.name === 'Takealot Logistics');
+      if (a && b) setTimeout(() => tryMove(a.id, b.id), 90); } },
+  { g:'D · Structure', id:'D3', t:'Undo', run(){
+      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+      const g = S.groups.find(x => x.name === 'Bryanston');
+      if (g){ snapshot('Deleted ' + g.name); S.groups = S.groups.filter(x => x.id !== g.id && !descendants(g.id).includes(x));
+        S.account.vehicles.forEach(v => { if (v.homeId === g.id) v.homeId = systemUnassigned().id; });
+        renderAll(); toast('Deleted Bryanston and everything under it', true); }
+      note('Every structural change is reversible, by the toast or by Cmd Z.'); } },
+  { g:'D · Structure', id:'D4', t:'Depth nudge', run(){
+      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+      note('Past four levels the screen offers a label instead. Labels survive a reorganisation, branches do not.');
+      const deep = S.groups.slice().sort((a,b) => depthOf(b.id) - depthOf(a.id))[0];
+      const other = S.groups.find(g => depthOf(g.id) >= 2 && canMoveUnder(deep.id, g.id));
+      if (deep && other) setTimeout(() => tryMove(deep.id, other.id), 90); } },
+  { g:'D · Structure', id:'D5', t:'Search with the full path', run(){
+      setAccount('group'); ensureStructure(); treeFilter = 'sandton'; renderAll(); showScreen('scWork','Structure');
+      el('treeSearch').value = 'sandton';
+      note('Three places are called Sandton. A bare name would be useless, so results carry their path.'); } },
+  { g:'D · Structure', id:'D6', t:'Nothing here yet', run(){
+      setAccount('mid'); ensureStructure();
+      const empty = { id:uid('g'), name:'Polokwane', kind:'Depot', parentId:rootGroup().id };
+      S.groups.push(empty); S.selectedGroup = empty.id;
+      renderAll(); showScreen('scWork','Structure');
+      note('An empty group says what to do next, not just that it is empty.'); } },
+  { g:'D · Structure', id:'D7', t:'Large account', run(){
+      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+      note(num(S.account.vehicles.length) + ' vehicles. Rows render in pages, and the tree index is built once per change, not per row.'); } },
+
+  { g:'E · Rules', id:'E1', t:'Effective rules, per rule', run(){
+      setAccount('group'); ensureStructure();
+      const g = S.groups.find(x => x.name === 'Sandton'); if (g) S.selectedGroup = g.id;
+      renderAll(); showScreen('scWork','Rules');
+      note('Each rule is resolved on its own. Setting fuel type here does not silently delete the night ban set above.'); } },
+  { g:'E · Rules', id:'E2', t:'Override one rule', run(){
+      setAccount('group'); ensureStructure();
+      const g = S.groups.find(x => x.name === 'Sandton') || rootGroup(); S.selectedGroup = g.id;
+      renderAll(); showScreen('scWork','Rules');
+      note('An override changes one line. Everything else keeps coming from above.');
+      setTimeout(() => editRule(g.id, 'maxValue'), 80); } },
+  { g:'E · Rules', id:'E3', t:'The three lock modes', run(){
+      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
+      renderAll(); showScreen('scWork','Rules');
+      note('Tighten only is the one that matters. A hard lock becomes a support queue within two months.');
+      setTimeout(() => editRule(rootGroup().id, 'maxValue'), 80); } },
+  { g:'E · Rules', id:'E4', t:'A rule that governs less than it claims', run(){
+      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
+      renderAll(); showScreen('scWork','Rules');
+      note('The litre rule needs a tank capacity. Most imports do not have one, so the screen says how many it misses.'); } },
+  { g:'E · Rules', id:'E5', t:'Check against the last 30 days', run(){
+      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
+      renderAll(); showScreen('scWork','Rules');
+      note('Nothing else makes a cascading rule set trustworthy before you switch it on.');
+      setTimeout(() => showSimulation(S.selectedGroup), 80); } },
+
+  { g:'F · Shared', id:'F1', t:'Shared vehicle found', run(){
+      setAccount('group'); renderShared(); showScreen('scShared','Shared');
+      note('Home group, shared with, operating now. Three separate facts, never one field doing all three jobs.'); } },
+  { g:'F · Shared', id:'F2', t:'Sharing is visibility, not rules', run(){
+      setAccount('group'); renderShared(); showScreen('scShared','Shared');
+      note('This one decision avoids the failure every incumbent ships: a driver and a vehicle in different groups, and the vehicle simply invisible.'); } },
+  { g:'F · Shared', id:'F3', t:'How the operating group was decided', run(){
+      setAccount('group'); renderShared(); showScreen('scShared','Shared');
+      note('The winner is highlighted, the losers are struck through, and the strictest of three is what applies.');
+      setTimeout(showPrecedence, 90); } },
+  { g:'F · Shared', id:'F4', t:'On loan, with dates', run(){
+      setAccount('group'); seedShared();
+      const l = S.loans[0]; if (l) l.active = true;
+      renderShared(); showScreen('scShared','Shared');
+      note('A dated hand-over, not a fake job. Rules and cost follow the borrower and hand back on their own.'); } },
+
+  { g:'G · Explain', id:'G1', t:'Why this was declined', run(){
+      setAccount('group'); renderDecline(); showScreen('scDecline','Explain');
+      note('Rule by rule, pass and fail, with the group that set each one. This is what support is actually asked.'); } },
+
+  { g:'H · Done', id:'H1', t:'One completion rule', run(){
+      setAccount('group'); ensureStructure(); renderDone(); showScreen('scDone','Review');
+      note('Every vehicle has a home group. That is the whole definition of done.'); } },
+  { g:'H · Done', id:'H2', t:'Live with work outstanding', run(){
+      setAccount('solo'); ensureSimple(); renderDone(); showScreen('scDone','Review');
+      note('Nothing here blocks activation. A manager who has to email finance can park it and still go live today.'); } },
+];
+
+let noteText = '';
+function note(t){ noteText = t; renderCaption(); }
+function renderCaption(){
+  const st = STATES.find(s => s.id === S.screen);
+  el('caption').innerHTML =
+    '<strong style="color:var(--color-text-secondary)">' + (st ? esc(st.id + ' · ' + st.t) : '') + '</strong>' +
+    '<span>' + esc(noteText) + '</span>';
+}
+
+function renderNav(){
+  el('accountSwitch').innerHTML = Object.entries(SPECS).map(([k, v]) =>
+    '<button class="o-state-nav__chip" type="button" data-acct="' + k + '" aria-pressed="' +
+    (S.accountId === k) + '">' + esc(v.label) + '</button>').join('');
+  let html = '', lastG = '';
+  STATES.forEach(s => {
+    if (s.g !== lastG){ html += '<h2 class="o-state-nav__h">' + esc(s.g) + '</h2>'; lastG = s.g; }
+    html += '<button class="o-state-nav__b" type="button" data-state-id="' + s.id + '" aria-current="' +
+      (S.screen === s.id) + '"><span class="o-state-nav__id">' + s.id + '</span><span>' + esc(s.t) + '</span></button>';
+  });
+  el('stateList').innerHTML = html;
+}
+
+function go(id){
+  const st = STATES.find(s => s.id === id); if (!st) return;
+  S.screen = id;
+  el('pop').hidden = true; closeDialog();
+  st.run();
+  renderNav(); renderCaption();
+  if (location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id);
+  announce(st.id + ', ' + st.t);
+}
+window.addEventListener('hashchange', () => {
+  const id = location.hash.slice(1);
+  if (id && id !== S.screen) go(id);
+});
+
+function setAccount(id){
+  if (S.accountId === id) return;
+  S.accountId = id;
+  S.account = buildAccount(id);
+  S.groups = []; S.attach = {}; S.tags = {}; S.tagGroups = []; S.loans = [];
+  S.expanded = new Set(); S.selectedRows = new Set(); S.selectedGroup = null;
+  S.proposal = null; S.undo = []; treeFilter = ''; treeFocusId = null; S.seq = 0;
+  el('portalAccount').textContent = SPECS[id].company + ' · ' +
+    num(S.account.vehicles.length) + ' vehicles, ' + num(S.account.drivers.length) + ' drivers';
+}
+
+function renderAll(){
+  if (!S.groups.length) return;
+  if (!byId(S.selectedGroup)) S.selectedGroup = rootGroup() && rootGroup().id;
+  renderTree(); renderRecords(); renderInspector();
+}
+
+function showDupes(){
+  const p = S.proposal; if (!p) return;
+  const d = p.rows.filter(r => r.variants.length > 1);
+  openDialog('Combined as one place',
+    (d.length ? d.map(r =>
+      '<div style="padding:var(--sp-2h) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
+      '<strong>' + esc(r.name) + '</strong> <span class="a-count">' + num(r.count) + '</span>' +
+      '<div style="margin-top:var(--sp-1);display:flex;gap:var(--sp-2);flex-wrap:wrap">' +
+      r.variants.map(v => '<code style="font-size:var(--text-micro);background:var(--color-surface-sunken);padding:2px 6px;border-radius:4px">' +
+        esc(JSON.stringify(v)) + '</code>').join('') + '</div></div>').join('')
+      : '<p>Nothing needed combining.</p>') +
+    '<p style="margin:var(--sp-3) 0 0;font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+      'Left as they were, these would be separate groups that look identical in every dropdown, ' +
+      'and six weeks later the reports would not reconcile.</p>',
+    '<button class="a-btn a-btn--secondary" type="button" data-act="split-dupes">Keep them separate</button>' +
+    '<button class="a-btn a-btn--primary" type="button" data-act="close">Combine them</button>');
+}
+
+/* ── Events. One delegated listener. ───────────────────────────────────── */
+document.addEventListener('click', e => {
+  const nav = e.target.closest('[data-state-id]');
+  if (nav){ go(nav.dataset.stateId); return; }
+  const acct = e.target.closest('[data-acct]');
+  if (acct){ setAccount(acct.dataset.acct); go(S.screen || 'A2'); return; }
+  const mode = e.target.closest('[data-mode]');
+  if (mode){ toggleMode(mode); return; }
+
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+  const gid = S.selectedGroup;
+
+  if (a === 'close') closeDialog();
+  else if (a === 'close-pop') el('pop').hidden = true;
+  else if (a === 'go') go(b.dataset.to);
+  else if (a === 'commit'){ commitProposal(S.proposal); go('D1'); toast('Groups created', true); }
+  else if (a === 'toggle-row'){ S.proposal.rows[+b.dataset.i].include = b.checked; renderConfirm(); }
+  else if (a === 'show-dupes') showDupes();
+  else if (a === 'split-dupes'){ closeDialog(); toast('Kept separate. You can merge them later from the structure screen.'); }
+  else if (a === 'template'){ ensureSimple(); toast('Started from the ' + b.dataset.t.toLowerCase() + ' template'); go('D1'); }
+  else if (a === 'promote'){ S.proposal = null; go('C1'); }
+  else if (a === 'simulate') showSimulation(gid || rootGroup().id);
+  else if (a === 'edit-rule') editRule(gid || rootGroup().id, b.dataset.rule);
+  else if (a === 'reset-rule'){
+    snapshot('Reset rule'); delete S.attach[gid][b.dataset.rule];
+    renderAll(); if (el('scSimple').dataset.state === 'on') renderSimple();
+    toast('Reset to the inherited value', true); }
+  else if (a === 'save-rule') saveRule(b.dataset.g, b.dataset.rule);
+  else if (a === 'fix-missing') toast('Opens the vehicles missing a tank capacity so they can be filled in');
+  else if (a === 'twist'){ const id = b.dataset.id;
+    S.expanded.has(id) ? S.expanded.delete(id) : S.expanded.add(id); renderTree(); }
+  else if (a === 'select') selectGroup(b.dataset.id);
+  else if (a === 'node-menu') nodeMenu(b.dataset.id);
+  else if (a === 'tab'){ inspectTab = b.dataset.t; renderInspector(); }
+  else if (a === 'sel-all'){ const vs = vehiclesIn(gid, true).slice(0, PAGE);
+    b.checked ? vs.forEach(v => S.selectedRows.add(v.id)) : S.selectedRows.clear(); renderRecords(); }
+  else if (a === 'sel-row'){ b.checked ? S.selectedRows.add(b.dataset.id) : S.selectedRows.delete(b.dataset.id); renderRecords(); }
+  else if (a === 'sel-clear'){ S.selectedRows.clear(); renderRecords(); }
+  else if (a === 'assign') assignPicker();
+  else if (a === 'label') toast('Adds a key and value label to ' + S.selectedRows.size + ' vehicles. Labels never change a rule.');
+  else if (a === 'share') toast('Lets another group’s drivers fuel these vehicles. It does not move them and does not change whose rules apply.');
+  else if (a === 'assign-to'){ snapshot('Assigned vehicles');
+    const n = S.selectedRows.size;
+    S.account.vehicles.forEach(v => { if (S.selectedRows.has(v.id)) v.homeId = b.dataset.to; });
+    S.selectedRows.clear(); closeDialog(); renderAll();
+    toast('Moved ' + num(n) + ' vehicles to ' + byId(b.dataset.to).name, true); }
+  else if (a === 'move-pick'){ closeDialog(); tryMove(b.dataset.id, b.dataset.to); }
+  else if (a === 'move-go') doMove(b.dataset.id, b.dataset.to, false);
+  else if (a === 'move-neutral') doMove(b.dataset.id, b.dataset.to, true);
+  else if (a === 'why-operating') showPrecedence();
+  else if (a === 'unshare'){ const p = sharedPair(); if (p){ snapshot('Stopped sharing');
+    p.v.sharedWith = []; renderShared(); toast('No longer shared', true); } }
+  else if (a === 'add-share') toast('Pick another group whose drivers may fuel this vehicle');
+  else if (a === 'toggle-loan'){ const l = S.loans[0]; if (l){ snapshot('Loan');
+    l.active = !l.active; renderShared(); toast(l.active ? 'On loan. The borrower’s rules apply from now.' : 'Loan ended', true); } }
+  else if (a === 'activate') toast('Cards activated. You can carry on organising whenever you like.');
+  else if (a === 'ask-owner') toast('Sends the question to whoever set the rule, not to support');
+  else if (a === 'tree-help') openDialog('Keyboard',
+    '<dl class="m-kv"><dt>Arrows</dt><dd>Move, open and close</dd>' +
+    '<dt>Type a letter</dt><dd>Jump to a name</dd><dt>Enter</dt><dd>Select</dd>' +
+    '<dt>Cmd X then Cmd V</dt><dd>Move a group without dragging</dd>' +
+    '<dt>Cmd Z</dt><dd>Undo</dd><dt>Tab</dt><dd>Leaves the tree. Always.</dd></dl>',
+    '<button class="a-btn a-btn--primary" type="button" data-act="close">Close</button>');
+});
+
+document.addEventListener('input', e => {
+  if (e.target.dataset.act === 'rename-row'){ S.proposal.rows[+e.target.dataset.i].name = e.target.value; }
+  if (e.target.id === 'treeSearch'){ treeFilter = e.target.value.trim(); renderTree(); }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'colPick'){ S.proposal = buildProposal([e.target.value, S.proposal.cols[1]].filter(Boolean)); renderConfirm(); }
+  if (e.target.id === 'col2Pick'){ S.proposal = buildProposal([S.proposal.cols[0], e.target.value].filter(Boolean)); renderConfirm(); }
+});
+document.addEventListener('keydown', e => { if (e.target.closest('#treeRoot')) onTreeKey(e); });
+
+function nodeMenu(id){
+  const g = byId(id);
+  openDialog(esc(g.name),
+    '<div class="m-crumb" style="margin-bottom:var(--sp-3)">' + esc(pathString(id)) + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:var(--sp-1)">' +
+      '<button class="a-btn a-btn--quiet" style="justify-content:flex-start" type="button" data-act="menu-move" data-id="' + id + '">Move to…</button>' +
+      '<button class="a-btn a-btn--quiet" style="justify-content:flex-start" type="button" data-act="menu-add" data-id="' + id + '">Add a group inside</button>' +
+      '<button class="a-btn a-btn--quiet" style="justify-content:flex-start" type="button" data-act="menu-del" data-id="' + id + '">Delete</button>' +
+    '</div>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Close</button>');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.dataset.id;
+  if (b.dataset.act === 'menu-move'){ closeDialog(); movePicker(id); }
+  if (b.dataset.act === 'menu-add'){ snapshot('Added a group');
+    const g = { id:uid('g'), name:'New group', kind:'Team', parentId:id };
+    S.groups.push(g); S.expanded.add(id); closeDialog(); selectGroup(g.id); toast('Group added', true); }
+  if (b.dataset.act === 'menu-del'){
+    const g = byId(id), kids = descendants(id), vs = vehiclesIn(id, true);
+    if (!g.parentId){ toast('The top group cannot be deleted'); return; }
+    closeDialog();
+    openDialog('Delete ' + esc(g.name) + '?',
+      '<p style="margin:0">This also deletes <strong>' + kids.length + ' groups</strong> beneath it. ' +
+      num(vs.length) + ' vehicles move to Unassigned.</p>',
+      '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+      '<button class="a-btn a-btn--danger" type="button" data-act="del-go" data-id="' + id + '">Delete ' +
+        esc(g.name) + ' and ' + kids.length + ' beneath</button>');
+  }
+  if (b.dataset.act === 'del-go'){
+    const g = byId(id), doomed = new Set([id, ...descendants(id).map(x => x.id)]);
+    snapshot('Deleted ' + g.name);
+    const u = systemUnassigned();
+    S.account.vehicles.forEach(v => { if (doomed.has(v.homeId)) v.homeId = u.id; });
+    S.account.drivers.forEach(d => { if (doomed.has(d.homeId)) d.homeId = u.id; });
+    S.groups = S.groups.filter(x => !doomed.has(x.id));
+    S.selectedGroup = rootGroup().id;
+    closeDialog(); renderAll();
+    toast('Deleted ' + g.name + ' and ' + (doomed.size - 1) + ' groups beneath it', true);
+  }
+});
+
+function assignPicker(){
+  const n = S.selectedRows.size;
+  openDialog('Assign ' + num(n) + ' vehicles',
+    '<div style="max-height:300px;overflow:auto">' +
+    S.groups.map(t => '<button class="a-btn a-btn--quiet" style="width:100%;justify-content:flex-start;min-height:34px" ' +
+      'type="button" data-act="assign-to" data-to="' + t.id + '">' +
+      '<span class="m-crumb">' + esc(pathString(t.id)) + '</span></button>').join('') + '</div>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>');
+}
+
+/* Drag is an accelerator only. Every move it can do, the menu can do too. */
+document.addEventListener('dragstart', e => {
+  const it = e.target.closest('[role="treeitem"]'); if (!it) return;
+  e.dataTransfer.setData('text/plain', it.dataset.id);
+});
+document.addEventListener('dragover', e => {
+  const row = e.target.closest('.o-tree__row'); if (!row) return;
+  e.preventDefault(); row.dataset.drop = 'into';
+});
+document.addEventListener('dragleave', e => {
+  const row = e.target.closest('.o-tree__row'); if (row) delete row.dataset.drop;
+});
+document.addEventListener('drop', e => {
+  const row = e.target.closest('.o-tree__row'); if (!row) return;
+  e.preventDefault(); delete row.dataset.drop;
+  const from = e.dataTransfer.getData('text/plain');
+  const to = row.closest('[role="treeitem"]').dataset.id;
+  if (from && to) tryMove(from, to);
+});
+
+/* ── Modes ─────────────────────────────────────────────────────────────── */
+function toggleMode(btn){
+  const on = btn.getAttribute('aria-pressed') !== 'true';
+  btn.setAttribute('aria-pressed', String(on));
+  const r = document.documentElement;
+  if (btn.dataset.mode === 'theme')   r.dataset.theme = on ? 'dark' : 'light';
+  if (btn.dataset.mode === 'motion')  r.dataset.motion = on ? 'off' : 'system';
+  if (btn.dataset.mode === 'density') r.dataset.density = on ? 'comfortable' : 'default';
+  if (btn.dataset.mode === 'narrow'){
+    el('stage').style.maxWidth = on ? '320px' : '';
+    el('stage').style.marginRight = on ? 'auto' : '';
+  }
+}
+
+/* ── Boot ──────────────────────────────────────────────────────────────── */
+setAccount('mid');
+renderNav();
+/* Every state is deep-linkable, so a state can be shared or screenshotted
+   without clicking through to it. */
+go(STATES.some(s => s.id === location.hash.slice(1)) ? location.hash.slice(1) : 'A2');
+</script>
+</body>
+</html>
