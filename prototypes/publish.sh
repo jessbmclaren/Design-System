@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Publish the EngenXT driver prototype.
+# Publish the EngenXT driver prototypes.
 #
-# The prototype lives in two places: this private repository, where it is
+# The prototypes live in two places: this private repository, where they are
 # authored and where the review history is, and a public one, which exists
 # only because GitHub Pages will not serve a private repo on a free plan.
 # Those two copies drift the moment either changes, and the drift is silent:
@@ -12,20 +12,35 @@
 #   ./prototypes/publish.sh "why this changed"
 #
 # It is safe to run when nothing has changed, and it will tell you so.
+#
+# There is more than one prototype now, and they link to each other, so they
+# are published together. Publishing one flow and not the one it hands over to
+# is how a live site ends up with a button that leads nowhere.
 
 set -euo pipefail
 
 SOURCE_REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROTOTYPE="$SOURCE_REPO/prototypes/engenxt-signup.html"
 MIRROR_URL="https://github.com/jessbmclaren/EngenXT-Mobile-Sign-up.git"
 MIRROR="${ENGENXT_MIRROR:-$HOME/Code/EngenXT-Mobile-Sign-up}"
-LIVE="https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up/"
+LIVE="https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up"
 MESSAGE="${1:-}"
+
+# Each entry is "source file in prototypes/  ->  name it is served under".
+# The sign-up flow is the landing page, so it is the one that becomes
+# index.html. Everything else keeps its own name, which is what the links
+# between the flows expect.
+PAGES=(
+  "engenxt-signup.html:index.html"
+  "engenxt-onboarding.html:engenxt-onboarding.html"
+)
 
 say() { printf '  %s\n' "$*"; }
 die() { printf '\n  STOPPED: %s\n\n' "$*" >&2; exit 1; }
 
-[ -f "$PROTOTYPE" ] || die "cannot find $PROTOTYPE"
+for entry in "${PAGES[@]}"; do
+  src="$SOURCE_REPO/prototypes/${entry%%:*}"
+  [ -f "$src" ] || die "cannot find $src"
+done
 
 # ── The mirror, cloned on first use ──────────────────────────────────────
 # Keeping it beside the source repo rather than in a temporary directory is
@@ -40,9 +55,18 @@ git -C "$MIRROR" checkout --quiet main
 git -C "$MIRROR" reset --quiet --hard origin/main
 
 # ── Is there anything to do? ─────────────────────────────────────────────
-SOURCE_DIRTY=$(git -C "$SOURCE_REPO" status --porcelain -- prototypes/engenxt-signup.html)
-if cmp -s "$PROTOTYPE" "$MIRROR/index.html" && [ -z "$SOURCE_DIRTY" ]; then
-  say "already published. The prototype, this repo and the live site all agree."
+SOURCE_DIRTY=""
+MIRROR_STALE=""
+for entry in "${PAGES[@]}"; do
+  file="${entry%%:*}"; dest="${entry##*:}"
+  src="$SOURCE_REPO/prototypes/$file"
+  dirty=$(git -C "$SOURCE_REPO" status --porcelain -- "prototypes/$file")
+  [ -n "$dirty" ] && SOURCE_DIRTY="$SOURCE_DIRTY $file"
+  cmp -s "$src" "$MIRROR/$dest" || MIRROR_STALE="$MIRROR_STALE $file"
+done
+
+if [ -z "$SOURCE_DIRTY" ] && [ -z "$MIRROR_STALE" ]; then
+  say "already published. The prototypes, this repo and the live site all agree."
   exit 0
 fi
 
@@ -50,37 +74,53 @@ fi
 
 # ── Commit the source ────────────────────────────────────────────────────
 if [ -n "$SOURCE_DIRTY" ]; then
-  git -C "$SOURCE_REPO" add prototypes/engenxt-signup.html
+  for file in $SOURCE_DIRTY; do
+    git -C "$SOURCE_REPO" add "prototypes/$file"
+  done
   git -C "$SOURCE_REPO" commit --quiet -m "$MESSAGE"
-  say "committed to $(git -C "$SOURCE_REPO" rev-parse --abbrev-ref HEAD)"
+  say "committed$SOURCE_DIRTY to $(git -C "$SOURCE_REPO" rev-parse --abbrev-ref HEAD)"
 fi
 git -C "$SOURCE_REPO" push --quiet origin HEAD
 say "pushed the source"
 
-# ── Copy, and prove the copy is exact ────────────────────────────────────
-cp "$PROTOTYPE" "$MIRROR/index.html"
-cmp -s "$PROTOTYPE" "$MIRROR/index.html" || die "the copy does not match the source"
-say "copied to index.html, byte for byte"
+# ── Copy, and prove each copy is exact ───────────────────────────────────
+for entry in "${PAGES[@]}"; do
+  file="${entry%%:*}"; dest="${entry##*:}"
+  cp "$SOURCE_REPO/prototypes/$file" "$MIRROR/$dest"
+  cmp -s "$SOURCE_REPO/prototypes/$file" "$MIRROR/$dest" || die "the copy of $file does not match the source"
+  say "copied $file to $dest, byte for byte"
+done
 
 if [ -n "$(git -C "$MIRROR" status --porcelain)" ]; then
-  git -C "$MIRROR" add index.html
+  git -C "$MIRROR" add -A
   git -C "$MIRROR" commit --quiet -m "$MESSAGE"
   git -C "$MIRROR" push --quiet origin main
   say "published to the mirror"
 fi
 
 # ── Wait for the live site to actually serve it ──────────────────────────
-# Pages builds asynchronously, so "pushed" is not "live". Checking a string
-# from the file we just published is the only honest confirmation.
-STAMP=$(grep -o 'Self-check' "$PROTOTYPE" | head -1 || true)
+# Pages builds asynchronously, so "pushed" is not "live". Comparing the served
+# bytes against the file we just published is the only honest confirmation,
+# and every page has to pass, not just the first one.
 say "waiting for the live site"
 for _ in $(seq 1 40); do
-  if curl -fsS "$LIVE" 2>/dev/null | cmp -s - "$PROTOTYPE"; then
-    say "live and identical: $LIVE"
+  all_live=1
+  for entry in "${PAGES[@]}"; do
+    file="${entry%%:*}"; dest="${entry##*:}"
+    url="$LIVE/$dest"
+    [ "$dest" = "index.html" ] && url="$LIVE/"
+    curl -fsS "$url" 2>/dev/null | cmp -s - "$SOURCE_REPO/prototypes/$file" || all_live=0
+  done
+  if [ "$all_live" = "1" ]; then
+    say "live and identical:"
+    for entry in "${PAGES[@]}"; do
+      dest="${entry##*:}"
+      [ "$dest" = "index.html" ] && say "  $LIVE/" || say "  $LIVE/$dest"
+    done
     exit 0
   fi
   sleep 15
 done
 
 say "pushed, but the live site has not caught up yet. It usually takes a minute."
-say "check: $LIVE"
+say "check: $LIVE/"
