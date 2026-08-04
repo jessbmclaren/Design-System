@@ -421,6 +421,31 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .m-crumb__sep { opacity: 0.5; }
 .m-crumb__last { color: var(--color-text-primary); font-weight: 600; }
 
+/* A numbered thing-to-make on the empty start. */
+.m-task {
+  display: grid; grid-template-columns: 28px minmax(0,1fr) auto; gap: var(--sp-3);
+  align-items: start; padding: var(--sp-3) var(--sp-2);
+}
+.m-task + .m-task { border-top: var(--hairline) solid var(--color-border-light); }
+.m-task__n {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--color-surface-sunken); color: var(--color-text-secondary);
+  border: var(--hairline) solid var(--color-border);
+  font-size: var(--text-micro); font-weight: 700;
+}
+.m-task[data-state="done"] .m-task__n { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success-bd); }
+.m-task__t { display: block; font-size: var(--text-small); font-weight: 700; }
+.m-task__b { display: block; margin-top: 2px; font-size: var(--text-caption); color: var(--color-text-secondary); }
+
+/* One rung of the layer chain. */
+.m-chainrow {
+  display: grid; grid-template-columns: 44px minmax(0,1fr) auto auto; gap: var(--sp-3);
+  align-items: center; padding: var(--sp-1h) 0;
+}
+.m-chainrow + .m-chainrow { border-top: var(--hairline) solid var(--color-border-light); }
+.m-chainrow__n { font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-tertiary); }
+.m-chainrow__v { font-size: var(--text-small); font-weight: 600; }
+
 .m-empty {
   display: flex; flex-direction: column; align-items: center; gap: var(--sp-2h);
   padding: var(--sp-8) var(--sp-5); text-align: center; color: var(--color-text-secondary);
@@ -709,11 +734,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
       </div>
       <div class="t-portal__body" id="portalBody">
 
-        <!-- B · Simple mode. No tree, no "group", no "hierarchy". -->
+        <!-- A · Nothing set up yet. The real starting point. -->
+        <section class="t-screen" id="scStart" aria-labelledby="startH"></section>
+
+        <!-- B · Layers: what the levels in this business are called. -->
+        <section class="t-screen" id="scLayers" aria-labelledby="layersH"></section>
+
+        <!-- C · Groups: the actual places and teams. -->
+        <section class="t-screen" id="scGroups" aria-labelledby="groupsH"></section>
+
+        <!-- D · Labels: cross-cutting, never granting access. -->
+        <section class="t-screen" id="scTags" aria-labelledby="tagsH"></section>
+
+        <!-- Simple mode, for an account with one layer and nothing to nest. -->
         <section class="t-screen" id="scSimple" aria-labelledby="simpleH"></section>
 
-        <!-- C · Confirm the inferred structure. -->
-        <section class="t-screen" id="scConfirm" aria-labelledby="confirmH"></section>
 
         <!-- D + E · Structure workspace. -->
         <section class="t-screen t-screen--flush" id="scWork" aria-label="Structure workspace">
@@ -795,8 +830,8 @@ const RULE_BY_KEY = Object.fromEntries(RULES.map(r => [r.key, r]));
 const CLS_LABEL = { asset:'From the vehicle', person:'From the driver', money:'From the paying group' };
 
 /* Node kinds are a controlled vocabulary. Free text here produces
-   Depot / depot / Depo / Dept and six categories in one report. */
-const KINDS = ['Company','Subsidiary','Division','Region','Department','Team','Depot','Site'];
+   Branch / branch / Brnach / Br and six categories in one report. */
+const KINDS = ['Company','Subsidiary','Division','Region','Department','Team','Branch','Site'];
 
 /* Column names that imply structure. Everything else becomes a tag group. */
 const STRUCTURAL = ['subsidiary','company','entity','division','region','area','province','branch',
@@ -824,15 +859,15 @@ const PLATE = {
 /* Distribution specs. [subsidiary, region, branch, count] */
 const SPECS = {
   solo: {
-    label: '5 vans',
-    company: 'Metro courier',
-    columns: ['Registration','Make','Model','Driver','Tank (L)'],
-    dist: [['', '', '', 5]],
+    label: 'Small company',
+    company: 'Small courier company',
+    columns: ['Registration','Branch','Make','Model','Tank (L)'],
+    dist: [['', '', 'Wynberg', 3], ['', '', 'Epping', 2]],
     drivers: 6,
   },
   mid: {
-    label: '220 vehicles',
-    company: 'Three-depot logistics',
+    label: 'Mid-size',
+    company: 'Three-branch distributor',
     columns: ['Registration','Branch','Shift','Class','Driver'],
     /* Deliberate near-duplicates. Four spellings of one place is what a real
        spreadsheet looks like, and the merge review exists because of it. */
@@ -840,14 +875,14 @@ const SPECS = {
       ['', '', 'Johannesburg', 140],
       ['', '', 'Cape Town', 31],
       ['', '', 'cape town ', 12],
-      ['', '', 'Cape Town Depot', 9],
+      ['', '', 'Cape Town Branch', 9],
       ['', '', 'Durban', 22],
       ['', '', '', 6],
     ],
     drivers: 186,
   },
   group: {
-    label: 'Group, 5 levels',
+    label: 'Takealot group',
     company: 'Takealot Group',
     columns: ['Registration','Subsidiary','Region','Branch','Cost Centre','Shift','Class'],
     dist: [
@@ -876,8 +911,8 @@ function buildAccount(id){
   let n = 0;
   spec.dist.forEach(([sub, region, branch, count]) => {
     for (let i = 0; i < count; i++){
-      const cls = pick(['LDV','LDV','LDV','Rigid','Interlink','Reefer']);
-      const tankByCls = { LDV:80, Rigid:200, Interlink:400, Reefer:300 };
+      const cls = pick(['LDV','LDV','Panel van','Panel van','Minibus','Refrigerated van']);
+      const tankByCls = { 'LDV':80, 'Panel van':70, 'Minibus':60, 'Refrigerated van':90 };
       /* Tank capacity is missing on a chunk of every real import. The
          "this rule is inactive for N vehicles" warning depends on it. */
       const hasTank = rnd() > (id === 'solo' ? 0.0 : 0.34);
@@ -943,6 +978,7 @@ const POLICY_SEEDS = [
    ══════════════════════════════════════════════════════════════════════════ */
 const S = {
   accountId: null, account: null,
+  layers: [],          /* ordered level names: ['Subsidiary','Region','Branch'] */
   groups: [],          /* {id,name,kind,parentId,system} */
   attach: {},          /* groupId -> { ruleKey: {value, lock} } */
   tagGroups: [],       /* {key, values:[...]}  key:value, never bare strings */
@@ -970,6 +1006,18 @@ function ancestors(id){            /* self, parent, ... root */
 function pathOf(id){ return ancestors(id).reverse(); }
 function pathString(id){ return pathOf(id).map(g => g.name).join(' › '); }
 function depthOf(id){ return ancestors(id).length - 1; }
+/* The layer chain is asked for once and answers "what do you call this
+   level". A node's kind comes from its depth, so two siblings can never end
+   up labelled Department and Region and make the tree illegible. */
+function layerAt(depth){ return S.layers[depth - 1] || null; }
+function kindOf(g){
+  if (!g) return '';
+  if (g.system) return 'Holding';
+  if (g.parentId === null) return 'Company';
+  return layerAt(depthOf(g.id)) || 'Group';
+}
+function maxUsedDepth(){ return S.groups.reduce((m, g) => Math.max(m, depthOf(g.id)), 0); }
+
 function descendants(id){
   const out = []; const walk = p => childrenOf(p).forEach(c => { out.push(c); walk(c.id); });
   walk(id); return out;
@@ -990,7 +1038,7 @@ function driversIn(id, deep){
 
 /* ── Inference ─────────────────────────────────────────────────────────── */
 /* Trim, casefold, collapse whitespace, strip a place-word suffix. This is
-   what turns "Cape Town", "cape town " and "Cape Town Depot" into one group
+   what turns "Cape Town", "cape town " and "Cape Town Branch" into one group
    instead of three siblings nobody can tell apart in a dropdown. */
 function normKey(s){
   return String(s || '').toLowerCase().trim().replace(/\s+/g, ' ')
@@ -1057,7 +1105,7 @@ function systemUnassigned(){
   return u;
 }
 
-const KIND_FOR = { Subsidiary:'Subsidiary', Region:'Region', Branch:'Depot',
+const KIND_FOR = { Subsidiary:'Subsidiary', Region:'Region', Branch:'Branch',
                    'Cost Centre':'Department', Department:'Department' };
 
 function commitProposal(p){
@@ -1105,6 +1153,7 @@ function commitProposal(p){
   childrenOf(root.id).forEach(g => S.expanded.add(g.id));
 
   /* Every unmapped column becomes a label group. Nothing in the file is thrown away. */
+  S.layers = p.cols.map(c => KIND_FOR[c] || c);
   buildTagGroups(p.cols);
   seedPolicies();
   S.selectedGroup = root.id;
@@ -1155,13 +1204,34 @@ function seedPolicies(){
 /* Simple mode still has a real root and a real policy. The customer just
    never sees the word "group". Promotion adds children to what exists. */
 function ensureSimple(){
-  if (rootGroup()) return;
   const root = ensureRoot();
-  S.account.vehicles.forEach(v => v.homeId = root.id);
-  S.account.drivers.forEach(d => d.homeId = root.id);
-  buildTagGroups([]);
-  seedPolicies();
+  if (S.account.vehicles.some(v => !v.homeId)){
+    S.account.vehicles.forEach(v => v.homeId = root.id);
+    S.account.drivers.forEach(d => d.homeId = root.id);
+  }
+  if (!S.tagGroups.length) buildTagGroups([]);
+  if (!Object.keys(S.attach).length) seedPolicies();
   S.selectedGroup = root.id;
+}
+
+/* fresh() is the true empty state: a company and nothing else.
+   sample() loads the dummy data for whichever account is selected, so the
+   later states have something to show without pretending it was inferred. */
+function fresh(){
+  if (!S.accountId) setAccount('group');
+  S.groups = []; S.attach = {}; S.tags = {}; S.tagGroups = []; S.loans = [];
+  S.layers = []; S.expanded = new Set(); S.selectedRows = new Set();
+  S.selectedGroup = null; S.proposal = null; S.undo = []; S.seq = 0;
+  treeFilter = ''; treeFocusId = null;
+  S.account.vehicles.forEach(v => { v.homeId = null; v.sharedWith = []; });
+  S.account.drivers.forEach(d => { d.homeId = null; });
+  ensureRoot();
+}
+function sample(){
+  if (!S.accountId) setAccount('group');
+  if (S.groups.length > 1) return;
+  fresh();
+  ensureStructure();
 }
 function ensureStructure(){
   if (S.groups.length > 1) return;
@@ -1466,11 +1536,11 @@ function renderSimple(){
   el('scSimple').innerHTML =
     '<div class="t-screen__lede">' +
       '<h1 class="t-screen__h1" id="simpleH">' + num(nV) + ' vehicles and ' + num(nD) + ' drivers imported</h1>' +
-      '<p class="t-screen__sub">Set the rules for using a card. You can change any of this later, and nothing here holds up going live.</p>' +
+      '<p class="t-screen__sub">Set the rules that apply. You can change any of this later, and nothing here holds up going live.</p>' +
     '</div>' +
     '<div class="m-card" style="max-width:720px">' +
       '<div class="m-card__head">' +
-        '<div><h2 class="m-card__title">Card rules for ' + esc(root.name) + '</h2>' +
+        '<div><h2 class="m-card__title">Rules for ' + esc(root.name) + '</h2>' +
         '<p class="m-card__sub">Started from a standard set, so you are never staring at a blank policy.</p></div>' +
       '</div>' +
       '<div class="m-card__body" id="simpleRules">' + ruleRows(root.id, { showSource:false }) + '</div>' +
@@ -1501,6 +1571,260 @@ function renderSimple(){
       '<p style="margin:var(--sp-1) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
         'Adds to what you already have. Nothing is re-imported and nothing is lost.</p>' +
     '</div>';
+}
+
+/* ══ A · Nothing set up yet ═══════════════════════════════════════════════
+   The real starting point. Three things to make, in the order they depend
+   on each other, each showing what it is for and what it is not for. */
+/* Only the next thing to do is primary. Three blue buttons is no guidance. */
+function taskRow(n, title, body, count, done, act, label, next){
+  return '<div class="m-task" data-state="' + (done ? 'done' : 'todo') + '">' +
+    '<span class="m-task__n">' + (done ? '✓' : n) + '</span>' +
+    '<span class="m-task__main"><span class="m-task__t">' + title +
+      (count ? ' <span class="a-count">' + count + '</span>' : '') + '</span>' +
+      '<span class="m-task__b">' + body + '</span></span>' +
+    '<button class="a-btn a-btn--sm ' + (next ? 'a-btn--primary' : 'a-btn--secondary') +
+      '" type="button" data-act="go" data-to="' + act + '">' + label + '</button></div>';
+}
+function renderStart(){
+  ensureRoot();
+  const nG = S.groups.filter(g => !g.system && g.parentId !== null).length;
+  const nT = S.tagGroups.length;
+  const nL = S.layers.length;
+  el('scStart').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="startH">Organise ' + num(S.account.vehicles.length) +
+        ' vehicles and ' + num(S.account.drivers.length) + ' drivers</h1>' +
+      '<p class="t-screen__sub">Nothing is set up yet. Build the structure your rules and invoices follow. ' +
+        'You can go live before any of it is finished.</p>' +
+    '</div>' +
+    '<div class="m-card" style="max-width:760px"><div class="m-card__body" style="padding:var(--sp-2) var(--sp-3)">' +
+      taskRow(1, 'Layers',
+        'What you call the levels in your business. Ask once, and every group below picks up its own name from where it sits.',
+        nL, nL > 0, 'B1', nL ? 'Edit' : 'Name your layers', !nL) +
+      taskRow(2, 'Groups',
+        'The actual subsidiaries, regions, branches and teams. Rules and invoices follow these, and so does who can see what.',
+        nG, nG > 0, 'C1', nG ? 'Add more' : 'Create the first', !!nL && !nG) +
+      taskRow(3, 'Labels',
+        'Cross-cutting facts such as shift or vehicle class. They filter and report. They never change a rule and never grant access.',
+        nT, nT > 0, 'D1', nT ? 'Add more' : 'Create a label', !!nG && !nT) +
+    '</div></div>' +
+    '<div class="m-note" style="max-width:760px;margin-top:var(--sp-4)"><span class="m-note__ico">◈</span><span>' +
+      '<strong>Layers and groups are not the same thing.</strong> A layer is the word (“Branch”). ' +
+      'A group is the thing (“Sandton”). Naming the layers first is what stops one branch calling itself a ' +
+      'Region while its sibling calls itself a Department.</span></div>' +
+    '<div style="max-width:760px;margin-top:var(--sp-4);padding-top:var(--sp-4);border-top:var(--hairline) solid var(--color-border)">' +
+      '<button class="a-link" type="button" data-act="go" data-to="A2">Everything is in one place, keep it simple</button>' +
+      '<p style="margin:var(--sp-1) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
+        'Skips all three. You can add layers and groups later without redoing anything.</p></div>';
+}
+
+/* ══ B · Layers ══════════════════════════════════════════════════════════ */
+const LAYER_SUGGEST = ['Subsidiary','Division','Region','Area','Department','Team','Branch','Site','Zone'];
+function renderLayers(){
+  ensureRoot();
+  const used = maxUsedDepth();
+  el('scLayers').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="layersH">What do you call your levels?</h1>' +
+      '<p class="t-screen__sub">Top to bottom. A small business often needs none of these. ' +
+        'A group might use four. You can change them later.</p></div>' +
+
+    '<div class="m-card" style="max-width:680px">' +
+      '<div class="m-card__body">' +
+        '<div class="m-chainrow"><span class="m-chainrow__n">Top</span>' +
+          '<span class="m-chainrow__v">' + esc(rootGroup().name) + '</span>' +
+          '<span class="a-kind">Company</span><span></span></div>' +
+        (S.layers.length ? S.layers.map((l, i) =>
+          '<div class="m-chainrow">' +
+            '<span class="m-chainrow__n">' + (i + 1) + '</span>' +
+            '<input class="a-input a-input--sm" value="' + esc(l) + '" data-act="layer-name" data-i="' + i +
+              '" aria-label="Layer ' + (i + 1) + ' name" list="layerSuggest">' +
+            '<span class="u-quiet" style="font-size:var(--text-micro)">' +
+              num(S.groups.filter(g => depthOf(g.id) === i + 1).length) + ' groups</span>' +
+            '<button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="layer-del" data-i="' + i + '"' +
+              (i + 1 <= used ? ' disabled title="Groups already sit at this layer"' : '') + '>Remove</button>' +
+          '</div>').join('')
+          : '<div class="m-empty" style="padding:var(--sp-5) 0"><p class="m-empty__title">No layers yet</p>' +
+            '<p class="m-empty__body">Add one for each level your business actually has. Most have one or two.</p></div>') +
+        '<datalist id="layerSuggest">' + LAYER_SUGGEST.map(s => '<option value="' + s + '">').join('') + '</datalist>' +
+        '<div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">' +
+          '<button class="a-btn a-btn--sm a-btn--secondary" type="button" data-act="layer-add">Add a layer</button>' +
+          (S.layers.length < 3 ? '<span class="u-quiet" style="font-size:var(--text-micro)">Suggestions: ' +
+            LAYER_SUGGEST.slice(0, 5).map(s =>
+              '<button class="a-link a-link--quiet" type="button" data-act="layer-quick" data-n="' + s + '">' + s + '</button>')
+              .join(', ') + '</span>' : '') +
+        '</div>' +
+        (S.layers.length >= 4 ?
+          '<div class="m-note" data-tone="warning" style="margin-top:var(--sp-3)"><span class="m-note__ico">△</span>' +
+          '<span>Four layers is already deep. Anything below this is usually better as a label, because a label ' +
+          'survives a reorganisation and a branch does not.</span></div>' : '') +
+      '</div>' +
+      '<div class="m-card__foot">' +
+        '<span class="u-quiet" style="font-size:var(--text-micro)">' +
+          (S.layers.length ? esc([rootGroup().name].concat(S.layers).join('  ›  ')) : 'Nothing nested yet') + '</span>' +
+        '<span style="margin-left:auto"></span>' +
+        '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="A1">Back</button>' +
+        '<button class="a-btn a-btn--primary" type="button" data-act="go" data-to="C1">' +
+          (S.layers.length ? 'Next, create groups' : 'Skip, no levels needed') + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ══ C · Groups ══════════════════════════════════════════════════════════ */
+function renderGroups(){
+  ensureRoot();
+  const root = rootGroup();
+  const made = S.groups.filter(g => !g.system && g.parentId !== null);
+  const placed = S.account.vehicles.filter(v => v.homeId && byId(v.homeId) && !byId(v.homeId).system && byId(v.homeId).parentId !== null).length;
+  const total = S.account.vehicles.length;
+
+  el('scGroups').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="groupsH">Create your groups</h1>' +
+      '<p class="t-screen__sub">' +
+        (S.layers.length ? 'One for each ' + esc(S.layers.map(l => l.toLowerCase()).join(', then each ')) + ' you run.'
+                         : 'You have no layers, so these all sit directly under ' + esc(root.name) + '.') +
+      '</p></div>' +
+
+    '<div class="m-card" style="max-width:820px">' +
+      '<div class="m-card__head"><div>' +
+        '<h2 class="m-card__title">' + (made.length ? made.length + ' groups' : 'No groups yet') + '</h2>' +
+        '<p class="m-card__sub">' + num(placed) + ' of ' + num(total) + ' vehicles have a home</p></div>' +
+        '<div style="margin-left:auto;display:flex;gap:var(--sp-2)">' +
+          '<button class="a-btn a-btn--sm a-btn--secondary" type="button" data-act="paste-groups">Paste a list</button>' +
+          '<button class="a-btn a-btn--sm a-btn--primary" type="button" data-act="new-group">Add a group</button>' +
+        '</div></div>' +
+      '<div class="m-card__body" style="max-height:380px;overflow:auto;padding:var(--sp-2) var(--sp-3)">' +
+        (made.length ? S.groups.filter(g => g.parentId !== null).map(g =>
+          '<div class="m-prop" style="grid-template-columns:auto minmax(0,1fr) auto auto">' +
+            '<span class="a-kind">' + esc(kindOf(g)) + '</span>' +
+            '<span style="min-width:0"><strong style="font-size:var(--text-small)">' + esc(g.name) + '</strong>' +
+              '<span class="m-crumb" style="display:block">' + esc(pathString(g.id)) + '</span></span>' +
+            '<span class="m-prop__count">' + num(vehiclesIn(g.id, true).length) + ' vehicles</span>' +
+            '<span><button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="node-menu" data-id="' + g.id +
+              '" aria-label="Actions for ' + esc(g.name) + '">⋯</button></span>' +
+          '</div>').join('')
+          : '<div class="m-empty"><p class="m-empty__title">Nothing here yet</p>' +
+            '<p class="m-empty__body">Add your first ' +
+            esc((S.layers[0] || 'group').toLowerCase()) +
+            '. Paste a list if you already have them written down somewhere.</p>' +
+            '<div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2)">' +
+            '<button class="a-btn a-btn--primary a-btn--sm" type="button" data-act="new-group">Add a group</button>' +
+            '<button class="a-btn a-btn--secondary a-btn--sm" type="button" data-act="paste-groups">Paste a list</button>' +
+            '</div></div>') +
+      '</div>' +
+      '<div class="m-card__foot">' +
+        (total - placed ? '<span style="display:flex;align-items:center;gap:var(--sp-2);font-size:var(--text-caption);color:var(--color-warning)">' +
+          '<span class="a-dot" data-tone="warning"></span>' + num(total - placed) +
+          ' vehicles still have no home</span>' : '') +
+        '<span style="margin-left:auto"></span>' +
+        '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="B1">Back</button>' +
+        '<button class="a-btn a-btn--primary" type="button" data-act="go" data-to="D1">Next, labels</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function newGroupDialog(parentId){
+  const root = rootGroup();
+  const parents = S.groups.filter(g => !g.system && depthOf(g.id) < Math.max(1, S.layers.length));
+  const p = parentId || (S.selectedGroup && byId(S.selectedGroup) ? S.selectedGroup : root.id);
+  openDialog('Add a group',
+    '<label style="display:block;font-size:var(--text-caption);color:var(--color-text-secondary)">Name' +
+      '<input class="a-input" id="ngName" placeholder="Sandton" style="margin-top:var(--sp-1)"></label>' +
+    '<label style="display:block;margin-top:var(--sp-3);font-size:var(--text-caption);color:var(--color-text-secondary)">Sits inside' +
+      '<select class="a-select" id="ngParent" style="margin-top:var(--sp-1)">' +
+      parents.map(g => '<option value="' + g.id + '"' + (g.id === p ? ' selected' : '') + '>' +
+        esc(pathString(g.id)) + '</option>').join('') + '</select></label>' +
+    '<p style="margin:var(--sp-3) 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)" id="ngKind"></p>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+    '<button class="a-btn a-btn--primary" type="button" data-act="new-group-save">Add</button>');
+  setTimeout(() => {
+    const upd = () => {
+      const par = byId(el('ngParent').value);
+      const k = layerAt(depthOf(par.id) + 1);
+      el('ngKind').textContent = k ? 'This will be a ' + k.toLowerCase() + ', because of where it sits.'
+        : 'You have no layer for this depth. Add one first, or it will just be called a group.';
+    };
+    el('ngParent').addEventListener('change', upd); upd();
+    el('ngName').focus();
+  }, 40);
+}
+
+function pasteGroupsDialog(){
+  const parents = S.groups.filter(g => !g.system && depthOf(g.id) < Math.max(1, S.layers.length));
+  openDialog('Paste a list',
+    '<p style="margin:0 0 var(--sp-2);font-size:var(--text-caption);color:var(--color-text-secondary)">' +
+      'One per line. Anything already there is left alone, so pasting twice does not double anything up.</p>' +
+    '<textarea class="a-input" id="pasteBox" rows="7" style="min-height:auto;padding:var(--sp-2)" ' +
+      'placeholder="Sandton&#10;Bryanston&#10;Midrand"></textarea>' +
+    '<label style="display:block;margin-top:var(--sp-3);font-size:var(--text-caption);color:var(--color-text-secondary)">All of them sit inside' +
+      '<select class="a-select" id="pasteParent" style="margin-top:var(--sp-1)">' +
+      parents.map(g => '<option value="' + g.id + '">' + esc(pathString(g.id)) + '</option>').join('') +
+      '</select></label>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+    '<button class="a-btn a-btn--primary" type="button" data-act="paste-save">Create them</button>');
+  setTimeout(() => el('pasteBox').focus(), 40);
+}
+
+/* ══ D · Labels ══════════════════════════════════════════════════════════ */
+function renderTags(){
+  ensureRoot();
+  el('scTags').innerHTML =
+    '<div class="t-screen__lede">' +
+      '<h1 class="t-screen__h1" id="tagsH">Create your labels</h1>' +
+      '<p class="t-screen__sub">A label group is a question asked of every vehicle. A label is one of the answers.</p></div>' +
+
+    '<div class="m-card" style="max-width:760px">' +
+      '<div class="m-card__head"><div>' +
+        '<h2 class="m-card__title">' + (S.tagGroups.length ? S.tagGroups.length + ' label groups' : 'No labels yet') + '</h2>' +
+        '<p class="m-card__sub">Optional. Nothing depends on them.</p></div>' +
+        '<button class="a-btn a-btn--sm a-btn--primary" type="button" data-act="new-tag" style="margin-left:auto">Add a label group</button>' +
+      '</div>' +
+      '<div class="m-card__body">' +
+        (S.tagGroups.length ? S.tagGroups.map((tg, i) =>
+          '<div style="padding:var(--sp-2h) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
+            '<div style="display:flex;align-items:center;gap:var(--sp-2)">' +
+              '<strong style="font-size:var(--text-small)">' + esc(tg.label) + '</strong>' +
+              '<span class="a-chip" data-tone="neutral">' + (tg.exclusive ? 'One answer only' : 'Several allowed') + '</span>' +
+              '<button class="a-btn a-btn--xs a-btn--quiet" type="button" data-act="tag-del" data-i="' + i +
+                '" style="margin-left:auto">Remove</button>' +
+            '</div>' +
+            '<div style="margin-top:var(--sp-1h);display:flex;gap:var(--sp-1h);flex-wrap:wrap">' +
+              tg.values.map(v => '<span class="a-tag"><span class="a-tag__k">' + esc(tg.key) + '</span>' +
+                '<span class="a-tag__v">' + esc(v) + '</span></span>').join('') + '</div>' +
+          '</div>').join('')
+          : '<div class="m-empty"><p class="m-empty__title">Nothing here yet</p>' +
+            '<p class="m-empty__body">Try “Shift” with Day and Night, or “Class” with the kinds of vehicle you run.</p>' +
+            '<button class="a-btn a-btn--primary a-btn--sm" type="button" data-act="new-tag" style="margin-top:var(--sp-2)">Add a label group</button></div>') +
+      '</div>' +
+      '<div class="m-card__foot">' +
+        '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="C1">Back</button>' +
+        '<span style="margin-left:auto"></span>' +
+        '<button class="a-btn a-btn--primary" type="button" data-act="go" data-to="E1">Next, rules</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="m-note" data-tone="info" style="max-width:760px;margin-top:var(--sp-4)">' +
+      '<span class="m-note__ico">◈</span><span><strong>Labels never grant access and never carry a rule.</strong> ' +
+      'A label made for a shift report would otherwise quietly open one subsidiary to another. ' +
+      'Access follows the groups only.</span></div>';
+}
+
+function newTagDialog(){
+  openDialog('Add a label group',
+    '<label style="display:block;font-size:var(--text-caption);color:var(--color-text-secondary)">The question' +
+      '<input class="a-input" id="tgName" placeholder="Shift" style="margin-top:var(--sp-1)"></label>' +
+    '<label style="display:block;margin-top:var(--sp-3);font-size:var(--text-caption);color:var(--color-text-secondary)">The answers, one per line' +
+      '<textarea class="a-input" id="tgVals" rows="4" style="min-height:auto;padding:var(--sp-2);margin-top:var(--sp-1)" ' +
+      'placeholder="Day&#10;Night"></textarea></label>' +
+    '<label style="display:flex;gap:var(--sp-2);align-items:flex-start;margin-top:var(--sp-3)">' +
+      '<input class="a-check" type="checkbox" id="tgExcl" checked>' +
+      '<span><strong style="font-size:var(--text-small)">One answer only</strong>' +
+      '<span style="display:block;font-size:var(--text-micro);color:var(--color-text-secondary)">' +
+      'Stops a vehicle being both Day and Night, which is what makes the totals in a report add up.</span></span></label>',
+    '<button class="a-btn a-btn--quiet" type="button" data-act="close">Cancel</button>' +
+    '<button class="a-btn a-btn--primary" type="button" data-act="new-tag-save">Add</button>');
+  setTimeout(() => el('tgName').focus(), 40);
 }
 
 /* ── D · Structure workspace ───────────────────────────────────────────── */
@@ -1539,7 +1863,7 @@ function renderTree(){
           '<span class="o-tree__name">' + esc(g.name) + '</span>' +
           '<span class="o-tree__sub">' +
             (g.system ? '<span class="a-chip" data-tone="warning">Holding</span>' :
-                        '<span class="a-kind">' + esc(g.kind) + '</span>') +
+                        '<span class="a-kind">' + esc(kindOf(g)) + '</span>') +
             (S.attach[g.id] ? '<span class="a-chip" data-source="here" title="Rules set on this group">Rules</span>' : '') +
           '</span>' +
         '</span>' +
@@ -1577,7 +1901,7 @@ function renderFlat(){
       '<button class="o-tree__row" type="button" style="width:100%;text-align:left" data-act="select" data-id="' + g.id + '">' +
         '<span class="o-tree__main">' +
           '<span class="o-tree__name">' + esc(g.name) + '</span>' +
-          '<span class="o-tree__sub"><span class="a-kind">' + esc(g.kind) + '</span>' +
+          '<span class="o-tree__sub"><span class="a-kind">' + esc(kindOf(g)) + '</span>' +
             '<span class="u-truncate">' + esc(pathString(g.id)) + '</span></span>' +
         '</span>' +
         '<span class="o-tree__meta"><span class="a-count">' + num(vehiclesIn(g.id, true).length) + '</span></span>' +
@@ -1914,90 +2238,6 @@ function showSimulation(gid){
     '<button class="a-btn a-btn--primary" type="button" data-act="close">Close</button>');
 }
 
-/* ── C · Confirm the inferred structure ────────────────────────────────── */
-/* The empty state is a proposal, not an empty tree with a plus button. */
-function renderConfirm(){
-  const cols = structuralColumns();
-  const host = el('scConfirm');
-
-  if (!cols.length){
-    host.innerHTML =
-      '<div class="t-screen__lede"><h1 class="t-screen__h1" id="confirmH">Nothing in your import looked like a structure</h1>' +
-      '<p class="t-screen__sub">No column held a place, a division or a cost centre. Start from a template, or keep everything together and split it later.</p></div>' +
-      '<div class="m-card" style="max-width:640px"><div class="m-card__body">' +
-        '<div style="display:flex;gap:var(--sp-2);flex-wrap:wrap">' +
-        ['Single site','Depots','Subsidiaries and departments'].map(t =>
-          '<button class="a-btn a-btn--secondary" type="button" data-act="template" data-t="' + t + '">' + t + '</button>').join('') +
-        '</div></div>' +
-        '<div class="m-card__foot"><button class="a-btn a-btn--primary" type="button" data-act="go" data-to="B1">Keep it simple for now</button></div>' +
-      '</div>';
-    return;
-  }
-
-  if (!S.proposal) S.proposal = buildProposal([cols[0]]);
-  const p = S.proposal;
-  const kept = p.rows.filter(r => r.include);
-  const covered = kept.reduce((n, r) => n + r.count, 0);
-  const dupes = p.rows.filter(r => r.variants.length > 1);
-
-  host.innerHTML =
-    '<div class="t-screen__lede">' +
-      '<h1 class="t-screen__h1" id="confirmH">Your vehicles, grouped by ' + esc(p.cols[0].toLowerCase()) + '</h1>' +
-      '<p class="t-screen__sub">Read from your import. Change anything that is wrong, then confirm. ' +
-      'This is how card rules and invoices get split.</p>' +
-    '</div>' +
-
-    (dupes.length ?
-      '<div class="m-note" data-tone="info" style="max-width:860px;margin-bottom:var(--sp-3)">' +
-      '<span class="m-note__ico">◇</span><span><strong>' + dupes.length +
-      (dupes.length === 1 ? ' entry looks' : ' entries look') + ' like the same place spelled more than one way.</strong> ' +
-      'They have been combined. ' +
-      '<button class="a-link" type="button" data-act="show-dupes">See what was combined</button></span></div>' : '') +
-
-    '<div class="m-card" style="max-width:860px">' +
-      '<div class="m-card__head">' +
-        '<div><h2 class="m-card__title">' + kept.length + ' groups from “' + esc(p.cols[0]) + '”</h2>' +
-        '<p class="m-card__sub">' + num(covered) + ' of ' + num(S.account.vehicles.length) + ' vehicles placed</p></div>' +
-        '<div style="margin-left:auto;display:flex;gap:var(--sp-2);align-items:center">' +
-          '<label style="font-size:var(--text-caption);color:var(--color-text-secondary)">Use column' +
-          '<select class="a-select a-input--sm" id="colPick" style="width:auto;margin-left:var(--sp-1)">' +
-          cols.map(c => '<option' + (c === p.cols[0] ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
-          '</select></label>' +
-        '</div>' +
-      '</div>' +
-      '<div class="m-card__body" style="max-height:340px;overflow:auto">' +
-        p.rows.map((r, i) =>
-          '<div class="m-prop" data-state="' + (r.include ? 'idle' : 'excluded') + '">' +
-            '<input class="a-check" type="checkbox" ' + (r.include ? 'checked' : '') +
-              ' data-act="toggle-row" data-i="' + i + '" aria-label="Include ' + esc(r.name) + '">' +
-            '<span class="m-prop__from">' + esc(r.variants[0]) +
-              (r.variants.length > 1 ? ' <span class="a-chip" data-tone="neutral">+' + (r.variants.length - 1) + '</span>' : '') + '</span>' +
-            '<span class="m-prop__arrow">→</span>' +
-            '<input class="a-input a-input--sm" value="' + esc(r.name) + '" data-act="rename-row" data-i="' + i +
-              '" aria-label="Group name for ' + esc(r.variants[0]) + '">' +
-            '<span class="m-prop__count">' + num(r.count) + ' vehicles</span>' +
-          '</div>').join('') +
-      '</div>' +
-      '<div class="m-card__foot">' +
-        '<label style="font-size:var(--text-caption);display:flex;align-items:center;gap:var(--sp-2)">Split each of these by' +
-          '<select class="a-select a-input--sm" id="col2Pick" style="width:auto">' +
-            '<option value="">nothing</option>' +
-            cols.filter(c => c !== p.cols[0]).map(c =>
-              '<option value="' + esc(c) + '"' + (c === p.cols[1] ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
-          '</select></label>' +
-        '<span style="margin-left:auto"></span>' +
-        '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="B1">Keep everything together</button>' +
-        '<button class="a-btn a-btn--primary" type="button" data-act="commit">Create ' + kept.length + ' groups</button>' +
-      '</div>' +
-    '</div>' +
-
-    (p.blank ?
-      '<div class="m-note" data-tone="warning" style="max-width:860px;margin-top:var(--sp-3)">' +
-      '<span class="m-note__ico">△</span><span><strong>' + num(p.blank) + ' vehicles have no ' + esc(p.cols[0].toLowerCase()) + '.</strong> ' +
-      'They go to a holding group called Unassigned, stay out of every billing rollup, and show as a standing task. ' +
-      'They are never quietly dropped into the top group.</span></div>' : '');
-}
-
 /* ── F · The shared asset ──────────────────────────────────────────────── */
 function sharedPair(){
   const shared = S.account.vehicles.find(v => v.sharedWith.length && byId(v.sharedWith[0]));
@@ -2056,7 +2296,7 @@ function renderShared(){
           '<h3 class="o-panel__title" style="margin:0">Home group</h3>' +
           '<p style="margin:var(--sp-1) 0 0;font-weight:700">' + esc(pathString(v.homeId)) + '</p>' +
           '<p style="margin:2px 0 0;font-size:var(--text-micro);color:var(--color-text-tertiary)">' +
-            'Owns the asset, the licence disc and the card.</p>' +
+            'Owns the asset and the licence disc.</p>' +
         '</div>' +
         '<div style="padding:var(--sp-3) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
           '<h3 class="o-panel__title" style="margin:0">Shared with</h3>' +
@@ -2224,7 +2464,7 @@ function renderDone(){
         'Go live now and place these later. If the answer is a finance question, park it. ' +
         'Structure never holds up activation.</span></div>' : '') +
     '</div><div class="m-card__foot">' +
-      '<button class="a-btn a-btn--primary" type="button" data-act="activate">Activate cards</button>' +
+      '<button class="a-btn a-btn--primary" type="button" data-act="activate">Finish setup</button>' +
       (unplaced ? '<button class="a-btn a-btn--quiet" type="button" data-act="go" data-to="D1">Place the rest first</button>' : '') +
     '</div></div>';
 }
@@ -2232,7 +2472,8 @@ function renderDone(){
 /* ══════════════════════════════════════════════════════════════════════════
    STATE MAP + WIRING
    ══════════════════════════════════════════════════════════════════════════ */
-const SCREENS = ['scSimple','scConfirm','scWork','scShared','scDecline','scDone'];
+const SCREENS = ['scStart','scLayers','scGroups','scTags','scSimple',
+                 'scWork','scShared','scDecline','scDone'];
 function showScreen(id, step){
   SCREENS.forEach(s => el(s).dataset.state = s === id ? 'on' : 'off');
   el('portalStep').textContent = step || 'Setup';
@@ -2240,137 +2481,139 @@ function showScreen(id, step){
 }
 
 const STATES = [
-  { g:'A · Entry', id:'A1', t:'Small account, no structure column', run(){
-      setAccount('solo'); note('The import had no column holding a place or a division, and the account is small. No fork question is asked.');
+  /* Every account starts with nothing. The structure is created, not inferred. */
+  { g:'A · Start', id:'A1', t:'Nothing set up yet', run(){
+      fresh(); note('The real starting point. Three things to make, in the order they depend on each other.');
+      renderStart(); showScreen('scStart','Organise'); } },
+  { g:'A · Start', id:'A2', t:'Keep everything in one place', run(){
+      fresh(); ensureSimple(); note('The way out for a business with one yard. No layers, no groups, no labels, and it can still go live.');
       renderSimple(); showScreen('scSimple','Organise'); } },
-  { g:'A · Entry', id:'A2', t:'Structure column found', run(){
-      setAccount('mid'); note('A column called Branch held four spellings of three places. The screen proposes, it does not ask you to build.');
-      renderConfirm(); showScreen('scConfirm','Organise'); } },
-  { g:'A · Entry', id:'A3', t:'No usable column, larger account', run(){
-      setAccount('solo'); S.account.columns = ['Registration','Make','Model'];
-      note('Falls back to three templates and a way out. Never a blank tree with a plus button.');
-      renderConfirm(); showScreen('scConfirm','Organise'); } },
 
-  { g:'B · Simple', id:'B1', t:'Default, no structure words', run(){
-      setAccount('solo'); note('Count the concepts on screen: none. No group, no hierarchy, no level, no inheritance.');
-      renderSimple(); showScreen('scSimple','Organise'); } },
-  { g:'B · Simple', id:'B2', t:'Adjust one rule', run(){
-      setAccount('solo'); ensureSimple(); renderSimple(); showScreen('scSimple','Organise');
-      note('Rules start from a standard set. Nobody is ever handed a blank policy.');
-      setTimeout(() => editRule(rootGroup().id, 'maxValue'), 80); } },
-  { g:'B · Simple', id:'B3', t:'Grow into structure', run(){
-      setAccount('solo'); ensureSimple(); renderSimple(); showScreen('scSimple','Organise');
-      note('The promotion link adds children to the root that already exists. No migration, no re-import.');
-      document.getElementById('labelBox').open = true; } },
+  { g:'B · Layers', id:'B1', t:'No layers yet', run(){
+      fresh(); note('A layer is the word. A group is the thing. Asking for the words once is what stops one branch calling itself a Region while its sibling calls itself a Department.');
+      renderLayers(); showScreen('scLayers','Layers'); } },
+  { g:'B · Layers', id:'B2', t:'Layers named', run(){
+      fresh(); S.layers = ['Subsidiary','Region','Branch'];
+      note('Top to bottom. Every group created below picks up its own name from where it sits.');
+      renderLayers(); showScreen('scLayers','Layers'); } },
+  { g:'B · Layers', id:'B3', t:'Getting too deep', run(){
+      fresh(); S.layers = ['Subsidiary','Division','Region','Area','Branch'];
+      note('Past four the screen says so. A label survives a reorganisation. A branch does not.');
+      renderLayers(); showScreen('scLayers','Layers'); } },
 
-  { g:'C · Confirm', id:'C1', t:'The proposal', run(){
-      setAccount('mid'); note('One click covers 214 of 220 vehicles. Rename inline, untick to drop.');
-      renderConfirm(); showScreen('scConfirm','Organise'); } },
-  { g:'C · Confirm', id:'C2', t:'A different column', run(){
-      setAccount('group'); note('Pick the column that matches how the business actually works.');
-      renderConfirm(); showScreen('scConfirm','Organise'); } },
-  { g:'C · Confirm', id:'C3', t:'Split by a second column', run(){
-      setAccount('group'); S.proposal = buildProposal(['Subsidiary','Region']);
-      note('Two levels appear without the word level ever being used.');
-      renderConfirm(); showScreen('scConfirm','Organise'); } },
-  { g:'C · Confirm', id:'C4', t:'Near duplicates combined', run(){
-      setAccount('mid'); renderConfirm(); showScreen('scConfirm','Organise');
-      note('Cape Town, cape town and Cape Town Depot are one place, not three siblings nobody can tell apart.');
-      setTimeout(showDupes, 80); } },
-  { g:'C · Confirm', id:'C5', t:'Vehicles with nothing to go on', run(){
-      setAccount('mid'); renderConfirm(); showScreen('scConfirm','Organise');
-      note('Six vehicles have no branch at all, so they wait in a holding group, out of every billing rollup. ' +
-           'A vehicle that has a region but no branch is different: it sits at the region, rather than being forced into a made-up leaf.'); } },
+  { g:'C · Groups', id:'C1', t:'No groups yet', run(){
+      fresh(); S.layers = ['Subsidiary','Region','Branch'];
+      note('An empty state that says what to make and offers the two ways to make it.');
+      renderGroups(); showScreen('scGroups','Groups'); } },
+  { g:'C · Groups', id:'C2', t:'Adding one', run(){
+      fresh(); S.layers = ['Subsidiary','Region','Branch'];
+      renderGroups(); showScreen('scGroups','Groups');
+      note('No layer picker. Where it sits decides what it is called, so the two can never disagree.');
+      setTimeout(() => newGroupDialog(), 80); } },
+  { g:'C · Groups', id:'C3', t:'Paste a list', run(){
+      fresh(); S.layers = ['Subsidiary','Region','Branch'];
+      renderGroups(); showScreen('scGroups','Groups');
+      note('Nobody types forty branches one at a time. Pasting twice adds nothing twice.');
+      setTimeout(() => pasteGroupsDialog(), 80); } },
+  { g:'C · Groups', id:'C4', t:'Groups made, vehicles still homeless', run(){
+      fresh(); S.layers = ['Subsidiary','Region','Branch'];
+      const root = rootGroup();
+      ['Takealot Retail','Takealot Logistics'].forEach(n => S.groups.push({ id:uid('g'), name:n, parentId:root.id }));
+      note('Creating a group does not place a vehicle. The count says so plainly rather than implying the job is done.');
+      renderGroups(); showScreen('scGroups','Groups'); } },
 
-  { g:'D · Structure', id:'D1', t:'Tree, records, inspector', run(){
-      setAccount('group'); ensureStructure(); note('Reached by choice, not by default. Arrow keys work, type-ahead works, Tab still leaves.');
+  { g:'D · Labels', id:'D1', t:'No labels yet', run(){
+      fresh(); note('Optional, and nothing depends on them. Suggestions rather than a blank box.');
+      renderTags(); showScreen('scTags','Labels'); } },
+  { g:'D · Labels', id:'D2', t:'Adding a label group', run(){
+      fresh(); renderTags(); showScreen('scTags','Labels');
+      note('A question and its answers. One-answer-only is what makes the totals in a report add up.');
+      setTimeout(() => newTagDialog(), 80); } },
+  { g:'D · Labels', id:'D3', t:'Labels created', run(){
+      fresh();
+      S.tagGroups = [{ key:'shift', label:'Shift', values:['Day','Night'], exclusive:true },
+                     { key:'class', label:'Class', values:['LDV','Panel van','Minibus','Refrigerated van'], exclusive:true }];
+      note('Key and value, never a bare word, so a label can later carry a condition without redoing them all.');
+      renderTags(); showScreen('scTags','Labels'); } },
+
+  { g:'E · Structure', id:'E1', t:'Tree, records, inspector', run(){
+      sample(); note('Dummy data loaded. Arrow keys work, type-ahead works, Tab still leaves.');
       renderAll(); showScreen('scWork','Structure'); } },
-  { g:'D · Structure', id:'D2', t:'Move, with the blast radius', run(){
-      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+  { g:'E · Structure', id:'E2', t:'Move, with the blast radius', run(){
+      setAccount('group'); sample(); renderAll(); showScreen('scWork','Structure');
       note('No move commits before you see what changes for how many vehicles.');
       const a = S.groups.find(g => g.name === 'Sandton'), b = S.groups.find(g => g.name === 'Takealot Logistics');
       if (a && b) setTimeout(() => tryMove(a.id, b.id), 90); } },
-  { g:'D · Structure', id:'D3', t:'Undo', run(){
-      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
+  { g:'E · Structure', id:'E3', t:'Undo', run(){
+      setAccount('group'); sample(); renderAll(); showScreen('scWork','Structure');
       const g = S.groups.find(x => x.name === 'Bryanston');
-      if (g){ snapshot('Deleted ' + g.name); S.groups = S.groups.filter(x => x.id !== g.id && !descendants(g.id).includes(x));
-        S.account.vehicles.forEach(v => { if (v.homeId === g.id) v.homeId = systemUnassigned().id; });
+      if (g){ const doomed = new Set([g.id, ...descendants(g.id).map(x => x.id)]);
+        snapshot('Deleted ' + g.name);
+        S.account.vehicles.forEach(v => { if (doomed.has(v.homeId)) v.homeId = systemUnassigned().id; });
+        S.groups = S.groups.filter(x => !doomed.has(x.id));
         renderAll(); toast('Deleted Bryanston and everything under it', true); }
       note('Every structural change is reversible, by the toast or by Cmd Z.'); } },
-  { g:'D · Structure', id:'D4', t:'Depth nudge', run(){
-      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
-      note('Past four levels the screen offers a label instead. Labels survive a reorganisation, branches do not.');
-      /* Move a branch that still has children under a leaf, so the result
-         genuinely goes deeper than four. */
+  { g:'E · Structure', id:'E4', t:'Depth nudge', run(){
+      setAccount('group'); sample(); renderAll(); showScreen('scWork','Structure');
+      note('Past four levels the screen offers a label instead of another branch.');
       const src = S.groups.find(g => childrenOf(g.id).length && depthOf(g.id) === 2);
       const dst = S.groups.find(g => depthOf(g.id) === 3 && canMoveUnder(src.id, g.id));
       if (src && dst) setTimeout(() => tryMove(src.id, dst.id), 90); } },
-  { g:'D · Structure', id:'D5', t:'Search with the full path', run(){
-      setAccount('group'); ensureStructure(); treeFilter = 'sandton'; renderAll(); showScreen('scWork','Structure');
+  { g:'E · Structure', id:'E5', t:'Search with the full path', run(){
+      setAccount('group'); sample(); treeFilter = 'sandton'; renderAll(); showScreen('scWork','Structure');
       el('treeSearch').value = 'sandton';
       note('Three places are called Sandton. A bare name would be useless, so results carry their path.'); } },
-  { g:'D · Structure', id:'D6', t:'Nothing here yet', run(){
-      setAccount('mid'); ensureStructure();
-      const empty = { id:uid('g'), name:'Polokwane', kind:'Depot', parentId:rootGroup().id };
-      S.groups.push(empty); S.selectedGroup = empty.id;
-      renderAll(); showScreen('scWork','Structure');
-      note('An empty group says what to do next, not just that it is empty.'); } },
-  { g:'D · Structure', id:'D7', t:'Large account', run(){
-      setAccount('group'); ensureStructure(); renderAll(); showScreen('scWork','Structure');
-      note(num(S.account.vehicles.length) + ' vehicles. Rows render in pages, and the tree index is built once per change, not per row.'); } },
+  { g:'E · Structure', id:'E6', t:'A small company', run(){
+      setAccount('solo'); sample(); renderAll(); showScreen('scWork','Structure');
+      note('The same screen with five vehicles and two branches. Two rows, no ceremony.'); } },
 
-  { g:'E · Rules', id:'E1', t:'Effective rules, per rule', run(){
-      setAccount('group'); ensureStructure();
-      const g = S.groups.find(x => x.name === 'Sandton'); if (g) S.selectedGroup = g.id;
+  { g:'F · Rules', id:'F1', t:'Effective rules, per rule', run(){
+      setAccount('group'); sample(); const g = S.groups.find(x => x.name === 'Sandton'); if (g) S.selectedGroup = g.id;
       renderAll(); showScreen('scWork','Rules');
       note('Each rule is resolved on its own. Setting fuel type here does not silently delete the night ban set above.'); } },
-  { g:'E · Rules', id:'E2', t:'Override one rule', run(){
-      setAccount('group'); ensureStructure();
-      const g = S.groups.find(x => x.name === 'Sandton') || rootGroup(); S.selectedGroup = g.id;
+  { g:'F · Rules', id:'F2', t:'Override one rule', run(){
+      setAccount('group'); sample(); const g = S.groups.find(x => x.name === 'Sandton') || rootGroup(); S.selectedGroup = g.id;
       renderAll(); showScreen('scWork','Rules');
       note('An override changes one line. Everything else keeps coming from above.');
       setTimeout(() => editRule(g.id, 'maxValue'), 80); } },
-  { g:'E · Rules', id:'E3', t:'The three lock modes', run(){
-      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
-      renderAll(); showScreen('scWork','Rules');
+  { g:'F · Rules', id:'F3', t:'The three lock modes', run(){
+      setAccount('group'); sample(); S.selectedGroup = rootGroup().id; renderAll(); showScreen('scWork','Rules');
       note('Tighten only is the one that matters. A hard lock becomes a support queue within two months.');
       setTimeout(() => editRule(rootGroup().id, 'maxValue'), 80); } },
-  { g:'E · Rules', id:'E4', t:'A rule that governs less than it claims', run(){
-      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
+  { g:'F · Rules', id:'F4', t:'A rule that governs less than it claims', run(){
+      setAccount('group'); sample(); const g = S.groups.find(x => x.name === 'Sandton') || rootGroup(); S.selectedGroup = g.id;
       renderAll(); showScreen('scWork','Rules');
       note('The litre rule needs a tank capacity. Most imports do not have one, so the screen says how many it misses.'); } },
-  { g:'E · Rules', id:'E5', t:'Check against the last 30 days', run(){
-      setAccount('group'); ensureStructure(); S.selectedGroup = rootGroup().id;
-      renderAll(); showScreen('scWork','Rules');
+  { g:'F · Rules', id:'F5', t:'Check against the last 30 days', run(){
+      setAccount('group'); sample(); S.selectedGroup = rootGroup().id; renderAll(); showScreen('scWork','Rules');
       note('Nothing else makes a cascading rule set trustworthy before you switch it on.');
       setTimeout(() => showSimulation(S.selectedGroup), 80); } },
 
-  { g:'F · Shared', id:'F1', t:'Shared vehicle found', run(){
-      setAccount('group'); renderShared(); showScreen('scShared','Shared');
+  { g:'G · Shared', id:'G1', t:'Shared vehicle found', run(){
+      setAccount('group'); sample(); renderShared(); showScreen('scShared','Shared');
       note('Home group, shared with, operating now. Three separate facts, never one field doing all three jobs.'); } },
-  { g:'F · Shared', id:'F2', t:'Sharing is visibility, not rules', run(){
-      setAccount('group'); renderShared(); showScreen('scShared','Shared');
+  { g:'G · Shared', id:'G2', t:'Sharing is visibility, not rules', run(){
+      setAccount('group'); sample(); renderShared(); showScreen('scShared','Shared');
       note('This one decision avoids the failure every incumbent ships: a driver and a vehicle in different groups, and the vehicle simply invisible.'); } },
-  { g:'F · Shared', id:'F3', t:'How the operating group was decided', run(){
-      setAccount('group'); renderShared(); showScreen('scShared','Shared');
-      note('The winner is highlighted, the losers are struck through, and the strictest of three is what applies.');
+  { g:'G · Shared', id:'G3', t:'How the operating group was decided', run(){
+      setAccount('group'); sample(); renderShared(); showScreen('scShared','Shared');
+      note('The winner is highlighted, the losers struck through, and the strictest of three is what applies.');
       setTimeout(showPrecedence, 90); } },
-  { g:'F · Shared', id:'F4', t:'On loan, with dates', run(){
-      setAccount('group'); seedShared();
-      const l = S.loans[0]; if (l) l.active = true;
+  { g:'G · Shared', id:'G4', t:'On loan, with dates', run(){
+      setAccount('group'); sample(); seedShared(); const l = S.loans[0]; if (l) l.active = true;
       renderShared(); showScreen('scShared','Shared');
       note('A dated hand-over, not a fake job. Rules and cost follow the borrower and hand back on their own.'); } },
 
-  { g:'G · Explain', id:'G1', t:'Why this was declined', run(){
-      setAccount('group'); renderDecline(); showScreen('scDecline','Explain');
+  { g:'H · Explain', id:'H1', t:'Why this was declined', run(){
+      setAccount('group'); sample(); renderDecline(); showScreen('scDecline','Explain');
       note('Rule by rule, pass and fail, with the group that set each one. This is what support is actually asked.'); } },
 
-  { g:'H · Done', id:'H1', t:'One completion rule', run(){
-      setAccount('group'); ensureStructure(); renderDone(); showScreen('scDone','Review');
+  { g:'I · Done', id:'I1', t:'One completion rule', run(){
+      sample(); renderDone(); showScreen('scDone','Review');
       note('Every vehicle has a home group. That is the whole definition of done.'); } },
-  { g:'H · Done', id:'H2', t:'Live with work outstanding', run(){
-      setAccount('solo'); ensureSimple(); renderDone(); showScreen('scDone','Review');
-      note('Nothing here blocks activation. A manager who has to email finance can park it and still go live today.'); } },
+  { g:'I · Done', id:'I2', t:'Live with work outstanding', run(){
+      setAccount('solo'); fresh(); ensureSimple(); renderDone(); showScreen('scDone','Review');
+      note('Nothing here blocks going live. A manager who has to email finance can park it and still finish today.'); } },
 ];
 
 let noteText = '';
@@ -2415,7 +2658,7 @@ function setAccount(id){
   S.account = buildAccount(id);
   S.groups = []; S.attach = {}; S.tags = {}; S.tagGroups = []; S.loans = [];
   S.expanded = new Set(); S.selectedRows = new Set(); S.selectedGroup = null;
-  S.proposal = null; S.undo = []; treeFilter = ''; treeFocusId = null; S.seq = 0;
+  S.proposal = null; S.undo = []; S.layers = []; treeFilter = ''; treeFocusId = null; S.seq = 0;
   el('portalAccount').textContent = SPECS[id].company + ' · ' +
     num(S.account.vehicles.length) + ' vehicles, ' + num(S.account.drivers.length) + ' drivers';
 }
@@ -2424,24 +2667,6 @@ function renderAll(){
   if (!S.groups.length) return;
   if (!byId(S.selectedGroup)) S.selectedGroup = rootGroup() && rootGroup().id;
   renderTree(); renderRecords(); renderInspector();
-}
-
-function showDupes(){
-  const p = S.proposal; if (!p) return;
-  const d = p.rows.filter(r => r.variants.length > 1);
-  openDialog('Combined as one place',
-    (d.length ? d.map(r =>
-      '<div style="padding:var(--sp-2h) 0;border-bottom:var(--hairline) solid var(--color-border-light)">' +
-      '<strong>' + esc(r.name) + '</strong> <span class="a-count">' + num(r.count) + '</span>' +
-      '<div style="margin-top:var(--sp-1);display:flex;gap:var(--sp-2);flex-wrap:wrap">' +
-      r.variants.map(v => '<code style="font-size:var(--text-micro);background:var(--color-surface-sunken);padding:2px 6px;border-radius:4px">' +
-        esc(JSON.stringify(v)) + '</code>').join('') + '</div></div>').join('')
-      : '<p>Nothing needed combining.</p>') +
-    '<p style="margin:var(--sp-3) 0 0;font-size:var(--text-caption);color:var(--color-text-secondary)">' +
-      'Left as they were, these would be separate groups that look identical in every dropdown, ' +
-      'and six weeks later the reports would not reconcile.</p>',
-    '<button class="a-btn a-btn--secondary" type="button" data-act="split-dupes">Keep them separate</button>' +
-    '<button class="a-btn a-btn--primary" type="button" data-act="close">Combine them</button>');
 }
 
 /* ── Events. One delegated listener. ───────────────────────────────────── */
@@ -2457,15 +2682,56 @@ document.addEventListener('click', e => {
   const a = b.dataset.act;
   const gid = S.selectedGroup;
 
+  /* ── Creation: layers, groups, labels ───────────────────────────────── */
+  if (a === 'layer-add'){ snapshot('Added a layer');
+    S.layers.push(LAYER_SUGGEST[Math.min(S.layers.length, LAYER_SUGGEST.length - 1)]);
+    renderLayers(); announce('Layer added'); return; }
+  if (a === 'layer-quick'){ snapshot('Added a layer');
+    S.layers.push(b.dataset.n); renderLayers(); announce(b.dataset.n + ' added'); return; }
+  if (a === 'layer-del'){
+    const i = +b.dataset.i;
+    if (i + 1 <= maxUsedDepth()){ toast('Groups already sit at this layer. Move or delete them first.'); return; }
+    snapshot('Removed a layer'); S.layers.splice(i, 1); renderLayers(); toast('Layer removed', true); return; }
+  if (a === 'new-group'){ newGroupDialog(); return; }
+  if (a === 'new-group-save'){
+    const name = el('ngName').value.trim();
+    if (!name){ toast('Give the group a name so it can be matched to your vehicles'); return; }
+    const parent = byId(el('ngParent').value);
+    if (childrenOf(parent.id).some(c => normKey(c.name) === normKey(name))){
+      toast('There is already a ' + name + ' inside ' + parent.name); return; }
+    snapshot('Added ' + name);
+    const g = { id:uid('g'), name, parentId:parent.id };
+    S.groups.push(g); S.expanded.add(parent.id); S.selectedGroup = g.id;
+    closeDialog(); renderGroups(); toast(name + ' added', true); return; }
+  if (a === 'paste-groups'){ pasteGroupsDialog(); return; }
+  if (a === 'paste-save'){
+    const parent = byId(el('pasteParent').value);
+    const lines = el('pasteBox').value.split('\n').map(s => s.trim()).filter(Boolean);
+    const existing = new Set(childrenOf(parent.id).map(c => normKey(c.name)));
+    const fresh = [];
+    lines.forEach(l => { const k = normKey(l); if (!existing.has(k)){ existing.add(k); fresh.push(l); } });
+    if (!fresh.length){ toast('Nothing new in that list'); return; }
+    snapshot('Created ' + fresh.length + ' groups');
+    fresh.forEach(n => S.groups.push({ id:uid('g'), name:titleise(n), parentId:parent.id }));
+    S.expanded.add(parent.id);
+    closeDialog(); renderGroups();
+    toast('Created ' + fresh.length + ' groups' + (lines.length > fresh.length ?
+      ', skipped ' + (lines.length - fresh.length) + ' already there' : ''), true); return; }
+  if (a === 'new-tag'){ newTagDialog(); return; }
+  if (a === 'new-tag-save'){
+    const label = el('tgName').value.trim();
+    const values = el('tgVals').value.split('\n').map(s => titleise(s)).filter(Boolean);
+    if (!label || !values.length){ toast('A label group needs a question and at least one answer'); return; }
+    snapshot('Added a label group');
+    S.tagGroups.push({ key: label.toLowerCase().replace(/\s+/g,'-'), label, values, exclusive: el('tgExcl').checked });
+    closeDialog(); renderTags(); toast(label + ' added', true); return; }
+  if (a === 'tag-del'){ snapshot('Removed a label group');
+    S.tagGroups.splice(+b.dataset.i, 1); renderTags(); toast('Label group removed', true); return; }
+
   if (a === 'close') closeDialog();
   else if (a === 'close-pop') el('pop').hidden = true;
   else if (a === 'go') go(b.dataset.to);
-  else if (a === 'commit'){ commitProposal(S.proposal); go('D1'); toast('Groups created', true); }
-  else if (a === 'toggle-row'){ S.proposal.rows[+b.dataset.i].include = b.checked; renderConfirm(); }
-  else if (a === 'show-dupes') showDupes();
-  else if (a === 'split-dupes'){ closeDialog(); toast('Kept separate. You can merge them later from the structure screen.'); }
-  else if (a === 'template'){ ensureSimple(); toast('Started from the ' + b.dataset.t.toLowerCase() + ' template'); go('D1'); }
-  else if (a === 'promote'){ S.proposal = null; go('C1'); }
+  else if (a === 'promote'){ go('B1'); }
   else if (a === 'simulate') showSimulation(gid || rootGroup().id);
   else if (a === 'edit-rule') editRule(gid || rootGroup().id, b.dataset.rule);
   else if (a === 'reset-rule'){
@@ -2500,7 +2766,7 @@ document.addEventListener('click', e => {
   else if (a === 'add-share') toast('Pick another group whose drivers may fuel this vehicle');
   else if (a === 'toggle-loan'){ const l = S.loans[0]; if (l){ snapshot('Loan');
     l.active = !l.active; renderShared(); toast(l.active ? 'On loan. The borrower’s rules apply from now.' : 'Loan ended', true); } }
-  else if (a === 'activate') toast('Cards activated. You can carry on organising whenever you like.');
+  else if (a === 'activate') toast('Setup finished. You can carry on organising whenever you like.');
   else if (a === 'ask-owner') toast('Sends the question to whoever set the rule, not to support');
   else if (a === 'tree-help') openDialog('Keyboard',
     '<dl class="m-kv"><dt>Arrows</dt><dd>Move, open and close</dd>' +
@@ -2513,10 +2779,9 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if (e.target.dataset.act === 'rename-row'){ S.proposal.rows[+e.target.dataset.i].name = e.target.value; }
   if (e.target.id === 'treeSearch'){ treeFilter = e.target.value.trim(); renderTree(); }
+  if (e.target.dataset.act === 'layer-name'){ S.layers[+e.target.dataset.i] = e.target.value; }
 });
 document.addEventListener('change', e => {
-  if (e.target.id === 'colPick'){ S.proposal = buildProposal([e.target.value, S.proposal.cols[1]].filter(Boolean)); renderConfirm(); }
-  if (e.target.id === 'col2Pick'){ S.proposal = buildProposal([S.proposal.cols[0], e.target.value].filter(Boolean)); renderConfirm(); }
 });
 document.addEventListener('keydown', e => { if (e.target.closest('#treeRoot')) onTreeKey(e); });
 
@@ -2607,11 +2872,11 @@ function toggleMode(btn){
 }
 
 /* ── Boot ──────────────────────────────────────────────────────────────── */
-setAccount('mid');
+setAccount('group');
 renderNav();
 /* Every state is deep-linkable, so a state can be shared or screenshotted
    without clicking through to it. */
-go(STATES.some(s => s.id === location.hash.slice(1)) ? location.hash.slice(1) : 'A2');
+go(STATES.some(s => s.id === location.hash.slice(1)) ? location.hash.slice(1) : 'A1');
 </script>
 </body>
 </html>
