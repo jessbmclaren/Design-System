@@ -81,6 +81,16 @@
   --color-on-dark-mid:    rgba(255,255,255,0.72);
   --color-on-dark-soft:   rgba(255,255,255,0.60);
   --color-on-dark-faint:  rgba(255,255,255,0.45);
+  /* The primary is too dark to read on the hero, so the dark screens get a
+     lifted version of it. The steps mirror --color-on-dark-* above: strong and
+     soft carry text, line draws an edge, fill sits behind an icon.
+     Soft is 0.90 rather than 0.80 because 0.80 composites to 4.40:1 on the
+     lightest stop of the hero, which is under AA for the small uppercase
+     labels this colour is for. */
+  --color-accent-on-dark:        #639EFF;
+  --color-accent-on-dark-soft:   rgba(99,158,255,0.90);
+  --color-accent-on-dark-line:   rgba(99,158,255,0.28);
+  --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
 
@@ -465,18 +475,19 @@ body {
    because it cannot be broken down without ceasing to mean anything. */
 .a-medal {
   position: relative; flex-shrink: 0;
-  width: 132px; height: 132px;
+  width: 156px; height: 156px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
   background: var(--color-on-dark-fill);
-  border: 1.5px solid var(--color-on-dark-faint);
+  border: 1.5px solid var(--color-accent-on-dark-line);
+  box-shadow: 0 0 44px var(--color-primary-30);
 }
-/* The ring reads as an achievement without a second colour. */
+/* Two rings, both in the accent: a solid edge and a dashed orbit outside it. */
 .a-medal::before {
   content: ""; position: absolute; inset: -10px;
   border-radius: var(--radius-circle);
-  border: 1.5px dashed var(--color-on-dark-faint);
+  border: 1.5px dashed var(--color-accent-on-dark-line);
 }
 .a-medal__value {
   font-size: var(--text-hero); font-weight: 800; line-height: 1;
@@ -501,6 +512,153 @@ body {
 }
 [data-motion="reduced"] .a-confetti { display: none; }
 
+/* The moment a point lands. One ring out of the graphic, which says that
+   something just happened without reaching for a second colour. */
+.a-medal__wave {
+  position: absolute; inset: -10px;
+  border-radius: var(--radius-circle);
+  border: 1.5px solid var(--color-accent-on-dark-line);
+  opacity: 0; pointer-events: none;
+}
+.a-medal__wave[data-state="out"] { animation: medalWave var(--dur-slow) var(--ease-out) both; }
+@keyframes medalWave {
+  from { transform: scale(0.86); opacity: 0.75; }
+  to   { transform: scale(1.42); opacity: 0; }
+}
+/* The bolt sits above the number rather than beside it, so the column reads
+   top to bottom as symbol, amount, unit. */
+.a-medal__bolt { font-size: var(--text-large); line-height: 1; margin-bottom: var(--sp-1); }
+
+/* a-meter. A track and a fill. It cannot be broken down further without
+   ceasing to say "this far along", so it is an atom. */
+.a-meter {
+  width: 100%; height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-on-dark-fill);
+  overflow: hidden;
+}
+.a-meter__fill {
+  height: 100%; width: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-accent-on-dark) 0%,
+              var(--color-tertiary) 100%);
+  box-shadow: 0 0 12px var(--color-primary-30);
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+/* m-earn-row. One line of the receipt: what was earned, and what it was
+   worth. An icon, a label and a value bonded into one job, so a molecule. */
+.m-earn-row {
+  width: 100%;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: left;
+}
+.m-earn-row__label {
+  flex: 1 1 auto; min-width: 0;
+  font-size: var(--text-caption); font-weight: 600;
+  color: var(--color-text-on-dark);
+}
+/* Never shrinks: the amount is the point of the row, so the label wraps
+   before the value does. */
+.m-earn-row__pill {
+  flex-shrink: 0;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-on-dark-fill);
+  border: 1px solid var(--color-on-dark-faint);
+  font-size: var(--text-caption2); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--color-on-dark-soft);
+  transition: color var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+/* Landed, meaning its points are now in the total above. */
+.m-earn-row[data-state="landed"] .m-earn-row__pill {
+  color: var(--color-text-on-dark); border-color: var(--color-on-dark-line);
+}
+
+/* m-reward-goal. The meter, the thing it counts towards and how far off it
+   is. A bar with no target is decoration, and the target is the part that
+   brings a driver back. */
+.m-reward-goal {
+  width: 100%;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: left;
+}
+/* Wraps rather than crushes: at 320dp with large text the two labels need
+   more than one line between them. */
+.m-reward-goal__head {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+.m-reward-goal__title {
+  flex: 1 1 auto;
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-on-dark-soft);
+}
+.m-reward-goal__value {
+  font-size: var(--text-caption2); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--color-accent-on-dark);
+}
+/* The scale is the set of targets the meter is measured against, so it sits
+   directly under the track it belongs to. */
+.m-reward-goal__scale {
+  display: flex; justify-content: space-between;
+  font-size: var(--text-nano); font-variant-numeric: tabular-nums;
+  color: var(--color-on-dark-mid);
+}
+.m-reward-goal__next {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--color-on-dark-faint);
+  font-size: var(--text-caption2); font-weight: 600;
+  color: var(--color-on-dark-soft);
+}
+
+/* On the dark screen the light icon plate would be a white square, so the
+   wrap takes the same on-dark treatment as everything else here. */
+.a-icon-wrap--onDark {
+  background: var(--color-accent-on-dark-fill);
+  border-color: var(--color-accent-on-dark-line);
+}
+
+/* The colour behind the dark. Three soft fields drift under the content, so
+   the screen reads as depth rather than a flat navy panel. Decorative, so it
+   is hidden from assistive tech and takes no pointer events. */
+.o-onboard__orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: var(--z-base); }
+.o-onboard__orb { position: absolute; border-radius: var(--radius-circle); }
+.o-onboard__orb--a {
+  top: -90px; right: -70px; width: 340px; height: 340px;
+  background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
+  animation: orbDriftA 9s var(--ease-in-out) infinite;
+}
+.o-onboard__orb--b {
+  top: 34%; left: -80px; width: 260px; height: 260px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
+  animation: orbDriftB 11s var(--ease-in-out) 1.5s infinite;
+}
+.o-onboard__orb--c {
+  bottom: 8%; right: -50px; width: 220px; height: 220px;
+  background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
+  animation: orbDriftC 13s var(--ease-in-out) 3s infinite;
+}
+@keyframes orbDriftA { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-18px,22px) } }
+@keyframes orbDriftB { 0%,100% { transform: translate(0,0) } 50% { transform: translate(20px,-16px) } }
+@keyframes orbDriftC { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-14px,-20px) } }
+/* Everything the driver reads sits in front of the colour. */
+.o-onboard--reward > *:not(.o-onboard__orbs) { position: relative; z-index: var(--z-content); }
+
 /* o-onboard. A full screen of its own, because the sign-up sheet has finished
    its job and a sheet over a hero would say the flow is still in progress. */
 .o-onboard {
@@ -514,7 +672,16 @@ body {
 /* The device's own chrome stays on top of an app screen, the way it does on a
    phone. Without this the surface covered the clock and the battery. */
 .m-notch, .m-status-bar { z-index: var(--z-tool-top); }
-.o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: center; }
+.o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: stretch; }
+.o-onboard--reward .o-onboard__eyebrow,
+.o-onboard--reward .o-onboard__title { text-align: center; }
+.o-onboard--reward .o-onboard__eyebrow { color: var(--color-accent-on-dark-soft); }
+/* Tighter than the task screen: this one carries a ring, three rows and a
+   card, and at 390x844 the action was otherwise a scroll away. */
+.o-onboard--reward .o-onboard__title { margin-top: var(--sp-4); }
+.o-onboard--reward .o-onboard__spacer { flex-basis: var(--sp-5); min-height: var(--sp-5); }
+/* The blocks under the medal are a list, evenly spaced. */
+.o-onboard__earned { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
 .o-onboard--task   { background: var(--color-surface-page); }
 
 .o-onboard__eyebrow {
@@ -806,21 +973,70 @@ body {
       <!-- SCREEN ONE · the reward, acknowledged before anything is asked -->
       <section class="o-onboard o-onboard--reward" id="rewardScreen"
                aria-labelledby="rewardTitle" hidden>
-        <p class="o-onboard__eyebrow">Welcome reward</p>
+        <div class="o-onboard__orbs" aria-hidden="true">
+          <div class="o-onboard__orb o-onboard__orb--a"></div>
+          <div class="o-onboard__orb o-onboard__orb--b"></div>
+          <div class="o-onboard__orb o-onboard__orb--c"></div>
+        </div>
+        <p class="o-onboard__eyebrow">Sign-up complete</p>
         <div class="o-onboard__stage">
-          <div class="a-medal" id="rewardMedal" role="img" aria-label="10 starter points earned">
-            <span class="a-medal__value">10</span>
+          <div class="a-medal" id="rewardMedal" role="img"
+               aria-label="50 points earned for signing up">
+            <span class="a-medal__wave" id="rewardWave" aria-hidden="true"></span>
+            <span class="a-medal__bolt" aria-hidden="true">⚡</span>
+            <span class="a-medal__value" id="rewardValue">0</span>
             <span class="a-medal__unit">pts</span>
           </div>
           <canvas class="a-confetti" id="rewardConfetti" aria-hidden="true"></canvas>
         </div>
-        <h1 class="o-onboard__title" id="rewardTitle" tabindex="-1">Welcome to EngenXT</h1>
-        <p class="o-onboard__body">
-          You earned 10 starter points. Your points count towards airtime and data rewards.
-        </p>
+        <h1 class="o-onboard__title" id="rewardTitle" tabindex="-1">You&rsquo;re signed up</h1>
+
+        <!-- What the points were for. The medal is the total, these are the
+             three things that made it. -->
+        <div class="o-onboard__earned">
+        <div class="m-earn-row" id="earnRow1">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9"/></svg></span>
+          <span class="m-earn-row__label">Number verified</span>
+          <span class="m-earn-row__pill">+20 pts</span>
+        </div>
+        <div class="m-earn-row" id="earnRow2">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg></span>
+          <span class="m-earn-row__label">Account created</span>
+          <span class="m-earn-row__pill">+20 pts</span>
+        </div>
+        <div class="m-earn-row" id="earnRow3">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
+          <span class="m-earn-row__label">Ready to fuel</span>
+          <span class="m-earn-row__pill">+10 pts</span>
+        </div>
+
+          <!-- What the points are for. The medal is a score, this says what
+               the score buys and how far off it is. -->
+          <div class="m-reward-goal" id="rewardGoal">
+            <div class="m-reward-goal__head">
+              <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1A10 10 0 0 1 4.9 4.9"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg></span>
+              <span class="m-reward-goal__title">Data reward</span>
+              <span class="m-reward-goal__value" id="rewardGoalValue">0.05 GB of 5 GB</span>
+            </div>
+            <div class="a-meter" id="rewardMeter" role="progressbar"
+                 aria-valuemin="0" aria-valuemax="5000" aria-valuenow="50"
+                 aria-valuetext="50 of 5 000 points, 0.05 of 5 gigabytes"
+                 aria-label="Data earned so far">
+              <div class="a-meter__fill" id="rewardMeterFill"></div>
+            </div>
+            <div class="m-reward-goal__scale" aria-hidden="true">
+              <span>0</span><span>1 GB</span><span>2 GB</span>
+              <span>3 GB</span><span>4 GB</span><span>5 GB</span>
+            </div>
+            <p class="m-reward-goal__next" id="rewardNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark-soft)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+              <span>950 points to your first 1 GB</span>
+            </p>
+          </div>
+        </div>
+
         <div class="o-onboard__spacer"></div>
         <div class="o-onboard__actions">
-          <button class="a-btn a-btn--onDark" id="rewardCta" type="button">Continue</button>
+          <button class="a-btn a-btn--primary" id="rewardCta" type="button">Continue</button>
         </div>
       </section>
 
@@ -859,6 +1075,10 @@ body {
     root: root, frame: frame,
     reward: $('rewardScreen'), rewardTitle: $('rewardTitle'), rewardMedal: $('rewardMedal'),
     rewardConfetti: $('rewardConfetti'), rewardCta: $('rewardCta'),
+    rewardValue: $('rewardValue'), rewardWave: $('rewardWave'),
+    rewardGoalValue: $('rewardGoalValue'), rewardMeter: $('rewardMeter'),
+    rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'),
+    earnRows: [$('earnRow1'), $('earnRow2'), $('earnRow3')],
     vehicle: $('vehicleScreen'), vehicleTitle: $('vehicleTitle'), vehicleBody: $('vehicleBody'),
     vehicleNote: $('vehicleNote'), vehicleArt: $('vehicleArt'), vehicleBack: $('vehicleBack'),
     vehicleActions: $('vehicleActions'),
@@ -872,7 +1092,16 @@ body {
      ════════════════════════════════════════════════════════════════════ */
   var S = {
     userType: 'new-driver',      // new-driver | returning-driver
-    starterPoints: 10,
+    /* Signing up is worth 50, the same as it is in the full app, and the
+       three rows on screen are what makes it up. Change these and the total,
+       the meter, the goal line and the announcement all follow. */
+    earned: [
+      { row: 0, label: 'Number verified', pts: 20 },
+      { row: 1, label: 'Account created', pts: 20 },
+      { row: 2, label: 'Ready to fuel',   pts: 10 }
+    ],
+    ptsPerGb: 1000,
+    gbCap: 5,
     vehicleLinked: false,
     step: 'signup-reward',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
@@ -911,49 +1140,85 @@ body {
       return;
     }
     var canvas = el.rewardConfetti;
-    var box = el.rewardMedal.getBoundingClientRect();
-    if (!box.width) { return; }
-    /* Three times the graphic, but never wider than the screen it is on: a
+    var stage = canvas.parentNode;
+    var medal = el.rewardMedal.getBoundingClientRect();
+    var frame = stage.getBoundingClientRect();
+    if (!medal.width || !frame.width) { return; }
+
+    /* Square, three times the graphic, and never wider than the screen: a
        fixed multiple put half the burst outside a 320dp frame, so the smallest
        phone got the least celebration. */
     var room = el.frame.clientWidth - 8;
-    var span = Math.min(Math.round(box.width * 3), room);
+    var span = Math.min(Math.round(medal.width * 3), room);
     var w = canvas.width  = span;
     var h = canvas.height = span;
     canvas.style.width  = w + 'px';
     canvas.style.height = h + 'px';
-    canvas.style.left = Math.round((box.width  - w) / 2) + 'px';
-    canvas.style.top  = Math.round((box.height - h) / 2) + 'px';
+    /* Placed against the stage, which is what it is positioned inside, and
+       centred on the ring rather than on the stage: offsetting by the medal's
+       own width put the burst most of a phone to the left of the ring it was
+       meant to come out of. */
+    canvas.style.right = 'auto';
+    canvas.style.bottom = 'auto';
+    canvas.style.left = Math.round((medal.left - frame.left) + medal.width / 2 - w / 2) + 'px';
+    canvas.style.top  = Math.round((medal.top  - frame.top)  + medal.height / 2 - h / 2) + 'px';
     var ctx = canvas.getContext('2d');
     if (!ctx) { return; }
 
     var cs = getComputedStyle(root);
     var palette = ['--color-primary', '--color-secondary', '--color-warning',
-                   '--color-success', '--color-text-on-dark']
+                   '--color-success', '--color-text-on-dark',
+                   '--color-accent-on-dark', '--color-tertiary']
       .map(function (n) { return cs.getPropertyValue(n).trim(); });
 
+    /* Two rings rather than one. An even ring reads as a diagram, so the inner
+       ring is dense and slow and the outer one is sparse and fast, and both
+       are nudged off the spoke so no two pieces travel the same line. */
     var bits = [];
-    for (var i = 0; i < 26; i++) {
-      var a = (Math.PI * 2 * i) / 26 + (i % 3) * 0.12;
-      var speed = 2.6 + (i % 5) * 0.55;
-      bits.push({ x: w / 2, y: h / 2, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - 1.2,
-                  size: 3 + (i % 3), spin: (i % 7) * 0.14, colour: palette[i % palette.length] });
+    var RINGS = [{ n: 32, speed: 2.3, spread: 1.1, size: 3 },
+                 { n: 20, speed: 4.0, spread: 1.5, size: 4 }];
+    var seed = 0;
+    /* Deterministic, so the burst is the same every time it is reviewed and a
+       screenshot of it does not change under the reviewer. */
+    function wobble() {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
     }
-    var start = null, DURATION = 1200;
+    RINGS.forEach(function (ring) {
+      for (var i = 0; i < ring.n; i++) {
+        var a = (Math.PI * 2 * i) / ring.n + wobble() * 0.5;
+        var speed = ring.speed + wobble() * ring.spread;
+        bits.push({
+          x: w / 2, y: h / 2,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed - 3,     /* thrown upward, then gravity takes it */
+          size: ring.size + Math.round(wobble() * 3),
+          spin: wobble() * Math.PI, spinRate: 0.06 + wobble() * 0.16,
+          colour: palette[(i + ring.n) % palette.length]
+        });
+      }
+    });
+
+    var start = null, DURATION = 1500;
     function frameStep(t) {
       if (start === null) { start = t; }
       var elapsed = t - start;
       ctx.clearRect(0, 0, w, h);
       if (elapsed > DURATION) { canvas.width = 0; return; }
-      var fade = 1 - elapsed / DURATION;
+      /* Holds full strength for the first half, so the burst is seen before it
+         starts leaving. */
+      var p = elapsed / DURATION;
+      var fade = p < 0.5 ? 1 : 1 - (p - 0.5) / 0.5;
       bits.forEach(function (b) {
-        b.x += b.vx; b.y += b.vy; b.vy += 0.12; b.spin += 0.08;
+        b.x += b.vx; b.y += b.vy;
+        b.vx *= 0.965; b.vy = b.vy * 0.965 + 0.22;
+        b.spin += b.spinRate;
         ctx.save();
         ctx.globalAlpha = Math.max(0, fade);
         ctx.translate(b.x, b.y);
         ctx.rotate(b.spin);
         ctx.fillStyle = b.colour;
-        ctx.fillRect(-b.size / 2, -b.size / 2, b.size, b.size * 1.6);
+        ctx.fillRect(-b.size / 2, -b.size / 2, b.size, b.size * 1.7);
         ctx.restore();
       });
       requestAnimationFrame(frameStep);
@@ -969,16 +1234,101 @@ body {
     el.vehicle.hidden = true; el.vehicle.removeAttribute('data-state');
   }
 
+  /* Total points, and everything on the screen that is derived from it. */
+  function rewardTotal() {
+    return S.earned.reduce(function (n, e) { return n + e.pts; }, 0);
+  }
+  /* Grouped in threes with a space, which is how a number this size is written
+     here and keeps 1 000 from reading as 1.000. */
+  function groupPts(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  function paintGoal(points) {
+    var gb = points / S.ptsPerGb;
+    var capPts = S.ptsPerGb * S.gbCap;
+    var nextGb = Math.min(S.gbCap, Math.floor(gb) + 1);
+    var toNext = Math.max(0, nextGb * S.ptsPerGb - points);
+    el.rewardGoalValue.textContent =
+      Math.min(gb, S.gbCap).toFixed(2) + ' GB of ' + S.gbCap + ' GB';
+    el.rewardMeter.setAttribute('aria-valuenow', points);
+    el.rewardMeter.setAttribute('aria-valuetext',
+      groupPts(points) + ' of ' + groupPts(capPts) + ' points, ' +
+      gb.toFixed(2) + ' of ' + S.gbCap + ' gigabytes');
+    el.rewardNext.lastElementChild.textContent = gb >= S.gbCap
+      ? 'You have earned the full ' + S.gbCap + ' GB'
+      : groupPts(toNext) + ' points to ' + (nextGb === 1 ? 'your first 1 GB' : nextGb + ' GB');
+    return Math.min(100, points / capPts * 100);
+  }
+
+  /* Put the screen in its finished state with nothing moving. This is the
+     whole screen under reduced motion, and the frame every beat is heading
+     towards otherwise. */
+  function settleReward() {
+    var total = rewardTotal();
+    el.rewardValue.textContent = total;
+    el.earnRows.forEach(function (r) { if (r) { r.setAttribute('data-state', 'landed'); } });
+    var pct = paintGoal(total);
+    el.rewardMeterFill.style.width = pct + '%';
+    setMeterFloor(total);
+  }
+
+  /* The total is earned rather than printed: each row lands, its value goes
+     quiet-to-solid, and the number above steps up by that much. A driver sees
+     the score being built out of things that happened. */
+  /* At fifty points the fill is three pixels wide, which reads as an empty bar
+     and so as something broken rather than something early. It never drops
+     below a visible sliver once there is anything to show. Nothing is
+     overstated by it: the exact figure sits directly above the track. */
+  function setMeterFloor(points) {
+    el.rewardMeterFill.style.minWidth = points > 0 ? 'var(--sp-2)' : '0';
+  }
+
+  function playReward() {
+    el.rewardValue.textContent = '0';
+    el.earnRows.forEach(function (r) { if (r) { r.removeAttribute('data-state'); } });
+    el.rewardMeterFill.style.transition = 'none';
+    el.rewardMeterFill.style.width = '0%';
+    setMeterFloor(0);
+    paintGoal(0);
+
+    if (prefersReduced()) {
+      el.rewardMeterFill.style.transition = '';
+      settleReward();
+      return;
+    }
+
+    var running = 0;
+    S.earned.forEach(function (e, i) {
+      after(360 + i * 260, function () {
+        var row = el.earnRows[e.row];
+        if (row) { row.setAttribute('data-state', 'landed'); }
+        running += e.pts;
+        el.rewardValue.textContent = running;
+        el.rewardWave.removeAttribute('data-state');
+        /* Restart the ring: an attribute set twice in a row does not replay an
+           animation until the element has been reflowed without it. */
+        void el.rewardWave.offsetWidth;
+        el.rewardWave.setAttribute('data-state', 'out');
+      });
+    });
+    after(360 + S.earned.length * 260 + 180, function () {
+      el.rewardMeterFill.style.transition = '';
+      el.rewardMeterFill.style.width = paintGoal(rewardTotal()) + '%';
+      setMeterFloor(rewardTotal());
+    });
+  }
+
   function showReward() {
     clearTimers(); hideAll();
     S.step = 'signup-reward';
     el.statusBar.setAttribute('data-tone', 'onDark');
     el.reward.hidden = false;
     el.reward.setAttribute('data-state', 'visible');
-    announce('Welcome to EngenXT. You earned ' + S.starterPoints + ' starter points.');
+    announce('You are signed up. You earned ' + rewardTotal() + ' points.');
     after(60, function () { el.rewardTitle.focus({ preventScroll: true }); });
-    /* After focus, so the burst cannot interrupt the announcement. */
+    /* After focus, so neither the burst nor the counting interrupts the
+       announcement. */
     after(240, playConfetti);
+    playReward();
   }
 
   var VEHICLE = {
