@@ -56,6 +56,7 @@ export 'src/components/atoms/ds_link.dart';
 export 'src/components/atoms/ds_nav_link.dart';
 export 'src/components/atoms/ds_progress_bar.dart';
 export 'src/components/atoms/ds_radio.dart';
+export 'src/components/atoms/ds_scroll_fade.dart';
 export 'src/components/atoms/ds_segmented_control.dart';
 export 'src/components/atoms/ds_shake.dart';
 export 'src/components/atoms/ds_spinner.dart';
