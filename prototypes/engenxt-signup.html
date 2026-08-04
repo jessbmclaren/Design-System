@@ -765,9 +765,14 @@ button { background: none; border: none; color: inherit; }
   display: flex; gap: var(--sp-2);
   animation: stageIn var(--dur-sheet) var(--ease-out) both;
 }
-.o-signup-sheet__stage[data-state="active"][data-shake="true"] {
-  animation: shakeX var(--dur-slow) ease;
-}
+/* The shake lives on the control the driver can correct, never on the stage.
+   Two animations on one element share one `animation` shorthand, so when the
+   shake ended the shorthand fell back to stageIn and replayed the entrance:
+   the field, the helper, the card and the button faded out and floated back
+   up half a second after the error arrived. Different elements, no shared
+   property, no replay. It also points at the thing that is wrong instead of
+   moving the whole column, including the parts that are fine. */
+[data-shake="true"] { animation: shakeX var(--dur-slow) ease; }
 /* A card about the control above it is the next group along. 8 + 8 = 16. */
 .o-signup-sheet__stage > [id$="Alert"] { margin-top: var(--sp-2); }
 /* A decision, one step clear of a group boundary. 8 + 16 = 24. */
@@ -967,7 +972,7 @@ button { background: none; border: none; color: inherit; }
 @keyframes scrimIn   { from { opacity: 0 } to { opacity: 1 } }
 @keyframes scrimOut  { from { opacity: 1 } to { opacity: 0 } }
 @keyframes stageIn   { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
-@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-7px) } 75% { transform: translateX(7px) } }
+@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(calc(var(--sp-1) * -1)) } 75% { transform: translateX(var(--sp-1)) } }
 @keyframes pop       { from { opacity: 0; transform: scale(.5) } to { opacity: 1; transform: scale(1) } }
 @keyframes spin      { to { transform: rotate(360deg) } }
 
@@ -1811,6 +1816,9 @@ button { background: none; border: none; color: inherit; }
     verifying: false,
     sending: false,
     dismissArmed: false,
+    /* True only while the navigator is placing a state directly, so feedback
+       meant for a driver's own action does not fire for a reviewer's click. */
+    jumping: false,
     /* Consecutive failures per kind, so a state can earn an extra action
        rather than showing every possible one from the first attempt. */
     fails: {}
@@ -1854,7 +1862,12 @@ button { background: none; border: none; color: inherit; }
      ════════════════════════════════════════════════════════════════════ */
   function isOffline() { return el.root.getAttribute('data-net') === 'offline'; }
   function announce(msg) { el.announcer.textContent = ''; setTimeout(function () { el.announcer.textContent = msg; }, 60); }
+  /* The shake answers something the driver just did. Jumping straight to a
+     state from the navigator is not something they did, so the sheet stays
+     still: a reviewer stepping down the list was getting a flinch per click
+     for errors nobody had made. */
   function shake(node) {
+    if (S.jumping) { return; }
     node.removeAttribute('data-shake'); void node.offsetWidth; node.setAttribute('data-shake', 'true');
     setTimeout(function () { node.removeAttribute('data-shake'); }, 500);
   }
@@ -2219,7 +2232,7 @@ button { background: none; border: none; color: inherit; }
     }
     if (def.hideCta === true || def.cta === 'countdown') { releaseKeyboard(); }
     el.phoneInput.readOnly = false;
-    shake(el.stageNumber);
+    shake(el.phoneField);
   }
 
   function submitPhone() {
@@ -2231,14 +2244,14 @@ button { background: none; border: none; color: inherit; }
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter a valid mobile number.'
         : 'Enter 9 digits after +27.', 'error');
-      shake(el.stageNumber);
+      shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
       return;
     }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
       setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
-      shake(el.stageNumber);
+      shake(el.phoneField);
       return;
     }
 
@@ -2449,7 +2462,7 @@ button { background: none; border: none; color: inherit; }
     if (!otpFull()) {
       el.otpGroup.setAttribute('data-state', 'error');
       setHelper(el.otpHelper, 'Enter all 6 digits.', 'error');
-      shake(el.stageCode);
+      shake(el.otpGroup);
       return;
     }
     /* Checking says what is happening, next to the thing it is happening to.
@@ -2510,7 +2523,7 @@ button { background: none; border: none; color: inherit; }
       msg += '<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
     }
     setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
-    shake(el.stageCode);
+    shake(el.otpGroup);
     setCodeView('wrong');
     /* Cleared now, not on a timer. A delayed clear races the driver: they
        start retyping into cells the timeout is about to empty. */
@@ -2905,7 +2918,8 @@ button { background: none; border: none; color: inherit; }
     var def = STATES[id];
     if (!def) { return; }
     currentState = id;
-    def.run();
+    S.jumping = true;
+    try { def.run(); } finally { S.jumping = false; }
     setNav(id);
     if (location.hash.slice(1) !== id) { history.replaceState(null, '', '#' + id); }
     el.caption.textContent = id + ' · ' + def.label;
