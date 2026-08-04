@@ -76,6 +76,16 @@
   --color-on-dark-mid:    rgba(255,255,255,0.72);
   --color-on-dark-soft:   rgba(255,255,255,0.60);
   --color-on-dark-faint:  rgba(255,255,255,0.45);
+  /* The primary is too dark to read on the hero, so the dark screens get a
+     lifted version of it. The steps mirror --color-on-dark-* above: strong and
+     soft carry text, line draws an edge, fill sits behind an icon.
+     Soft is 0.90 rather than 0.80 because 0.80 composites to 4.40:1 on the
+     lightest stop of the hero, which is under AA for the small uppercase
+     labels this colour is for. */
+  --color-accent-on-dark:        #639EFF;
+  --color-accent-on-dark-soft:   rgba(99,158,255,0.90);
+  --color-accent-on-dark-line:   rgba(99,158,255,0.28);
+  --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
 
