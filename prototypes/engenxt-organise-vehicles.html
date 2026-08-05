@@ -31,22 +31,23 @@
   --brand-dark: #0D3A8A;
   --brand-tint: #EEF3FF;
   --red:        #E2231A;
+  --red-on-dark:#FF6B62;   /* the wordmark needs to lift off the dark sidebar */
 
   --ink:   #16181D;
-  --ink-2: #6B6F76;
-  --ink-3: #8A8F98;
-  --ink-4: #B4B8BF;
+  --ink-2: #5C6068;   /* 6.4:1 on white */
+  --ink-3: #6E737C;   /* 4.9:1 on white, and 4.6:1 on the sunken grey */
+  --ink-4: #8B9099;   /* 3.2:1, only ever used for control glyphs, never text */
 
   --bg:      #ffffff;
   --bg-side: #FAFBFC;
-  --bg-sunk: #F4F5F8;
+  --bg-sunk: #F7F8FA;
   --bg-hov:  #F7F8FA;
   --line:    #E6E8EB;
   --line-2:  #EFF1F3;
   --scrim:   rgba(22,24,29,0.40);
 
   --ok:   #1F8A4C; --ok-bg:   #EAF6EF;
-  --warn: #A6620A; --warn-bg: #FDF3E6;
+  --warn: #8A5108; --warn-bg: #FDF3E6;   /* 5.1:1 on its own tint */
   --bad:  #C0392B; --bad-bg:  #FCEDEB;
 
   --focus: #0D3A8A;
@@ -76,9 +77,10 @@
 }
 [data-theme="dark"] {
   --brand: #7B9CF5; --brand-dark: #A8C4F8; --brand-tint: #1A2438;
-  --ink: #EDEEF0; --ink-2: #9598A1; --ink-3: #7A7D87; --ink-4: #5C5F68;
+  --ink: #EDEEF0; --ink-2: #A8ABB4; --ink-3: #9498A1; --ink-4: #74787F;
   --bg: #101114; --bg-side: #0B0C0E; --bg-sunk: #1A1C20; --bg-hov: #1A1C20;
   --line: #26282D; --line-2: #1E2024; --scrim: rgba(0,0,0,.6);
+  --red: #FF6B62;
   --ok: #4CC38A; --ok-bg: #10281C; --warn: #E9A23B; --warn-bg: #2A1D0C; --bad: #E5484D; --bad-bg: #2A1315;
   --focus: #A8C4F8;
   --sh-pop: 0 0 0 1px rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.5);
@@ -106,7 +108,7 @@ button,input,select,textarea { font:inherit; color:inherit; letter-spacing:inher
          border:1px solid var(--line); border-radius:var(--r-sm); background:var(--bg);
          font-size:var(--t-sm); font-weight:500; cursor:pointer; white-space:nowrap;
          transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease); }
-.a-btn::after { content:''; position:absolute; inset:-6px -2px; }   /* 44px hit area */
+.a-btn::after { content:''; position:absolute; inset:-7px -2px; }   /* 32 + 12 = 44 */
 .a-btn:hover:not(:disabled) { background:var(--bg-hov); }
 .a-btn:disabled { opacity:.4; cursor:not-allowed; }
 .a-btn--go { background:var(--brand); border-color:var(--brand); color:#fff; font-weight:500; }
@@ -116,16 +118,21 @@ button,input,select,textarea { font:inherit; color:inherit; letter-spacing:inher
 .a-btn--bare:hover:not(:disabled) { background:var(--bg-hov); color:var(--ink); }
 .a-btn--risk { color:var(--bad); }
 .a-btn--risk:hover:not(:disabled) { background:var(--bad-bg); }
-.a-btn--sm { height:26px; padding:0 var(--s2); font-size:var(--t-xs); }
+.a-btn--sm { height:28px; padding:0 var(--s2); font-size:var(--t-xs); }
+.a-btn--sm::after { inset:-8px -2px; }   /* 28 + 16 = 44 */
 .a-btn--icon { width:28px; padding:0; color:var(--ink-3); border-color:transparent; background:transparent; }
 .a-btn--icon:hover { background:var(--bg-hov); color:var(--ink); }
 
-.a-in, .a-sel { width:100%; height:34px; padding:0 var(--s2h);
+.a-in, .a-sel { width:100%; height:44px; padding:0 var(--s2h);
                 border:1px solid var(--line); border-radius:var(--r-sm);
                 background:var(--bg); color:var(--ink); font-size:var(--t-body); }
 .a-in:focus, .a-sel:focus { border-color:var(--brand); outline:none; box-shadow:0 0 0 3px var(--brand-tint); }
 textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical; }
-.a-check { width:15px; height:15px; accent-color:var(--brand); cursor:pointer; flex:none; }
+.a-check { width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex:none; }
+/* The label is the target, not the 16px box inside it. */
+.o-tick { padding:0; }
+.o-tick label { display:flex; align-items:center; justify-content:center;
+                min-height:44px; padding:0 var(--s2); cursor:pointer; }
 
 .a-dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
 .a-chip { display:inline-flex; align-items:center; gap:var(--s1); height:20px; padding:0 var(--s1h);
@@ -156,8 +163,6 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
 .o-side__b::after { content:''; position:absolute; inset:-7px -2px; }
 .o-side__b:hover { background:var(--bg-hov); color:var(--ink); }
 .o-side__b[aria-current="true"] { background:var(--bg-sunk); color:var(--ink); font-weight:550; }
-.o-side__i { flex:none; width:16px; text-align:center; color:var(--ink-3); font-size:var(--t-xs); }
-.o-side__b[aria-current="true"] .o-side__i { color:var(--ink); }
 .o-side__sw { display:flex; flex-wrap:wrap; gap:var(--s1); padding:var(--s1) var(--s2) 0; }
 .o-side__chip { height:26px; padding:0 var(--s2); position:relative;
                 border:1px solid var(--line); border-radius:var(--r-pill); background:var(--bg);
@@ -185,8 +190,20 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
          padding:var(--s2) var(--s2); border-radius:var(--r-sm); }
 .m-row + .m-row { border-top:1px solid var(--line-2); }
 .m-row:hover { background:var(--bg-hov); }
+.m-row__i { flex:none; }
+.o-tw { flex:none; width:20px; height:20px; padding:0; border:0; background:none; cursor:pointer;
+        display:grid; place-items:center; color:var(--ink-3); font-size:9px; position:relative;
+        transition:transform var(--dur) var(--ease); }
+.o-tw::after { content:''; position:absolute; inset:-12px -6px; }
+.o-tw[data-state="open"] { transform:rotate(90deg); }
+.o-tw:hover { color:var(--ink); }
+span.o-tw { cursor:default; }
 .m-row__m { flex:1 1 auto; min-width:0; }
-.m-row__n { display:block; font-size:var(--t-body); font-weight:500; }
+/* A guide down the left of anything nested, so the shape of the structure
+   reads at a glance instead of having to be worked out from the "in X" line. */
+.m-row__m--sub { padding-left:var(--s3); border-left:1px solid var(--line); }
+.m-row[data-depth="1"] .m-row__n { font-weight:600; }
+.m-tg__i .a-btn--bare { color:var(--ink-3); }
 .m-row__s { display:block; font-size:var(--t-xs); color:var(--ink-3); }
 .m-row__a { flex:none; display:flex; align-items:center; gap:var(--s1); }
 /* Actions fade in on hover but never disappear for keyboard or touch. */
@@ -209,7 +226,7 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
             padding:var(--s8) var(--s4); text-align:center;
             border:1px dashed var(--line); border-radius:var(--r-lg); }
 .m-empty__g { display:grid; place-items:center; width:40px; height:40px; margin-bottom:var(--s1);
-              border-radius:var(--r-md); background:var(--bg-sunk); color:var(--ink-3); font-size:var(--t-h); }
+              border-radius:var(--r-md); background:var(--bg-sunk); color:var(--ink-2); font-size:var(--t-h); }
 .m-empty h3 { margin:0; font-size:var(--t-h); font-weight:600; }
 .m-empty p  { margin:0 auto; max-width:42ch; font-size:var(--t-sm); color:var(--ink-2); }
 .m-empty__a { display:flex; gap:var(--s2); flex-wrap:wrap; justify-content:center; margin-top:var(--s3); }
@@ -245,6 +262,35 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
 .o-next__m strong { display:block; font-size:var(--t-body); font-weight:600; }
 .o-next__m span  { display:block; font-size:var(--t-xs); color:var(--ink-2); }
 .o-next__a { flex:none; font-size:var(--t-sm); font-weight:600; color:var(--brand); }
+.o-next[data-state="done"] { cursor:default; background:var(--ok-bg); border-color:transparent; }
+.o-next[data-state="done"]:hover { background:var(--ok-bg); border-color:transparent; }
+
+/* A row name is a way in to that group's vehicles, so it looks like one. */
+.m-row__n { display:block; padding:0; border:0; background:none; text-align:left;
+            font:inherit; font-size:var(--t-body); font-weight:500; color:inherit;
+            cursor:pointer; border-radius:var(--r-xs); }
+.m-row__n { position:relative; }
+.m-row__n::after { content:''; position:absolute; inset:-12px -4px; }
+.m-row__n:hover { color:var(--brand); text-decoration:underline; text-underline-offset:2px; }
+
+.o-plus { gap:var(--s1); font-weight:500; color:var(--ink-2); }
+.o-plus__t { font-size:var(--t-xs); }
+.m-row:hover .o-plus, .o-plus:focus-visible { color:var(--brand); border-color:var(--brand); }
+/* Below a comfortable width the label folds away and the + carries it,
+   but its accessible name never changes. */
+@media (max-width:1100px){ .o-plus__t { display:none; } }
+.o-aside { margin:var(--s2) 0 0; font-size:var(--t-xs); color:var(--ink-3); }
+.o-shape { display:inline-block; margin:var(--s2) 0 var(--s1); padding:var(--s2h) var(--s4);
+           border-radius:var(--r-sm); background:var(--bg-sunk); color:var(--ink-2);
+           font-family:var(--mono); font-size:var(--t-xs); line-height:1.7; text-align:left; }
+.o-shape span span { padding-left:var(--s3); }
+.o-shape > span { display:inline-block; padding-left:var(--s3); }
+
+.o-sort { padding:0; border:0; background:none; font:inherit; font-size:var(--t-xs);
+          font-weight:500; color:var(--ink-3); cursor:pointer; }
+.o-sort { position:relative; }
+.o-sort::after { content:''; position:absolute; inset:-13px -6px; }
+.o-sort:hover { color:var(--ink); }
 
 .o-filters { display:flex; gap:var(--s2); margin-bottom:var(--s3); flex-wrap:wrap; }
 .o-filters .a-in { flex:1 1 220px; min-width:0; }
@@ -252,6 +298,67 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
 
 .o-menu { display:flex; flex-direction:column; gap:var(--s1); }
 .o-menu .a-btn { justify-content:flex-start; height:36px; }
+
+/* ── people ────────────────────────────────────────────────────────────── */
+.o-role { flex:none; min-width:72px; font-size:var(--t-xs); font-weight:600; }
+.o-role[data-role="owner"]   { color:var(--brand); }
+.o-role[data-role="manager"] { color:var(--ink); }
+.o-role[data-role="viewer"]  { color:var(--ink-2); }
+.o-sees { flex:0 1 260px; min-width:0; font-size:var(--t-xs); color:var(--ink-2);
+          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:900px){ .o-sees { display:none; } }
+
+.o-radio { display:flex; gap:var(--s2); align-items:flex-start; padding:var(--s2) 0; cursor:pointer; }
+.o-radio input { margin-top:3px; accent-color:var(--brand); width:16px; height:16px; }
+.o-radio strong { display:block; font-size:var(--t-body); font-weight:600; }
+.o-radio span span { display:block; font-size:var(--t-xs); color:var(--ink-2); }
+
+.o-scopes { max-height:220px; overflow-y:auto; border:1px solid var(--line);
+            border-radius:var(--r-sm); padding:var(--s1) 0; }
+.o-scope { display:flex; align-items:center; gap:var(--s2); min-height:34px;
+           padding:0 var(--s3) 0 var(--s2); cursor:pointer; }
+label.o-scope:hover { background:var(--bg-hov); }
+.o-scope__n { flex:1 1 auto; min-width:0; font-size:var(--t-sm);
+              overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.o-scope__c { flex:none; font-size:var(--t-xs); color:var(--ink-3); font-variant-numeric:tabular-nums; }
+
+.o-next[data-state="warn"] { cursor:default; background:var(--warn-bg); border-color:transparent; }
+.o-next[data-state="warn"]:hover { background:var(--warn-bg); border-color:transparent; }
+.o-next[data-state="warn"] strong { color:var(--warn); }
+
+/* ── the sleeve ────────────────────────────────────────────────────────── */
+/* Slides in beside the list rather than covering it, so the selection stays
+   visible and can still be changed while the destination is chosen. No
+   scrim: the page behind stays live on purpose. */
+.o-sleeve { position:fixed; top:0; right:0; bottom:0; width:340px; z-index:30;
+            display:flex; flex-direction:column; background:var(--bg);
+            border-left:1px solid var(--line); box-shadow:-8px 0 24px rgba(22,24,29,.06);
+            animation:sleeveIn var(--dur) var(--ease); }
+[data-theme="dark"] .o-sleeve { box-shadow:-8px 0 24px rgba(0,0,0,.4); }
+@keyframes sleeveIn { from { transform:translateX(12px); opacity:0; } to { transform:none; opacity:1; } }
+body[data-sleeve="on"] .t-main { padding-right:340px; }
+.o-sleeve__h { display:flex; align-items:flex-start; gap:var(--s2); flex:none;
+               padding:var(--s4) var(--s4) var(--s3); border-bottom:1px solid var(--line-2); }
+.o-sleeve__h strong { display:block; font-size:var(--t-h); font-weight:600; }
+.o-sleeve__n { display:block; font-size:var(--t-xs); color:var(--ink-3); }
+.o-sleeve__h .a-btn { margin-left:auto; }
+.o-sleeve__f { flex:none; padding:var(--s3) var(--s4); }
+.o-sleeve__b { flex:1 1 auto; min-height:0; overflow-y:auto; padding:0 var(--s2) var(--s3); }
+.o-sleeve__i { display:flex; align-items:center; gap:var(--s2); width:100%; min-height:48px;
+               padding:var(--s2); border:0; border-radius:var(--r-sm); background:none;
+               text-align:left; cursor:pointer; }
+.o-sleeve__i:hover:not(:disabled) { background:var(--brand-tint); }
+.o-sleeve__i:disabled { opacity:.45; cursor:not-allowed; }
+.o-sleeve__m { flex:1 1 auto; min-width:0; }
+.o-sleeve__t { display:block; font-size:var(--t-body); font-weight:500; }
+.o-sleeve__p { display:block; font-size:var(--t-2xs); color:var(--ink-3);
+               overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.o-sleeve__foot { flex:none; padding:var(--s3) var(--s4); border-top:1px solid var(--line-2);
+                  background:var(--bg-sunk); font-size:var(--t-xs); color:var(--ink-2); }
+@media (max-width:900px){
+  .o-sleeve { width:100%; }
+  body[data-sleeve="on"] .t-main { padding-right:0; }
+}
 
 /* ── overlays ──────────────────────────────────────────────────────────── */
 .o-scrim { position:fixed; inset:0; background:var(--scrim); z-index:40; display:grid;
@@ -289,7 +396,7 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
     <div class="o-side__foot">
       <h2 class="o-side__h">Prototype</h2>
       <div class="o-side__sw" role="group" aria-label="Prototype controls">
-        <button class="o-side__chip" type="button" data-act="example">Fill in data</button>
+        <button class="o-side__chip" type="button" data-act="example">Load sample</button>
         <button class="o-side__chip" type="button" data-act="wipe">Clear</button>
         <button class="o-side__chip" type="button" data-mode="theme"  aria-pressed="false">Dark</button>
         <button class="o-side__chip" type="button" data-mode="motion" aria-pressed="false">Reduced motion</button>
@@ -298,6 +405,7 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
     </div>
   </nav>
   <main class="t-main" id="main"><div class="t-col" id="col"></div></main>
+  <div id="sleeve"></div>
 </div>
 
 <div class="o-scrim" id="scrim"><div class="o-mod" id="mod" role="dialog" aria-modal="true"
@@ -310,7 +418,12 @@ textarea.a-in { height:auto; padding:var(--s2); line-height:1.5; resize:vertical
 /* ══════════════════════════════════════════════════════════════════════════
    DATA · Takealot Group, already imported
    ══════════════════════════════════════════════════════════════════════════ */
-const MAX_DEPTH = 5;               /* Linear's sub-team cap, and ours */
+const MAX_DEPTH = 5;
+const ROLES = {
+  owner:   { t:'Owner',   d:'The whole account, including people and billing. Cannot be limited to a group.' },
+  manager: { t:'Manager', d:'Can see and change vehicles, groups and limits inside what they are given.' },
+  viewer:  { t:'Viewer',  d:'Can see inside what they are given. Changes nothing.' },
+};               /* Linear's sub-team cap, and ours */
 const CLASSES = { 'LDV':80, 'Panel van':70, 'Minibus':60, 'Refrigerated van':90 };
 const TAG_COLOURS = ['#5E6AD2','#0F9D58','#D97706','#C0392B','#0E7490','#7C3AED','#BE185D','#4B5563'];
 
@@ -338,13 +451,21 @@ const pick = a => a[Math.floor(rnd()*a.length)];
 /* Nothing is set up. The vehicles and drivers are in, and that is all. */
 const S = {
   groups: [], vehicles: [], drivers: 3986, tagGroups: [],
-  tags: {}, page: 'groups', filter: '', q: '', tagFilter: null,
+  tags: {}, page: 'groups', filter: '', q: '', gq: '', tagFilter: null,
+  sort: { k:'reg', d:1 }, open: new Set(), openInit: false, sleeve:false, sq:'',
+  people: [], pq: '',
   rows: new Set(), undo: [], seq: 0,
 };
 const uid = p => p + (++S.seq);
 
 /* The import has already happened, so the vehicles exist. None of them is
    in a group yet, because no groups exist yet. */
+const SEED_PEOPLE = [
+  ['Marlize Botha',   'marlize@example.co.za', 'owner',   null],
+  ['Rajesh Naidoo',   'rajesh@example.co.za',  'manager', ['Gauteng']],
+  ['Pieter van Wyk',  'pieter@example.co.za',  'manager', ['Takealot Logistics']],
+  ['Thandi Nkosi',    'thandi@example.co.za',  'viewer',  ['Cape Town','Durban']],
+];
 (function importVehicles(){
   let n = 0;
   const total = Object.values(HOLDS).reduce((a,b)=>a+b,0) + 118;
@@ -360,7 +481,7 @@ const uid = p => p + (++S.seq);
 /* Fills in the worked example, so the populated version is one click away. */
 function loadExample(){
   snap('Filled in the example');
-  S.groups = []; S.tagGroups = []; S.tags = {}; S.seq = 0;
+  S.groups = []; S.tagGroups = []; S.tags = {}; S.people = []; S.seq = 0;
   const by = {};
   SEED.forEach(([name, parent]) => {
     const g = { id:uid('g'), name, parentId: parent ? by[parent].id : null };
@@ -370,6 +491,10 @@ function loadExample(){
     { id:uid('tg'), name:'Shift', tags:[{id:uid('t'),name:'Day',c:1},{id:uid('t'),name:'Night',c:5}] },
     { id:uid('tg'), name:'Vehicle type', tags:Object.keys(CLASSES).map((n,i)=>({id:uid('t'),name:n,c:i})) },
   ];
+  SEED_PEOPLE.forEach(function(sp){
+    S.people.push({ id:uid('u'), name:sp[0], email:sp[1], role:sp[2],
+      scopes: sp[3] ? sp[3].map(function(n){ return (by[n]||{}).id; }).filter(Boolean) : null });
+  });
   const shift = S.tagGroups[0], type = S.tagGroups[1];
   let i = 0;
   Object.entries(HOLDS).forEach(([name, count]) => {
@@ -403,9 +528,48 @@ const inGroup = (id, deep) => {
   return S.vehicles.filter(v => set.has(v.groupId));
 };
 const unplaced = () => S.vehicles.filter(v => !v.groupId);
+
+/* What a person can reach. A scope covers the group and everything inside
+   it, which is the whole point and the thing exact-id matching gets wrong. */
+function scopeGroups(p){
+  if (!p || p.role === 'owner') return S.groups.slice();
+  const out = [], seen = new Set();
+  (p.scopes || []).forEach(function(id){
+    const g = byId(id); if (!g) return;
+    [g].concat(under(id)).forEach(function(x){ if(!seen.has(x.id)){ seen.add(x.id); out.push(x); } });
+  });
+  return out;
+}
+function scopeVehicles(p){
+  if (!p || p.role === 'owner') return S.vehicles.slice();
+  const ids = new Set(scopeGroups(p).map(function(g){ return g.id; }));
+  return S.vehicles.filter(function(v){ return ids.has(v.groupId); });
+}
+/* Only the groups a person was explicitly given, not everything beneath. */
+const scopeRoots = p => (p.scopes||[]).map(byId).filter(Boolean);
+const owners = () => S.people.filter(p => p.role === 'owner');
 /* Depth-first, so the list reads like the structure without being a tree. */
-function ordered(){
-  const o=[]; (function w(p){ kids(p).forEach(c=>{ o.push(c); w(c.id); }); })(null); return o;
+function ordered(){        /* every group, structure order, for pickers */
+  const o=[];
+  (function w(p){
+    kids(p).slice().sort((a,b)=>a.name.localeCompare(b.name,'en'))
+      .forEach(c=>{ o.push(c); w(c.id); });
+  })(null);
+  return o;
+}
+function visible(){        /* what the list shows, honouring collapse */
+  const o=[];
+  (function w(p){
+    kids(p).slice().sort((a,b)=>a.name.localeCompare(b.name,'en'))
+      .forEach(c=>{ o.push(c); if (S.open.has(c.id)) w(c.id); });
+  })(null);
+  return o;
+}
+/* First run, open the top level only, so a big structure arrives readable. */
+function seedOpen(){
+  if (S.openInit || !S.groups.length) return;
+  S.openInit = true;
+  kids(null).forEach(g => S.open.add(g.id));
 }
 
 const num = n => Number(n).toLocaleString('en-ZA');
@@ -446,16 +610,22 @@ function modal(title, body, foot){
 function shut(){ el('scrim').dataset.state='off'; if(lastFocus&&lastFocus.isConnected) lastFocus.focus(); }
 el('scrim').addEventListener('click', e=>{ if(e.target===el('scrim')) shut(); });
 document.addEventListener('keydown', e=>{
-  if (e.key==='Escape') shut();
+  if (e.key==='Escape'){ if (S.sleeve && el('scrim').dataset.state!=='on'){ S.sleeve=false; draw(); } else shut(); }
+  if (e.key==='Enter' && e.target.id==='gName'){
+    e.preventDefault();
+    const again = document.querySelector('[data-act="saveGroup"][data-again]');
+    (again || document.querySelector('[data-act="saveGroup"]')).click();
+  }
   if ((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)){
     e.preventDefault(); const l=undo(); if(l){ draw(); toast(l+' undone'); } else toast('Nothing to undo');
   }
 });
 
 const PAGES = [
-  { id:'groups',   i:'▦', t:'Groups' },
-  { id:'tags',     i:'◍', t:'Tags' },
-  { id:'vehicles', i:'▤', t:'Vehicles' },
+  { id:'groups',   t:'Groups' },
+  { id:'tags',     t:'Tags' },
+  { id:'vehicles', t:'Vehicles' },
+  { id:'people',   t:'People' },
 ];
 
 /* ══ groups ═════════════════════════════════════════════════════════════ */
@@ -464,58 +634,138 @@ const PAGES = [
    There is no tree to expand and nothing to drag. */
 function pageGroups(){
   const list = ordered();
-  const out = unplaced().length;
+  seedOpen();
+  const out = unplaced().length, done = S.vehicles.length - out;
+  const q = S.gq.trim().toLowerCase();
+  const shown = q ? list.filter(g => g.name.toLowerCase().indexOf(q) > -1
+                                  || pathStr(g.id).toLowerCase().indexOf(q) > -1)
+                  : visible();
+  const hidden = list.length - (q ? shown.length : shown.length);
   return '<div class="o-head"><h1>Groups</h1>'+
-      '<p>The parts of your business that bill, or report, or are managed separately.</p></div>'+
-    '<div class="o-bar"><h2>'+num(list.length)+' group'+(list.length===1?'':'s')+'</h2>'+
+      '<p>Vehicles in the same group share one invoice and one set of limits. '+
+      'A vehicle can be in <strong>one group only</strong>.</p></div>'+
+    /* Search appears when the list outgrows a glance, not before. */
+    (list.length > 8 ? '<div class="o-filters"><input class="a-in" type="search" id="gq" '+
+      'value="'+esc(S.gq)+'" placeholder="Search groups" aria-label="Search groups"></div>' : '')+
+    '<div class="o-bar"><h2>'+num(shown.length)+
+      (q ? ' of '+num(list.length) : '')+' group'+(shown.length===1?'':'s')+'</h2>'+
+      (list.some(g=>kids(g.id).length) ?
+        '<span class="o-bar__n">counts include sub-groups</span>' : '')+
       '<span style="margin-left:auto"></span>'+
+      (!q && list.length > 20 ?
+        '<button class="a-btn a-btn--sm" type="button" data-act="expandAll">'+
+        (S.open.size > kids(null).length ? 'Collapse all' : 'Expand all')+'</button>' : '')+
       '<button class="a-btn a-btn--go" type="button" data-act="newGroup">New group</button></div>'+
     /* The scent to the next task. Without this the trail goes cold the
        moment the groups exist, and nothing says what to do with them. */
     (list.length && out ?
       '<button class="o-next" type="button" data-act="toUnplaced">'+
-        '<span class="o-next__m"><strong>'+num(out)+' vehicles are not in a group yet</strong>'+
-        '<span>Put them in one so billing and reporting can follow the structure.</span></span>'+
-        '<span class="o-next__a">Place them →</span></button>' : '')+
-    (list.length ? list.map(g => {
+        '<span class="o-next__m"><strong>'+num(out)+' vehicles still need a group</strong>'+
+        '<span>'+(done ? num(done)+' of '+num(S.vehicles.length)+' placed so far.'
+                       : 'Nothing is placed yet.')+
+        ' Billing and reporting follow whatever they sit in.</span></span>'+
+        '<span class="o-next__a">Place them →</span></button>'+
+      '<p class="o-aside">Nothing is broken if you leave them. Anything without a group is billed together.</p>'
+      : list.length ?
+      '<div class="o-next" data-state="done"><span class="o-next__m">'+
+        '<strong>Every vehicle is in a group</strong>'+
+        '<span>All '+num(S.vehicles.length)+' of them.</span></span>'+
+        '<span class="o-next__a" style="color:var(--ok)">✓</span></div>' : '')+
+    (shown.length ? shown.map(g => {
       const kid = kids(g.id).length, v = inGroup(g.id,true).length;
-      return '<div class="m-row">'+
-        '<span class="m-row__m" style="padding-left:'+((depth(g.id)-1)*16)+'px">'+
-          '<span class="m-row__n">'+esc(g.name)+'</span>'+
-          '<span class="m-row__s">'+
-            (g.parentId ? 'in '+esc(byId(g.parentId).name) : 'Top level')+
+      const d = depth(g.id);
+      /* Past the second level the parent's name alone stops being enough,
+         so the row carries the whole path from the top. */
+      const where = !g.parentId ? 'Top level'
+                  : d === 2      ? 'in '+esc(byId(g.parentId).name)
+                  : 'in '+esc(path(g.id).slice(0,-1).map(x=>x.name).join(' › '));
+      const open = S.open.has(g.id);
+      return '<div class="m-row" data-depth="'+d+'">'+
+        '<span class="m-row__i" style="width:'+((d-1)*22)+'px" aria-hidden="true"></span>'+
+        (kid && !q
+          ? '<button class="o-tw" type="button" data-act="tw" data-id="'+g.id+'" data-state="'+
+            (open?'open':'shut')+'" aria-expanded="'+open+'" aria-label="'+
+            (open?'Collapse ':'Expand ')+esc(g.name)+'">&#9656;</button>'
+          : '<span class="o-tw" aria-hidden="true"></span>')+
+        '<span class="m-row__m'+(d>1?' m-row__m--sub':'')+'">'+
+          '<button class="m-row__n" type="button" data-act="toGroup" data-id="'+g.id+
+            '" title="See the vehicles in '+esc(g.name)+'">'+esc(g.name)+'</button>'+
+          '<span class="m-row__s">'+where+
             (kid?' · '+kid+(kid===1?' group inside':' groups inside'):'')+'</span></span>'+
         '<span class="m-row__a">'+
-          '<span class="a-count" title="'+num(v)+' vehicles, including any inside this group">'+num(v)+'</span>'+
+          '<span class="a-count" title="'+num(v)+' vehicles, including any inside this group">'+
+            (v ? num(v) : '<span style="color:var(--ink-3)">—</span>')+'</span>'+
+          (d < MAX_DEPTH
+            ? '<button class="a-btn a-btn--sm o-plus" type="button" data-act="addInside" '+
+              'data-id="'+g.id+'" aria-label="Add a group inside '+esc(g.name)+'">'+
+              '+<span class="o-plus__t">Add inside</span></button>'
+            : '<span class="a-btn a-btn--sm" style="opacity:.3" '+
+              'title="Groups stop at '+MAX_DEPTH+' levels">+<span class="o-plus__t">Deepest level</span></span>')+
           '<button class="a-btn a-btn--sm a-btn--icon" type="button" data-act="rowMenu" data-id="'+g.id+
-            '" aria-label="Actions for '+esc(g.name)+'">⋯</button>'+
+            '" aria-label="Edit or delete '+esc(g.name)+'">⋯</button>'+
         '</span></div>';
     }).join('')
+      : q ? '<div class="m-empty"><h3>Nothing matches “'+esc(S.gq)+'”</h3>'+
+        '<p>Try part of a name, or clear the search.</p></div>'
       : '<div class="m-empty"><span class="m-empty__g" aria-hidden="true">▦</span>'+
         '<h3>No groups yet</h3>'+
-        '<p>Create one for each part of the business that needs its own rules, its own invoice or its own '+
-        'manager. Anything that only describes a vehicle is a tag, not a group.</p>'+
+        '<p>Make one for each part of the business that gets its own invoice or its own limits. '+
+        'Groups can sit inside each other, so a region can hold its branches.</p>'+
+        '<p style="margin-top:var(--s2)"><strong>You can skip this.</strong> Anything without a group '+
+        'is billed together, and you can come back whenever you like.</p>'+
+        '<span class="o-shape" aria-hidden="true">Takealot Retail<br>'+
+          '<span>&#9492; Gauteng</span><br><span><span>&#9492; Sandton</span></span></span>'+
         '<span class="m-empty__a">'+
           '<button class="a-btn a-btn--go" type="button" data-act="newGroup">New group</button>'+
-          '<button class="a-btn" type="button" data-act="example">Use the example</button>'+
-        '</span></div>')+
+          '<button class="a-btn" type="button" data-act="example">Load a sample structure</button>'+
+        '</span>'+
+        '<p class="o-aside" style="margin-top:var(--s3)">The sample uses a made-up group as an '+
+        'example, so you can see the shape before building your own.</p></div>')+
     '';
 }
-function formGroup(g){
+/* Shows the resulting path as you pick, so nesting is something you can see
+   happening rather than something you have to hold in your head. */
+function wireWhere(){
+  const sel = el('gParent'), name = el('gName'), out = el('gWhere');
+  if (!sel || !out) return;
+  const paint = () => {
+    const nm = (name && name.value.trim()) || 'this group';
+    out.innerHTML = sel.value
+      ? 'It will sit here: ' + esc(pathStr(sel.value)) + ' › <strong>' + esc(nm) + '</strong>'
+      : 'It will sit at the top, with nothing above it.';
+  };
+  sel.addEventListener('change', paint);
+  if (name) name.addEventListener('input', paint);
+  paint();
+}
+function openNew(into){
+  modal(into ? 'New group inside '+esc(byId(into).name) : 'New group',
+    formGroup(null, into),
+    '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
+    '<button class="a-btn" type="button" data-act="saveGroup" data-again="1">Create and add another</button>'+
+    '<button class="a-btn a-btn--go" type="button" data-act="saveGroup">Create group</button>');
+  wireWhere();
+  setTimeout(function(){ const f=el('gName'); if(f) f.focus(); },40);
+}
+function formGroup(g, into){
   const opts = S.groups.filter(x => !g || canParent(g.id, x.id));
-  const parent = g ? (g.parentId || '') : '';
+  const parent = g ? (g.parentId || '') : (into || '');
   return '<label class="m-field"><span class="m-field__l">Name</span>'+
       '<input class="a-in" id="gName" value="'+esc(g?g.name:'')+'" placeholder="Cape Town"></label>'+
     '<label class="m-field"><span class="m-field__l">Sits inside</span>'+
       '<select class="a-sel" id="gParent">'+
       '<option value=""'+(parent?'':' selected')+'>Nothing, it is top level</option>'+
-      opts.map(x=>'<option value="'+x.id+'"'+(x.id===parent?' selected':'')+'>'+esc(pathStr(x.id))+'</option>').join('')+
+      (S.groups.length > 20 ? groupedOptions(parent)
+        : opts.map(x=>'<option value="'+x.id+'"'+(x.id===parent?' selected':'')+'>'+esc(pathStr(x.id))+'</option>').join(''))+
       '</select>'+
-      (g ? '<span class="m-field__h">Anything already inside this group moves with it.</span>' : '')+
+      '<span class="m-field__h" id="gWhere"></span>'+
     '</label>'+
+    (g ? '<p class="m-field__h" style="margin:calc(var(--s4)*-1) 0 var(--s4)">Anything already inside '+
+         'this group moves with it.</p>' : '')+
     (g ? '' :
-      '<div class="m-note"><i>◈</i><span>Make a group if it bills, reports or is managed separately. '+
-      'If it only describes a vehicle, such as its shift or its size, make a <strong>tag</strong> instead.</span></div>');
+      '<div class="m-note"><i>◈</i><span>A vehicle can be in <strong>one group only</strong>. '+
+      'If a vehicle could belong to two of these at the same time, such as a shift or a size, '+
+      'make it a <strong>tag</strong> instead.</span></div>');
 }
 
 /* ══ tags ═══════════════════════════════════════════════════════════════ */
@@ -523,7 +773,8 @@ function formGroup(g){
    from a group can apply. That is Linear's label groups, unchanged. */
 function pageTags(){
   return '<div class="o-head"><h1>Tags</h1>'+
-      '<p>A question asked of every vehicle, and its possible answers.</p></div>'+
+      '<p>A tag describes a vehicle. Unlike a group, a vehicle can carry '+
+      '<strong>as many tags as you like</strong>.</p></div>'+
     '<div class="o-bar"><h2>'+S.tagGroups.length+' tag group'+(S.tagGroups.length===1?'':'s')+'</h2>'+
       '<span style="margin-left:auto"></span>'+
       '<button class="a-btn a-btn--go" type="button" data-act="newTagGroup">New tag group</button></div>'+
@@ -531,7 +782,7 @@ function pageTags(){
       const on = S.vehicles.filter(v => S.tags[v.id] && S.tags[v.id][tg.id]).length;
       return '<div class="m-tg"><div class="m-tg__h">'+
           '<span class="m-tg__n">'+esc(tg.name)+'</span>'+
-          '<span class="a-count" style="min-width:auto">'+num(on)+' of '+num(S.vehicles.length)+' answered</span>'+
+          '<span class="a-count" style="min-width:auto">'+num(on)+' of '+num(S.vehicles.length)+' vehicles</span>'+
           '<span style="margin-left:auto"></span>'+
           '<button class="a-btn a-btn--sm" type="button" data-act="newTag" data-tg="'+tg.id+'">Add tag</button>'+
           '<button class="a-btn a-btn--sm a-btn--icon" type="button" data-act="tgMenu" data-i="'+gi+
@@ -554,7 +805,7 @@ function pageTags(){
         'or “Vehicle type” with the kinds you run.</p>'+
         '<span class="m-empty__a">'+
           '<button class="a-btn a-btn--go" type="button" data-act="newTagGroup">New tag group</button>'+
-          '<button class="a-btn" type="button" data-act="example">Use the example</button>'+
+          '<button class="a-btn" type="button" data-act="example">Load a sample structure</button>'+
         '</span></div>')+
     '';
 }
@@ -571,12 +822,40 @@ function matching(){
   if (q) list = list.filter(v => v.reg.toLowerCase().indexOf(q) > -1);
   return list;
 }
+/* A native select with 203 long paths is unusable. Grouping the options by
+   their top-level parent, and showing the short name with its immediate
+   parent, keeps it readable without building a combobox. */
+function groupedOptions(sel){
+  /* Head the list at whichever level actually branches. A holding company
+     with one root would otherwise put all 203 under a single heading. */
+  let heads = kids(null);
+  while (heads.length === 1 && kids(heads[0].id).length) heads = kids(heads[0].id);
+  const covered = new Set();
+  const opt = g => '<option value="'+g.id+'"'+(sel===g.id?' selected':'')+'>'+
+      '\u00a0'.repeat(Math.max(0,(depth(g.id)-depth(heads[0].id)))*2)+
+      esc(g.parentId ? g.name+'  ·  '+byId(g.parentId).name : g.name)+'</option>';
+  const blocks = heads.slice().sort((a,b)=>a.name.localeCompare(b.name,'en')).map(h => {
+    const inside = [h].concat(under(h.id))
+      .sort((a,b)=>pathStr(a.id).localeCompare(pathStr(b.id),'en'));
+    inside.forEach(g=>covered.add(g.id));
+    return '<optgroup label="'+esc(h.name)+'">'+inside.map(opt).join('')+'</optgroup>';
+  }).join('');
+  const rest = S.groups.filter(g=>!covered.has(g.id));
+  return (rest.length ? '<optgroup label="Above all of these">'+rest.map(opt).join('')+'</optgroup>' : '')+blocks;
+}
 function tagName(id){
   for (const tg of S.tagGroups){ const t = tg.tags.find(x=>x.id===id); if (t) return tg.name+': '+t.name; }
   return '';
 }
+const SORTS = {
+  reg:   v => v.reg,
+  cls:   v => v.cls,
+  group: v => v.groupId ? pathStr(v.groupId) : '\uffff',   /* unplaced sort last */
+};
 function pageVehicles(){
-  const list = matching(), show = list.slice(0, 100);
+  const list = matching().slice().sort((a,b) =>
+    SORTS[S.sort.k](a).localeCompare(SORTS[S.sort.k](b),'en') * S.sort.d);
+  const show = list.slice(0, 100);
   const all  = list.length && list.every(v => S.rows.has(v.id));
   return '<div class="o-head"><h1>Vehicles</h1>'+
       '<p>Put them in a group. You can come back to whatever is left.</p></div>'+
@@ -586,7 +865,7 @@ function pageVehicles(){
       '<select class="a-sel" id="filter" aria-label="Filter by group">'+
         '<option value="">Every group</option>'+
         '<option value="none"'+(S.filter==='none'?' selected':'')+'>Not in a group</option>'+
-        ordered().map(g=>'<option value="'+g.id+'"'+(S.filter===g.id?' selected':'')+'>'+esc(pathStr(g.id))+'</option>').join('')+
+        groupedOptions(S.filter)+
       '</select>'+
       (S.tagFilter ? '<button class="a-btn a-btn--sm" type="button" data-act="clearTag">'+
         esc(tagName(S.tagFilter))+' ✕</button>' : '')+
@@ -600,12 +879,21 @@ function pageVehicles(){
     '</div>'+
     '<div class="o-scroll"><table class="o-tbl"><thead><tr>'+
       '<th style="width:26px"><span class="vh">Selected</span></th>'+
-      '<th>Registration</th><th>Type</th><th>Group</th></tr></thead><tbody>'+
+      [['reg','Registration'],['cls','Type'],['group','Group']].map(function(c){
+        const on = S.sort.k===c[0];
+        return '<th aria-sort="'+(on?(S.sort.d>0?'ascending':'descending'):'none')+'">'+
+          '<button class="o-sort" type="button" data-act="sort" data-k="'+c[0]+'">'+c[1]+
+          '<span aria-hidden="true">'+(on?(S.sort.d>0?' ↑':' ↓'):'')+'</span></button></th>';
+      }).join('')+
+      '</tr></thead><tbody>'+
       (show.length ? show.map(v =>
-        '<tr><td><input class="a-check" type="checkbox" data-act="row" data-id="'+v.id+'"'+
-          (S.rows.has(v.id)?' checked':'')+' aria-label="Select '+esc(v.reg)+'"></td>'+
+        '<tr><td class="o-tick"><label><input class="a-check" type="checkbox" data-act="row" data-id="'+v.id+'"'+
+          (S.rows.has(v.id)?' checked':'')+' aria-label="Select '+esc(v.reg)+'"></label></td>'+
         '<td style="font-family:var(--mono)">'+esc(v.reg)+'</td><td>'+esc(v.cls)+'</td>'+
-        '<td class="quiet">'+(v.groupId?esc(byId(v.groupId).name):'<span class="a-chip" data-tone="warn">None</span>')+'</td></tr>').join('')
+        '<td class="quiet">'+(v.groupId
+          ? esc(byId(v.groupId).name)+(byId(v.groupId).parentId
+              ? ' <span style="color:var(--ink-3)">· '+esc(byId(byId(v.groupId).parentId).name)+'</span>' : '')
+          : '<span class="a-chip" data-tone="warn">None</span>')+'</td></tr>').join('')
         : '<tr><td colspan="4"><div class="m-empty" style="border:0">'+
           '<h3>'+(S.q?'Nothing matches “'+esc(S.q)+'”':'Nothing here')+'</h3>'+
           '<p>'+(S.q?'Check the registration, or clear the search.':'Try a different filter.')+'</p></div></td></tr>')+
@@ -615,13 +903,142 @@ function pageVehicles(){
       '<button class="a-btn a-btn--sm a-btn--bare" type="button" data-act="clear" style="margin-left:auto">Clear</button></div>':'');
 }
 
+/* ══ people ═════════════════════════════════════════════════════════════ */
+/* The sentence that makes scope understandable is not "scoped to Gauteng",
+   it is "sees 700 vehicles". Every row says what the person can actually
+   reach, as a number, because that is the thing people get wrong. */
+function seesLine(p){
+  if (p.role === 'owner') return 'Everything · '+num(S.vehicles.length)+' vehicles';
+  const roots = scopeRoots(p), vs = scopeVehicles(p).length, gs = scopeGroups(p).length;
+  if (!roots.length) return 'Nothing yet';
+  return roots.map(function(g){ return esc(g.name); }).join(', ')+
+    ' · '+num(vs)+' vehicle'+(vs===1?'':'s')+
+    (gs > roots.length ? ' in '+num(gs)+' groups' : '');
+}
+function pagePeople(){
+  const q = S.pq.trim().toLowerCase();
+  const list = S.people.filter(function(p){
+    return !q || p.name.toLowerCase().indexOf(q)>-1 || p.email.toLowerCase().indexOf(q)>-1; });
+  const noScope = S.people.filter(function(p){ return p.role!=='owner' && !(p.scopes||[]).length; });
+  return '<div class="o-head"><h1>People</h1>'+
+      '<p>Who can see and change what. Access follows your groups: someone given Gauteng also sees '+
+      'everything inside it. <strong>Tags never give access.</strong></p></div>'+
+    (S.people.length > 8 ? '<div class="o-filters"><input class="a-in" type="search" id="pq" '+
+      'value="'+esc(S.pq)+'" placeholder="Search people" aria-label="Search people"></div>' : '')+
+    '<div class="o-bar"><h2>'+num(list.length)+' '+(list.length===1?'person':'people')+'</h2>'+
+      '<span style="margin-left:auto"></span>'+
+      '<button class="a-btn a-btn--go" type="button" data-act="newPerson">Invite person</button></div>'+
+    (noScope.length ?
+      '<div class="o-next" data-state="warn"><span class="o-next__m">'+
+        '<strong>'+num(noScope.length)+' '+(noScope.length===1?'person has':'people have')+
+        ' no groups yet</strong><span>They can sign in and see nothing until you give them one.</span>'+
+        '</span></div>' : '')+
+    (list.length ? list.map(function(p){
+      return '<div class="m-row">'+
+        '<span class="m-row__m">'+
+          '<span class="m-row__n" style="cursor:default">'+esc(p.name)+'</span>'+
+          '<span class="m-row__s">'+esc(p.email)+'</span></span>'+
+        '<span class="o-role" data-role="'+p.role+'">'+ROLES[p.role].t+'</span>'+
+        '<span class="o-sees">'+seesLine(p)+'</span>'+
+        '<span class="m-row__a">'+
+          '<button class="a-btn a-btn--sm" type="button" data-act="editPerson" data-id="'+p.id+'">Edit</button>'+
+          '<button class="a-btn a-btn--sm a-btn--icon" type="button" data-act="personMenu" data-id="'+p.id+
+            '" aria-label="More for '+esc(p.name)+'">&#8943;</button></span></div>';
+    }).join('')
+      : q ? '<div class="m-empty"><h3>Nobody matches &#8220;'+esc(S.pq)+'&#8221;</h3><p>Try part of a name.</p></div>'
+      : '<div class="m-empty"><span class="m-empty__g" aria-hidden="true">&#9679;</span>'+
+        '<h3>Only you so far</h3>'+
+        '<p>Invite the people who run each part of the business, and give them the groups they look after.</p>'+
+        '<span class="m-empty__a"><button class="a-btn a-btn--go" type="button" data-act="newPerson">'+
+        'Invite person</button></span></div>');
+}
+function formPerson(p){
+  const role = p ? p.role : 'manager';
+  const picked = new Set(p && p.scopes ? p.scopes : []);
+  return '<label class="m-field"><span class="m-field__l">Name</span>'+
+      '<input class="a-in" id="pName" value="'+esc(p?p.name:'')+'" placeholder="Rajesh Naidoo"></label>'+
+    '<label class="m-field"><span class="m-field__l">Email</span>'+
+      '<input class="a-in" id="pMail" type="email" value="'+esc(p?p.email:'')+'" '+
+      'placeholder="rajesh@example.co.za"></label>'+
+    '<div class="m-field"><span class="m-field__l">Role</span>'+
+      Object.keys(ROLES).map(function(k){
+        return '<label class="o-radio"><input type="radio" name="prole" value="'+k+'"'+
+          (role===k?' checked':'')+'>'+
+          '<span><strong>'+ROLES[k].t+'</strong><span>'+ROLES[k].d+'</span></span></label>';
+      }).join('')+'</div>'+
+    '<div class="m-field" id="pScopeWrap">'+
+      '<span class="m-field__l">Which groups can they see?</span>'+
+      '<div class="o-scopes">'+ordered().map(function(g){
+        return '<label class="o-scope" style="padding-left:'+(8+(depth(g.id)-1)*16)+'px">'+
+          '<input class="a-check" type="checkbox" data-scope="'+g.id+'"'+(picked.has(g.id)?' checked':'')+'>'+
+          '<span class="o-scope__n">'+esc(g.name)+'</span>'+
+          '<span class="o-scope__c">'+num(inGroup(g.id,true).length)+'</span></label>';
+      }).join('')+'</div>'+
+      '<span class="m-field__h" id="pSees"></span></div>';
+}
+/* The preview is the point. Nobody can picture what a scope grants, so it is
+   spelled out in vehicles and groups, live, before anything is saved. */
+function wireScopes(){
+  const wrap = el('pScopeWrap'), out = el('pSees');
+  if (!wrap || !out) return;
+  const paint = function(){
+    const role = (document.querySelector('[name="prole"]:checked')||{}).value || 'manager';
+    wrap.style.display = role === 'owner' ? 'none' : '';
+    if (role === 'owner'){ return; }
+    const ids = Array.prototype.filter.call(wrap.querySelectorAll('[data-scope]'), function(c){ return c.checked; })
+      .map(function(c){ return c.dataset.scope; });
+    const fake = { role:role, scopes:ids };
+    const vs = scopeVehicles(fake).length, gs = scopeGroups(fake).length;
+    out.innerHTML = ids.length
+      ? 'They will see <strong>'+num(vs)+' vehicles</strong> across '+num(gs)+' group'+(gs===1?'':'s')+
+        ', and nothing else.'
+      : 'Nothing selected. They will sign in and see nothing.';
+  };
+  wrap.addEventListener('change', paint);
+  Array.prototype.forEach.call(document.querySelectorAll('[name="prole"]'), function(r){
+    r.addEventListener('change', paint); });
+  paint();
+}
+
 /* ══ render ═════════════════════════════════════════════════════════════ */
-const BODY = { groups:pageGroups, tags:pageTags, vehicles:pageVehicles };
+const BODY = { groups:pageGroups, tags:pageTags, vehicles:pageVehicles, people:pagePeople };
+function sleeveHTML(){
+  if (!S.sleeve) return '';
+  const n = S.rows.size;
+  const q = (S.sq||'').trim().toLowerCase();
+  const list = ordered().filter(g => !q || g.name.toLowerCase().indexOf(q) > -1
+                                       || pathStr(g.id).toLowerCase().indexOf(q) > -1);
+  return '<aside class="o-sleeve" aria-label="Move vehicles into a group">'+
+    '<div class="o-sleeve__h">'+
+      '<div><strong>Move into a group</strong>'+
+      '<span class="o-sleeve__n">'+(n?num(n)+' selected':'nothing selected yet')+'</span></div>'+
+      '<button class="a-btn a-btn--sm a-btn--icon" type="button" data-act="sleeveShut" '+
+        'aria-label="Close">&#215;</button></div>'+
+    '<div class="o-sleeve__f"><input class="a-in" type="search" id="sq" value="'+esc(S.sq||'')+'" '+
+      'placeholder="Search groups" aria-label="Search groups"></div>'+
+    '<div class="o-sleeve__b">'+
+      (list.length ? list.map(g =>
+        '<button class="o-sleeve__i" type="button" data-act="assign" data-to="'+g.id+'"'+
+          (n?'':' disabled')+'>'+
+          '<span class="o-sleeve__m"><span class="o-sleeve__t">'+esc(g.name)+'</span>'+
+          '<span class="o-sleeve__p">'+esc(g.parentId?pathStr(g.parentId):'Top level')+'</span></span>'+
+          '<span class="a-count">'+num(inGroup(g.id,true).length)+'</span></button>').join('')
+        : '<div class="m-empty" style="border:0"><h3>Nothing matches</h3>'+
+          '<p>Try part of a name.</p></div>')+
+    '</div>'+
+    '<div class="o-sleeve__foot">'+(n
+      ? 'Pick a group to move '+num(n)+' vehicles. The panel stays open for the next batch.'
+      : 'Tick some vehicles on the left, then pick a group.')+'</div>'+
+  '</aside>';
+}
 function draw(){
   el('nav').innerHTML = PAGES.map(p =>
     '<li><button class="o-side__b" type="button" data-page="'+p.id+'" aria-current="'+(S.page===p.id)+'">'+
     esc(p.t)+'</button></li>').join('');
+  if (S.page !== 'vehicles') S.sleeve = false;
   el('col').innerHTML = BODY[S.page]();
+  el('sleeve').innerHTML = sleeveHTML();
+  document.body.dataset.sleeve = S.sleeve ? 'on' : 'off';
   const placedN = S.vehicles.filter(v=>v.groupId).length;
   el('dataNote').textContent = S.groups.length
     ? num(S.groups.length)+' groups, '+num(S.tagGroups.length)+' tag groups, '+num(placedN)+' vehicles placed.'
@@ -635,7 +1052,7 @@ function go(p){
 }
 
 /* ══ events ═════════════════════════════════════════════════════════════ */
-let editing = null;
+let editing = null, editingP = null;
 document.addEventListener('click', e => {
   const nav = e.target.closest('[data-page]'); if (nav){ go(nav.dataset.page); return; }
   const md = e.target.closest('[data-mode]');
@@ -648,6 +1065,73 @@ document.addEventListener('click', e => {
   const a = b.dataset.act;
 
   if (a==='shut') shut();
+  else if (a==='newPerson'){ editingP=null;
+    modal('Invite person', formPerson(null),
+      '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
+      '<button class="a-btn a-btn--go" type="button" data-act="savePerson">Send invite</button>');
+    wireScopes(); setTimeout(function(){ el('pName').focus(); },40); }
+  else if (a==='editPerson'){ editingP=b.dataset.id;
+    const p2=S.people.find(function(x){return x.id===editingP;});
+    modal('Edit '+esc(p2.name), formPerson(p2),
+      '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
+      '<button class="a-btn a-btn--go" type="button" data-act="savePerson">Save</button>');
+    wireScopes(); }
+  else if (a==='savePerson'){
+    const name=el('pName').value.trim(), mail=el('pMail').value.trim();
+    const role=document.querySelector('[name="prole"]:checked').value;
+    const scopes = role==='owner' ? null :
+      Array.prototype.filter.call(document.querySelectorAll('[data-scope]'), function(c){return c.checked;})
+        .map(function(c){return c.dataset.scope;});
+    if (!name || !mail){ toast('A person needs a name and an email'); return; }
+    if (role!=='owner' && !scopes.length){ toast('Give them at least one group, or they see nothing'); return; }
+    /* An account with no owner cannot be recovered, so the last one is held. */
+    if (editingP){
+      const p2=S.people.find(function(x){return x.id===editingP;});
+      if (p2.role==='owner' && role!=='owner' && owners().length===1){
+        toast('Somebody has to stay an owner. Make another person an owner first.'); return; }
+      snap('Changed '+p2.name);
+      p2.name=name; p2.email=mail; p2.role=role; p2.scopes=scopes;
+      shut(); draw(); toast('Saved', true);
+    } else {
+      snap('Invited '+name);
+      S.people.push({ id:uid('u'), name:name, email:mail, role:role, scopes:scopes });
+      shut(); draw(); toast('Invited '+name, true);
+    } }
+  else if (a==='personMenu'){ const p2=S.people.find(function(x){return x.id===b.dataset.id;});
+    modal(esc(p2.name),
+      '<p class="quiet" style="margin:0 0 var(--s3);font-size:var(--t-sm)">'+ROLES[p2.role].t+' &#183; '+seesLine(p2)+'</p>'+
+      '<div class="o-menu">'+
+        '<button class="a-btn a-btn--bare" type="button" data-act="seeAs" data-id="'+p2.id+'">'+
+        'Show exactly what they can see</button>'+
+        '<button class="a-btn a-btn--bare a-btn--risk" type="button" data-act="delPerson" data-id="'+p2.id+'">'+
+        'Remove from the account</button></div>',
+      '<button class="a-btn" type="button" data-act="shut">Close</button>'); }
+  else if (a==='seeAs'){ const p2=S.people.find(function(x){return x.id===b.dataset.id;});
+    const gs=scopeGroups(p2), vs=scopeVehicles(p2);
+    const hiddenG=S.groups.length-gs.length, hiddenV=S.vehicles.length-vs.length;
+    modal('What '+esc(p2.name)+' can see',
+      '<p style="margin:0 0 var(--s3);font-size:var(--t-sm)"><strong>'+num(vs.length)+' vehicles</strong> in '+
+        num(gs.length)+' group'+(gs.length===1?'':'s')+'.'+
+        (hiddenV? ' <span class="quiet">'+num(hiddenV)+' vehicles and '+num(hiddenG)+
+          ' groups stay hidden.</span>':'')+'</p>'+
+      '<div class="o-scopes">'+(gs.length ? gs.slice().sort(function(a,b){
+          return pathStr(a.id).localeCompare(pathStr(b.id),'en'); }).map(function(g){
+          const own=(p2.scopes||[]).indexOf(g.id)>-1;
+          return '<div class="o-scope" style="padding-left:'+(8+(depth(g.id)-1)*16)+'px">'+
+            '<span class="o-scope__n">'+esc(g.name)+(own?' <span class="a-chip">given</span>':'')+'</span>'+
+            '<span class="o-scope__c">'+num(inGroup(g.id,true).length)+'</span></div>';
+        }).join('') : '<div class="m-empty" style="border:0"><h3>Nothing</h3>'+
+          '<p>They have no groups, so they see an empty account.</p></div>')+'</div>'+
+      (p2.role!=='owner' ? '<div class="m-note" style="margin-top:var(--s3)"><i>&#9670;</i><span>'+
+        'Totals and reports are counted inside this list only, so one part of the business never '+
+        'learns another\u2019s numbers.</span></div>' : ''),
+      '<button class="a-btn a-btn--go" type="button" data-act="shut">Close</button>'); }
+  else if (a==='delPerson'){ const p2=S.people.find(function(x){return x.id===b.dataset.id;});
+    if (p2.role==='owner' && owners().length===1){
+      toast('Somebody has to stay an owner'); return; }
+    shut(); snap('Removed '+p2.name);
+    S.people = S.people.filter(function(x){ return x.id!==p2.id; });
+    draw(); toast('Removed '+p2.name, true); }
   else if (a==='rowMenu'){ const g=byId(b.dataset.id);
     modal(esc(g.name),
       '<p class="quiet" style="margin:0 0 var(--s3);font-size:var(--t-sm)">'+esc(pathStr(g.id))+'</p>'+
@@ -660,7 +1144,9 @@ document.addEventListener('click', e => {
     modal(esc(tg.name),
       '<div class="o-menu">'+
         '<button class="a-btn a-btn--bare a-btn--risk" type="button" data-act="delTagGroup" data-i="'+b.dataset.i+'">'+
-        'Delete this tag group and its '+tg.tags.length+' tags</button></div>',
+        'Delete this tag group and its '+tg.tags.length+' tags</button></div>'+
+      '<div class="m-note" style="margin-top:var(--s3)"><i>↩</i><span>You can undo this straight '+
+      'afterwards, from the message that appears.</span></div>',
       '<button class="a-btn" type="button" data-act="shut">Close</button>'); }
   else if (a==='tagMenu'){ const tg=S.tagGroups[+b.dataset.tg], t=tg.tags[+b.dataset.i];
     modal(esc(t.name),
@@ -671,21 +1157,28 @@ document.addEventListener('click', e => {
     toast('Filled in '+num(S.groups.length)+' groups and '+num(S.tagGroups.length)+' tag groups', true); }
   else if (a==='wipe'){
     if (!S.groups.length && !S.tagGroups.length){ toast('Already empty'); return; }
+    modal('Clear everything?',
+      '<p style="margin:0;font-size:var(--t-sm)">This removes all '+num(S.groups.length)+' groups and '+
+      num(S.tagGroups.length)+' tag groups. The '+num(S.vehicles.length)+' vehicles stay.</p>'+
+      '<div class="m-note" style="margin-top:var(--s3)"><i>\u21a9</i><span>You can undo this straight '+
+      'afterwards.</span></div>',
+      '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
+      '<button class="a-btn a-btn--go" style="background:var(--bad);border-color:var(--bad);color:#fff" '+
+      'type="button" data-act="wipeGo">Clear</button>'); }
+  else if (a==='wipeGo'){ shut();
     snap('Cleared everything');
     S.groups=[]; S.tagGroups=[]; S.tags={}; S.rows.clear(); S.filter='';
     S.vehicles.forEach(v=>v.groupId=null);
     draw(); toast('Cleared. The '+num(S.vehicles.length)+' vehicles are still here.', true); }
 
-  else if (a==='newGroup'){ editing=null;
-    modal('New group', formGroup(null),
-      '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
-      '<button class="a-btn a-btn--go" type="button" data-act="saveGroup">Create group</button>');
-    setTimeout(()=>el('gName').focus(),40); }
+  else if (a==='addInside'){ editing=null; openNew(b.dataset.id); }
+  else if (a==='newGroup'){ editing=null; openNew(null); }
   else if (a==='editGroup'){ editing=b.dataset.id;
     modal('Edit group', formGroup(byId(editing)),
       '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
       '<button class="a-btn a-btn--go" type="button" data-act="saveGroup">Save</button>');
-    setTimeout(()=>el('gName').select(),40); }
+    wireWhere();
+    setTimeout(function(){ el('gName').select(); },40); }
   else if (a==='saveGroup'){
     const name = el('gName').value.trim(), parent = el('gParent').value || null;
     if (!name){ toast('Give the group a name'); return; }
@@ -694,12 +1187,24 @@ document.addEventListener('click', e => {
     if (editing){ snap('Edited '+byId(editing).name);
       const g=byId(editing); g.name=name; g.parentId=parent; shut(); draw(); toast('Saved', true); }
     else { snap('Created '+name);
-      S.groups.push({ id:uid('g'), name, parentId:parent }); shut(); draw(); toast(name+' created', true); } }
+      const g = { id:uid('g'), name, parentId:parent };
+      S.groups.push(g);
+      if (parent) up(parent).forEach(a=>S.open.add(a.id));
+      const where = parent ? ' in '+byId(parent).name : ' at the top level';
+      if (b.dataset.again){
+        /* Stay open, same parent, cleared name, so a run of siblings is one
+           keystroke each rather than four clicks each. */
+        el('gName').value = ''; el('gName').focus(); draw(); toast(name+' created'+where);
+      } else { shut(); draw(); toast(name+' created'+where, true); } } }
   else if (a==='delGroup'){ const g=byId(b.dataset.id), n=under(g.id).length, v=inGroup(g.id,true).length;
     modal('Delete '+esc(g.name)+'?',
       '<p style="margin:0;font-size:var(--t-sm)">'+
       (n?'This also deletes <strong>'+n+'</strong> group'+(n===1?'':'s')+' inside it. ':'')+
-      (v?'<strong>'+num(v)+'</strong> vehicle'+(v===1?'':'s')+' will have no group.':'Nothing else is affected.')+
+      (v?'<strong>'+num(v)+'</strong> vehicle'+(v===1?'':'s')+' will have no group. ':'')+
+      (function(){ const hit=S.people.filter(function(u){ return u.scopes && u.scopes.some(function(id){
+          return id===g.id || under(g.id).some(function(x){return x.id===id;}); }); });
+        return hit.length ? '<strong>'+hit.length+'</strong> '+(hit.length===1?'person':'people')+
+          ' lose access: '+hit.map(function(u){return esc(u.name);}).join(', ')+'.' : ''; })()+
       '</p><div class="m-note" style="margin-top:var(--s3)"><i>↩</i><span>You can undo this straight '+
       'afterwards, from the message that appears.</span></div>',
       '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
@@ -757,24 +1262,49 @@ document.addEventListener('click', e => {
   else if (a==='toUnplaced'){ S.filter='none'; S.q=''; S.tagFilter=null; S.rows.clear(); go('vehicles'); }
   else if (a==='byTag'){ S.tagFilter=b.dataset.tag; S.filter=''; S.q=''; S.rows.clear(); go('vehicles'); }
   else if (a==='clearTag'){ S.tagFilter=null; draw(); }
+  else if (a==='tw'){ const id=b.dataset.id;
+    S.open.has(id) ? S.open.delete(id) : S.open.add(id); draw(); }
+  else if (a==='expandAll'){
+    if (S.open.size > kids(null).length){ S.open = new Set(kids(null).map(g=>g.id)); }
+    else { S.groups.forEach(g=>{ if(kids(g.id).length) S.open.add(g.id); }); }
+    draw(); }
+  else if (a==='sort'){ const k=b.dataset.k;
+    S.sort = S.sort.k===k ? { k, d:-S.sort.d } : { k, d:1 }; draw(); }
+  else if (a==='toGroup'){ S.filter=b.dataset.id; S.q=''; S.tagFilter=null; S.rows.clear(); go('vehicles'); }
   else if (a==='row'){ b.checked?S.rows.add(b.dataset.id):S.rows.delete(b.dataset.id); draw(); }
   else if (a==='clear'){ S.rows.clear(); draw(); }
-  else if (a==='move'){
-    modal('Move '+num(S.rows.size)+' vehicles',
-      '<label class="m-field"><span class="m-field__l">Group</span>'+
-      '<select class="a-sel" id="mv">'+ordered().map(g=>'<option value="'+g.id+'">'+esc(pathStr(g.id))+'</option>').join('')+
-      '</select></label>',
-      '<button class="a-btn" type="button" data-act="shut">Cancel</button>'+
-      '<button class="a-btn a-btn--go" type="button" data-act="moveGo">Move</button>'); }
-  else if (a==='moveGo'){ const to=el('mv').value, n=S.rows.size;
+  else if (a==='move'){ S.sleeve = true; S.sq = ''; draw();
+    setTimeout(function(){ const f=el('sq'); if(f) f.focus(); },60); }
+  else if (a==='sleeveShut'){ S.sleeve=false; draw(); }
+  else if (a==='assign'){ const to=b.dataset.to, n=S.rows.size;
+    if (!n){ toast('Nothing selected'); return; }
     snap('Moved '+n+' vehicles');
     S.vehicles.forEach(v=>{ if(S.rows.has(v.id)) v.groupId=to; });
-    S.rows.clear(); shut(); draw(); toast('Moved '+num(n)+' into '+byId(to).name, true); }
+    S.rows.clear();
+    /* The sleeve stays open, because the next batch is usually right behind
+       this one, and reopening a panel per batch is the whole friction. */
+    draw();
+    toast('Moved '+num(n)+' into '+byId(to).name, true); }
 });
 document.addEventListener('change', e => {
   if (e.target.id==='filter'){ S.filter=e.target.value; S.rows.clear(); draw(); }
 });
 document.addEventListener('input', e => {
+  if (e.target.id==='gq'){
+    S.gq = e.target.value;
+    const at = e.target.selectionStart; draw();
+    const f = el('gq'); if (f){ f.focus(); f.setSelectionRange(at, at); }
+  }
+  if (e.target.id==='pq'){
+    S.pq = e.target.value;
+    const at = e.target.selectionStart; draw();
+    const f = el('pq'); if (f){ f.focus(); f.setSelectionRange(at, at); }
+  }
+  if (e.target.id==='sq'){
+    S.sq = e.target.value;
+    const at = e.target.selectionStart; draw();
+    const f = el('sq'); if (f){ f.focus(); f.setSelectionRange(at, at); }
+  }
   if (e.target.id==='q'){
     S.q = e.target.value; S.rows.clear();
     const at = e.target.selectionStart; draw();
