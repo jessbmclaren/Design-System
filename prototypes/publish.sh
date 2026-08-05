@@ -54,6 +54,33 @@ git -C "$MIRROR" fetch --quiet origin
 git -C "$MIRROR" checkout --quiet main
 git -C "$MIRROR" reset --quiet --hard origin/main
 
+# ── The shared block must be identical in every prototype ────────────────
+# The prototypes deliberately each carry their own copy of the tokens and the
+# shared atoms. A <link> cannot be read back over file:// (cssRules throws a
+# SecurityError on an external sheet), which would silently break the design
+# specification panel and the self-check, and a shared file that is missing
+# leaves an unstyled page rather than a loud error. Duplication is the right
+# trade for something whose whole value is that double-clicking it works.
+#
+# What was never acceptable is drift nobody notices. So it is checked here,
+# where both files are in one place, and a mismatch stops the publish.
+token_block() {
+  awk '/^:root \{/,/^\}/' "$1" | sed 's/[[:space:]]\+/ /g'
+}
+FIRST=""
+for entry in "${PAGES[@]}"; do
+  file="${entry%%:*}"
+  sum=$(token_block "$SOURCE_REPO/prototypes/$file" | shasum | cut -d' ' -f1)
+  if [ -z "$FIRST" ]; then FIRST="$sum"; FIRST_FILE="$file"
+  elif [ "$sum" != "$FIRST" ]; then
+    printf '\n  STOPPED: the token block in %s no longer matches %s\n' "$file" "$FIRST_FILE" >&2
+    printf '  These are meant to be identical copies. Diff them and make them agree:\n' >&2
+    printf "    diff <(awk '/^:root {/,/^}/' prototypes/%s) <(awk '/^:root {/,/^}/' prototypes/%s)\n\n" "$FIRST_FILE" "$file" >&2
+    exit 1
+  fi
+done
+say "token block identical across ${#PAGES[@]} prototypes"
+
 # ── Is there anything to do? ─────────────────────────────────────────────
 SOURCE_DIRTY=""
 MIRROR_STALE=""
