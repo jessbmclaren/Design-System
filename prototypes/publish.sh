@@ -2,9 +2,12 @@
 #
 # Publish the EngenXT driver prototypes.
 #
-# The prototypes live in two places: this private repository, where they are
-# authored and where the review history is, and a public one, which exists
-# only because GitHub Pages will not serve a private repo on a free plan.
+# The prototypes live in two places: this repository, where they are authored
+# and where the review history is, and a public mirror, which is what Pages
+# actually serves. The mirror exists because GitHub Pages will not serve a
+# private repo on a free plan. This repository is public now, so that reason
+# has gone and the mirror could be retired, but until it is, the live site is
+# still served from it.
 # Those two copies drift the moment either changes, and the drift is silent:
 # the live site simply keeps showing yesterday's work.
 #
