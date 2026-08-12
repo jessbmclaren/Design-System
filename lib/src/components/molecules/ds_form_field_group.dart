@@ -59,6 +59,7 @@ class DsFormFieldGroup extends StatelessWidget {
     this.description,
     required this.children,
     this.spacing,
+    this.headerSpacing,
     this.columns = 2,
     this.minRowWidth = 360,
   }) : assert(columns == 1 || columns == 2, 'columns must be 1 or 2');
@@ -79,6 +80,14 @@ class DsFormFieldGroup extends StatelessWidget {
   /// resolves to twice [DsTokens.spacingUnit], 16 with the default tokens, so
   /// the group re-spaces with the active skin.
   final double? spacing;
+
+  /// The gap between the legend/description block and the first field.
+  ///
+  /// When null, resolves to one and a half [DsTokens.spacingUnit] — tighter
+  /// than [spacing] on purpose, so a legend sits closer to the fields it names
+  /// than those fields sit to each other and reads as belonging to them.
+  /// Pass a larger value where a form wants its headings to breathe.
+  final double? headerSpacing;
 
   /// The maximum number of columns to flow children into on medium and wider
   /// layouts. Either `1` (always stacked) or `2` (two-per-row when there is
@@ -139,7 +148,9 @@ class DsFormFieldGroup extends StatelessWidget {
               children: [
                 if (header.isNotEmpty) ...[
                   ...header,
-                  SizedBox(height: tokens.spacingUnit * 1.5),
+                  SizedBox(
+                    height: headerSpacing ?? tokens.spacingUnit * 1.5,
+                  ),
                 ],
                 fields,
               ],
