@@ -28,6 +28,7 @@ class DsFocusView extends StatelessWidget {
     this.footer,
     this.onClose,
     this.fill = false,
+    this.footerPadding,
   });
 
   /// The heading shown at the top of the panel.
@@ -48,6 +49,13 @@ class DsFocusView extends StatelessWidget {
   /// edge: the drawer presentation. When false (the default) it hugs its
   /// content and is centred as a dialog.
   final bool fill;
+
+  /// The footer's padding. Null keeps the panel's standard 20.
+  ///
+  /// A parameter rather than a new default: this is shared with every other
+  /// panel, and one form wanting a tighter footer is not a reason to move
+  /// everybody's.
+  final EdgeInsets? footerPadding;
 
   /// The maximum width of the panel in logical pixels, in dialog mode.
   static const double maxWidth = 560;
@@ -108,7 +116,7 @@ class DsFocusView extends StatelessWidget {
         if (footer != null) ...[
           Divider(height: 1, thickness: 1, color: borderColor),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: footerPadding ?? const EdgeInsets.all(20),
             child: Align(
               alignment: Alignment.centerRight,
               child: footer,
